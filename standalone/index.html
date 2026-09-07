@@ -5441,9 +5441,11 @@
 
   
     // ========================================================
-    // 🤖 KISAN MITRA MULTILINGUAL AI ENGINE (11 INDIAN LANGUAGES)
+    // 🤖 ROCKY AI MULTILINGUAL AI ENGINE (11 INDIAN LANGUAGES)
     // ========================================================
-    const KisanAiEngine = {
+    const KisanAiEngine = RockyAiEngine = {
+      name: 'Rocky',
+
       isVoiceOutputEnabled: true,
       isListening: false,
       speechRecognition: null,
@@ -5452,7 +5454,7 @@
       // Multilingual Greetings & System Knowledge
       knowledgeBase: {
         'en': {
-          welcome: "Namaste! I am Kisan Mitra AI. How can I assist you with Govt MSP rates, cold-chain storage, pest advisory, or direct buyer payouts?",
+          welcome: "Namaste! I am Rocky AI. How can I assist you with Govt MSP rates, cold-chain storage, pest advisory, or direct buyer payouts?",
           chips: [
             { label: "🌾 Check Govt MSP Rates", query: "What are the latest Govt MSP prices for vegetables?" },
             { label: "❄️ Cold Storage Guidelines", query: "What temperature is needed for cold storage of onions and tomatoes?" },
@@ -5462,7 +5464,7 @@
           ]
         },
         'ta': {
-          welcome: "வணக்கம்! நான் கிசான் மித்ரா AI. குறைந்தபட்ச ஆதரவு விலை (MSP), குளிர்சாதன கிடங்கு, பூச்சி கட்டுப்பாடு அல்லது நேரடி வங்கி கட்டணங்கள் பற்றி நான் எவ்வாறு உதவ முடியும்?",
+          welcome: "வணக்கம்! நான் ராக்கி AI (Rocky AI). குறைந்தபட்ச ஆதரவு விலை (MSP), குளிர்சாதன கிடங்கு, பூச்சி கட்டுப்பாடு அல்லது நேரடி வங்கி கட்டணங்கள் பற்றி நான் எவ்வாறு உதவ முடியும்?",
           chips: [
             { label: "🌾 MSP அரசு விலை", query: "வெங்காயம் மற்றும் தக்காளியின் தற்போதைய MSP விலை என்ன?" },
             { label: "❄️ குளிர்சாதன வழிகாட்டி", query: "தக்காளி மற்றும் வெங்காயத்தை எத்தனை டிகிரியில் பாதுகாக்க வேண்டும்?" },
@@ -5472,7 +5474,7 @@
           ]
         },
         'hi': {
-          welcome: "नमस्ते! मैं किसान मित्र AI हूँ। मैं सरकारी एमएसपी (MSP) दरों, कोल्ड स्टोरेज, कीट नियंत्रण या सीधे बैंक भुगतान में आपकी कैसे सहायता कर सकता हूँ?",
+          welcome: "नमस्ते! मैं रॉकी AI (Rocky AI) हूँ। मैं सरकारी एमएसपी (MSP) दरों, कोल्ड स्टोरेज, कीट नियंत्रण या सीधे बैंक भुगतान में आपकी कैसे सहायता कर सकता हूँ?",
           chips: [
             { label: "🌾 सरकारी MSP दरें", query: "सब्जियों के लिए नवीनतम सरकारी एमएसपी दरें क्या हैं?" },
             { label: "❄️ कोल्ड स्टोरेज नियम", query: "टमाटर और प्याज को किस तापमान पर स्टोर करना चाहिए?" },
@@ -5482,7 +5484,7 @@
           ]
         },
         'ml': {
-          welcome: "നമസ്കാരം! ഞാൻ കിസാൻ മിത്ര AI ആണ്. സർക്കാർ എംഎസ്പി നിരക്കുകൾ, ശീതീകരണ സംഭരണം, കീടനിയന്ത്രണം എന്നിവയിൽ ഞാൻ എങ്ങനെ സഹായിക്കണം?",
+          welcome: "നമസ്കാരം! ഞാൻ റോക്കി AI (Rocky AI) ആണ്. സർക്കാർ എംഎസ്പി നിരക്കുകൾ, ശീതീകരണ സംഭരണം, കീടനിയന്ത്രണം എന്നിവയിൽ ഞാൻ എങ്ങനെ സഹായിക്കണം?",
           chips: [
             { label: "🌾 സർക്കാർ MSP നിരക്ക്", query: "പച്ചക്കറികളുടെ ഏറ്റവും പുതിയ MSP നിരക്കുകൾ എന്തൊക്കെയാണ്?" },
             { label: "❄️ കോൾഡ് സ്റ്റോറേജ്", query: "തക്കാളിയും ഉള്ളിയും എത്ര താപനിലയിൽ സൂക്ഷിക്കണം?" },
@@ -5491,7 +5493,7 @@
           ]
         },
         'te': {
-          welcome: "నమస్కారం! నేను కిసాన్ మిత్ర AI. ప్రభుత్వ MSP ధరలు, కోల్డ్ స్టోరేజ్ మరియు పంట రక్షణలో మీకు ఎలా సహాయపడగలను?",
+          welcome: "నమస్కారం! నేను రాకీ AI (Rocky AI). ప్రభుత్వ MSP ధరలు, కోల్డ్ స్టోరేజ్ మరియు పంట రక్షణలో మీకు ఎలా సహాయపడగలను?",
           chips: [
             { label: "🌾 ప్రభుత్వ MSP ధరలు", query: "కూరగాయల ప్రస్తుత ప్రభుత్వ MSP ధరలు ఏమిటి?" },
             { label: "❄️ కోల్డ్ స్టోరేజ్ ఉష్ణోగ్రత", query: "ఉల్లిపాయలు మరియు టమోటాల నిల్వ ఉష్ణోగ్రత ఎంత?" },
@@ -5499,14 +5501,14 @@
           ]
         },
         'kn': {
-          welcome: "ನಮಸ್ಕಾರ! ನಾನು ಕಿಸಾನ್ ಮಿತ್ರ AI. ಸರ್ಕಾರಿ MSP ಬೆಲೆಗಳು, ಶೀತಲ ಸಂಗ್ರಹಣೆ ಮತ್ತು ಬೆಳೆ ರಕ್ಷಣೆಯಲ್ಲಿ ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+          welcome: "ನಮಸ್ಕಾರ! ನಾನು ರಾಕಿ AI (Rocky AI). ಸರ್ಕಾರಿ MSP ಬೆಲೆಗಳು, ಶೀತಲ ಸಂಗ್ರಹಣೆ ಮತ್ತು ಬೆಳೆ ರಕ್ಷಣೆಯಲ್ಲಿ ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
           chips: [
             { label: "🌾 ಸರ್ಕಾರಿ MSP ದರಗಳು", query: "ತರಕಾರಿಗಳ ಇತ್ತೀಚಿನ ಸರ್ಕಾರಿ MSP ಬೆಲೆಗಳು ಯಾವುವು?" },
             { label: "❄️ ಕೋಲ್ಡ್ ಸ್ಟೋರೇಜ್ ಮಾರ್ಗದರ್ಶಿ", query: "ಟೊಮ್ಯಾಟೊ ಸಂಗ್ರಹಣೆಗೆ ಸೂಕ್ತ ತಾಪಮಾನ ಎಷ್ಟು?" }
           ]
         },
         'mr': {
-          welcome: "नमस्कार! मी किसान मित्र AI आहे. हमीभाव (MSP), शीतगृह साठवणूक, कीड नियंत्रण किंवा थेट बँक खात्यात पैसे मिळवण्याबाबत मी कशी मदत करू?",
+          welcome: "नमस्कार! मी रॉकी AI (Rocky AI) आहे. हमीभाव (MSP), शीतगृह साठवणूक, कीड नियंत्रण किंवा थेट बँक खात्यात पैसे मिळवण्याबाबत मी कशी मदत करू?",
           chips: [
             { label: "🌾 शासकीय हमीभाव (MSP)", query: "कांदा आणि टोमॅटोचे सध्याचे शासकीय हमीभाव काय आहेत?" },
             { label: "❄️ शीतगृह तापमान", query: "कांदा सुरक्षित ठेवण्यासाठी शीतगृहाचे तापमान किती असावे?" },
@@ -5567,11 +5569,11 @@
 
         // Default General Advisory
         if (lang === 'ta') {
-          return "🌾 **கிசான் மித்ரா AI பதில்:**\n\nஉங்கள் கேள்விக்கு உதவ தயாராக உள்ளேன். தக்காளி, வெங்காயம் மற்றும் 40+ காய்கறிகளுக்கான குறைந்தபட்ச ஆதரவு விலை (MSP), குளிர்சாதன சரக்கு முன்பதிவு அல்லது பூச்சி மேலாண்மை பற்றி கேளுங்கள்.\n\n📞 அவசர உதவிக்கு: 1800-180-1551 ஐ அழைக்கவும்.";
+          return "🌾 **ராக்கி AI பதில் (Rocky AI):**\n\nஉங்கள் கேள்விக்கு உதவ தயாராக உள்ளேன். தக்காளி, வெங்காயம் மற்றும் 40+ காய்கறிகளுக்கான குறைந்தபட்ச ஆதரவு விலை (MSP), குளிர்சாதன சரக்கு முன்பதிவு அல்லது பூச்சி மேலாண்மை பற்றி கேளுங்கள்.\n\n📞 அவசர உதவிக்கு: 1800-180-1551 ஐ அழைக்கவும்.";
         } else if (lang === 'hi') {
-          return "🌾 **किसान मित्र AI उत्तर:**\n\nमैं आपकी सहायता के लिए उपस्थित हूँ। आप सब्जियों के सरकारी हमीभाव (MSP), कोल्ड-चेन बुकिंग, रोग उपचार या फसल मूल्य के बारे में कोई भी प्रश्न पूछ सकते हैं।\n\n📞 मुफ्त किसान सहायता: 1800-180-1551 पर कॉल करें।";
+          return "🌾 **रॉकी AI उत्तर (Rocky AI):**\n\nमैं आपकी सहायता के लिए उपस्थित हूँ। आप सब्जियों के सरकारी हमीभाव (MSP), कोल्ड-चेन बुकिंग, रोग उपचार या फसल मूल्य के बारे में कोई भी प्रश्न पूछ सकते हैं।\n\n📞 मुफ्त किसान सहायता: 1800-180-1551 पर कॉल करें।";
         } else {
-          return "🌾 **Kisan Mitra Agro-Intelligence:**\n\nI am ready to help you with 40+ Indian vegetables, Government MSP price floors, 0-4°C cold chain logistics, and same-day bank settlements.\n\nFeel free to speak via microphone 🎙️ or type your query in any Indian language!";
+          return "🌾 **Rocky AI Agro-Intelligence:**\n\nI am ready to help you with 40+ Indian vegetables, Government MSP price floors, 0-4°C cold chain logistics, and same-day bank settlements.\n\nFeel free to speak via microphone 🎙️ or type your query in any Indian language!";
         }
       }
     };
@@ -5590,10 +5592,10 @@
 
     // Toggle AI Voice Speech Output
     function toggleAiVoiceSpeech() {
-      KisanAiEngine.isVoiceOutputEnabled = !KisanAiEngine.isVoiceOutputEnabled;
+      RockyAiEngine.isVoiceOutputEnabled = !RockyAiEngine.isVoiceOutputEnabled;
       const icon = document.getElementById('ai-voice-icon');
       if (icon) {
-        if (KisanAiEngine.isVoiceOutputEnabled) {
+        if (RockyAiEngine.isVoiceOutputEnabled) {
           icon.className = 'fa-solid fa-volume-high text-emerald-400';
           showNotification('AI Spoken Voice Enabled 🔊', 'info');
         } else {
@@ -5605,11 +5607,11 @@
 
     // Set AI Assistant Active Language
     function setAiAssistantLanguage(lang) {
-      KisanAiEngine.activeLanguage = lang;
+      RockyAiEngine.activeLanguage = lang;
       renderAiQuickChips(lang);
       if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
       
-      const kb = KisanAiEngine.knowledgeBase[lang] || KisanAiEngine.knowledgeBase['en'];
+      const kb = RockyAiEngine.knowledgeBase[lang] || RockyAiEngine.knowledgeBase['en'];
       addAiMessage('ai', kb.welcome);
     }
 
@@ -5617,8 +5619,8 @@
     function renderAiQuickChips(lang) {
       const container = document.getElementById('ai-quick-chips');
       if (!container) return;
-      const kb = KisanAiEngine.knowledgeBase[lang] || KisanAiEngine.knowledgeBase['en'];
-      const chips = kb.chips || KisanAiEngine.knowledgeBase['en'].chips;
+      const kb = RockyAiEngine.knowledgeBase[lang] || RockyAiEngine.knowledgeBase['en'];
+      const chips = kb.chips || RockyAiEngine.knowledgeBase['en'].chips;
 
       container.innerHTML = chips.map(c => `
         <button type="button" onclick="sendQuickAiQuery('${c.query.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-emerald-950 border border-emerald-500/30 text-emerald-300 hover:text-white text-[10px] font-bold whitespace-nowrap transition-all shadow shrink-0">
@@ -5632,12 +5634,12 @@
       const chatContainer = document.getElementById('ai-chat-messages');
       if (chatContainer && chatContainer.children.length === 0) {
         const lang = localStorage.getItem('agriflow_lang') || 'en';
-        KisanAiEngine.activeLanguage = lang;
+        RockyAiEngine.activeLanguage = lang;
         const langSelect = document.getElementById('ai-lang-select');
         if (langSelect) langSelect.value = lang;
 
         renderAiQuickChips(lang);
-        const kb = KisanAiEngine.knowledgeBase[lang] || KisanAiEngine.knowledgeBase['en'];
+        const kb = RockyAiEngine.knowledgeBase[lang] || RockyAiEngine.knowledgeBase['en'];
         addAiMessage('ai', kb.welcome);
       }
     }
@@ -5677,7 +5679,7 @@
       container.appendChild(msgDiv);
       container.scrollTop = container.scrollHeight;
 
-      if (!isUser && KisanAiEngine.isVoiceOutputEnabled) {
+      if (!isUser && RockyAiEngine.isVoiceOutputEnabled) {
         speakAiText(text);
       }
     }
@@ -5686,7 +5688,7 @@
     function speakAiText(text) {
       if (!('speechSynthesis' in window)) return;
       const clean = text.replace(/[*#•_-]/g, '').replace(/\n/g, ' ');
-      const lang = KisanAiEngine.activeLanguage || 'en';
+      const lang = RockyAiEngine.activeLanguage || 'en';
       const langMap = {
         'en': 'en-IN', 'ta': 'ta-IN', 'hi': 'hi-IN', 'ml': 'ml-IN',
         'te': 'te-IN', 'kn': 'kn-IN', 'mr': 'mr-IN', 'bn': 'bn-IN', 'gu': 'gu-IN'
@@ -5720,7 +5722,7 @@
 
       // Generate response with brief thinking simulation
       setTimeout(() => {
-        const response = KisanAiEngine.generateResponse(text, KisanAiEngine.activeLanguage);
+        const response = RockyAiEngine.generateResponse(text, RockyAiEngine.activeLanguage);
         addAiMessage('ai', response);
       }, 400);
     }
@@ -5736,17 +5738,17 @@
       const micIcon = document.getElementById('ai-mic-icon');
       const micBtn = document.getElementById('btn-ai-mic');
 
-      if (KisanAiEngine.isListening && KisanAiEngine.speechRecognition) {
-        KisanAiEngine.speechRecognition.stop();
-        KisanAiEngine.isListening = false;
+      if (RockyAiEngine.isListening && RockyAiEngine.speechRecognition) {
+        RockyAiEngine.speechRecognition.stop();
+        RockyAiEngine.isListening = false;
         if (micIcon) micIcon.className = 'fa-solid fa-microphone text-sm text-slate-950';
         if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0';
         return;
       }
 
       const recognition = new SpeechRecognition();
-      KisanAiEngine.speechRecognition = recognition;
-      const lang = KisanAiEngine.activeLanguage || 'en';
+      RockyAiEngine.speechRecognition = recognition;
+      const lang = RockyAiEngine.activeLanguage || 'en';
       const langMap = {
         'en': 'en-IN', 'ta': 'ta-IN', 'hi': 'hi-IN', 'ml': 'ml-IN',
         'te': 'te-IN', 'kn': 'kn-IN', 'mr': 'mr-IN', 'bn': 'bn-IN', 'gu': 'gu-IN', 'pa': 'pa-IN'
@@ -5757,7 +5759,7 @@
       recognition.maxAlternatives = 1;
 
       recognition.onstart = () => {
-        KisanAiEngine.isListening = true;
+        RockyAiEngine.isListening = true;
         if (micIcon) micIcon.className = 'fa-solid fa-waveform-lines fa-fade text-sm text-white';
         if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-rose-600 text-white font-black shadow-lg shadow-rose-500/40 animate-pulse transition-all flex items-center justify-center shrink-0';
         showNotification('🎙️ Listening in ' + recognition.lang + '... Speak your query!', 'info');
@@ -5771,14 +5773,14 @@
       };
 
       recognition.onerror = (event) => {
-        KisanAiEngine.isListening = false;
+        RockyAiEngine.isListening = false;
         if (micIcon) micIcon.className = 'fa-solid fa-microphone text-sm text-slate-950';
         if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0';
         showNotification('Voice input ended. You can type or try speaking again.', 'info');
       };
 
       recognition.onend = () => {
-        KisanAiEngine.isListening = false;
+        RockyAiEngine.isListening = false;
         if (micIcon) micIcon.className = 'fa-solid fa-microphone text-sm text-slate-950';
         if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0';
       };
@@ -6159,7 +6161,7 @@
 
 
   <!-- ======================================================== -->
-  <!-- 🤖 5. KISAN MITRA MULTILINGUAL AI ASSISTANT (11 LANGUAGES) -->
+  <!-- 🤖 5. ROCKY AI MULTILINGUAL AI ASSISTANT (11 LANGUAGES) -->
   <!-- ======================================================== -->
   
   <!-- Floating AI Assistant Launcher FAB -->
@@ -6171,7 +6173,7 @@
       </div>
       <div class="text-left hidden sm:block">
         <div class="text-xs font-black leading-tight flex items-center gap-1">
-          <span>Kisan Mitra AI</span>
+          <span>Rocky AI</span>
           <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-950 text-emerald-300">11 LANGS</span>
         </div>
         <div class="text-[10px] text-emerald-950 font-bold">🎙️ Voice & Agro-Doctor</div>
@@ -6190,7 +6192,7 @@
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <h3 class="font-extrabold text-white text-sm font-heading">Kisan Mitra AI</h3>
+            <h3 class="font-extrabold text-white text-sm font-heading">Rocky AI</h3>
             <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">ONLINE</span>
           </div>
           <div class="text-[10px] text-slate-300 flex items-center gap-1 font-medium">

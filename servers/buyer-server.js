@@ -8,41 +8,47 @@ const PORT = 5002;
 app.use(cors());
 app.use(express.json());
 
+// Health & System Info
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'online',
-    server: 'AgriFlow Buyer Microservice',
-    databaseEngine: 'SQLite3 (node:sqlite Binary Relational DB)',
+    server: '🛒 AgriFlow Buyer Microservice',
     port: PORT,
+    database: 'SQLite3 (servers/agriflow.db)',
+    endpoints: [
+      'POST /api/buyer/auth/login',
+      'GET /api/buyer/catalog',
+      'POST /api/buyer/orders/create',
+      'GET /api/buyer/chamber-iot',
+      'GET /api/buyer/invoices'
+    ],
     timestamp: new Date().toISOString()
   });
 });
 
+// 1. Buyer Login
 app.post('/api/buyer/auth/login', (req, res) => {
-  const { phone, pin, email } = req.body;
-  const user = db.prepare("SELECT * FROM users WHERE role = 'buyer' AND (phone = ? OR pin = ?)").get(phone, pin);
-
-  if (!user && pin !== '1111' && pin !== '2222') {
-    return res.status(401).json({ error: 'Invalid Buyer credentials. Demo PIN is 1111 or 2222.' });
-  }
-
-  const activeUser = user || db.prepare("SELECT * FROM users WHERE id = 'buyer-1'").get();
+  const { phone, pin } = req.body;
+  const user = db.prepare("SELECT * FROM users WHERE role = 'buyer' AND (phone = ? OR pin = ?)").get(phone, pin) ||
+               db.prepare("SELECT * FROM users WHERE id = 'buyer-1'").get();
 
   res.json({
     success: true,
-    token: `sql-token-buyer-${activeUser.id}-${Date.now()}`,
+    serverPort: PORT,
+    token: `sql-token-buyer-${user.id}-${Date.now()}`,
     user: {
-      id: activeUser.id,
-      name: activeUser.name,
-      role: activeUser.role,
-      phone: activeUser.phone,
-      depot: activeUser.location,
-      walletBalance: activeUser.wallet_balance,
-      avatar: activeUser.avatar
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      phone: user.phone,
+      depot: user.location,
+      walletBalance: user.wallet_balance,
+      avatar: user.avatar
     }
   });
 });
 
+// 2. Direct Sourcing Catalog
 app.get('/api/buyer/catalog', (req, res) => {
   const { sortBy } = req.query;
   let query = 'SELECT * FROM crops';
@@ -53,6 +59,7 @@ app.get('/api/buyer/catalog', (req, res) => {
   const crops = db.prepare(query).all();
   res.json({
     success: true,
+    serverPort: PORT,
     count: crops.length,
     catalog: crops.map(c => ({
       id: c.id,
@@ -72,6 +79,7 @@ app.get('/api/buyer/catalog', (req, res) => {
   });
 });
 
+// 3. Escrow Order Creation
 app.post('/api/buyer/orders/create', (req, res) => {
   const { items, deliveryBay } = req.body;
   const created = [];
@@ -98,13 +106,50 @@ app.post('/api/buyer/orders/create', (req, res) => {
       'Dr. M. Swaminathan', 'AGRI-QC-NASHIK-01', 'Cold Chamber Bay 3', 'Escrow Confirmed (ICICI Agri-Escrow)', `QC-2026-${Math.floor(1000 + Math.random() * 9000)}`, new Date().toISOString()
     );
 
-    created.push({ id: newId, totalValue: total });
+    created.push({ id: newId, commodity: item.name, totalValue: total });
   });
 
   res.json({
     success: true,
-    message: `${created.length} smart contract escrow order(s) written to SQLite.`,
-    createdOrders: created
+    serverPort: PORT,
+    message: `${created.length} smart contract escrow order(s) locked into SQLite.`,
+    orders: created
+  });
+});
+
+// 4. Chamber IoT Sensor Feeds
+app.get('/api/buyer/chamber-iot', (req, res) => {
+  res.json({
+    success: true,
+    serverPort: PORT,
+    chamberId: 'CHAMBER-MMR-MEGA-04',
+    temperatureCelsius: 4.1,
+    targetTemp: 4.0,
+    humidityPercent: 88.5,
+    co2Ppm: 420,
+    ethylenePpm: 0.06,
+    spoilageRiskFactor: '0.02% (Ultra-Low)',
+    powerBackupStatus: 'Active Solar Hybrid Online',
+    capacityTons: 500,
+    utilizedTons: 342.5
+  });
+});
+
+// 5. Invoices
+app.get('/api/buyer/invoices', (req, res) => {
+  const orders = db.prepare("SELECT * FROM orders").all();
+  res.json({
+    success: true,
+    serverPort: PORT,
+    count: orders.length,
+    invoices: orders.map(o => ({
+      invoiceNo: `INV-${o.id}`,
+      orderId: o.id,
+      commodity: o.commodity,
+      amount: o.total_value,
+      gstin: '27AABCU9603R1ZM',
+      status: o.stage_index === 4 ? 'Paid & Settled' : 'In Escrow'
+    }))
   });
 });
 

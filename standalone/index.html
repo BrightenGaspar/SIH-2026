@@ -238,7 +238,7 @@
         </button>
         <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
           <i class="fa-solid fa-terminal text-rose-400"></i>
-          <span>💻 SQLite API</span>
+          <span>💻 3-Server APIs</span>
         </button>
       </nav>
 
@@ -286,7 +286,7 @@
             Eliminating Farm-to-Fork <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">Intermediary Loss</span>
           </h1>
           <p class="text-sm text-slate-300 leading-relaxed">
-            Running on a high-speed <strong class="text-white">SQLite3 Relational Database</strong> with 3 dedicated microservers, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant <strong class="text-emerald-400">T+0 direct payouts</strong>.
+            Running on <strong class="text-white">3 Dedicated SQLite Microservers</strong> with real-time dynamic balance payouts, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant <strong class="text-emerald-400">T+0 direct payouts</strong>.
           </p>
         </div>
 
@@ -367,13 +367,19 @@
           </div>
         </div>
 
-        <!-- Wallet Balance Card with Instant UPI Release -->
-        <div class="bg-gradient-to-br from-emerald-950 to-slate-900 p-5 rounded-2xl border border-emerald-500/40 min-w-[280px]">
-          <div class="text-[11px] text-emerald-300 uppercase tracking-wider font-semibold">e-RUPI Kisan Wallet Balance</div>
-          <div class="text-3xl font-extrabold text-white mt-1 font-mono" id="farmer-wallet-display">₹1,84,500</div>
+        <!-- Wallet Balance Card with Instant Dynamic Withdrawal -->
+        <div class="bg-gradient-to-br from-emerald-950 to-slate-900 p-5 rounded-2xl border border-emerald-500/40 min-w-[290px] shadow-xl">
+          <div class="text-[11px] text-emerald-300 uppercase tracking-wider font-semibold flex items-center justify-between">
+            <span>e-RUPI Kisan Wallet Balance</span>
+            <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">PORT 5001</span>
+          </div>
+          <div class="text-3xl font-extrabold text-white mt-1 font-mono transition-all duration-300" id="farmer-wallet-display">₹1,84,500</div>
           <div class="flex items-center justify-between mt-3 text-xs">
-            <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> T+0 Instant Settlement</span>
-            <button onclick="triggerFarmerPayout()" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md">Withdraw</button>
+            <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> T+0 Instant Payout</span>
+            <button onclick="openWithdrawModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1">
+              <i class="fa-solid fa-building-columns"></i>
+              <span>Withdraw</span>
+            </button>
           </div>
         </div>
       </div>
@@ -492,23 +498,45 @@
           </div>
         </div>
 
-        <!-- Right: 14-Day Degradation Chart -->
-        <div class="lg:col-span-5 agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col justify-between space-y-4">
-          <div>
-            <h3 class="font-bold text-white text-base flex items-center gap-2 font-heading">
-              <i class="fa-solid fa-chart-line text-amber-400"></i>
-              <span>14-Day Quality Degradation Curve</span>
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Reefer (+4°C) vs Ambient (+34°C) Comparison</p>
+        <!-- Right: 14-Day Degradation Chart & Payouts Ledger -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col justify-between space-y-4">
+            <div>
+              <h3 class="font-bold text-white text-base flex items-center gap-2 font-heading">
+                <i class="fa-solid fa-chart-line text-amber-400"></i>
+                <span>14-Day Quality Degradation Curve</span>
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">Reefer (+4°C) vs Ambient (+34°C) Comparison</p>
+            </div>
+
+            <div class="relative h-56 w-full">
+              <canvas id="degradationChart"></canvas>
+            </div>
+
+            <div class="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
+              <i class="fa-solid fa-snowflake text-emerald-400"></i>
+              <span>Active Cold-Chain adds <strong>+45 Days</strong> of export shelf-life.</span>
+            </div>
           </div>
 
-          <div class="relative h-64 w-full">
-            <canvas id="degradationChart"></canvas>
-          </div>
-
-          <div class="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
-            <i class="fa-solid fa-snowflake text-emerald-400"></i>
-            <span>Active Cold-Chain adds <strong>+45 Days</strong> of export shelf-life.</span>
+          <!-- Live Payouts History Table -->
+          <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-2 font-heading">
+                <i class="fa-solid fa-receipt text-emerald-400"></i>
+                <span>Recent e-RUPI Payout Settlements</span>
+              </h4>
+              <span class="text-[10px] text-emerald-400 font-mono">T+0 SETTLED</span>
+            </div>
+            <div id="payout-history-list" class="space-y-2 text-xs">
+              <div class="p-2.5 rounded-xl bg-slate-900/80 border border-emerald-500/20 flex justify-between items-center">
+                <div>
+                  <div class="font-bold text-white">₹2,56,000 Payout Settled</div>
+                  <div class="text-[10px] text-slate-400 font-mono">Ref: UPI-2026-992144 • SBI ...8821</div>
+                </div>
+                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">COMPLETED</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -520,7 +548,7 @@
             <i class="fa-solid fa-truck-pickup text-emerald-400"></i>
             <span>Schedule Farmgate Milk-Run Reefer Pickup</span>
           </h3>
-          <span class="text-xs text-slate-400">Writes directly to SQLite database</span>
+          <span class="text-xs text-slate-400 font-mono">Connected to Farmer Server :5001</span>
         </div>
 
         <form id="pickup-form" onsubmit="submitPickupSchedule(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -557,7 +585,7 @@
         </form>
       </div>
 
-      <!-- Live GPS Milk-Run Radar Leaflet Map with Real-Time Animated Truck -->
+      <!-- Live GPS Milk-Run Radar Leaflet Map -->
       <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-4">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
@@ -591,7 +619,7 @@
             <i class="fa-solid fa-cart-flatbed text-blue-400"></i>
             <span>Institutional Buyer Procurement Floor</span>
           </h2>
-          <p class="text-xs text-slate-300 mt-1">Direct farmgate sourcing with automated ICICI smart-contract escrow locking.</p>
+          <p class="text-xs text-slate-300 mt-1">Direct farmgate sourcing backed by Buyer Microservice (Port 5002) with smart contract escrow.</p>
         </div>
 
         <div class="flex items-center gap-2">
@@ -770,58 +798,170 @@
     </section>
 
     <!-- ======================================================== -->
-    <!-- VIEW 6: 3-SERVER SQLITE REST API SANDBOX (persona-view-coder) -->
+    <!-- VIEW 6: 3 INDIVIDUAL MICROSERVERS API SANDBOX (persona-view-coder) -->
     <!-- ======================================================== -->
     <section id="view-coder" class="persona-view hidden space-y-6">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
             <i class="fa-solid fa-terminal text-rose-400"></i>
-            <span>3-Server SQLite Interactive Microservice Sandbox</span>
+            <span>3 Dedicated Microservers REST API Sandbox</span>
           </h2>
-          <p class="text-xs text-slate-300 mt-1">Live interactive REST API console querying the native SQLite binary database.</p>
+          <p class="text-xs text-slate-300 mt-1">Live interactive REST API console for testing all 3 individual microservices (:5001, :5002, :5003).</p>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 font-mono">Database: servers/agriflow.db</span>
+          <span class="text-xs text-slate-400 font-mono">Storage: SQLite3 (servers/agriflow.db)</span>
         </div>
       </div>
 
-      <!-- Endpoint Selector Buttons -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <button onclick="testApiEndpoint('farmer_health')" class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs transition-all">
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">PORT 5001</span>
-          <div class="font-bold text-white mt-1.5">GET /api/farmer/crops</div>
-        </button>
+      <!-- 3 Columns for 3 Individual Microservers -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Column 1: Farmer Server (Port 5001) -->
+        <div class="agri-card p-4 rounded-2xl border border-emerald-500/40 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-emerald-800/60 pb-2">
+            <div class="font-bold text-emerald-300 text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-wheat-awn"></i> 1. Farmer Svr (:5001)
+            </div>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">PORT 5001</span>
+          </div>
+          <button onclick="testApiEndpoint('farmer_crops')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950 border border-emerald-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-emerald-400 font-mono">GET /api/farmer/crops</div>
+            <div class="text-[10px] text-slate-400">List all 8 crops from SQLite</div>
+          </button>
+          <button onclick="testApiEndpoint('farmer_otp')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950 border border-emerald-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-emerald-400 font-mono">POST /api/farmer/auth/send-otp</div>
+            <div class="text-[10px] text-slate-400">Generate spoken voice OTP</div>
+          </button>
+          <button onclick="testApiEndpoint('farmer_withdraw')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950 border border-emerald-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-emerald-400 font-mono">POST /api/farmer/withdraw</div>
+            <div class="text-[10px] text-slate-400">Deduct wallet balance in SQLite</div>
+          </button>
+        </div>
 
-        <button onclick="testApiEndpoint('farmer_otp')" class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs transition-all">
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">PORT 5001</span>
-          <div class="font-bold text-white mt-1.5">POST /api/farmer/auth/send-otp</div>
-        </button>
+        <!-- Column 2: Buyer Server (Port 5002) -->
+        <div class="agri-card p-4 rounded-2xl border border-blue-500/40 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-blue-800/60 pb-2">
+            <div class="font-bold text-blue-300 text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-cart-shopping"></i> 2. Buyer Svr (:5002)
+            </div>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-mono">PORT 5002</span>
+          </div>
+          <button onclick="testApiEndpoint('buyer_catalog')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950 border border-blue-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-blue-400 font-mono">GET /api/buyer/catalog</div>
+            <div class="text-[10px] text-slate-400">Direct sourcing catalog with sorting</div>
+          </button>
+          <button onclick="testApiEndpoint('buyer_chamber')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950 border border-blue-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-blue-400 font-mono">GET /api/buyer/chamber-iot</div>
+            <div class="text-[10px] text-slate-400">Live cold chamber IoT sensors</div>
+          </button>
+          <button onclick="testApiEndpoint('buyer_invoices')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950 border border-blue-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-blue-400 font-mono">GET /api/buyer/invoices</div>
+            <div class="text-[10px] text-slate-400">GST tax invoices & bills</div>
+          </button>
+        </div>
 
-        <button onclick="testApiEndpoint('buyer_catalog')" class="p-3 rounded-xl bg-slate-900 border border-blue-500/30 hover:border-blue-400 text-left text-xs transition-all">
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono">PORT 5002</span>
-          <div class="font-bold text-white mt-1.5">GET /api/buyer/catalog</div>
-        </button>
-
-        <button onclick="testApiEndpoint('logistics_manifest')" class="p-3 rounded-xl bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-left text-xs transition-all">
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">PORT 5003</span>
-          <div class="font-bold text-white mt-1.5">GET /api/logistics/telematics</div>
-        </button>
+        <!-- Column 3: Logistics Server (Port 5003) -->
+        <div class="agri-card p-4 rounded-2xl border border-amber-500/40 space-y-2.5">
+          <div class="flex items-center justify-between border-b border-amber-800/60 pb-2">
+            <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-truck-fast"></i> 3. Logistics Svr (:5003)
+            </div>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">PORT 5003</span>
+          </div>
+          <button onclick="testApiEndpoint('logistics_telematics')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-amber-950 border border-amber-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-amber-400 font-mono">GET /api/logistics/telematics</div>
+            <div class="text-[10px] text-slate-400">Reefer truck MH-15 GPS stream</div>
+          </button>
+          <button onclick="testApiEndpoint('logistics_manifest')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-amber-950 border border-amber-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-amber-400 font-mono">GET /api/logistics/orders/manifest</div>
+            <div class="text-[10px] text-slate-400">4-way assigned manifest table</div>
+          </button>
+          <button onclick="testApiEndpoint('logistics_bays')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-amber-950 border border-amber-500/20 text-xs text-slate-200 transition-all">
+            <div class="font-bold text-amber-400 font-mono">GET /api/logistics/qc-bays</div>
+            <div class="text-[10px] text-slate-400">Cold bay allocations & temps</div>
+          </button>
+        </div>
       </div>
 
-      <!-- Live Console -->
+      <!-- Live JSON Console -->
       <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
         <div class="flex justify-between items-center text-xs font-mono">
           <span class="text-emerald-400 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span id="api-status-label">SQLite Database Sync — Ready</span>
+            <span id="api-status-label">HTTP 200 OK — Ready</span>
           </span>
-          <span class="text-slate-400" id="api-latency-label">Latency: 4.2ms</span>
+          <span class="text-slate-400" id="api-latency-label">Latency: 2.4ms</span>
         </div>
-        <pre id="api-json-display" class="bg-slate-950 p-4 rounded-2xl text-emerald-400 font-mono text-xs overflow-x-auto max-h-96 border border-emerald-950">SELECT * FROM orders WHERE stage_index = 3;</pre>
+        <pre id="api-json-display" class="bg-slate-950 p-4 rounded-2xl text-emerald-400 font-mono text-xs overflow-x-auto max-h-96 border border-emerald-950">{
+  "message": "Click any endpoint above to send live HTTP requests to the 3 microservers.",
+  "microservers": [
+    { "role": "🌾 Farmer Server", "port": 5001, "status": "online" },
+    { "role": "🛒 Buyer Server", "port": 5002, "status": "online" },
+    { "role": "🚛 Logistics Server", "port": 5003, "status": "online" }
+  ]
+}</pre>
       </div>
     </section>
   </main>
+
+  <!-- ======================================================== -->
+  <!-- INTERACTIVE E-RUPI WITHDRAWAL MODAL -->
+  <!-- ======================================================== -->
+  <div id="withdraw-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="agri-card max-w-md w-full rounded-3xl border border-emerald-500/40 p-6 space-y-5 shadow-2xl relative">
+      <button onclick="closeWithdrawModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+          <i class="fa-solid fa-bolt text-amber-400"></i>
+          <span>e-RUPI UPI DIRECT SETTLEMENT</span>
+        </div>
+        <h3 class="text-xl font-bold text-white mt-1 font-heading">Withdraw to Bank Account</h3>
+        <p class="text-xs text-slate-300">Instant direct transfer to farmer's registered bank account</p>
+      </div>
+
+      <!-- Account Info Card -->
+      <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/20 space-y-2 text-xs">
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400">Target Bank Account:</span>
+          <span class="text-white font-bold">State Bank of India</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400">Account Number:</span>
+          <span class="text-emerald-400 font-mono font-bold">•••• •••• 8821</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-slate-400">IFSC Code:</span>
+          <span class="text-slate-300 font-mono">SBIN0001234 (Lasalgaon)</span>
+        </div>
+        <div class="flex justify-between items-center border-t border-emerald-900/40 pt-2">
+          <span class="text-slate-400">Current Available Balance:</span>
+          <span class="text-amber-400 font-mono font-extrabold text-sm" id="modal-available-balance">₹1,84,500</span>
+        </div>
+      </div>
+
+      <!-- Withdrawal Amount Input -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300">Enter Amount to Withdraw (₹):</label>
+        <input type="number" id="withdraw-amount-input" value="50000" class="w-full bg-slate-900 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-base font-bold text-white font-mono focus:outline-none focus:border-emerald-400">
+        
+        <!-- Preset Amount Pills -->
+        <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
+          <button onclick="setWithdrawAmount(25000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-emerald-900 border border-emerald-500/20 text-slate-300">₹25,000</button>
+          <button onclick="setWithdrawAmount(50000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-emerald-900 border border-emerald-500/20 text-slate-300">₹50,000</button>
+          <button onclick="setWithdrawAmount('full')" class="py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-400 text-emerald-300 font-bold">Withdraw All</button>
+        </div>
+      </div>
+
+      <!-- Confirm Action -->
+      <button onclick="confirmWithdrawal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-xl flex items-center justify-center gap-2 transition-all">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>Confirm Instant e-RUPI Payout ➔</span>
+      </button>
+    </div>
+  </div>
 
   <!-- ======================================================== -->
   <!-- UNIVERSAL FARMER-FRIENDLY AUTHENTICATION MODAL -->
@@ -1104,7 +1244,7 @@
   <!-- MAIN CLIENT-SIDE SCRIPT: WEB AUDIO, CANVAS AI & SQLITE SYNC -->
   <!-- ======================================================== -->
   <script>
-    // --- Web Audio Synthesizer Effects for High Realism ---
+    // --- Web Audio Synthesizer Effects ---
     const SoundEngine = {
       ctx: null,
       init() {
@@ -1338,9 +1478,91 @@
         document.getElementById('cv-color-ratio').textContent = `R: ${rPct}% • G: ${gPct}% • B: ${bPct}%`;
         document.getElementById('cv-chlorophyll').textContent = `${Math.min(95, Math.max(10, gPct * 2))}% Residual`;
       } catch (err) {
-        // Cross-origin image fallback
         document.getElementById('cv-color-ratio').textContent = "R: 62% • G: 24% • B: 14%";
       }
+    }
+
+    // --- Dynamic Wallet Withdrawal Modal & Live Decrement ---
+    function openWithdrawModal() {
+      document.getElementById('modal-available-balance').textContent = `₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')}`;
+      document.getElementById('withdraw-amount-input').value = AppState.currentUser.walletBalance > 50000 ? 50000 : AppState.currentUser.walletBalance;
+      document.getElementById('withdraw-modal').classList.remove('hidden');
+    }
+
+    function closeWithdrawModal() {
+      document.getElementById('withdraw-modal').classList.add('hidden');
+    }
+
+    function setWithdrawAmount(amt) {
+      if (amt === 'full') {
+        document.getElementById('withdraw-amount-input').value = AppState.currentUser.walletBalance;
+      } else {
+        document.getElementById('withdraw-amount-input').value = amt;
+      }
+    }
+
+    async function confirmWithdrawal() {
+      const input = document.getElementById('withdraw-amount-input');
+      const amount = parseFloat(input.value);
+
+      if (!amount || amount <= 0) return alert('Please enter a valid withdrawal amount.');
+      if (amount > AppState.currentUser.walletBalance) return alert('Insufficient wallet balance!');
+
+      SoundEngine.playCashPayout();
+      closeWithdrawModal();
+
+      // Animate on-screen balance decrement
+      const prevBal = AppState.currentUser.walletBalance;
+      const targetBal = prevBal - amount;
+      AppState.currentUser.walletBalance = targetBal;
+
+      // Animate counter down
+      let current = prevBal;
+      const step = Math.ceil(amount / 20);
+      const timer = setInterval(() => {
+        current -= step;
+        if (current <= targetBal) {
+          current = targetBal;
+          clearInterval(timer);
+        }
+        document.getElementById('farmer-wallet-display').textContent = `₹${current.toLocaleString('en-IN')}`;
+      }, 25);
+
+      // Call Farmer Server (:5001) to deduct in SQLite
+      try {
+        const res = await fetch('http://localhost:5001/api/farmer/withdraw', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            farmerName: AppState.currentUser.name,
+            amount: amount
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          console.log("SQLite Wallet Updated:", data);
+        }
+      } catch (e) {
+        console.log("Local wallet deduction executed.");
+      }
+
+      // Prepend to transaction history list
+      const hist = document.getElementById('payout-history-list');
+      if (hist) {
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl bg-slate-900/80 border border-emerald-500/20 flex justify-between items-center transition-all animate-pulse";
+        item.innerHTML = `
+          <div>
+            <div class="font-bold text-white">₹${amount.toLocaleString('en-IN')} Payout Settled</div>
+            <div class="text-[10px] text-slate-400 font-mono">Ref: UPI-eRUPI-${Math.floor(100000 + Math.random()*900000)} • SBI ...8821</div>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">SETTLED</span>
+        `;
+        hist.prepend(item);
+      }
+
+      confetti({ particleCount: 130, spread: 80, origin: { y: 0.6 } });
+      alert(`✅ Withdrawal of ₹${amount.toLocaleString('en-IN')} successfully settled to State Bank of India A/c ...8821! Remaining Wallet Balance: ₹${targetBal.toLocaleString('en-IN')}`);
     }
 
     // --- Render Orders Manifest ---
@@ -1633,7 +1855,7 @@
           console.log("Written orders to SQLite:", data);
         }
       } catch (e) {
-        console.log("Client fallback checkout.");
+        console.log("Local fallback checkout.");
       }
 
       AppState.cart.forEach(item => {
@@ -1810,7 +2032,7 @@
       });
     }
 
-    // --- Interactive Leaflet Radar with Live Moving Truck Animation ---
+    // --- Interactive Leaflet Radar ---
     function initLeafletRadar() {
       const mapContainer = document.getElementById('radarMap');
       if (!mapContainer || AppState.leafletMap) return;
@@ -1835,7 +2057,6 @@
         L.marker(s.pos).addTo(AppState.leafletMap).bindPopup(`<strong>${s.name}</strong>`);
       });
 
-      // Moving Truck Marker
       const truckIcon = L.divIcon({
         className: 'custom-truck-icon',
         html: '<div style="background:#10b981; color:#022c22; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px; border:2px solid #ffffff; box-shadow:0 4px 10px rgba(0,0,0,0.5);">🚛 MH-15</div>',
@@ -1875,7 +2096,6 @@
         AppState.truckMarker.setLatLng(target);
         AppState.leafletMap.panTo(target);
 
-        // Update random live sensor jitter
         const speed = Math.floor(52 + Math.random() * 12);
         const temp = +(4.0 + Math.random() * 0.4).toFixed(1);
 
@@ -2064,36 +2284,49 @@
       const statusLabel = document.getElementById('api-status-label');
       const latencyLabel = document.getElementById('api-latency-label');
 
-      display.textContent = 'Executing SQLite binary query...';
+      display.textContent = 'Sending HTTP request to microservice...';
       const t0 = performance.now();
 
       try {
         let url = '';
         let opts = { method: 'GET' };
 
-        if (type === 'farmer_health') url = 'http://localhost:5001/api/farmer/crops';
+        // 1. Farmer Server (Port 5001)
+        if (type === 'farmer_crops') url = 'http://localhost:5001/api/farmer/crops';
         else if (type === 'farmer_otp') {
           url = 'http://localhost:5001/api/farmer/auth/send-otp';
           opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: '9822012345' }) };
         }
+        else if (type === 'farmer_withdraw') {
+          url = 'http://localhost:5001/api/farmer/withdraw';
+          opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ farmerName: 'Ramesh Patil', amount: 50000 }) };
+        }
+
+        // 2. Buyer Server (Port 5002)
         else if (type === 'buyer_catalog') url = 'http://localhost:5002/api/buyer/catalog?sortBy=shelflife';
-        else if (type === 'logistics_manifest') url = 'http://localhost:5003/api/logistics/telematics';
+        else if (type === 'buyer_chamber') url = 'http://localhost:5002/api/buyer/chamber-iot';
+        else if (type === 'buyer_invoices') url = 'http://localhost:5002/api/buyer/invoices';
+
+        // 3. Logistics Server (Port 5003)
+        else if (type === 'logistics_telematics') url = 'http://localhost:5003/api/logistics/telematics';
+        else if (type === 'logistics_manifest') url = 'http://localhost:5003/api/logistics/orders/manifest';
+        else if (type === 'logistics_bays') url = 'http://localhost:5003/api/logistics/qc-bays';
 
         const res = await fetch(url, opts);
         const json = await res.json();
         const t1 = performance.now();
 
-        statusLabel.textContent = `HTTP ${res.status} OK — SQLite Port ${url.split(':')[2].split('/')[0]}`;
+        statusLabel.textContent = `HTTP ${res.status} OK — Microservice Port ${url.split(':')[2].split('/')[0]}`;
         latencyLabel.textContent = `Latency: ${(t1 - t0).toFixed(1)}ms`;
         display.textContent = JSON.stringify(json, null, 2);
       } catch (e) {
         const t1 = performance.now();
-        statusLabel.textContent = `SQLite Local Database Mode`;
+        statusLabel.textContent = `Offline Simulation Mode`;
         latencyLabel.textContent = `Latency: ${(t1 - t0).toFixed(1)}ms`;
         display.textContent = JSON.stringify({
           database: "SQLite3 (servers/agriflow.db)",
-          status: "standalone_active",
-          message: "Run 'npm run servers' in your terminal to boot all 3 live microservices!"
+          status: "simulated_local",
+          message: "Run 'npm run servers' in your terminal to connect directly to the 3 live microservices!"
         }, null, 2);
       }
     }
@@ -2138,12 +2371,6 @@
       check('http://localhost:5001/api/health', 'badge-farmer-status');
       check('http://localhost:5002/api/health', 'badge-buyer-status');
       check('http://localhost:5003/api/health', 'badge-logistics-status');
-    }
-
-    function triggerFarmerPayout() {
-      SoundEngine.playCashPayout();
-      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-      alert(`🏦 Payout of ₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')} initiated via e-RUPI to State Bank of India A/c ...8821.`);
     }
 
     // --- Application Initialization ---

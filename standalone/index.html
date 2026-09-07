@@ -216,7 +216,7 @@
 
     /* Glassmorphism Cards */
     .agri-card {
-      background: rgba(3, 25, 18, 0.86);
+      background: rgba(3, 25, 18, 0.88);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(52, 211, 153, 0.25);
@@ -270,13 +270,13 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- 🔐 1. STRICT INITIAL AUTHENTICATION GATE / LOGIN PORTAL -->
+  <!-- 🔐 1. SUPER EASY & INTUITIVE LOGIN GATE -->
   <!-- (Website only opens into full app once logged in) -->
   <!-- ======================================================== -->
   <div id="auth-gate-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative z-20 transition-all duration-500">
     <div class="agri-card max-w-xl w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
       
-      <!-- Top SIH-2026 Header Banner -->
+      <!-- SIH-2026 Header Banner -->
       <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-amber-400 p-0.5 shadow-lg shadow-emerald-500/20">
@@ -298,193 +298,130 @@
         </button>
       </div>
 
-      <!-- Live Microservices Status Pills -->
-      <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20 space-y-1.5">
-        <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold flex items-center justify-between">
-          <span>Active SQLite Microserver Cluster:</span>
-          <span class="text-emerald-400 font-mono text-[10px] flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> NODE LIVE</span>
-        </div>
-        <div class="grid grid-cols-3 gap-1.5 text-[10px]">
-          <div class="bg-emerald-950/60 p-1.5 rounded-lg border border-emerald-500/30 text-center">
-            <span class="text-emerald-400 font-bold">🌾 Farmer :5001</span>
+      <!-- 🌟 SUPER EASY: 1-CLICK INSTANT ENTRY HERO BUTTON -->
+      <div class="space-y-3">
+        <button onclick="quickLoginPersona('farmer-1')" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-extrabold text-base shadow-2xl hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-950/20 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+              🌾
+            </div>
+            <div class="text-left">
+              <div class="text-sm font-black leading-tight">1-CLICK INSTANT ENTRY (Kisan Portal)</div>
+              <div class="text-[11px] font-semibold text-slate-900/80">Log in immediately as Ramesh Patil (Nashik FPO)</div>
+            </div>
           </div>
-          <div class="bg-blue-950/60 p-1.5 rounded-lg border border-blue-500/30 text-center">
-            <span class="text-blue-400 font-bold">🛒 Buyer :5002</span>
+          <div class="w-9 h-9 rounded-xl bg-slate-950/20 flex items-center justify-center text-slate-950 font-bold text-sm">
+            <i class="fa-solid fa-arrow-right group-hover:translate-x-0.5 transition-transform"></i>
           </div>
-          <div class="bg-amber-950/60 p-1.5 rounded-lg border border-amber-500/30 text-center">
-            <span class="text-amber-400 font-bold">🚛 Logistics :5003</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Portal Welcome Message -->
-      <div>
-        <h3 class="text-xl font-bold text-white flex items-center gap-2 font-heading">
-          <i class="fa-solid fa-fingerprint text-emerald-400"></i>
-          <span>Log In to Unlock Complete Application</span>
-        </h3>
-        <p class="text-xs text-slate-300 mt-1">Select any farmer-friendly login method or 1-click evaluation persona below to enter:</p>
-      </div>
-
-      <!-- Auth Method Selector Tabs -->
-      <div class="grid grid-cols-4 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/20 text-[11px] font-semibold text-center">
-        <button onclick="switchGateAuthTab('voice-otp')" id="gate-tab-btn-voice-otp" class="gate-auth-subtab py-2 rounded-xl bg-emerald-600 text-white font-bold transition-all">📱 Voice OTP</button>
-        <button onclick="switchGateAuthTab('qr-card')" id="gate-tab-btn-qr-card" class="gate-auth-subtab py-2 rounded-xl text-slate-300 hover:text-white transition-all">📷 Kisan Card</button>
-        <button onclick="switchGateAuthTab('dialer-pin')" id="gate-tab-btn-dialer-pin" class="gate-auth-subtab py-2 rounded-xl text-slate-300 hover:text-white transition-all">🔢 4-Digit PIN</button>
-        <button onclick="switchGateAuthTab('personas')" id="gate-tab-btn-personas" class="gate-auth-subtab py-2 rounded-xl text-slate-300 hover:text-white transition-all">⚡ 1-Click Role</button>
-      </div>
-
-      <!-- Tab 1: Voice & SMS OTP -->
-      <div id="gate-subtab-voice-otp" class="space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-300 mb-1">Mobile Number / मोबाइल नंबर</label>
-          <div class="flex gap-2">
-            <span class="px-3 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs font-bold text-emerald-400 flex items-center">+91</span>
-            <input type="tel" id="gate-login-phone" value="9822012345" class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
-            <button onclick="sendGateVoiceOtp()" class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-paper-plane"></i>
-              <span>Send OTP</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <label class="block text-xs font-semibold text-slate-300">Enter 4-Digit OTP / 4 अंकों का कोड</label>
-          <div class="flex items-center gap-2">
-            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="1">
-            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="2">
-            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="9">
-            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="5">
-            
-            <button onclick="speakCurrentOtp('1295')" title="Audio Readout (आवाज़ सुनें)" class="ml-auto px-3.5 h-12 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center gap-1.5 text-xs font-bold shadow-md transition-transform active:scale-95">
-              <i class="fa-solid fa-volume-high text-sm"></i>
-              <span>Spoken Hindi</span>
-            </button>
-          </div>
-          <p class="text-[11px] text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Demo OTP prefilled: <strong>1 2 9 5</strong> (Ramesh Patil • Nashik)</p>
-        </div>
-
-        <button onclick="verifyOtpAndUnlockApp()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-slate-950 font-extrabold text-sm shadow-xl hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-lock-open text-base"></i>
-          <span>Verify OTP & Open AgriFlow Application</span>
         </button>
       </div>
 
-      <!-- Tab 2: 1-Tap Kisan Green Card QR Scan -->
-      <div id="gate-subtab-qr-card" class="hidden space-y-4">
-        <p class="text-xs text-slate-300">Tap your registered <strong>Kisan Green Card</strong> to login & enter directly:</p>
-        
-        <!-- Interactive Smart Green Card -->
-        <div onclick="loginWithKisanCard('farmer-1')" class="cursor-pointer p-4 rounded-2xl bg-gradient-to-r from-emerald-950 to-emerald-900 border-2 border-emerald-400/80 shadow-2xl hover:scale-[1.02] transition-transform space-y-3">
-          <div class="flex justify-between items-center border-b border-emerald-700/50 pb-2">
+      <!-- 🌟 4 EASY 1-TAP ROLE CARDS -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-300 font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-bolt text-amber-400"></i> Or Tap Any Stakeholder to Enter Instantly:
+          </span>
+          <span class="text-[10px] text-emerald-400 font-mono">Zero Typing Needed</span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5 text-xs">
+          <!-- Role 1: Farmer -->
+          <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 hover:border-emerald-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-11 h-11 rounded-xl object-cover border border-emerald-400">
+            <div>
+              <div class="font-bold text-white group-hover:text-emerald-300 transition-colors">Ramesh Patil</div>
+              <div class="text-[10px] text-emerald-400 font-medium">🌾 Kisan Farmer</div>
+              <div class="text-[9px] text-slate-400 font-mono">₹1,84,500 Bal</div>
+            </div>
+          </button>
+
+          <!-- Role 2: Buyer -->
+          <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-2xl bg-blue-950/60 hover:bg-blue-900/80 border border-blue-500/40 hover:border-blue-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+            <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-11 h-11 rounded-xl object-cover border border-blue-400">
+            <div>
+              <div class="font-bold text-white group-hover:text-blue-300 transition-colors">BigBasket Sourcing</div>
+              <div class="text-[10px] text-blue-400 font-medium">🛒 Institutional Buyer</div>
+              <div class="text-[9px] text-slate-400 font-mono">Escrow Active</div>
+            </div>
+          </button>
+
+          <!-- Role 3: Logistics -->
+          <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-2xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/40 hover:border-amber-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-11 h-11 rounded-xl object-cover border border-amber-400">
+            <div>
+              <div class="font-bold text-white group-hover:text-amber-300 transition-colors">Suresh Mane</div>
+              <div class="text-[10px] text-amber-400 font-medium">🚚 Reefer Fleet Driver</div>
+              <div class="text-[9px] text-slate-400 font-mono">MH-15-EG-8821</div>
+            </div>
+          </button>
+
+          <!-- Role 4: QC Officer -->
+          <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-2xl bg-purple-950/60 hover:bg-purple-900/80 border border-purple-500/40 hover:border-purple-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-11 h-11 rounded-xl object-cover border border-purple-400">
+            <div>
+              <div class="font-bold text-white group-hover:text-purple-300 transition-colors">Dr. Swaminathan</div>
+              <div class="text-[10px] text-purple-400 font-medium">🔬 Senior QC Officer</div>
+              <div class="text-[9px] text-slate-400 font-mono">Bay 3 NIR Scan</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- 📱 OPTIONAL ACCESSIBLE METHODS (VOICE OTP / KISAN CARD / PIN) -->
+      <div class="border-t border-emerald-900/60 pt-4 space-y-3">
+        <div class="flex items-center justify-between text-xs text-slate-400">
+          <span>More Accessible Login Modes:</span>
+        </div>
+
+        <!-- Auth Method Selector Tabs -->
+        <div class="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/20 text-[11px] font-semibold text-center">
+          <button onclick="switchGateAuthTab('voice-otp')" id="gate-tab-btn-voice-otp" class="gate-auth-subtab py-1.5 rounded-xl bg-emerald-600 text-white font-bold transition-all">📱 Spoken OTP</button>
+          <button onclick="switchGateAuthTab('qr-card')" id="gate-tab-btn-qr-card" class="gate-auth-subtab py-1.5 rounded-xl text-slate-300 hover:text-white transition-all">📷 Kisan Card</button>
+          <button onclick="switchGateAuthTab('dialer-pin')" id="gate-tab-btn-dialer-pin" class="gate-auth-subtab py-1.5 rounded-xl text-slate-300 hover:text-white transition-all">🔢 4-Digit PIN</button>
+        </div>
+
+        <!-- Tab 1: Voice & SMS OTP -->
+        <div id="gate-subtab-voice-otp" class="space-y-3">
+          <div class="flex items-center gap-2">
+            <input type="tel" id="gate-login-phone" value="+91 98220 12345 (Ramesh Patil)" readonly class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-emerald-300 font-mono">
+            <button onclick="speakCurrentOtp('1295')" title="Audio Readout (आवाज़ सुनें)" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1 text-xs font-bold shadow transition-all">
+              <i class="fa-solid fa-volume-high"></i>
+              <span>Hear OTP</span>
+            </button>
+          </div>
+          <button onclick="verifyOtpAndUnlockApp()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-lock-open"></i>
+            <span>Verify Demo OTP (1 2 9 5) & Enter</span>
+          </button>
+        </div>
+
+        <!-- Tab 2: Kisan Smart Card -->
+        <div id="gate-subtab-qr-card" class="hidden space-y-2">
+          <div onclick="loginWithKisanCard('farmer-1')" class="cursor-pointer p-3 rounded-xl bg-emerald-950/70 border border-emerald-400 text-xs flex items-center justify-between hover:bg-emerald-900 transition-all">
             <div class="flex items-center gap-2">
-              <i class="fa-solid fa-seedling text-emerald-400 text-lg"></i>
-              <span class="font-extrabold text-white text-xs tracking-wider font-heading">KISAN SMART CARD • MH GOVT</span>
+              <i class="fa-solid fa-qrcode text-emerald-400 text-lg"></i>
+              <span><strong>Kisan Smart Card</strong> • Ramesh Patil</span>
             </div>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-bold">1-TAP UNLOCK</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-14 h-14 rounded-xl object-cover border border-emerald-400">
-            <div class="text-xs">
-              <div class="font-bold text-white text-sm">Ramesh Patil</div>
-              <div class="text-emerald-300 text-[11px] font-mono">ID: KISAN-MH-7721</div>
-              <div class="text-slate-300 text-[10px]">Nashik Agro FPO • 4.5 Acres</div>
-            </div>
-            <div class="ml-auto text-emerald-400 text-2xl">
-              <i class="fa-solid fa-qrcode animate-pulse"></i>
-            </div>
-          </div>
-          <div class="text-center text-[11px] font-bold text-emerald-300 bg-emerald-950/60 py-1.5 rounded-lg border border-emerald-500/30">
-            👉 Tap Here to Unlock App as Ramesh Patil
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-bold">1-Tap</span>
           </div>
         </div>
 
-        <div onclick="loginWithKisanCard('farmer-2')" class="cursor-pointer p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-400 transition-all flex items-center gap-3">
-          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150" alt="Farmer" class="w-10 h-10 rounded-lg object-cover">
-          <div class="text-xs">
-            <div class="font-bold text-white">Sardar Balram Singh</div>
-            <div class="text-slate-400 text-[10px]">KISAN-PB-3310 • Ludhiana, Punjab</div>
+        <!-- Tab 3: Dialer PIN -->
+        <div id="gate-subtab-dialer-pin" class="hidden space-y-3">
+          <div class="text-center">
+            <span class="text-xs text-slate-400">PIN: <strong class="text-emerald-400 font-mono">•••• (1234)</strong></span>
           </div>
-          <button class="ml-auto text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg font-bold">1-Tap Unlock</button>
-        </div>
-      </div>
-
-      <!-- Tab 3: 4-Digit Dialer PIN -->
-      <div id="gate-subtab-dialer-pin" class="hidden space-y-4">
-        <div class="text-center">
-          <div class="text-xs text-slate-300">Enter Your 4-Digit Security PIN:</div>
-          <div class="text-3xl font-mono tracking-widest text-emerald-400 font-bold mt-2" id="gate-pin-display">••••</div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto">
-          <button onclick="pressGatePin('1')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">1</button>
-          <button onclick="pressGatePin('2')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">2</button>
-          <button onclick="pressGatePin('3')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">3</button>
-          <button onclick="pressGatePin('4')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">4</button>
-          <button onclick="pressGatePin('5')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">5</button>
-          <button onclick="pressGatePin('6')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">6</button>
-          <button onclick="pressGatePin('7')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">7</button>
-          <button onclick="pressGatePin('8')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">8</button>
-          <button onclick="pressGatePin('9')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">9</button>
-          <button onclick="clearGatePin()" class="h-12 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-400 font-bold text-xs">CLR</button>
-          <button onclick="pressGatePin('0')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">0</button>
-          <button onclick="submitGatePinLogin()" class="h-12 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 flex items-center justify-center gap-1">
-            <i class="fa-solid fa-unlock"></i> OK
+          <button onclick="submitGatePinLogin()" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500">
+            Submit PIN & Unlock
           </button>
         </div>
       </div>
 
-      <!-- Tab 4: 1-Click Role Switcher for Hackathon Jury -->
-      <div id="gate-subtab-personas" class="hidden space-y-3">
-        <p class="text-xs text-slate-300">Instantly authenticate as any ecosystem stakeholder for live evaluation:</p>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-          <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-xl bg-emerald-900/40 hover:bg-emerald-800 border border-emerald-500/30 text-left flex items-center gap-2.5 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-wheat-awn text-base"></i>
-            </div>
-            <div>
-              <div class="font-bold text-white">Ramesh Patil</div>
-              <div class="text-[10px] text-emerald-300">🌾 Kisan (Nashik Hub)</div>
-            </div>
-          </button>
-
-          <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-xl bg-blue-900/40 hover:bg-blue-800 border border-blue-500/30 text-left flex items-center gap-2.5 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-building text-base"></i>
-            </div>
-            <div>
-              <div class="font-bold text-white">BigBasket Lead</div>
-              <div class="text-[10px] text-blue-300">🛒 Institutional Buyer</div>
-            </div>
-          </button>
-
-          <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-xl bg-amber-900/40 hover:bg-amber-800 border border-amber-500/30 text-left flex items-center gap-2.5 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-truck text-base"></i>
-            </div>
-            <div>
-              <div class="font-bold text-white">Suresh Mane</div>
-              <div class="text-[10px] text-amber-300">🚚 Reefer Fleet Driver</div>
-            </div>
-          </button>
-
-          <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-xl bg-purple-900/40 hover:bg-purple-800 border border-purple-500/30 text-left flex items-center gap-2.5 transition-all">
-            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
-              <i class="fa-solid fa-microscope text-base"></i>
-            </div>
-            <div>
-              <div class="font-bold text-white">Dr. Swaminathan</div>
-              <div class="text-[10px] text-purple-300">🔬 Senior QC Officer</div>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Trust Footer Inside Login Card -->
+      <!-- Trust Footer -->
       <div class="border-t border-emerald-900/60 pt-3 flex items-center justify-between text-[11px] text-slate-400">
-        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-shield-check"></i> Zero-Middleman Protocol</span>
-        <span>⚡ T+0 Direct Settlement</span>
+        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-shield-check"></i> 3 SQLite Microservers Active</span>
+        <span>⚡ T+0 Direct Payouts</span>
       </div>
 
     </div>
@@ -749,7 +686,7 @@
                   <i class="fa-solid fa-camera text-emerald-400"></i>
                 </div>
                 <div>
-                  <h3 class="font-bold text-white text-lg font-heading">AI Optical Ripeness & Sugar Brix Studio</h3>
+                  <h3 class="font-bold text-white text-lg font-heading">AI Ripeness & Brix Computer Vision</h3>
                   <p class="text-xs text-slate-300">HTML5 Canvas Pixel Histogram & NIR Estimation</p>
                 </div>
               </div>
@@ -1226,7 +1163,7 @@
           <i class="fa-solid fa-arrows-rotate text-emerald-400"></i>
           <span>Switch Active User / Persona</span>
         </h3>
-        <p class="text-xs text-slate-300 mt-1">Switch between Farmer, Buyer, Logistics Driver, and QC Officer:</p>
+        <p class="text-xs text-slate-300 mt-1">1-Click switch between Farmer, Buyer, Logistics Driver, and QC Officer:</p>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -1571,13 +1508,13 @@
       document.getElementById('gate-subtab-voice-otp').classList.add('hidden');
       document.getElementById('gate-subtab-qr-card').classList.add('hidden');
       document.getElementById('gate-subtab-dialer-pin').classList.add('hidden');
-      document.getElementById('gate-subtab-personas').classList.add('hidden');
 
-      document.getElementById('gate-subtab-' + tabId).classList.remove('hidden');
+      const targetSubtab = document.getElementById('gate-subtab-' + tabId);
+      if (targetSubtab) targetSubtab.classList.remove('hidden');
     }
 
     async function sendGateVoiceOtp() {
-      const phone = document.getElementById('gate-login-phone').value;
+      const phone = '9822012345';
       SoundEngine.playDispatchChime();
       try {
         const res = await fetch('http://localhost:5001/api/farmer/auth/send-otp', {
@@ -1590,7 +1527,6 @@
       } catch (e) {
         speakCurrentOtp('1295');
       }
-      alert('📲 Voice OTP Dispatched! Listen to audio prompt.');
     }
 
     function speakCurrentOtp(customOtp) {
@@ -1645,16 +1581,6 @@
       unlockApplication('farmer');
     }
 
-    function pressGatePin(num) {
-      if (AppState.currentGatePin.length < 4) {
-        AppState.currentGatePin += num;
-        document.getElementById('gate-pin-display').textContent = '•'.repeat(AppState.currentGatePin.length);
-      }
-    }
-    function clearGatePin() {
-      AppState.currentGatePin = "";
-      document.getElementById('gate-pin-display').textContent = "••••";
-    }
     function submitGatePinLogin() {
       verifyOtpAndUnlockApp();
     }

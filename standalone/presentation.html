@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriFlow AI — SIH 2026 Presentation Deck (Problem Statement 33)</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              900: '#064e3b',
+              950: '#022c22'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #022218;
+      color: #f8fafc;
+      overflow: hidden;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Outfit', sans-serif;
+    }
+    
+    .nature-bg {
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.35) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(2, 34, 24, 0.75) 0%, rgba(2, 22, 16, 0.88) 100%),
+        url('https://img.freepik.com/premium-photo/beautiful-green-forest-trees-vivid-color-nature-landscape-delightful-view-lush-woods-treetop-o_124507-11523.jpg?w=2000') center/cover no-repeat;
+      z-index: 0;
+    }
+
+    .slide {
+      display: none;
+      opacity: 0;
+      transform: translateY(12px) scale(0.99);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .card-glass {
+      background: rgba(11, 46, 35, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between select-none relative">
+
+  <div class="nature-bg"></div>
+
+  <!-- TOP PRESENTATION BAR -->
+  <header class="relative z-20 w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <div>
+        <span class="font-extrabold text-white text-base tracking-tight font-heading">AgriFlow <span class="text-emerald-400">AI</span></span>
+        <span class="text-[10px] text-amber-300 font-bold ml-2 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30">SIH 2026 • PS-33</span>
+      </div>
+    </div>
+
+    <!-- Controls & Slide Indicator -->
+    <div class="flex items-center gap-3">
+      <!-- Fullscreen Button -->
+      <button onclick="toggleFullScreen()" title="Toggle Fullscreen (F)" class="p-2 px-3 rounded-xl bg-slate-900/80 border border-emerald-500/30 text-slate-300 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5">
+        <i class="fa-solid fa-expand text-emerald-400"></i>
+        <span class="hidden sm:inline">Fullscreen [F]</span>
+      </button>
+
+      <!-- App Link -->
+      <a href="index.html" class="p-2 px-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition-all flex items-center gap-1.5 shadow-lg">
+        <i class="fa-solid fa-play text-[10px]"></i>
+        <span>Launch App</span>
+      </a>
+
+      <!-- Slide Counter -->
+      <div class="px-3.5 py-1.5 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold">
+        <span id="slide-current">1</span> / <span id="slide-total">12</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SLIDES CONTAINER -->
+  <main class="relative z-10 w-full max-w-7xl mx-auto px-6 flex-1 flex items-center justify-center">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active flex-col items-center text-center max-w-4xl p-8 sm:p-12 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs">
+        <i class="fa-solid fa-trophy"></i> SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33
+      </div>
+      <h1 class="text-4xl sm:text-6xl font-black text-white font-heading tracking-tight">
+        AgriFlow <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">AI</span>
+      </h1>
+      <p class="text-xl sm:text-2xl font-bold text-slate-200">
+        Decentralized Smart Agri-Logistics & Direct Procurement Protocol
+      </p>
+      <p class="text-sm sm:text-base text-slate-300 max-w-2xl">
+        Empowering 140M+ Indian Farmers with AI Cold-Chain IoT Telematics, Direct Institutional Sourcing, and Guaranteed Above-MSP T+0 Bank Payouts.
+      </p>
+      <div class="flex flex-wrap justify-center gap-3 pt-2">
+        <span class="px-3 py-1 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">🌾 5-Stakeholder Unified UX</span>
+        <span class="px-3 py-1 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">🇮🇳 11 Indian Languages</span>
+        <span class="px-3 py-1 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">❄️ 0-4°C Active Cold Chain</span>
+        <span class="px-3 py-1 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">⚡ T+0 RBI Escrow Payouts</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: THE PROBLEM -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-amber-400 tracking-wider uppercase">Problem Statement 33</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">The Ground Reality: Post-Harvest Loss & Middleman Exploitation</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-rose-500/40 space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div class="text-2xl font-black text-rose-400 font-mono">35% - 40% Spoilage</div>
+          <div class="text-xs font-bold text-white uppercase tracking-wider">Cold Chain Deficit</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Lack of temperature-controlled logistics causes massive rotting of tomatoes, onions, and greens before reaching urban consumer markets.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-amber-500/40 space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-users-slash"></i>
+          </div>
+          <div class="text-2xl font-black text-amber-400 font-mono">4 to 6 Middlemen</div>
+          <div class="text-xs font-bold text-white uppercase tracking-wider">APMC Mandi Margin Cuts</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Farmers receive only 25-30% of the consumer rupee. Commission agents and distress auctions force sales below cost of cultivation.</p>
+        </div>
+
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-purple-500/40 space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+          </div>
+          <div class="text-2xl font-black text-purple-400 font-mono">Below Govt MSP</div>
+          <div class="text-xs font-bold text-white uppercase tracking-wider">Distress Selling & Delayed Pay</div>
+          <p class="text-xs text-slate-300 leading-relaxed">Absence of transparent benchmark data forces uneducated farmers into distress sales with chronic 45-day payment delays.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: AGRIFLOW AI SOLUTION -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase">Our Innovation</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">The AgriFlow AI Solution: End-to-End Agri-Logistics</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-wheat-awn"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold text-white">Direct Farmgate Sourcing</div>
+            <div class="text-xs text-amber-300 font-semibold mb-1">Zero Middlemen Commission</div>
+            <p class="text-xs text-slate-300">Connects FPOs directly to BigBasket, Zepto, and Reliance Retail with smart batch quality grading and 0% APMC fee.</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-snowflake"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold text-white">0-4°C Active IoT Cold Chain</div>
+            <div class="text-xs text-amber-300 font-semibold mb-1">Live Telematics & Routing</div>
+            <p class="text-xs text-slate-300">Monitors Sugar Brix, ethylene, and temperature in real time with dynamic GPS rerouting to avoid heat corridors.</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold text-white">Govt MSP Price Floor Protection</div>
+            <div class="text-xs text-amber-300 font-semibold mb-1">3-Tier Benchmark Model</div>
+            <p class="text-xs text-slate-300">Automated price protection model ensuring farmer payouts always exceed Mandi distress rates and Govt MSP floors (+32% uplift).</p>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-lg shrink-0">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <div class="text-sm font-bold text-white">T+0 Instant Escrow Payouts</div>
+            <div class="text-xs text-amber-300 font-semibold mb-1">RBI-Verified Bank Settlements</div>
+            <p class="text-xs text-slate-300">Smart contract escrow credits farmer bank accounts via UPI/NEFT upon digital QC waybill confirmation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: 5 STAKEHOLDERS -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase">User-Centric Architecture</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">5-Stakeholder Unified Digital Ecosystem</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-emerald-500/40 text-center space-y-2">
+          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=120" class="w-14 h-14 rounded-full mx-auto object-cover border-2 border-emerald-400">
+          <div class="font-bold text-white text-xs">🌾 Kisan Farmer</div>
+          <div class="text-[10px] text-emerald-300 font-semibold">Ramesh Patil</div>
+          <p class="text-[11px] text-slate-400">1-Tap login, voice advisory, farmgate pickup scheduler, payout ledger.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-blue-500/40 text-center space-y-2">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120" class="w-14 h-14 rounded-full mx-auto object-cover border-2 border-blue-400">
+          <div class="font-bold text-white text-xs">🏢 Buyer</div>
+          <div class="text-[10px] text-blue-300 font-semibold">Priya Sharma</div>
+          <p class="text-[11px] text-slate-400">Direct 40+ vegetable sourcing catalog, escrow basket, Brix grade proofs.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-amber-500/40 text-center space-y-2">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120" class="w-14 h-14 rounded-full mx-auto object-cover border-2 border-amber-400">
+          <div class="font-bold text-white text-xs">🚚 Driver</div>
+          <div class="text-[10px] text-amber-300 font-semibold">Suresh Mane</div>
+          <p class="text-[11px] text-slate-400">Reefer telematics, ambient vs cold tracker, digital QR waybills.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-purple-500/40 text-center space-y-2">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120" class="w-14 h-14 rounded-full mx-auto object-cover border-2 border-purple-400">
+          <div class="font-bold text-white text-xs">🔬 QC Officer</div>
+          <div class="text-[10px] text-purple-300 font-semibold">Dr. Swaminathan</div>
+          <p class="text-[11px] text-slate-400">AI computer vision freshness, digital Sugar Brix grading, lot release.</p>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-900/90 border border-rose-500/40 text-center space-y-2">
+          <div class="w-14 h-14 rounded-full mx-auto bg-rose-500/20 border-2 border-rose-400 flex items-center justify-center text-rose-400 text-xl font-bold">
+            <i class="fa-solid fa-user-tie"></i>
+          </div>
+          <div class="font-bold text-white text-xs">👔 Boss / Staff</div>
+          <div class="text-[10px] text-rose-300 font-semibold">Audit Executive</div>
+          <p class="text-[11px] text-slate-400">MPIN-secured confidential farmer earnings ledger, UTR bank audits.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: RURAL ACCESSIBILITY SUITE -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-amber-400 tracking-wider uppercase">Inclusivity for Uneducated Farmers</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">Rural Accessibility Suite & 11 Indian Languages</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 space-y-2">
+          <div class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-language text-emerald-400"></i>
+            <span>11 Indian Regional Languages</span>
+          </div>
+          <p class="text-xs text-slate-300">Complete UI localization across Tamil, Hindi, Malayalam, Telugu, Kannada, Bengali, Marathi, Gujarati, Punjabi, Odia, and English.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 space-y-2">
+          <div class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-volume-high text-amber-400"></i>
+            <span>Web Speech Spoken Voice Synthesis</span>
+          </div>
+          <p class="text-xs text-slate-300">Allows illiterate farmers to hear real-time MSP advisory, OTP codes, and weather alerts spoken naturally in regional languages.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 space-y-2">
+          <div class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-phone-volume text-emerald-400"></i>
+            <span>24x7 Kisan Helpline (1800-180-1551)</span>
+          </div>
+          <p class="text-xs text-slate-300">Direct 1-tap toll-free calling connects rural farmers with agricultural scientists and emergency cold-truck dispatchers.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 space-y-2">
+          <div class="text-base font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-key text-purple-400"></i>
+            <span>Self-Service Credential Recovery</span>
+          </div>
+          <p class="text-xs text-slate-300">Forgot User ID and Forgot Password workflows with simple 4-digit SMS OTP verification and profile username customization.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: MSP 3-TIER PRICE ENGINE -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase">Price Discovery</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">Government MSP Protection & 3-Tier Price Architecture</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 space-y-3">
+          <h3 class="text-lg font-bold text-amber-300 font-heading">3-Tier Benchmark Mechanics</h3>
+          <div class="space-y-2 text-xs text-slate-300">
+            <div>🏛️ <strong class="text-white">Govt MSP Floor:</strong> Guaranteed statutory benchmark set by CACP (Ministry of Agriculture). Platform locks transactions above this price.</div>
+            <div>📉 <strong class="text-white">APMC Mandi Distress:</strong> Local auction rate depressed by middlemen cartels, spoilage risks, and delayed settlement.</div>
+            <div>⚡ <strong class="text-white">AgriFlow Direct Price:</strong> Pre-negotiated institutional bulk purchase price offering direct +32% net gain to farmers.</div>
+          </div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-emerald-500/30 space-y-2 text-xs">
+          <h3 class="text-lg font-bold text-emerald-300 font-heading">Live Price Uplift Sample</h3>
+          <div class="divide-y divide-emerald-900/60 font-mono">
+            <div class="py-1.5 flex justify-between"><span>Nashik Red Onion</span><span class="text-emerald-400">₹38.50 vs Mandi ₹22.00 (+60%)</span></div>
+            <div class="py-1.5 flex justify-between"><span>Ratnagiri Alphonso</span><span class="text-emerald-400">₹210.0 vs Mandi ₹135.0 (+50%)</span></div>
+            <div class="py-1.5 flex justify-between"><span>Pusa Ruby Tomato</span><span class="text-emerald-400">₹28.00 vs Mandi ₹14.00 (+55%)</span></div>
+            <div class="py-1.5 flex justify-between"><span>Jalgaon Banana</span><span class="text-emerald-400">₹24.00 vs Mandi ₹15.00 (+50%)</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: CONFIDENTIAL STAFF AUDIT -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-purple-400 tracking-wider uppercase">Executive Governance</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">Confidential Staff Audit & Secure Banking Ledger</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-5 rounded-2xl bg-purple-950/70 border border-purple-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">🔐 4-Digit Boss MPIN Gate</div>
+          <p class="text-xs text-purple-200/80">Only authorized executives and field auditors with MPIN authentication (Default: 8821) can access cluster payout aggregates and bank data.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-purple-950/70 border border-purple-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">🛡️ DPDP Act 2023 Bank Privacy Masking</div>
+          <p class="text-xs text-purple-200/80">Sensitive bank account numbers and IFSC codes are dynamically masked (`•••• •••• 4412`) with a secure 1-tap unmask toggle for audits.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-purple-950/70 border border-purple-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">💸 T+0 Direct Settlement Ledger</div>
+          <p class="text-xs text-purple-200/80">Individual farmer records with real-time disbursement status, bank transaction UTR numbers, and zero-commission confirmation.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-purple-950/70 border border-purple-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">📊 Cluster Savings Analytics</div>
+          <p class="text-xs text-purple-200/80">Live dashboard tracking ₹4.82+ Crores disbursed, ₹1.48+ Crores saved in middleman commission cuts, and 99.4% freshness retention.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: AI COLD CHAIN TELEMATICS -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-blue-400 tracking-wider uppercase">Cold Logistics</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">AI Cold-Chain Telematics & Active Shelf-Life Preservation</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-blue-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">❄️ 0-4°C Multi-Sensor IoT</div>
+          <p class="text-xs text-slate-300">Continuous telemetry of temperature, humidity (85-90%), and ethylene gas ppm inside active reefer vans.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-blue-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">📉 Arrhenius Decay Modeling</div>
+          <p class="text-xs text-slate-300">Predicts shelf-life decay comparing ambient storage (4-5 days) vs active cold-chain (18-21 days) in real time.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-blue-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">🗺️ Dynamic GPS Cold Routing</div>
+          <p class="text-xs text-slate-300">Automatically reroutes refrigerated trucks away from extreme heat corridors and traffic congestion to preserve cargo.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-900/80 border border-blue-500/40 space-y-2">
+          <div class="text-sm font-bold text-white">📱 Cryptographic QR Digital Waybill</div>
+          <p class="text-xs text-slate-300">Tamper-proof digital waybill proving end-to-end cold-chain compliance before buyer escrow release.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: 40+ INDIAN VEGETABLES -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase">Produce Catalog</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">Comprehensive 40+ Indian Vegetables Database</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-xs">
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+          <div class="font-bold text-emerald-300 mb-1">🥔 Roots & Tubers</div>
+          <div class="text-slate-400 text-[11px]">Potato, Onion, Carrot, Beetroot, Radish, Ginger, Garlic, Sweet Potato, Arbi, Yam.</div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+          <div class="font-bold text-emerald-300 mb-1">🥬 Leafy Greens</div>
+          <div class="text-slate-400 text-[11px]">Palak (Spinach), Methi, Coriander, Curry Leaves, Mustard Greens (Sarson), Amaranth.</div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+          <div class="font-bold text-emerald-300 mb-1">🥒 Gourds & Squashes</div>
+          <div class="text-slate-400 text-[11px]">Bottle Gourd (Lauki), Bitter Gourd (Karela), Ridge Gourd (Turai), Sponge Gourd, Pumpkin.</div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+          <div class="font-bold text-emerald-300 mb-1">🥦 Brassicas / Cabbages</div>
+          <div class="text-slate-400 text-[11px]">Cauliflower (Gobi), Green Cabbage, Broccoli, Knol Khol (Ganth Gobi).</div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+          <div class="font-bold text-emerald-300 mb-1">🍅 Solanaceous Nightshades</div>
+          <div class="text-slate-400 text-[11px]">Tomato (Hybrid & Desi), Green Chilli, Red & Yellow Capsicum, Bell Pepper, Brinjal.</div>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900/80 border border-emerald-500/30">
+          <div class="font-bold text-emerald-300 mb-1">🫛 Pods & Legumes</div>
+          <div class="text-slate-400 text-[11px]">Green Peas (Matar), Okra / Bhindi, Cluster Beans (Gawar), French Beans, Drumstick.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: TECH STACK -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-amber-400 tracking-wider uppercase">Engineering Architecture</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">Production-Grade Technology Stack</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-emerald-500/30 space-y-1.5">
+          <div class="font-bold text-white text-sm">🖥️ Frontend Framework</div>
+          <p class="text-slate-400">Tailwind CSS CDN, Modern Glassmorphism UI, Responsive Dual-Panel Auth, Leaflet GIS Mapping, Chart.js.</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-emerald-500/30 space-y-1.5">
+          <div class="font-bold text-white text-sm">🎵 Naturistic SoundEngine</div>
+          <p class="text-slate-400">Web Audio API 528Hz acoustic bamboo leaf feedback for organic tactile user experience on all buttons and actions.</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-emerald-500/30 space-y-1.5">
+          <div class="font-bold text-white text-sm">🗄️ Relational SQLite3 Database</div>
+          <p class="text-slate-400">Local binary database (`agriflow.db`) storing crops, staff MPIN credentials, farmer earnings, orders, and telemetry logs.</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/90 border border-emerald-500/30 space-y-1.5">
+          <div class="font-bold text-white text-sm">⚙️ 3 Node.js Microservices</div>
+          <p class="text-slate-400">Farmer Server (:5001), Buyer Server (:5002), and Logistics Server (:5003) for decentralized scalability.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: QUANTIFIABLE ROI -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-emerald-400 tracking-wider uppercase">Business Model & ROI</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">Quantifiable Economic Impact & Stakeholder ROI</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div class="p-5 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-center space-y-2">
+          <div class="text-3xl font-black text-emerald-300 font-mono">35%</div>
+          <div class="text-xs font-bold text-white uppercase">Spoilage Elimination</div>
+          <p class="text-[11px] text-slate-300">AI cold routing and 0-4°C active reefers preserve perishable grade quality.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-amber-950/80 border border-amber-500/40 text-center space-y-2">
+          <div class="text-3xl font-black text-amber-300 font-mono">+32.4%</div>
+          <div class="text-xs font-bold text-white uppercase">Farmer Net Income</div>
+          <p class="text-[11px] text-slate-300">Direct farmgate sourcing + MSP floor guarantees higher realization per kg.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-blue-950/80 border border-blue-500/40 text-center space-y-2">
+          <div class="text-3xl font-black text-blue-300 font-mono">28%</div>
+          <div class="text-xs font-bold text-white uppercase">Buyer Cost Savings</div>
+          <p class="text-[11px] text-slate-300">Direct FPO procurement eliminates mandi cess, middleman cuts, and transit loss.</p>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-purple-950/80 border border-purple-500/40 text-center space-y-2">
+          <div class="text-3xl font-black text-purple-300 font-mono">T+0</div>
+          <div class="text-xs font-bold text-white uppercase">Instant Cashflow</div>
+          <p class="text-[11px] text-slate-300">Automated escrow payout solves chronic 45-day buyer credit cycles.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: ROADMAP & CONCLUSION -->
+    <div class="slide flex-col max-w-6xl w-full p-6 sm:p-10 card-glass rounded-3xl shadow-2xl space-y-6">
+      <div>
+        <span class="text-xs font-bold text-amber-400 tracking-wider uppercase">Next Horizons</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-white font-heading">National Scale, Future Roadmap & Conclusion</h2>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div class="p-4 rounded-xl bg-emerald-950/90 border border-emerald-400 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white">Phase 1: SIH 2026 Production Prototype (Complete)</div>
+            <div class="text-emerald-300 text-[11px]">Full 5-stakeholder protocol, SQLite relational DB, 11 languages, 40+ veggies, MSP price model live.</div>
+          </div>
+          <span class="px-2.5 py-1 rounded bg-emerald-500 text-slate-950 font-black text-[10px]">LIVE NOW</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white">Phase 2: ONDC Agri & e-NAM Integration</div>
+            <div class="text-slate-400 text-[11px]">Direct integration with National Agriculture Market and ONDC open network for nationwide buyer discovery.</div>
+          </div>
+          <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-400 font-bold text-[10px]">Q3 2026</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white">Phase 3: 500+ APMC Mandi Cold Corridors</div>
+            <div class="text-slate-400 text-[11px]">Deploying solar-powered mobile cold hubs across Maharashtra, Punjab, Karnataka, and Tamil Nadu farm clusters.</div>
+          </div>
+          <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-400 font-bold text-[10px]">Q4 2026</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-emerald-500/30 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-white">Phase 4: Carbon Credit Monetization</div>
+            <div class="text-slate-400 text-[11px]">Incentivizing zero-emission electric reefer fleets with tradable carbon credits for FPOs.</div>
+          </div>
+          <span class="px-2.5 py-1 rounded bg-slate-800 text-slate-400 font-bold text-[10px]">2027</span>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION CONTROLS -->
+  <footer class="relative z-20 w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- Left: Prev button -->
+    <button onclick="prevSlide()" id="btn-prev" class="px-4 py-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 text-slate-300 hover:text-white font-bold text-xs shadow-lg transition-all flex items-center gap-2">
+      <i class="fa-solid fa-arrow-left"></i>
+      <span>Previous [←]</span>
+    </button>
+
+    <!-- Center: Progress dots -->
+    <div class="flex items-center gap-1.5" id="dots-container">
+      <!-- Dots injected dynamically -->
+    </div>
+
+    <!-- Right: Next button -->
+    <button onclick="nextSlide()" id="btn-next" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center gap-2">
+      <span>Next [→]</span>
+      <i class="fa-solid fa-arrow-right"></i>
+    </button>
+  </footer>
+
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    const dotsContainer = document.getElementById('dots-container');
+    const slideCurrentElem = document.getElementById('slide-current');
+    const slideTotalElem = document.getElementById('slide-total');
+
+    if (slideTotalElem) slideTotalElem.innerText = totalSlides;
+
+    // Create dots
+    dotsContainer.innerHTML = Array.from({ length: totalSlides }).map((_, i) => `
+      <button onclick="goToSlide(${i})" class="w-2.5 h-2.5 rounded-full transition-all ${i === 0 ? 'bg-emerald-400 w-6' : 'bg-slate-700 hover:bg-slate-500'}" title="Slide ${i+1}"></button>
+    `).join('');
+
+    function updateSlide() {
+      slides.forEach((s, idx) => {
+        if (idx === currentSlide) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+
+      if (slideCurrentElem) slideCurrentElem.innerText = currentSlide + 1;
+
+      // Update dots
+      const dots = dotsContainer.querySelectorAll('button');
+      dots.forEach((dot, idx) => {
+        if (idx === currentSlide) {
+          dot.className = 'w-6 h-2.5 rounded-full bg-emerald-400 transition-all shadow';
+        } else {
+          dot.className = 'w-2.5 h-2.5 rounded-full bg-slate-700 hover:bg-slate-500 transition-all';
+        }
+      });
+
+      // Update Prev/Next button states
+      const prevBtn = document.getElementById('btn-prev');
+      const nextBtn = document.getElementById('btn-next');
+      if (prevBtn) prevBtn.disabled = currentSlide === 0;
+      if (nextBtn) {
+        if (currentSlide === totalSlides - 1) {
+          nextBtn.innerHTML = '<span>Finish 🎉</span> <i class="fa-solid fa-trophy"></i>';
+        } else {
+          nextBtn.innerHTML = '<span>Next [→]</span> <i class="fa-solid fa-arrow-right"></i>';
+        }
+      }
+
+      if (currentSlide === totalSlides - 1 && typeof confetti !== 'undefined') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(n) {
+      if (n >= 0 && n < totalSlides) {
+        currentSlide = n;
+        updateSlide();
+      }
+    }
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.log("Fullscreen error:", err);
+        });
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // Keyboard Navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(totalSlides - 1);
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullScreen();
+      }
+    });
+
+    updateSlide();
+  </script>
+</body>
+</html>

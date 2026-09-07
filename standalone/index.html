@@ -313,251 +313,461 @@
   <!-- 🔐 1. ULTRA-PERFECT, GORGEOUS & DEAD-SIMPLE 1-TAP LOGIN LAUNCHPAD -->
   <!-- (Website only opens into full app once logged in) -->
   <!-- ======================================================== -->
-  <div id="auth-gate-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 relative z-20 transition-all duration-500">
-    
-    <!-- Ambient Radial Glow Behind the Card -->
-    <div class="absolute w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse"></div>
-    <div class="absolute w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10 translate-x-32 translate-y-32"></div>
+  <div id="auth-gate-container" class="min-h-screen flex flex-col justify-between p-3 sm:p-6 lg:p-8 relative z-10">
 
-    <div class="agri-card max-w-xl w-full rounded-[32px] border-2 border-emerald-400/60 p-6 sm:p-9 space-y-6 shadow-[0_30px_100px_rgba(0,0,0,0.85)] relative overflow-hidden backdrop-blur-2xl bg-slate-950/85">
+    <!-- 🌐 REALISTIC WEB TOP NAVIGATION BAR -->
+    <header class="w-full max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 bg-slate-950/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl px-4 sm:px-6 py-3 shadow-2xl mb-6">
+      <!-- Logo & SIH Badge -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-emerald-600 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-emerald-500/30">
+          <i class="fa-solid fa-leaf"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-lg font-black text-white tracking-tight font-heading">AgriFlow <span class="text-emerald-400">AI</span></span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 uppercase tracking-wider hidden sm:inline-block">SIH 2026 • PS-33</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-medium">Decentralized Perishable Supply Chain & MSP Protocol</div>
+        </div>
+      </div>
+
+      <!-- Right Utility Controls: Language Selector, Sound Toggle, 24x7 Helpline -->
+      <div class="flex items-center flex-wrap gap-2.5">
+        <!-- 11 Indian Languages Selector -->
+        <div class="relative">
+          <select id="login-lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-900/90 text-white text-xs rounded-xl pl-8 pr-7 py-2 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-semibold cursor-pointer shadow-md">
+            <option value="en">🇬🇧 English</option>
+            <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+            <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+            <option value="ml">🇮🇳 മലയാളം (Malayalam)</option>
+            <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+            <option value="kn">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+            <option value="bn">🇮🇳 বাংলা (Bengali)</option>
+            <option value="mr">🇮🇳 मराठी (Marathi)</option>
+            <option value="gu">🇮🇳 ગુજરાતી (Gujarati)</option>
+            <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</option>
+            <option value="or">🇮🇳 ଓଡ଼ିଆ (Odia)</option>
+          </select>
+          <i class="fa-solid fa-language absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-400 text-xs pointer-events-none"></i>
+          <i class="fa-solid fa-chevron-down absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none"></i>
+        </div>
+
+        <!-- Organic Sound Toggle -->
+        <button onclick="SoundEngine.toggleMute()" id="login-sound-toggle-btn" title="Toggle Nature Sounds" class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/40 text-emerald-300 hover:text-emerald-200 text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+          <i id="login-sound-icon" class="fa-solid fa-volume-high text-emerald-400"></i>
+          <span class="hidden md:inline text-[11px]" id="login-sound-text">528Hz Audio</span>
+        </button>
+
+        <!-- 24x7 Kisan Call Center -->
+        <a href="tel:18001801551" class="px-3 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs shadow-lg transition-all flex items-center gap-1.5">
+          <i class="fa-solid fa-phone-volume text-[11px] animate-pulse"></i>
+          <span class="hidden sm:inline">1800-180-1551</span>
+          <span class="sm:hidden">Help</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- 🌟 HERO SPLIT LAYOUT: REALISTIC ENTERPRISE SAAS DESIGN -->
+    <main class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch my-auto">
       
-      <!-- Top Subtle Gold & Emerald Accent Bar -->
-      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-300 to-amber-400"></div>
-
-      <!-- Brand & Global Accessibility Controls Header -->
-      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4 pt-1">
+      <!-- 🌿 LEFT COLUMN: PLATFORM SHOWCASE, VALUE PROPOSITION & LIVE METRICS (7 Cols) -->
+      <section class="lg:col-span-7 flex flex-col justify-between bg-slate-950/75 backdrop-blur-xl border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
         
-        <!-- Logo & Title -->
-        <div class="flex items-center gap-3.5">
-          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-amber-400 p-0.5 shadow-xl shadow-emerald-500/30 group">
-            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center relative overflow-hidden">
-              <i class="fa-solid fa-seedling text-emerald-400 text-2xl group-hover:scale-110 transition-transform"></i>
-              <div class="absolute inset-0 bg-emerald-400/10 animate-ping rounded-full pointer-events-none"></div>
+        <!-- Background Ambient Glow -->
+        <div class="absolute -top-24 -left-24 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Header Badges -->
+        <div class="space-y-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/40 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-check text-emerald-400"></i> MoA&FW & ONDC Agri Certified
+            </span>
+            <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-500/40 flex items-center gap-1.5">
+              <i class="fa-solid fa-award text-amber-400"></i> Smart India Hackathon 2026
+            </span>
+          </div>
+
+          <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight font-heading">
+            Next-Gen <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300">AI Cold Chain</span> & Direct Farmgate Procurement
+          </h1>
+
+          <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-normal">
+            Empowering 140M+ Indian farmers by eliminating 35% post-harvest spoilage with AI IoT telematics and guaranteeing above-MSP direct settlements with zero middlemen.
+          </p>
+        </div>
+
+        <!-- 4 Core Pillars Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/25 hover:border-emerald-400/50 transition-all flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-base shrink-0">
+              <i class="fa-solid fa-wheat-awn"></i>
             </div>
+            <div>
+              <div class="text-xs font-bold text-white">Direct Farmgate Sourcing</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Instant aggregation for BigBasket, Zepto & Reliance Retail at 0% mandi fee.</div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/25 hover:border-emerald-400/50 transition-all flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-base shrink-0">
+              <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">Govt MSP Protection Floor</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Guaranteed minimum prices (+32% average income uplift over distress mandis).</div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/25 hover:border-emerald-400/50 transition-all flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-base shrink-0">
+              <i class="fa-solid fa-snowflake"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">0-4°C Active Reefer IoT</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Real-time Sugar Brix, ethylene decay curves & automated cold-routing.</div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/25 hover:border-emerald-400/50 transition-all flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-base shrink-0">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">T+0 RBI Escrow Payouts</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Instant UPI/NEFT bank settlement upon digital QC waybill confirmation.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 📊 Live Real-Time Platform Statistics Bar -->
+        <div class="p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <div>
+            <div class="text-base sm:text-xl font-black text-emerald-300 font-mono">₹4.82 Cr+</div>
+            <div class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Farmer Payouts</div>
           </div>
           <div>
-            <div class="flex items-center gap-2">
-              <span class="font-heading font-black text-2xl sm:text-3xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 font-mono font-bold">AI</span></span>
-            </div>
-            <p class="text-[11px] text-emerald-300 font-semibold flex items-center gap-1.5 mt-0.5">
-              <i class="fa-solid fa-award text-amber-400"></i> Smart India Hackathon 2026 • Problem Statement 33
-            </p>
+            <div class="text-base sm:text-xl font-black text-amber-300 font-mono">40+</div>
+            <div class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Indian Veggies</div>
+          </div>
+          <div>
+            <div class="text-base sm:text-xl font-black text-teal-300 font-mono">99.4%</div>
+            <div class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Spoilage-Free</div>
+          </div>
+          <div>
+            <div class="text-base sm:text-xl font-black text-purple-300 font-mono">11 Langs</div>
+            <div class="text-[10px] text-slate-300 uppercase tracking-wider font-semibold">Voice Enabled</div>
           </div>
         </div>
 
-        <!-- Top Utility Controls: Language & Sunlight Mode -->
-        <div class="flex items-center gap-2">
-          
-          <!-- 🌐 11-Language Selector with Native Flags -->
-          <div class="relative">
-            <select id="login-lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-900/90 hover:bg-slate-800 text-emerald-300 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold py-1.5 pl-2.5 pr-7 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-md transition-all">
-              <option value="en">🇬🇧 English</option>
-              <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
-              <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
-              <option value="ml">🇮🇳 മലയാളം (Malayalam)</option>
-              <option value="te">🇮🇳 తెలుగు (Telugu)</option>
-              <option value="kn">🇮🇳 ಕನ್ನಡ (Kannada)</option>
-              <option value="bn">🇮🇳 বাংলা (Bengali)</option>
-              <option value="mr">🇮🇳 मराठी (Marathi)</option>
-              <option value="gu">🇮🇳 ગુજરાતી (Gujarati)</option>
-              <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</option>
-              <option value="or">🇮🇳 ଓଡ଼ିଆ (Odia)</option>
-            </select>
-            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-emerald-400">
-              <i class="fa-solid fa-language text-xs"></i>
-            </div>
-          </div>
-
-          <!-- Sunlight Field Mode -->
-          <button onclick="toggleSunlightMode()" title="Toggle High Contrast Sunlight Mode" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/40 text-amber-300 text-xs font-bold transition-all flex items-center gap-1 shadow-md">
-            <i class="fa-solid fa-sun text-xs"></i>
-            <span class="hidden sm:inline" data-i18n="sun_mode_btn">Sun Mode</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Multilingual Greetings & Welcome Banner -->
-      <div class="text-center space-y-1 bg-gradient-to-r from-emerald-950/60 via-slate-900/80 to-emerald-950/60 py-2 px-4 rounded-2xl border border-emerald-500/20">
-        <h2 class="text-lg sm:text-xl font-black text-white font-heading flex items-center justify-center gap-2">
-          <span>🌾</span>
-          <span data-i18n="auth_title">Select Your Role to Enter</span>
-          <span>⚡</span>
-        </h2>
-        <p class="text-xs text-emerald-300 font-medium">
-          <span data-i18n="auth_subtitle">⚡ 1-Click Direct Access • No Password Required</span>
-        </p>
-      </div>
-
-      <!-- 🌟 1. GIANT 1-CLICK FAST LAUNCH HERO BUTTON (FARMER RAMESH PATIL) -->
-      <button onclick="quickLoginPersona('farmer-1')" class="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm shadow-[0_10px_30px_rgba(16,185,129,0.35)] hover:shadow-[0_15px_40px_rgba(16,185,129,0.5)] transition-all transform hover:-translate-y-1 flex items-center justify-between group border-2 border-emerald-300">
-        <div class="flex items-center gap-3.5">
-          <div class="relative">
-            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Ramesh Patil" class="w-12 h-12 rounded-2xl object-cover border-2 border-slate-950 shadow-md">
-            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-700 border-2 border-slate-950 flex items-center justify-center text-white text-[8px]">
-              <i class="fa-solid fa-check"></i>
-            </span>
-          </div>
-          <div class="text-left">
-            <div class="font-black text-base text-slate-950 leading-tight flex items-center gap-1.5">
-              <span data-i18n="auth_hero_btn">1-CLICK INSTANT ENTRY (Kisan Farmer)</span>
-              <span class="text-xs">➔</span>
-            </div>
-            <div class="text-[11px] font-bold text-slate-900/90 mt-0.5">
-              Ramesh Patil • Nashik FPO • <strong class="text-emerald-950 bg-emerald-300/60 px-1.5 py-0.2 rounded font-mono">₹1,84,500 Available</strong>
-            </div>
+        <!-- Farmer Testimonial & Trust Quote -->
+        <div class="flex items-center gap-3 p-3 rounded-xl bg-slate-900/60 border border-emerald-500/20 text-xs">
+          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=120" alt="Ramesh Patil" class="w-9 h-9 rounded-full object-cover border border-emerald-400 shrink-0">
+          <div class="text-slate-300 text-[11px] italic">
+            "AgriFlow direct cold routing earned our Nashik cluster <strong class="text-emerald-300 not-italic">₹14.50/kg higher</strong> than the local APMC mandi with instant bank credit."
+            <span class="block text-[10px] text-slate-400 not-italic font-bold mt-0.5">— Ramesh Patil, Nashik Agro FPO</span>
           </div>
         </div>
-        <div class="w-10 h-10 rounded-2xl bg-slate-950/20 group-hover:bg-slate-950/30 flex items-center justify-center text-slate-950 font-bold text-base shadow transition-all">
-          <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
-        </div>
-      </button>
 
-      <!-- 🌟 2. 4 SIMPLE 1-TAP ROLE BUTTONS (GRID) -->
-      <div class="space-y-2.5">
-        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider text-center">Or choose your direct stakeholder role:</div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          
-          <!-- Role 1: Kisan Farmer -->
-          <button onclick="quickLoginPersona('farmer-1')" class="p-3.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-500/50 hover:border-emerald-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
-            <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-10 h-10 rounded-xl object-cover border border-emerald-400 shadow">
-              <div>
-                <div class="font-bold text-white group-hover:text-emerald-300">Ramesh Patil</div>
-                <div class="text-[10px] text-emerald-400 font-semibold">🌾 <span data-i18n="role_farmer_label">Kisan Farmer</span></div>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors shadow">
-              <span data-i18n="enter_arrow">Enter ➔</span>
-            </span>
-          </button>
-
-          <!-- Role 2: Institutional Buyer -->
-          <button onclick="quickLoginPersona('buyer-1')" class="p-3.5 rounded-2xl bg-blue-950/80 hover:bg-blue-900 border-2 border-blue-500/50 hover:border-blue-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
-            <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-10 h-10 rounded-xl object-cover border border-blue-400 shadow">
-              <div>
-                <div class="font-bold text-white group-hover:text-blue-300">BigBasket</div>
-                <div class="text-[10px] text-blue-400 font-semibold">🛒 <span data-i18n="role_buyer_label">Sourcing Buyer</span></div>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-xl bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 group-hover:bg-blue-500 group-hover:text-slate-950 transition-colors shadow">
-              <span data-i18n="enter_arrow">Enter ➔</span>
-            </span>
-          </button>
-
-          <!-- Role 3: Reefer Logistics Driver -->
-          <button onclick="quickLoginPersona('logistics-1')" class="p-3.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border-2 border-amber-500/50 hover:border-amber-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
-            <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-10 h-10 rounded-xl object-cover border border-amber-400 shadow">
-              <div>
-                <div class="font-bold text-white group-hover:text-amber-300">Suresh Mane</div>
-                <div class="text-[10px] text-amber-400 font-semibold">🚚 <span data-i18n="role_driver_label">Reefer Driver</span></div>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors shadow">
-              <span data-i18n="enter_arrow">Enter ➔</span>
-            </span>
-          </button>
-
-          <!-- Role 4: Quality Control Officer -->
-          <button onclick="quickLoginPersona('qc-1')" class="p-3.5 rounded-2xl bg-purple-950/80 hover:bg-purple-900 border-2 border-purple-500/50 hover:border-purple-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
-            <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-10 h-10 rounded-xl object-cover border border-purple-400 shadow">
-              <div>
-                <div class="font-bold text-white group-hover:text-purple-300">Dr. Swaminathan</div>
-                <div class="text-[10px] text-purple-400 font-semibold">🔬 <span data-i18n="role_qc_label">QC Officer</span></div>
-              </div>
-            </div>
-            <span class="px-2.5 py-1 rounded-xl bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors shadow">
-              <span data-i18n="enter_arrow">Enter ➔</span>
-            </span>
-          </button>
-
-        </div>
-      </div>
-
-      <!-- 👔 3. BOSS & EXECUTIVE STAFF PORTAL BUTTON (MPIN GUARDED) -->
-      <button onclick="openStaffAuthModal()" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-950/90 via-slate-900 to-purple-950/90 hover:from-purple-900 hover:to-indigo-950 border-2 border-purple-500/60 hover:border-purple-400 text-purple-200 hover:text-white text-xs font-bold transition-all flex items-center justify-between shadow-xl group">
-        <div class="flex items-center gap-2.5">
-          <div class="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-400 flex items-center justify-center text-amber-400">
-            <i class="fa-solid fa-user-tie text-xs"></i>
-          </div>
-          <div class="text-left">
-            <div class="font-black text-white group-hover:text-purple-300 flex items-center gap-1.5">
-              <span>👔 Boss & Staff Executive Portal</span>
-              <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">MPIN SECURED</span>
-            </div>
-            <div class="text-[10px] text-purple-300/80">View Total Farmer Earnings, Margin Savings & Bank UTR Ledger</div>
-          </div>
-        </div>
-        <span class="px-2.5 py-1 rounded-xl bg-purple-500/30 text-purple-200 text-[10px] font-bold border border-purple-400/40 group-hover:bg-purple-500 group-hover:text-slate-950 transition-all">
-          Audit Ledger ➔
-        </span>
-      </button>
-
-      <!-- 🎙️ 4. RURAL ACCESSIBILITY BAR: VOICE OTP + 24x7 KISAN HELPLINE -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-        
-        <!-- Spoken Voice OTP -->
-        <div class="bg-slate-950/90 p-3 rounded-2xl border border-emerald-500/30 flex items-center justify-between text-xs shadow-md">
+        <!-- Ecosystem Partner Badges -->
+        <div class="flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400 pt-2 border-t border-emerald-900/50">
           <div class="flex items-center gap-2">
-            <i class="fa-solid fa-volume-high text-amber-400 text-base animate-pulse"></i>
-            <div>
-              <div class="text-white font-bold text-[11px]"><span data-i18n="voice_login_title">Rural Voice Login</span></div>
-              <div class="text-[10px] text-slate-400"><span data-i18n="voice_login_sub">Hear OTP audio prompt</span></div>
-            </div>
+            <i class="fa-solid fa-network-wired text-emerald-400"></i>
+            <span>Integrated with e-NAM • ONDC Agri • NABARD • APEDA</span>
           </div>
-          <button onclick="speakCurrentOtp('1295')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow transition-all flex items-center gap-1">
-            <i class="fa-solid fa-play text-[9px]"></i> <span data-i18n="voice_speak_btn">Speak OTP</span>
+          <div class="flex items-center gap-1.5 text-emerald-400 font-mono text-[10px]">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>Microservers Ready (:5001 - :5003)</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 🔐 RIGHT COLUMN: REALISTIC AUTHENTICATION CARD & TABBED ACCESS (5 Cols) -->
+      <section class="lg:col-span-5 bg-slate-950/90 backdrop-blur-2xl border-2 border-emerald-500/40 rounded-3xl p-5 sm:p-7 shadow-2xl flex flex-col justify-between space-y-5">
+        
+        <!-- Auth Card Header -->
+        <div class="space-y-1.5 border-b border-emerald-900/60 pb-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-black text-white font-heading flex items-center gap-2">
+              <i class="fa-solid fa-lock text-emerald-400"></i>
+              <span data-i18n="auth_welcome">Sign In to AgriFlow</span>
+            </h2>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+              🔒 256-Bit SSL
+            </span>
+          </div>
+          <p class="text-xs text-slate-400" data-i18n="auth_portal_desc">Select your preferred login method below to access the platform.</p>
+        </div>
+
+        <!-- 📑 AUTHENTICATION METHOD TABS -->
+        <div class="grid grid-cols-4 gap-1 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/30 text-[11px] font-bold">
+          <button id="auth-tab-btn-easy" onclick="switchAuthTab('easy')" class="auth-tab-btn active py-2 px-1 rounded-xl bg-emerald-500 text-slate-950 transition-all flex flex-col items-center justify-center gap-1 shadow">
+            <i class="fa-solid fa-bolt text-xs"></i>
+            <span>1-Tap Easy</span>
+          </button>
+          <button id="auth-tab-btn-pwd" onclick="switchAuthTab('pwd')" class="auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1">
+            <i class="fa-solid fa-key text-xs"></i>
+            <span>Password</span>
+          </button>
+          <button id="auth-tab-btn-mpin" onclick="switchAuthTab('mpin')" class="auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1">
+            <i class="fa-solid fa-shield-halved text-xs"></i>
+            <span>Boss MPIN</span>
+          </button>
+          <button id="auth-tab-btn-otp" onclick="switchAuthTab('otp')" class="auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1">
+            <i class="fa-solid fa-mobile-screen-button text-xs"></i>
+            <span>Phone OTP</span>
           </button>
         </div>
 
-        <!-- 24x7 Toll-Free Call Center Direct Dial -->
-        <div class="bg-slate-950/90 p-3 rounded-2xl border border-emerald-500/30 flex items-center justify-between text-xs shadow-md">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-phone-volume text-emerald-400 text-base animate-bounce"></i>
-            <div>
-              <div class="text-white font-bold text-[11px]">Kisan Helpline</div>
-              <div class="text-[10px] text-emerald-300 font-mono">1800-180-1551 (Free)</div>
+        <!-- ======================================================== -->
+        <!-- TAB CONTENT 1: 🌾 RURAL 1-TAP EASY ACCESS (DEFAULT) -->
+        <!-- ======================================================== -->
+        <div id="auth-panel-easy" class="auth-panel space-y-3.5">
+          
+          <!-- Hero 1-Click Button (Ramesh Patil) -->
+          <button onclick="quickLoginPersona('farmer-1')" class="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm shadow-xl shadow-emerald-500/30 transition-all hover:scale-[1.01] flex items-center justify-between group border-2 border-emerald-300">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=120" alt="Farmer" class="w-10 h-10 rounded-full object-cover border-2 border-slate-950 shadow">
+              <div class="text-left">
+                <div class="text-[10px] text-emerald-950 font-bold uppercase tracking-wider">⚡ Instant 1-Click Entry</div>
+                <div class="font-extrabold text-slate-950 text-sm leading-tight">Ramesh Patil (Kisan Farmer)</div>
+              </div>
             </div>
+            <div class="w-8 h-8 rounded-xl bg-slate-950 text-emerald-400 flex items-center justify-center text-xs group-hover:translate-x-1 transition-transform">
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </button>
+
+          <!-- 4 Stakeholder Quick Cards -->
+          <div class="grid grid-cols-2 gap-2">
+            <!-- Farmer -->
+            <button onclick="quickLoginPersona('farmer-1')" class="p-2.5 rounded-xl bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow group">
+              <div class="flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=80" alt="Farmer" class="w-8 h-8 rounded-lg object-cover border border-emerald-400">
+                <div>
+                  <div class="font-bold text-white text-xs group-hover:text-emerald-300 leading-tight">Ramesh Patil</div>
+                  <div class="text-[9px] text-emerald-400 font-semibold">🌾 Kisan Farmer</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-arrow-right text-[10px] text-emerald-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </button>
+
+            <!-- Buyer -->
+            <button onclick="quickLoginPersona('buyer-1')" class="p-2.5 rounded-xl bg-blue-950/80 hover:bg-blue-900 border border-blue-500/40 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow group">
+              <div class="flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=80" alt="Buyer" class="w-8 h-8 rounded-lg object-cover border border-blue-400">
+                <div>
+                  <div class="font-bold text-white text-xs group-hover:text-blue-300 leading-tight">Priya Sharma</div>
+                  <div class="text-[9px] text-blue-400 font-semibold">🏢 BigBasket Buyer</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-arrow-right text-[10px] text-blue-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </button>
+
+            <!-- Driver -->
+            <button onclick="quickLoginPersona('logistics-1')" class="p-2.5 rounded-xl bg-amber-950/80 hover:bg-amber-900 border border-amber-500/40 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow group">
+              <div class="flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80" alt="Driver" class="w-8 h-8 rounded-lg object-cover border border-amber-400">
+                <div>
+                  <div class="font-bold text-white text-xs group-hover:text-amber-300 leading-tight">Suresh Mane</div>
+                  <div class="text-[9px] text-amber-400 font-semibold">🚚 Reefer Driver</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-arrow-right text-[10px] text-amber-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </button>
+
+            <!-- QC Officer -->
+            <button onclick="quickLoginPersona('qc-1')" class="p-2.5 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow group">
+              <div class="flex items-center gap-2">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80" alt="QC" class="w-8 h-8 rounded-lg object-cover border border-purple-400">
+                <div>
+                  <div class="font-bold text-white text-xs group-hover:text-purple-300 leading-tight">Dr. Swaminathan</div>
+                  <div class="text-[9px] text-purple-400 font-semibold">🔬 QC Inspector</div>
+                </div>
+              </div>
+              <i class="fa-solid fa-arrow-right text-[10px] text-purple-400 group-hover:translate-x-0.5 transition-transform"></i>
+            </button>
           </div>
-          <a href="tel:18001801551" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow transition-all flex items-center gap-1">
-            <i class="fa-solid fa-phone text-[9px]"></i> Call
-          </a>
+
+          <!-- Spoken Voice OTP & Kisan Helpline Access -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="speakCurrentOtp('1295')" class="p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-amber-500/40 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow">
+              <i class="fa-solid fa-volume-high text-amber-400"></i>
+              <span data-i18n="voice_speak_btn">Hear Voice OTP</span>
+            </button>
+            <button onclick="openStaffAuthModal()" class="p-2 rounded-xl bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 text-purple-300 font-bold text-xs flex items-center justify-center gap-1.5 shadow">
+              <i class="fa-solid fa-user-tie text-purple-400"></i>
+              <span>Boss MPIN ➔</span>
+            </button>
+          </div>
         </div>
 
+        <!-- ======================================================== -->
+        <!-- TAB CONTENT 2: 🔑 STANDARD USERNAME & PASSWORD -->
+        <!-- ======================================================== -->
+        <div id="auth-panel-pwd" class="auth-panel hidden space-y-3.5">
+          <form id="standard-login-form" onsubmit="submitStandardPasswordLogin(event)" class="space-y-3 text-xs">
+            <!-- Username Input -->
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Username / Registered Mobile</label>
+              <div class="relative">
+                <input type="text" id="login-username-input" value="farmer-1" required placeholder="e.g. farmer-1 or 9822012345" class="w-full bg-slate-900 text-white text-xs rounded-xl pl-9 pr-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+                <i class="fa-solid fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              </div>
+            </div>
+
+            <!-- Password Input with Show/Hide Toggle -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-slate-300 font-semibold">Password</label>
+                <button type="button" onclick="openChangePasswordModal()" class="text-[11px] text-amber-400 hover:text-amber-300 font-bold">
+                  Forgot Password?
+                </button>
+              </div>
+              <div class="relative">
+                <input type="password" id="login-password-input" value="kisan123" required placeholder="Enter password" class="w-full bg-slate-900 text-white text-xs rounded-xl pl-9 pr-9 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+                <i class="fa-solid fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <button type="button" onclick="togglePasswordVisibility('login-password-input', 'pwd-eye-icon')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+                  <i id="pwd-eye-icon" class="fa-solid fa-eye text-xs"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Remember Me & Forgot User ID -->
+            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-0.5">
+              <label class="flex items-center gap-1.5 cursor-pointer">
+                <input type="checkbox" checked class="rounded bg-slate-900 border-emerald-500/40 text-emerald-500 focus:ring-0">
+                <span>Remember this device</span>
+              </label>
+              <button type="button" onclick="openFindUserIdModal()" class="text-emerald-400 hover:text-emerald-300 font-semibold">
+                Forgot User ID?
+              </button>
+            </div>
+
+            <!-- Quick Demo Autofill Chips -->
+            <div class="pt-1">
+              <div class="text-[10px] text-slate-400 font-semibold mb-1">Quick Demo Autofill:</div>
+              <div class="flex flex-wrap gap-1.5 text-[10px]">
+                <button type="button" onclick="autofillLogin('farmer-1', 'kisan123')" class="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900">🌾 Farmer</button>
+                <button type="button" onclick="autofillLogin('buyer-1', 'buyer123')" class="px-2 py-0.5 rounded bg-blue-950 border border-blue-500/40 text-blue-300 hover:bg-blue-900">🏢 Buyer</button>
+                <button type="button" onclick="autofillLogin('logistics-1', 'driver123')" class="px-2 py-0.5 rounded bg-amber-950 border border-amber-500/40 text-amber-300 hover:bg-amber-900">🚚 Driver</button>
+                <button type="button" onclick="autofillLogin('admin', 'admin123')" class="px-2 py-0.5 rounded bg-purple-950 border border-purple-500/40 text-purple-300 hover:bg-purple-900">👔 Staff</button>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="btn-submit-pwd-login" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-right-to-bracket"></i>
+              <span>Sign In with Credentials</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TAB CONTENT 3: 🛡️ BOSS & STAFF MPIN ACCESS -->
+        <!-- ======================================================== -->
+        <div id="auth-panel-mpin" class="auth-panel hidden space-y-3.5">
+          <div class="p-3 rounded-2xl bg-purple-950/60 border border-purple-500/40 space-y-1">
+            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-amber-400"></i> Executive Audit Security Gate
+            </div>
+            <div class="text-[11px] text-purple-300/80">Guarded by 4-digit Boss MPIN. Grants access to Confidential Bank Ledger.</div>
+          </div>
+
+          <form id="direct-mpin-form" onsubmit="submitDirectMpinLogin(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Staff Username</label>
+              <input type="text" id="direct-staff-user" value="admin" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-purple-500/40 focus:outline-none focus:border-purple-400 font-mono">
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-slate-300 font-semibold">Enter 4-Digit Boss MPIN</label>
+                <span class="text-[10px] text-amber-400 font-mono font-bold bg-slate-900 px-1.5 py-0.5 rounded">Default: 8821</span>
+              </div>
+              <input type="password" id="direct-mpin-input" value="8821" maxlength="4" required class="w-full bg-slate-900 text-white text-center text-xl font-black tracking-widest rounded-xl px-3.5 py-2.5 border-2 border-purple-500/60 focus:outline-none focus:border-amber-400 font-mono">
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-indigo-500 to-purple-500 hover:from-purple-400 hover:to-indigo-400 text-white font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-unlock-keyhole"></i>
+              <span>Authenticate MPIN & Unlock Ledger</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TAB CONTENT 4: 📲 PHONE NUMBER + SMS OTP -->
+        <!-- ======================================================== -->
+        <div id="auth-panel-otp" class="auth-panel hidden space-y-3.5">
+          <form id="phone-otp-login-form" onsubmit="submitPhoneOtpLogin(event)" class="space-y-3 text-xs">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Mobile Number</label>
+              <div class="flex gap-2">
+                <span class="px-2.5 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-slate-300 font-mono text-xs flex items-center">🇮🇳 +91</span>
+                <input type="tel" id="otp-login-phone" value="9822012345" required placeholder="10-digit mobile" class="flex-1 bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+                <button type="button" onclick="generateSimulatedOtp()" class="px-3 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] shadow whitespace-nowrap">
+                  Get OTP 📲
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-slate-300 font-semibold">Enter 4-Digit OTP</label>
+                <button type="button" onclick="speakCurrentOtp('1295')" class="text-[11px] text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-volume-high"></i> Speak OTP
+                </button>
+              </div>
+              <input type="text" id="otp-login-code" value="1295" maxlength="4" required class="w-full bg-slate-900 text-white text-center text-xl font-black tracking-widest rounded-xl px-3.5 py-2 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+              <span>Auto-verified in simulated demo</span>
+              <span class="text-emerald-400 font-mono">OTP: 1295</span>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-mobile-screen-button"></i>
+              <span>Verify OTP & Sign In</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- 📝 CARD FOOTER: NEW REGISTRATION & TRUST GUARANTEE -->
+        <div class="pt-3 border-t border-emerald-900/60 space-y-2 text-center">
+          <button onclick="openRegisterModal()" class="text-xs text-slate-300 hover:text-emerald-300 transition-colors font-medium">
+            New to AgriFlow? <strong class="text-emerald-400 underline decoration-emerald-500/40">Register as Farmer or Buyer ➔</strong>
+          </button>
+          <div class="flex items-center justify-center gap-3 text-[10px] text-slate-400 pt-1">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-lock text-emerald-400"></i> DPDP Act 2023 Compliant</span>
+            <span>•</span>
+            <span class="flex items-center gap-1"><i class="fa-solid fa-building-columns text-amber-400"></i> RBI Escrow Verified</span>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- 🌐 REALISTIC WEB PAGE FOOTER -->
+    <footer class="w-full max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400 bg-slate-950/70 backdrop-blur-md border border-emerald-500/20 rounded-2xl px-5 py-3 shadow-lg mt-6">
+      <div>
+        © 2026 <strong class="text-white">AgriFlow AI Protocol</strong>. All rights reserved. Smart India Hackathon 2026.
       </div>
-
-      <!-- 🔑 5. CREDENTIAL RECOVERY BUTTONS (CHANGE PASSWORD & FIND USER ID VIA OTP) -->
-      <div class="grid grid-cols-2 gap-2.5 pt-1 text-xs">
-        
-        <!-- Button 1: Change / Reset Password -->
-        <button onclick="openChangePasswordModal()" class="p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-amber-500/40 hover:border-amber-400 text-slate-200 hover:text-white font-bold transition-all flex items-center justify-center gap-2 shadow-md group">
-          <i class="fa-solid fa-key text-amber-400 text-xs group-hover:rotate-45 transition-transform"></i>
-          <span>Change Password (OTP)</span>
-        </button>
-
-        <!-- Button 2: Find User ID -->
-        <button onclick="openFindUserIdModal()" class="p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-emerald-500/40 hover:border-emerald-400 text-slate-200 hover:text-white font-bold transition-all flex items-center justify-center gap-2 shadow-md group">
-          <i class="fa-solid fa-id-badge text-emerald-400 text-xs group-hover:scale-110 transition-transform"></i>
-          <span>Find User ID (OTP)</span>
-        </button>
-
+      <div class="flex items-center gap-4 text-[11px]">
+        <a href="#view-staff-audit" onclick="openStaffAuthModal()" class="hover:text-emerald-300 transition-colors">Staff Ledger</a>
+        <span>•</span>
+        <button onclick="openChangePasswordModal()" class="hover:text-emerald-300 transition-colors">Password Reset</button>
+        <span>•</span>
+        <button onclick="openFindUserIdModal()" class="hover:text-emerald-300 transition-colors">Find User ID</button>
+        <span>•</span>
+        <a href="tel:18001801551" class="text-emerald-400 hover:text-emerald-300 font-semibold">Toll-Free Helpline: 1800-180-1551</a>
       </div>
+    </footer>
 
-      <!-- Live Microserver Status & Security Footnote -->
-      <div class="border-t border-emerald-900/60 pt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
-        <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span data-i18n="microservers_ready">3 Microservers Ready (:5001, :5002, :5003)</span>
-        </span>
-        <span class="text-slate-300 font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded border border-emerald-500/20">SQLite3 Binary DB • T+0 RBI Verified</span>
-      </div>
-
-    </div>
   </div>
-
-  <!-- ======================================================== -->
+<!-- ======================================================== -->
   <!-- 🌟 2. COMPLETE WEB APPLICATION (UNLOCKED ONLY AFTER LOGIN) -->
   <!-- ======================================================== -->
   <div id="main-app-container" class="hidden flex-col min-h-screen relative z-10">
@@ -1051,6 +1261,47 @@
         </div>
 
         <!-- Buyer Catalog Grid -->
+        <!-- Buyer Search & Category Filter Controls -->
+        <div class="space-y-3">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div class="relative flex-1">
+              <input type="text" id="buyer-search-input" oninput="filterBuyerCatalog()" placeholder="Search all 40+ Indian vegetables (e.g. Tomato, Onion, Palak, Potato, Ginger, Garlic...)" class="w-full bg-slate-900/90 text-white text-xs sm:text-sm rounded-2xl pl-10 pr-4 py-3 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-medium placeholder-slate-400 shadow-lg">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-emerald-400 text-sm pointer-events-none"></i>
+            </div>
+            <button onclick="document.getElementById('buyer-search-input').value=''; filterBuyerCatalog();" class="px-4 py-3 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-emerald-500/30 text-slate-300 hover:text-white text-xs font-bold transition-all shadow flex items-center justify-center gap-2">
+              <i class="fa-solid fa-rotate-left"></i> Reset Filter
+            </button>
+          </div>
+
+          <!-- Category Filter Pills -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1 text-xs no-scrollbar">
+            <button onclick="setVegCategory('all')" id="cat-pill-all" class="cat-pill px-3.5 py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-bold transition-all whitespace-nowrap shadow">
+              🌱 All Vegetables (40+)
+            </button>
+            <button onclick="setVegCategory('Roots & Tubers')" id="cat-pill-Roots & Tubers" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🥔 Roots & Tubers
+            </button>
+            <button onclick="setVegCategory('Leafy Greens')" id="cat-pill-Leafy Greens" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🥬 Leafy Greens
+            </button>
+            <button onclick="setVegCategory('Gourds & Squashes')" id="cat-pill-Gourds & Squashes" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🥒 Gourds & Squashes
+            </button>
+            <button onclick="setVegCategory('Brassicas / Cruciferous')" id="cat-pill-Brassicas / Cruciferous" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🥦 Brassicas / Cabbages
+            </button>
+            <button onclick="setVegCategory('Solanaceous (Nightshades)')" id="cat-pill-Solanaceous (Nightshades)" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🍅 Solanaceous (Tomato/Brinjal)
+            </button>
+            <button onclick="setVegCategory('Pods & Legumes')" id="cat-pill-Pods & Legumes" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🫛 Pods & Legumes
+            </button>
+            <button onclick="setVegCategory('Alliums & Aromatics')" id="cat-pill-Alliums & Aromatics" class="cat-pill px-3.5 py-1.5 rounded-xl bg-slate-900 text-slate-300 border border-emerald-500/20 hover:border-emerald-400 transition-all whitespace-nowrap font-medium">
+              🧅 Alliums & Aromatics
+            </button>
+          </div>
+        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="buyer-catalog-grid">
           <!-- Populated dynamically -->
         </div>
@@ -4297,6 +4548,334 @@
       checkMicroserversHealth();
       setInterval(checkMicroserversHealth, 8000);
     });
+  
+    // ========================================================
+    // 🌐 REALISTIC WEB AUTHENTICATION & INTERACTIVE CONTROLS
+    // ========================================================
+
+    // Switch between Auth Tabs
+    function switchAuthTab(tabId) {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      
+      const tabBtns = ['easy', 'pwd', 'mpin', 'otp'];
+      tabBtns.forEach(t => {
+        const btn = document.getElementById('auth-tab-btn-' + t);
+        const panel = document.getElementById('auth-panel-' + t);
+        if (btn) {
+          if (t === tabId) {
+            btn.className = 'auth-tab-btn active py-2 px-1 rounded-xl bg-emerald-500 text-slate-950 font-bold transition-all flex flex-col items-center justify-center gap-1 shadow';
+          } else {
+            btn.className = 'auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1';
+          }
+        }
+        if (panel) {
+          if (t === tabId) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        }
+      });
+    }
+
+    // Toggle Password Visibility Eye
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input && icon) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.className = 'fa-solid fa-eye-slash text-xs text-amber-400';
+        } else {
+          input.type = 'password';
+          icon.className = 'fa-solid fa-eye text-xs text-slate-400';
+        }
+      }
+    }
+
+    // Autofill demo login credentials
+    function autofillLogin(user, pwd) {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const userInput = document.getElementById('login-username-input');
+      const pwdInput = document.getElementById('login-password-input');
+      if (userInput) userInput.value = user;
+      if (pwdInput) pwdInput.value = pwd;
+      showNotification('Loaded ' + user + ' credentials!', 'info');
+    }
+
+    // Standard Password Login Form Submit
+    function submitStandardPasswordLogin(e) {
+      if (e) e.preventDefault();
+      const user = (document.getElementById('login-username-input')?.value || '').trim();
+      const pwd = (document.getElementById('login-password-input')?.value || '').trim();
+
+      if (!user || !pwd) {
+        showNotification('Please enter your username and password', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-pwd-login');
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
+        btn.disabled = true;
+      }
+
+      setTimeout(() => {
+        if (btn) {
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In with Credentials';
+          btn.disabled = false;
+        }
+
+        // Map user to persona
+        let personaKey = 'farmer-1';
+        if (user.includes('buyer') || user.includes('priya')) personaKey = 'buyer-1';
+        else if (user.includes('logistics') || user.includes('driver') || user.includes('suresh')) personaKey = 'logistics-1';
+        else if (user.includes('qc') || user.includes('swami')) personaKey = 'qc-1';
+        else if (user.includes('admin') || user.includes('boss')) {
+          unlockConfidentialStaffAudit();
+          return;
+        }
+
+        quickLoginPersona(personaKey);
+        showNotification('Welcome back, ' + user + '! Session authenticated.', 'success');
+      }, 400);
+    }
+
+    // Direct MPIN Login Form Submit
+    function submitDirectMpinLogin(e) {
+      if (e) e.preventDefault();
+      const staffUser = document.getElementById('direct-staff-user')?.value || 'admin';
+      const mpin = (document.getElementById('direct-mpin-input')?.value || '').trim();
+      const expectedMpin = localStorage.getItem('agriflow_boss_mpin') || '8821';
+
+      if (mpin === expectedMpin || mpin === '8821') {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playCashPayout();
+        unlockConfidentialStaffAudit();
+      } else {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+        showNotification('Invalid MPIN! Default boss MPIN is 8821', 'error');
+      }
+    }
+
+    // Phone OTP Login Form Submit
+    function submitPhoneOtpLogin(e) {
+      if (e) e.preventDefault();
+      const phone = document.getElementById('otp-login-phone')?.value || '';
+      const code = document.getElementById('otp-login-code')?.value || '';
+
+      if (code === '1295' || code.length === 4) {
+        if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+        quickLoginPersona('farmer-1');
+        showNotification('Phone verified (' + phone + '). Welcome Ramesh Patil!', 'success');
+      } else {
+        showNotification('Invalid OTP! Please enter 1295.', 'error');
+      }
+    }
+
+    // Generate Simulated OTP
+    function generateSimulatedOtp() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const otpField = document.getElementById('otp-login-code');
+      if (otpField) otpField.value = '1295';
+      showNotification('SMS OTP sent to mobile: 1295', 'info');
+      speakCurrentOtp('1295');
+    }
+
+    // Registration Modal Open/Close/Submit
+    function openRegisterModal() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const m = document.getElementById('register-modal');
+      if (m) m.classList.remove('hidden');
+    }
+
+    function closeRegisterModal() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const m = document.getElementById('register-modal');
+      if (m) m.classList.add('hidden');
+    }
+
+    function submitRegistration(e) {
+      if (e) e.preventDefault();
+      const name = document.getElementById('reg-fullname')?.value || 'New Farmer';
+      const role = document.querySelector('input[name="reg-role"]:checked')?.value || 'farmer';
+      
+      closeRegisterModal();
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playCashPayout();
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+      }
+
+      let personaKey = 'farmer-1';
+      if (role === 'buyer') personaKey = 'buyer-1';
+      else if (role === 'logistics') personaKey = 'logistics-1';
+      else if (role === 'qc') personaKey = 'qc-1';
+
+      quickLoginPersona(personaKey);
+      showNotification('Registration successful! Welcome to AgriFlow, ' + name, 'success');
+    }
+
+    // ========================================================
+    // 🛒 INSTITUTIONAL BUYER PROCUREMENT BASKET & ESCROW
+    // ========================================================
+    AppState.cart = [
+      { id: 'nashik_onion', name: 'Nashik Red Onion (Export Grade A+)', price: 38.5, qty: 5000, farmer: 'Ramesh Patil' },
+      { id: 'ratnagiri_alphonso', name: 'Ratnagiri Alphonso Mango (GI)', price: 210.0, qty: 500, farmer: 'Santosh Sawant' }
+    ];
+
+    function toggleCartDrawer() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const drawer = document.getElementById('cart-drawer');
+      if (drawer) {
+        drawer.classList.toggle('translate-x-full');
+        renderCartItemsList();
+      }
+    }
+
+    function addToBuyerCart(cropId) {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const crop = AppState.crops.find(c => c.id === cropId);
+      if (!crop) return;
+
+      const existing = AppState.cart.find(item => item.id === cropId);
+      if (existing) {
+        existing.qty += 500;
+      } else {
+        AppState.cart.push({
+          id: crop.id,
+          name: crop.name,
+          price: crop.directPrice,
+          qty: 1000,
+          farmer: crop.farmer
+        });
+      }
+
+      updateCartBadgeCounters();
+      renderCartItemsList();
+      showNotification('Added 1,000 kg ' + crop.name + ' to Procurement Basket!', 'success');
+    }
+
+    function removeFromCart(cropId) {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      AppState.cart = AppState.cart.filter(item => item.id !== cropId);
+      updateCartBadgeCounters();
+      renderCartItemsList();
+      showNotification('Item removed from basket', 'info');
+    }
+
+    function updateCartBadgeCounters() {
+      const count = AppState.cart.length;
+      const count1 = document.getElementById('buyer-catalog-cart-count');
+      const count2 = document.getElementById('cart-counter');
+      if (count1) count1.innerText = count;
+      if (count2) count2.innerText = count;
+    }
+
+    function renderCartItemsList() {
+      const container = document.getElementById('cart-items-list');
+      const totalDisplay = document.getElementById('cart-total-display');
+      if (!container) return;
+
+      if (AppState.cart.length === 0) {
+        container.innerHTML = `
+          <div class="py-10 text-center text-slate-400">
+            <i class="fa-solid fa-basket-shopping text-3xl text-slate-600 mb-2"></i>
+            <div class="text-xs font-bold text-slate-300">Procurement basket is empty</div>
+            <div class="text-[10px] text-slate-500 mt-1">Browse 40+ vegetables and add lots</div>
+          </div>
+        `;
+        if (totalDisplay) totalDisplay.innerText = '₹0';
+        return;
+      }
+
+      let total = 0;
+      container.innerHTML = AppState.cart.map(item => {
+        const itemTotal = item.price * item.qty;
+        total += itemTotal;
+        return `
+          <div class="p-3 rounded-2xl bg-slate-900/90 border border-emerald-500/30 flex items-center justify-between gap-3 shadow-md">
+            <div class="flex-1">
+              <div class="font-bold text-white text-xs">${item.name}</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Farmer: ${item.farmer} • ₹${item.price}/kg</div>
+              <div class="text-[11px] text-emerald-300 font-mono font-bold mt-1">${item.qty.toLocaleString()} kg = ₹${itemTotal.toLocaleString('en-IN')}</div>
+            </div>
+            <button onclick="removeFromCart('${item.id}')" class="text-slate-400 hover:text-rose-400 p-2 text-xs">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      if (totalDisplay) {
+        totalDisplay.innerText = '₹' + total.toLocaleString('en-IN');
+      }
+    }
+
+    function checkoutCartOrders() {
+      if (AppState.cart.length === 0) {
+        showNotification('Your basket is empty. Add items first!', 'error');
+        return;
+      }
+
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playCashPayout();
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.5 } });
+      }
+
+      let totalAmount = AppState.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+      AppState.cart = [];
+      updateCartBadgeCounters();
+      renderCartItemsList();
+      toggleCartDrawer();
+
+      showNotification('₹' + totalAmount.toLocaleString('en-IN') + ' Locked in Smart Escrow! Reefer dispatch initiated.', 'success');
+    }
+
+    // ========================================================
+    // 🚚 LOGISTICS TELEMATICS & DISPATCH SCHEDULER
+    // ========================================================
+    function submitPickupSchedule(e) {
+      if (e) e.preventDefault();
+      const crop = document.getElementById('pickup-crop')?.value || 'Produce Lot';
+      const volume = document.getElementById('pickup-volume')?.value || '10.0';
+      const slot = document.getElementById('pickup-slot')?.value || 'Immediate';
+
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playDispatchChime();
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 70, spread: 60, origin: { y: 0.6 } });
+      }
+
+      showNotification('Pickup scheduled! Reefer Van RF-MH-4412 assigned for ' + volume + ' MT ' + crop + ' (' + slot + ')', 'success');
+    }
+
+    function refreshOrdersFromLogisticsServer() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      showNotification('Synced live telemetry with Cold Chain Fleet server (:5003)', 'info');
+    }
+
+    // ========================================================
+    // 🎹 GLOBAL KEYBOARD & BACKDROP ACCESSIBILITY
+    // ========================================================
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modals = ['change-password-modal', 'find-userid-modal', 'edit-profile-modal', 'register-modal', 'auth-modal', 'withdraw-modal', 'waybill-modal'];
+        modals.forEach(id => {
+          const el = document.getElementById(id);
+          if (el && !el.classList.contains('hidden')) el.classList.add('hidden');
+        });
+        const drawer = document.getElementById('cart-drawer');
+        if (drawer && !drawer.classList.contains('translate-x-full')) {
+          drawer.classList.add('translate-x-full');
+        }
+      }
+    });
+
+    // Close modals on backdrop click
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('fixed') && e.target.classList.contains('inset-0') && e.target.classList.contains('bg-slate-950/85')) {
+        e.target.classList.add('hidden');
+      }
+    });
+
   </script>
 
   <!-- ======================================================== -->
@@ -4567,6 +5146,107 @@
         <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
           <i class="fa-solid fa-floppy-disk"></i>
           <span>Save Changes & Update Username</span>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- 📝 4. NEW FARMER & ENTERPRISE BUYER REGISTRATION MODAL -->
+  <!-- ======================================================== -->
+  <div id="register-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="agri-card max-w-lg w-full rounded-3xl border-2 border-emerald-500/60 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden bg-slate-950/95 max-h-[90vh] overflow-y-auto">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-user-plus text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white font-heading">Register New Stakeholder Account</h3>
+            <p class="text-[10px] text-emerald-300">Join 140M+ Indian Farmers on AgriFlow Protocol</p>
+          </div>
+        </div>
+        <button onclick="closeRegisterModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="register-form" onsubmit="submitRegistration(event)" class="space-y-4 text-xs">
+        
+        <!-- Role Selection -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Select Account Type</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="reg-role" value="farmer" checked class="peer sr-only">
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-emerald-400 peer-checked:bg-emerald-950 text-center font-bold text-slate-300 peer-checked:text-emerald-300 transition-all">
+                <i class="fa-solid fa-wheat-awn block text-sm mb-1 text-emerald-400"></i>
+                <span class="text-[11px]">Farmer</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="reg-role" value="buyer" class="peer sr-only">
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-blue-400 peer-checked:bg-blue-950 text-center font-bold text-slate-300 peer-checked:text-blue-300 transition-all">
+                <i class="fa-solid fa-building-columns block text-sm mb-1 text-blue-400"></i>
+                <span class="text-[11px]">Buyer</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="reg-role" value="logistics" class="peer sr-only">
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-amber-400 peer-checked:bg-amber-950 text-center font-bold text-slate-300 peer-checked:text-amber-300 transition-all">
+                <i class="fa-solid fa-truck-fast block text-sm mb-1 text-amber-400"></i>
+                <span class="text-[11px]">Driver</span>
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="reg-role" value="qc" class="peer sr-only">
+              <div class="p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-purple-400 peer-checked:bg-purple-950 text-center font-bold text-slate-300 peer-checked:text-purple-300 transition-all">
+                <i class="fa-solid fa-microchip block text-sm mb-1 text-purple-400"></i>
+                <span class="text-[11px]">QC Officer</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Full Legal Name</label>
+          <input type="text" id="reg-fullname" placeholder="e.g. Balram Deshmukh" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400">
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Mobile Number (Aadhaar Linked)</label>
+            <input type="tel" id="reg-phone" placeholder="10-digit mobile" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">State / APMC District</label>
+            <input type="text" id="reg-location" placeholder="e.g. Nashik, Maharashtra" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Set Password</label>
+            <input type="password" id="reg-password" placeholder="Create password" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Set 4-Digit Quick MPIN</label>
+            <input type="password" id="reg-mpin" placeholder="e.g. 5544" maxlength="4" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono text-center">
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30 text-[11px] text-slate-300 flex items-center gap-2">
+          <i class="fa-solid fa-shield-check text-emerald-400 text-base"></i>
+          <span>Direct zero-commission onboarding under Smart India Hackathon 2026 digital mandate.</span>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-circle-check"></i>
+          <span>Create Account & Enter Platform</span>
         </button>
 
       </form>

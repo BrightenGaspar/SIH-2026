@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ==========================================
+    // HELPER FUNCTIONS FOR ROLE-BASED ACCESS
+    // ==========================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+    
+    // ==========================================
+    // 1. USERS COLLECTION
+    // ==========================================
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isOwner(userId) || hasRole('admin');
+      allow delete: if hasRole('admin');
+    }
+
+    // ==========================================
+    // 2. CROPS COLLECTION (Marketplace Listings)
+    // ==========================================
+    match /crops/{cropId} {
+      allow read: if true; // Public marketplace viewing
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (resource.data.farmerId == request.auth.uid || hasRole('admin'));
+      allow delete: if isAuthenticated() && (resource.data.farmerId == request.auth.uid || hasRole('admin'));
+    }
+
+    // ==========================================
+    // 3. ORDERS & PROCUREMENT COLLECTION
+    // ==========================================
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.farmerId == request.auth.uid || 
+        hasRole('admin') || 
+        hasRole('fpo')
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.farmerId == request.auth.uid || 
+        hasRole('admin')
+      );
+    }
+
+    // ==========================================
+    // 4. ESCROW VAULT (Immutable Financial Contracts)
+    // ==========================================
+    match /escrow/{escrowId} {
+      allow read: if isAuthenticated() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.farmerId == request.auth.uid || 
+        hasRole('admin')
+      );
+      // Writes strictly restricted to Cloud Functions Admin SDK
+      allow write: if false; 
+    }
+
+    // ==========================================
+    // 5. IOT COLD-CHAIN TELEMATICS COLLECTION
+    // ==========================================
+    match /telematics/{telematicsId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated(); // IoT hardware agent or cloud function
+      allow update: if hasRole('admin') || hasRole('logistics');
+    }
+
+    // ==========================================
+    // 6. COLD STORAGE WAREHOUSES
+    // ==========================================
+    match /cold_storage/{storageId} {
+      allow read: if true;
+      allow write: if hasRole('admin') || hasRole('warehouse_manager');
+    }
+
+    // ==========================================
+    // 7. APMC MANDI & MSP PRICE BENCHMARKS
+    // ==========================================
+    match /msp_records/{recordId} {
+      allow read: if true;
+      allow write: if hasRole('admin');
+    }
+
+    // ==========================================
+    // 8. ROCKY AI CONVERSATIONS & VOICE LOGS
+    // ==========================================
+    match /ai_conversations/{convId} {
+      allow read, write: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated();
+    }
+  }
+}

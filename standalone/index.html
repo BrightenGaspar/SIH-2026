@@ -86,7 +86,7 @@
         radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.40) 0%, transparent 45%),
         radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.45) 0%, transparent 50%),
         linear-gradient(180deg, rgba(2, 34, 24, 0.42) 0%, rgba(2, 22, 16, 0.65) 50%, rgba(1, 14, 10, 0.85) 100%),
-        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&auto=format&fit=crop&q=85') center/cover no-repeat;
+        url('https://img.freepik.com/premium-photo/beautiful-green-forest-trees-vivid-color-nature-landscape-delightful-view-lush-woods-treetop-o_124507-11523.jpg?w=2000') center/cover no-repeat;
       animation: landscapeBreathe 18s ease-in-out infinite alternate;
       transform-origin: center center;
     }
@@ -328,19 +328,41 @@
           </div>
         </div>
 
-        <button onclick="toggleSunlightMode()" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-emerald-500/40 text-amber-300 text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-1 shadow">
-          <i class="fa-solid fa-sun text-xs"></i>
-          <span class="hidden sm:inline">Sun Mode</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <!-- 🌐 Language Selector in Login -->
+          <div class="relative">
+            <select id="login-lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-900/90 text-emerald-300 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold py-1.5 pl-2.5 pr-7 rounded-xl cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-400 shadow">
+              <option value="en">🇬🇧 English</option>
+              <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+              <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+              <option value="ml">🇮🇳 മലയാളം (Malayalam)</option>
+              <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+              <option value="kn">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+              <option value="bn">🇮🇳 বাংলা (Bengali)</option>
+              <option value="mr">🇮🇳 मराठी (Marathi)</option>
+              <option value="gu">🇮🇳 ગુજરાતી (Gujarati)</option>
+              <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</option>
+              <option value="or">🇮🇳 ଓଡ଼ିଆ (Odia)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-emerald-400">
+              <i class="fa-solid fa-language text-xs"></i>
+            </div>
+          </div>
+
+          <button onclick="toggleSunlightMode()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-amber-300 text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-1 shadow">
+            <i class="fa-solid fa-sun text-xs"></i>
+            <span class="hidden sm:inline" data-i18n="sun_mode_btn">Sun Mode</span>
+          </button>
+        </div>
       </div>
 
       <!-- Welcome Title -->
       <div class="text-center space-y-1">
         <h2 class="text-xl sm:text-2xl font-black text-white font-heading">
-          Select Your Role to Enter
+          <span data-i18n="auth_title">Select Your Role to Enter</span>
         </h2>
         <p class="text-xs text-emerald-300/90 font-medium">
-          ⚡ 1-Click Direct Access • No Password Required
+          <span data-i18n="auth_subtitle">⚡ 1-Click Direct Access • No Password Required</span>
         </p>
       </div>
 
@@ -349,8 +371,8 @@
         <div class="flex items-center gap-2.5">
           <span class="text-xl">🌾</span>
           <div class="text-left">
-            <div class="font-extrabold leading-tight text-slate-950">1-CLICK INSTANT ENTRY (Kisan Farmer)</div>
-            <div class="text-[10px] font-semibold text-slate-900/80">Ramesh Patil • Nashik FPO • ₹1,84,500 Balance</div>
+            <div class="font-extrabold leading-tight text-slate-950"><span data-i18n="auth_hero_btn">1-CLICK INSTANT ENTRY (Kisan Farmer)</span></div>
+            <div class="text-[10px] font-semibold text-slate-900/80"><span data-i18n="auth_hero_sub">Ramesh Patil • Nashik FPO • ₹1,84,500 Balance</span></div>
           </div>
         </div>
         <div class="w-8 h-8 rounded-xl bg-slate-950/20 flex items-center justify-center text-slate-950 font-bold text-sm">
@@ -368,10 +390,10 @@
               <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-10 h-10 rounded-xl object-cover border border-emerald-400">
               <div>
                 <div class="font-bold text-white group-hover:text-emerald-300">Ramesh Patil</div>
-                <div class="text-[10px] text-emerald-400 font-semibold">🌾 Kisan Farmer</div>
+                <div class="text-[10px] text-emerald-400 font-semibold">🌾 <span data-i18n="role_farmer_label">Kisan Farmer</span></div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+            <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors"><span data-i18n="enter_arrow">Enter ➔</span></span>
           </button>
 
           <!-- Role 2: Institutional Buyer -->
@@ -380,7 +402,7 @@
               <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-10 h-10 rounded-xl object-cover border border-blue-400">
               <div>
                 <div class="font-bold text-white group-hover:text-blue-300">BigBasket</div>
-                <div class="text-[10px] text-blue-400 font-semibold">🛒 Sourcing Buyer</div>
+                <div class="text-[10px] text-blue-400 font-semibold">🛒 <span data-i18n="role_buyer_label">Sourcing Buyer</span></div>
               </div>
             </div>
             <span class="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 group-hover:bg-blue-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
@@ -392,7 +414,7 @@
               <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-10 h-10 rounded-xl object-cover border border-amber-400">
               <div>
                 <div class="font-bold text-white group-hover:text-amber-300">Suresh Mane</div>
-                <div class="text-[10px] text-amber-400 font-semibold">🚚 Reefer Driver</div>
+                <div class="text-[10px] text-amber-400 font-semibold">🚚 <span data-i18n="role_driver_label">Reefer Driver</span></div>
               </div>
             </div>
             <span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
@@ -404,7 +426,7 @@
               <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-10 h-10 rounded-xl object-cover border border-purple-400">
               <div>
                 <div class="font-bold text-white group-hover:text-purple-300">Dr. Swaminathan</div>
-                <div class="text-[10px] text-purple-400 font-semibold">🔬 QC Officer</div>
+                <div class="text-[10px] text-purple-400 font-semibold">🔬 <span data-i18n="role_qc_label">QC Officer</span></div>
               </div>
             </div>
             <span class="px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
@@ -418,18 +440,18 @@
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-volume-high text-amber-400 text-base animate-pulse"></i>
           <div>
-            <div class="text-white font-semibold">Rural Voice Login Demo</div>
-            <div class="text-[10px] text-slate-400">Hear Hindi OTP audio prompt</div>
+            <div class="text-white font-semibold"><span data-i18n="voice_login_title">Rural Voice Login Demo</span></div>
+            <div class="text-[10px] text-slate-400"><span data-i18n="voice_login_sub">Hear voice OTP audio in your language</span></div>
           </div>
         </div>
         <button onclick="speakCurrentOtp('1295')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow transition-all flex items-center gap-1">
-          <i class="fa-solid fa-play text-[10px]"></i> Speak OTP
+          <i class="fa-solid fa-play text-[10px]"></i> <span data-i18n="voice_speak_btn">Speak OTP</span>
         </button>
       </div>
 
       <!-- Live Server Footnote -->
       <div class="border-t border-emerald-900/60 pt-3 flex items-center justify-between text-[11px] text-slate-400">
-        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-circle-check"></i> 3 Microservers Ready</span>
+        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-circle-check"></i> <span data-i18n="microservers_ready">3 Microservers Ready</span></span>
         <span class="text-slate-300 font-mono">SQLite3 Protocol</span>
       </div>
 
@@ -445,7 +467,7 @@
     <div class="bg-slate-950/95 border-b border-emerald-500/20 py-1.5 px-4 text-[11px] overflow-hidden flex items-center z-20">
       <div class="flex items-center gap-2 font-bold text-amber-400 shrink-0 pr-4 border-r border-emerald-900/60 z-10 bg-slate-950">
         <i class="fa-solid fa-satellite-dish animate-pulse text-emerald-400"></i>
-        <span>LIVE APMC BENCHMARK:</span>
+        <span><span data-i18n="live_apmc_benchmark">LIVE APMC BENCHMARK:</span></span>
       </div>
       <div class="overflow-hidden relative w-full">
         <div class="animate-marquee whitespace-nowrap text-slate-300 font-mono flex gap-8">
@@ -490,11 +512,32 @@
         </div>
 
         <div class="flex items-center gap-3 text-[11px]">
+          <!-- 🌐 Top Bar Language Switcher -->
+          <div class="relative flex items-center">
+            <i class="fa-solid fa-globe text-emerald-400 mr-1.5 text-xs"></i>
+            <select id="top-lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-900/90 text-emerald-300 border border-emerald-500/50 hover:border-emerald-400 text-[11px] font-bold py-1 pl-2 pr-6 rounded-lg cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-400">
+              <option value="en">🇬🇧 English</option>
+              <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
+              <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
+              <option value="ml">🇮🇳 മലയാളം (Malayalam)</option>
+              <option value="te">🇮🇳 తెలుగు (Telugu)</option>
+              <option value="kn">🇮🇳 ಕನ್ನಡ (Kannada)</option>
+              <option value="bn">🇮🇳 বাংলা (Bengali)</option>
+              <option value="mr">🇮🇳 मराठी (Marathi)</option>
+              <option value="gu">🇮🇳 ગુજરાતી (Gujarati)</option>
+              <option value="pa">🇮🇳 ਪੰਜਾਬੀ (Punjabi)</option>
+              <option value="or">🇮🇳 ଓଡ଼ିଆ (Odia)</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-emerald-400">
+              <i class="fa-solid fa-chevron-down text-[9px]"></i>
+            </div>
+          </div>
+
           <button onclick="toggleSunlightMode()" class="px-2.5 py-0.5 rounded bg-slate-900 border border-emerald-500/40 text-amber-300 font-bold hover:bg-slate-800 transition-all flex items-center gap-1">
             <i class="fa-solid fa-sun text-xs"></i>
-            <span id="sunlight-mode-label">Sunlight Field Mode</span>
+            <span id="sunlight-mode-label" data-i18n="sun_mode_full">Sunlight Field Mode</span>
           </button>
-          <span class="text-slate-400"><i class="fa-solid fa-database mr-1 text-emerald-400"></i>Engine: <strong class="text-emerald-300 font-mono">SQLite3 Binary DB</strong></span>
+          <span class="text-slate-400 hidden lg:inline"><i class="fa-solid fa-database mr-1 text-emerald-400"></i><span data-i18n="engine_label">Engine:</span> <strong class="text-emerald-300 font-mono">SQLite3 Binary DB</strong></span>
         </div>
       </div>
 
@@ -511,7 +554,7 @@
             <div class="flex items-center gap-2">
               <span class="font-heading font-extrabold text-xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
             </div>
-            <p class="text-[10px] text-emerald-400/80 font-medium tracking-wide">ZERO-MIDDLEMAN REEFER SUPPLY PROTOCOL</p>
+            <p class="text-[10px] text-emerald-400/80 font-medium tracking-wide"><span data-i18n="brand_tagline">ZERO-MIDDLEMAN REEFER SUPPLY PROTOCOL</span></p>
           </div>
         </div>
 
@@ -519,27 +562,27 @@
         <nav class="hidden md:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-emerald-500/20">
           <button onclick="switchPersona('orders')" id="nav-orders" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all bg-emerald-600 text-white shadow-md">
             <i class="fa-solid fa-boxes-packing"></i>
-            <span>Central Orders</span>
+            <span data-i18n="nav_orders">Central Orders</span>
           </button>
           <button onclick="switchPersona('farmer')" id="nav-farmer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
             <i class="fa-solid fa-tractor text-amber-400"></i>
-            <span>🌾 Farmer Station</span>
+            <span>🌾 <span data-i18n="nav_farmer">Farmer Station</span></span>
           </button>
           <button onclick="switchPersona('buyer')" id="nav-buyer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
             <i class="fa-solid fa-store text-blue-400"></i>
-            <span>🛒 Buyer Trade</span>
+            <span>🛒 <span data-i18n="nav_buyer">Buyer Trade</span></span>
           </button>
           <button onclick="switchPersona('matrix')" id="nav-matrix" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
             <i class="fa-solid fa-table-list text-purple-400"></i>
-            <span>📋 Produce Matrix</span>
+            <span>📋 <span data-i18n="nav_matrix">Produce Matrix</span></span>
           </button>
           <button onclick="switchPersona('calculator')" id="nav-calculator" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
             <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
-            <span>📊 Arbitrage Math</span>
+            <span>📊 <span data-i18n="nav_calculator">Arbitrage Math</span></span>
           </button>
           <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
             <i class="fa-solid fa-terminal text-rose-400"></i>
-            <span>💻 3-Server APIs</span>
+            <span>💻 <span data-i18n="nav_coder">3-Server APIs</span></span>
           </button>
         </nav>
 
@@ -567,7 +610,7 @@
           <!-- Prominent Logout / Lock Application Button -->
           <button onclick="logoutToAuthGate()" title="Lock Portal & Return to Login Screen" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 hover:text-white text-xs font-bold transition-all shadow-md">
             <i class="fa-solid fa-lock"></i>
-            <span class="hidden sm:inline">Lock / Sign Out</span>
+            <span class="hidden sm:inline" data-i18n="btn_lock_signout">Lock / Sign Out</span>
           </button>
         </div>
       </div>
@@ -585,10 +628,10 @@
           <div class="space-y-3 max-w-2xl">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
               <i class="fa-solid fa-award text-amber-400"></i>
-              <span>Smart India Hackathon 2026 • Problem Statement 33</span>
+              <span><span data-i18n="sih_ps33_badge">Smart India Hackathon 2026 • Problem Statement 33</span></span>
             </div>
             <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-heading">
-              Eliminating Farm-to-Fork <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">Intermediary Loss</span>
+              <span data-i18n="hero_title_pre">Eliminating Farm-to-Fork</span> <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400"><span data-i18n="hero_title_post">Intermediary Loss</span></span>
             </h1>
             <p class="text-sm text-slate-300 leading-relaxed">
               Running on <strong class="text-white">3 Dedicated SQLite Microservers</strong> with dynamic balance payouts, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant <strong class="text-emerald-400">T+0 direct payouts</strong>.
@@ -1379,6 +1422,632 @@
     };
 
     // Global Application State
+    
+    /* ======================================================== */
+    /* 🌐 COMPREHENSIVE MULTI-LANGUAGE TRANSLATION DICTIONARY   */
+    /* (Tamil, English, Hindi, Malayalam, Telugu, Kannada, etc.)*/
+    /* ======================================================== */
+    const agriTranslations = {
+      en: {
+        auth_title: "Select Your Role to Enter",
+        auth_subtitle: "⚡ 1-Click Direct Access • No Password Required",
+        auth_hero_btn: "1-CLICK INSTANT ENTRY (Kisan Farmer)",
+        auth_hero_sub: "Ramesh Patil • Nashik FPO • ₹1,84,500 Balance",
+        role_farmer_label: "Kisan Farmer",
+        role_buyer_label: "Sourcing Buyer",
+        role_driver_label: "Reefer Driver",
+        role_qc_label: "QC Officer",
+        enter_arrow: "Enter ➔",
+        voice_login_title: "Rural Voice Login Demo",
+        voice_login_sub: "Hear voice OTP audio in your language",
+        voice_speak_btn: "Speak OTP",
+        microservers_ready: "3 Microservers Ready",
+        sun_mode_btn: "Sun Mode",
+        sun_mode_full: "Sunlight Field Mode",
+        engine_label: "Engine:",
+        live_apmc_benchmark: "LIVE APMC BENCHMARK:",
+        brand_tagline: "ZERO-MIDDLEMAN REEFER SUPPLY PROTOCOL",
+        sih_ps33_badge: "Smart India Hackathon 2026 • Problem Statement 33",
+        nav_orders: "Central Orders",
+        nav_farmer: "Farmer Station",
+        nav_buyer: "Buyer Trade",
+        nav_matrix: "Produce Matrix",
+        nav_calculator: "Arbitrage Math",
+        nav_coder: "3-Server APIs",
+        btn_lock_signout: "Lock / Sign Out",
+        hero_title_pre: "Eliminating Farm-to-Fork",
+        hero_title_post: "Intermediary Loss",
+        hero_desc: "Running on 3 Dedicated SQLite Microservers with dynamic balance payouts, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant T+0 direct payouts.",
+        farmer_fpo_title: "Nashik Grape Growers FPO",
+        wallet_bal_title: "Available Wallet Balance",
+        t0_settlement_badge: "⚡ Instant T+0 Direct Bank Settlement",
+        withdraw_btn: "Withdraw Funds",
+        list_crop_btn: "List New Crop",
+        cv_scanner_title: "AI Spectral Quality & Brix Sugar Scanner",
+        cv_scanner_sub: "Upload or capture harvest photo for real-time Brix sugar, ripeness %, and export grade certification.",
+        run_ai_scan_btn: "Run AI Quality Scan",
+        buyer_market_title: "Direct Cold-Chain Procurement Market",
+        buyer_market_sub: "Purchase verified farmgate produce with active reefer dispatch and automated escrow smart contracts.",
+        orders_manifest_title: "Live Cold-Chain Dispatch & GPS Telemetry",
+        orders_manifest_sub: "Real-time temperature, humidity, door-sensors, and instant stage-progression for active supply routes.",
+        matrix_title: "Mandi vs AgriFlow Direct Rate Matrix",
+        matrix_sub: "Live comparison showing middleman margin elimination across high-value agricultural commodities.",
+        export_csv_btn: "Export CSV Report",
+        calc_title: "Arbitrage & Profit Gain Calculator",
+        calc_sub: "Simulate savings and net realization increase by bypassing traditional APMC middlemen.",
+        otp_speech_text: "AgriFlow AI OTP verification code is 1 2 9 5. Direct login confirmed."
+      },
+      ta: {
+        auth_title: "நுழைய உங்கள் பங்கைத் தேர்ந்தெடுக்கவும்",
+        auth_subtitle: "⚡ 1-கிளிக் நேரடி அணுகல் • கடவுச்சொல் தேவையில்லை",
+        auth_hero_btn: "1-கிளிக் உடனடி நுழைவு (விவசாயி)",
+        auth_hero_sub: "ரமேஷ் பாட்டீல் • நாசிக் FPO • ₹1,84,500 இருப்பு",
+        role_farmer_label: "விவசாயி",
+        role_buyer_label: "கொள்முதல் வாங்குபவர்",
+        role_driver_label: "குளிர்சாதன ஓட்டுநர்",
+        role_qc_label: "தரக்கட்டுப்பாட்டு அதிகாரி",
+        enter_arrow: "நுழை ➔",
+        voice_login_title: "கிராமப்புற குரல் உள்நுழைவு",
+        voice_login_sub: "உங்கள் மொழியில் OTP ஆடியோவைக் கேளுங்கள்",
+        voice_speak_btn: "OTP பேசு",
+        microservers_ready: "3 மைக்ரோ சர்வர்கள் தயார்",
+        sun_mode_btn: "பகல் பயன்முறை",
+        sun_mode_full: "பகல் வெளிச்ச பயன்முறை",
+        engine_label: "இயந்திரம்:",
+        live_apmc_benchmark: "நேரடி மண்டி விலை ஒப்பீடு:",
+        brand_tagline: "இடைத்தரகர் இல்லா குளிர்சாதன விநியோக நெறிமுறை",
+        sih_ps33_badge: "ஸ்மார்ட் இந்தியா ஹேக்கத்தான் 2026 • பிரச்சனை 33",
+        nav_orders: "மைய ஆர்டர்கள்",
+        nav_farmer: "விவசாயி நிலையம்",
+        nav_buyer: "வாங்குபவர் வர்த்தகம்",
+        nav_matrix: "விளைபொருள் ஒப்பீடு",
+        nav_calculator: "லாபக் கணிப்பான்",
+        nav_coder: "3-சர்வர் APIகள்",
+        btn_lock_signout: "பூட்டு / வெளியேறு",
+        hero_title_pre: "பண்ணையிலிருந்து நுகர்வோருக்கு",
+        hero_title_post: "இடைத்தரகர் இழப்பை நீக்குதல்",
+        hero_desc: "3 பிரத்யேக SQLite மைக்ரோசர்வருடன், உடனடி T+0 நேரடி வங்கிப் பரிமாற்றம், AI கணினி பார்வை மூலம் தரப் பரிசோதனை மற்றும் நேரடி GPS குளிர்சாதனக் கண்காணிப்பு.",
+        farmer_fpo_title: "நாசிக் திராட்சை உற்பத்தியாளர் FPO",
+        wallet_bal_title: "கிடைக்கும் பணப்பை இருப்பு",
+        t0_settlement_badge: "⚡ உடனடி T+0 நேரடி வங்கிப் பரிமாற்றம்",
+        withdraw_btn: "பணம் எடு",
+        list_crop_btn: "புதிய பயிரைப் பட்டியலிடு",
+        cv_scanner_title: "AI பிரிக்ஸ் சர்க்கரை & தர ஸ்கேனர்",
+        cv_scanner_sub: "பிரிக்ஸ் சர்க்கரை அளவு, பழுத்த நிலை மற்றும் ஏற்றுமதி தரச் சான்றிதழைப் பெற புகைப்படத்தைப் பதிவேற்றவும்.",
+        run_ai_scan_btn: "AI தரப் பரிசோதனையை இயக்கு",
+        buyer_market_title: "நேரடி குளிர்சாதன கொள்முதல் சந்தை",
+        buyer_market_sub: "தானியங்கி எஸ்க்ரோ ஒப்பந்தங்கள் மற்றும் குளிர்சாதன விநியோகத்துடன் தரமான விளைபொருட்களை வாங்கவும்.",
+        orders_manifest_title: "நேரடி குளிர்சாதன கண்காணிப்பு & GPS",
+        orders_manifest_sub: "வெப்பநிலை, ஈரப்பதம் மற்றும் விநியோக பாதைகளின் நிகழ்நேர கண்காணிப்பு.",
+        matrix_title: "மண்டி மற்றும் அக்ரிஃப்ளோ நேரடி விலை ஒப்பீடு",
+        matrix_sub: "இடைத்தரகர்கள் நீக்கப்பட்டதால் விவசாயிகளுக்குக் கிடைக்கும் கூடுதல் லாப ஒப்பீடு.",
+        export_csv_btn: "CSV அறிக்கை பதிவிறக்கு",
+        calc_title: "லாபம் மற்றும் சேமிப்பு கணிப்பான்",
+        calc_sub: "பாரம்பரிய மண்டிகளைத் தவிர்ப்பதன் மூலம் கூடுதல் வருமானத்தைக் கணக்கிடுங்கள்.",
+        otp_speech_text: "அக்ரிஃப்ளோ AI சரிபார்ப்புக் குறியீடு ஒன்று இரண்டு ஒன்பது ஐந்து. நேரடி உள்நுழைவு உறுதி செய்யப்பட்டது."
+      },
+      hi: {
+        auth_title: "प्रवेश करने के लिए अपनी भूमिका चुनें",
+        auth_subtitle: "⚡ 1-क्लिक सीधा प्रवेश • कोई पासवर्ड आवश्यक नहीं",
+        auth_hero_btn: "1-क्लिक तुरंत प्रवेश (किसान)",
+        auth_hero_sub: "रमेश पाटिल • नासिक FPO • ₹1,84,500 शेष राशि",
+        role_farmer_label: "किसान",
+        role_buyer_label: "खरीददार / व्यापारी",
+        role_driver_label: "रीफर वाहन चालक",
+        role_qc_label: "गुणवत्ता नियंत्रण अधिकारी",
+        enter_arrow: "प्रवेश ➔",
+        voice_login_title: "ग्रामीण वॉयस लॉगिन डेमो",
+        voice_login_sub: "अपनी भाषा में OTP ऑडियो संदेश सुनें",
+        voice_speak_btn: "OTP बोलें",
+        microservers_ready: "3 माइक्रो-सर्वर ऑनलाइन",
+        sun_mode_btn: "धूप मोड",
+        sun_mode_full: "सनलाइट फील्ड मोड",
+        engine_label: "इंजन:",
+        live_apmc_benchmark: "लाइव मंडी मूल्य तुलना:",
+        brand_tagline: "बिचौलिया-मुक्त कोल्ड-चेन आपूर्ति प्रोटोकॉल",
+        sih_ps33_badge: "स्मार्ट इंडिया हैकथॉन 2026 • समस्या विवरण 33",
+        nav_orders: "केंद्रीय ऑर्डर",
+        nav_farmer: "किसान स्टेशन",
+        nav_buyer: "खरीदार व्यापार",
+        nav_matrix: "उपज तुलना मैट्रिक्स",
+        nav_calculator: "लाभ गणना",
+        nav_coder: "3-सर्वर API",
+        btn_lock_signout: "लॉक / साइन आउट",
+        hero_title_pre: "खेत से थाली तक",
+        hero_title_post: "बिचौलियों के नुकसान का अंत",
+        hero_desc: "3 समर्पित SQLite माइक्रो-सर्वर, तत्काल T+0 बैंक ट्रांसफर, AI कंप्यूटर विज़न गुणवत्ता जांच और रीफर वाहन की लाइव GPS ट्रैकिंग।",
+        farmer_fpo_title: "नासिक अंगूर उत्पादक FPO",
+        wallet_bal_title: "उपलब्ध वॉलेट शेष राशि",
+        t0_settlement_badge: "⚡ तुरंत T+0 सीधा बैंक भुगतान",
+        withdraw_btn: "धन निकासी करें",
+        list_crop_btn: "नई फसल सूची जोड़ें",
+        cv_scanner_title: "AI ब्रिक्स शुगर और गुणवत्ता स्कैनर",
+        cv_scanner_sub: "ब्रिक्स शुगर, पकने का प्रतिशत और निर्यात गुणवत्ता ग्रेड जानने के लिए फसल की फोटो अपलोड करें।",
+        run_ai_scan_btn: "AI गुणवत्ता जांच शुरू करें",
+        buyer_market_title: "प्रत्यक्ष कोल्ड-चेन खरीद बाजार",
+        buyer_market_sub: "स्मार्ट एस्क्रो अनुबंध और रीफर वाहन सुरक्षा के साथ सीधे खेत से उच्च गुणवत्ता वाली उपज खरीदें।",
+        orders_manifest_title: "लाइव कोल्ड-चेन ट्रैकिंग और GPS टेलीमेट्री",
+        orders_manifest_sub: "तापमान, आर्द्रता और डिलीवरी मार्ग की वास्तविक समय में निगरानी।",
+        matrix_title: "मंडी बनाम एग्रीफ्लो लाइव मूल्य मैट्रिक्स",
+        matrix_sub: "बिचौलियों को हटाने से किसानों को मिलने वाले वास्तविक मुनाफे की तुलना।",
+        export_csv_btn: "CSV रिपोर्ट डाउनलोड करें",
+        calc_title: "लाभ एवं बचत कैलकुलेटर",
+        calc_sub: "मंडी बिचौलियों को हटाकर अपनी अतिरिक्त कमाई और बचत की गणना करें।",
+        otp_speech_text: "एग्रीफ्लो एआई सत्यापन कोड एक दो नौ पांच है। डायरेक्ट लॉगिन स्वीकृत।"
+      },
+      ml: {
+        auth_title: "പ്രവേശിക്കാൻ നിങ്ങളുടെ റോൾ തിരഞ്ഞെടുക്കുക",
+        auth_subtitle: "⚡ 1-ക്ലിക്ക് നേരിട്ടുള്ള പ്രവേശനം • പാസ്‌വേഡ് ആവശ്യമില്ല",
+        auth_hero_btn: "1-ക്ലിക്ക് തൽക്ഷണ പ്രവേശനം (കർഷകൻ)",
+        auth_hero_sub: "രമേഷ് പാട്ടീൽ • നാസിക് FPO • ₹1,84,500 ബാലൻസ്",
+        role_farmer_label: "കർഷകൻ",
+        role_buyer_label: "സോഴ്സിംഗ് ബയർ",
+        role_driver_label: "റീഫർ ഡ്രൈവർ",
+        role_qc_label: "ക്വാളിറ്റി ഓഫീസർ",
+        enter_arrow: "പ്രവേശിക്കുക ➔",
+        voice_login_title: "ഗ്രാമീണ വോയ്‌സ് ലോഗിൻ",
+        voice_login_sub: "നിങ്ങളുടെ ഭാഷയിൽ OTP ഓഡിയോ കേൾക്കുക",
+        voice_speak_btn: "OTP കേൾക്കുക",
+        microservers_ready: "3 മൈക്രോസെർവറുകൾ തയ്യാറാണ്",
+        sun_mode_btn: "ഡേ മോഡ്",
+        sun_mode_full: "സൺലൈറ്റ് ഫീൽഡ് മോഡ്",
+        engine_label: "എഞ്ചിൻ:",
+        live_apmc_benchmark: "തത്സമയ മാർക്കറ്റ് നിരക്ക്:",
+        brand_tagline: "ഇടനിലക്കാരില്ലാത്ത കോൾഡ് ചെയിൻ വിതരണം",
+        sih_ps33_badge: "സ്മാർട്ട് ഇന്ത്യ ഹാക്കത്തോൺ 2026 • പ്രശ്നം 33",
+        nav_orders: "സെൻട്രൽ ഓർഡറുകൾ",
+        nav_farmer: "കർഷക സ്റ്റേഷൻ",
+        nav_buyer: "ബയർ ട്രേഡ്",
+        nav_matrix: "വിള മെട്രിക്സ്",
+        nav_calculator: "ലാഭ കണക്കുകൂട്ടൽ",
+        nav_coder: "3-സെർവർ APIകൾ",
+        btn_lock_signout: "ലോക്ക് / ലോഗ് ഔട്ട്",
+        hero_title_pre: "പാടത്തുനിന്ന് തീൻമേശയിലേക്ക്",
+        hero_title_post: "ഇടനിലക്കാരുടെ നഷ്ടം ഒഴിവാക്കുന്നു",
+        hero_desc: "3 സമർപ്പിത SQLite മൈക്രോസെർവറുകൾ, തൽക്ഷണ T+0 ബാങ്ക് സെറ്റിൽമെന്റ്, AI ഗുണനിലവാര സ്കാനിംഗ്, തത്സമയ റീഫർ GPS ട്രാക്കിംഗ്.",
+        farmer_fpo_title: "നാസിക് മുന്തിരി ഉത്പാദക FPO",
+        wallet_bal_title: "ലഭ്യമായ വാലറ്റ് ബാലൻസ്",
+        t0_settlement_badge: "⚡ തൽക്ഷണ T+0 നേരിട്ടുള്ള ബാങ്ക് പേയ്മെന്റ്",
+        withdraw_btn: "പണം പിൻവലിക്കുക",
+        list_crop_btn: "പുതിയ വിള ചേർക്കുക",
+        cv_scanner_title: "AI ബ്രിക്സ് ഷുഗർ & ക്വാളിറ്റി സ്കാനർ",
+        cv_scanner_sub: "പഞ്ചസാരയുടെ അളവും ഗുണനിലവാരവും തത്സമയം അറിയാൻ വിളയുടെ ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യുക.",
+        run_ai_scan_btn: "AI ക്വാളിറ്റി സ്കാൻ നടത്തുക",
+        buyer_market_title: "നേരിട്ടുള്ള കോൾഡ് ചെയിൻ വിപണി",
+        buyer_market_sub: "തത്സമയ കോൾഡ് ചെയിൻ സുരക്ഷയോടെ നേരിട്ട് മികച്ച കാർഷിക ഉൽപ്പന്നങ്ങൾ വാങ്ങുക.",
+        orders_manifest_title: "തത്സമയ കോൾഡ്-ചെയിൻ റീഫർ ട്രാക്കിംഗ്",
+        orders_manifest_sub: "താപനില, ഈർപ്പം, വാഹനത്തിന്റെ സ്ഥാനം എന്നിവ തത്സമയം നിരീക്ഷിക്കുക.",
+        matrix_title: "മാർക്കറ്റും അഗ്രിഫ്ലോയും തമ്മിലുള്ള വില താരതമ്യം",
+        matrix_sub: "ഇടനിലക്കാരെ ഒഴിവാക്കുന്നതിലൂടെ കർഷകർക്ക് ലഭിക്കുന്ന അധിക ലാഭം.",
+        export_csv_btn: "CSV റിപ്പോർട്ട് ഡൗൺലോഡ് ചെയ്യുക",
+        calc_title: "ലാഭ ലാഭക്കണക്ക് കാൽക്കുലേറ്റർ",
+        calc_sub: "പരമ്പരാഗത ഇടനിലക്കാരെ ഒഴിവാക്കി ലഭിക്കുന്ന അധിക വരുമാനം കണക്കാക്കുക.",
+        otp_speech_text: "അഗ്രിഫ്ലോ എഐ സ്ഥിരീകരണ കോഡ് ഒന്ന് രണ്ട് ഒൻപത് അഞ്ച് ആണ്. നേരിട്ടുള്ള ലോഗിൻ സ്ഥിരീകരിച്ചു."
+      },
+      te: {
+        auth_title: "ప్రవేశించడానికి మీ పాత్రను ఎంచుకోండి",
+        auth_subtitle: "⚡ 1-క్లిక్ ప్రత్యక్ష ప్రాప్యత • పాస్‌వర్డ్ అవసరం లేదు",
+        auth_hero_btn: "1-క్లిక్ తక్షణ ప్రవేశం (రైతు)",
+        auth_hero_sub: "రమేష్ పాటిల్ • నాసిక్ FPO • ₹1,84,500 నిల్వ",
+        role_farmer_label: "రైతు",
+        role_buyer_label: "కొనుగోలుదారు",
+        role_driver_label: "రీఫర్ డ్రైవర్",
+        role_qc_label: "నాణ్యతా అధికారి",
+        enter_arrow: "ప్రవేశించు ➔",
+        voice_login_title: "గ్రామీణ వాయిస్ లాగిన్",
+        voice_login_sub: "మీ భాషలో OTP ఆడియో వినండి",
+        voice_speak_btn: "OTP వినండి",
+        microservers_ready: "3 మైక్రో సర్వర్లు సిద్ధంగా ఉన్నాయి",
+        sun_mode_btn: "డే మోడ్",
+        sun_mode_full: "సన్‌లైట్ ఫీల్డ్ మోడ్",
+        engine_label: "ఇంజిన్:",
+        live_apmc_benchmark: "లైవ్ మార్కెట్ ధర పోలిక:",
+        brand_tagline: "దళారీ రహిత కోల్డ్-చైన్ సరఫరా వ్యవస్థ",
+        sih_ps33_badge: "స్మార్ట్ ఇండియా హ్యాకథాన్ 2026 • సమస్య 33",
+        nav_orders: "కేంద్ర ఆర్డర్లు",
+        nav_farmer: "రైతు కేంద్రం",
+        nav_buyer: "కొనుగోలు వ్యాపారం",
+        nav_matrix: "ఉత్పత్తుల పోలిక",
+        nav_calculator: "లాభ కాలిక్యులేటర్",
+        nav_coder: "3-సర్వర్ APIలు",
+        btn_lock_signout: "లాక్ / సైన్ అవుట్",
+        hero_title_pre: "పొలం నుండి నేరుగా వినియోగదారునికి",
+        hero_title_post: "దళారీల నష్టాల నివారణ",
+        hero_desc: "3 ప్రత్యేక SQLite మైక్రోసర్వర్లు, తక్షణ T+0 బ్యాంక్ చెల్లింపులు, AI నాణ్యత పరీక్ష మరియు లైవ్ GPS కోల్డ్-చైన్ ట్రాకింగ్.",
+        farmer_fpo_title: "నాసిక్ ద్రాక్ష రైతుల FPO",
+        wallet_bal_title: "అందుబాటులో ఉన్న వాలెట్ బ్యాలెన్స్",
+        t0_settlement_badge: "⚡ తక్షణ T+0 ప్రత్యక్ష బ్యాంక్ చెల్లింపు",
+        withdraw_btn: "డబ్బు విత్‌డ్రా చేయండి",
+        list_crop_btn: "కొత్త పంటను జోడించండి",
+        cv_scanner_title: "AI బ్రిక్స్ షుగర్ & నాణ్యత స్కానర్",
+        cv_scanner_sub: "చక్కెర స్థాయి మరియు నాణ్యతను తక్షణమే తనిఖీ చేయడానికి పంట ఫోటోను అప్‌లోడ్ చేయండి.",
+        run_ai_scan_btn: "AI నాణ్యత స్కాన్ ప్రారంభించండి",
+        buyer_market_title: "ప్రత్యక్ష కోల్డ్ చైన్ మార్కెట్",
+        buyer_market_sub: "ఎటువంటి మధ్యవర్తులు లేకుండా నాణ్యమైన పంటను నేరుగా కొనుగోలు చేయండి.",
+        orders_manifest_title: "లైవ్ కోల్డ్ చైన్ GPS ట్రాకింగ్",
+        orders_manifest_sub: "ఉష్ణోగ్రత, తేమ మరియు రవాణా మార్గాలను నిజ సమయంలో పర్యవేక్షించండి.",
+        matrix_title: "మార్కెట్ మరియు అగ్రిఫ్లో ధరల పోలిక",
+        matrix_sub: "దళారీలు లేకపోవడం వల్ల రైతులకు వచ్చే అదనపు లాభాలు.",
+        export_csv_btn: "CSV నివేదిక డౌన్‌లోడ్ చేయండి",
+        calc_title: "లాభం మరియు పొదుపు కాలిక్యులేటర్",
+        calc_sub: "సాంప్రదాయ మార్కెట్‌లను నివారించడం ద్వారా అదనపు లాభాలను లెక్కించండి.",
+        otp_speech_text: "అగ్రిఫ్లో AI ధృవీకరణ కోడ్ ఒకటి రెండు తొమ్మిది ఐదు. ప్రత్యక్ష లాగిన్ ధృవీకరించబడింది."
+      },
+      kn: {
+        auth_title: "ಪ್ರವೇಶಿಸಲು ನಿಮ್ಮ ಪಾತ್ರವನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+        auth_subtitle: "⚡ 1-ಕ್ಲಿಕ್ ನೇರ ಪ್ರವೇಶ • ಯಾವುದೇ ಪಾಸ್‌ವರ್ಡ್ ಅಗತ್ಯವಿಲ್ಲ",
+        auth_hero_btn: "1-ಕ್ಲಿಕ್ ತ್ವರಿತ ಪ್ರವೇಶ (ರೈತ)",
+        auth_hero_sub: "ರಮೇಶ್ ಪಾಟೀಲ್ • ನಾಸಿಕ್ FPO • ₹1,84,500 ಬ್ಯಾಲೆನ್ಸ್",
+        role_farmer_label: "ಕಿಸಾನ್ ರೈತ",
+        role_buyer_label: "ಖರೀದಿದಾರ",
+        role_driver_label: "ರೀಫರ್ ಚಾಲಕ",
+        role_qc_label: "ಗುಣಮಟ್ಟ ಅಧಿಕಾರಿ",
+        enter_arrow: "ಪ್ರವೇಶ ➔",
+        voice_login_title: "ಗ್ರಾಮೀಣ ಧ್ವನಿ ಲಾಗಿನ್",
+        voice_login_sub: "ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ OTP ಆಡಿಯೋ ಆಲಿಸಿ",
+        voice_speak_btn: "OTP ಆಲಿಸಿ",
+        microservers_ready: "3 ಮೈಕ್ರೋ ಸರ್ವರ್‌ಗಳು ಸಿದ್ಧವಾಗಿವೆ",
+        sun_mode_btn: "ಡೇ ಮೋಡ್",
+        sun_mode_full: "ಸನ್‌ಲೈಟ್ ಫೀಲ್ಡ್ ಮೋಡ್",
+        engine_label: "ಎಂಜಿನ್:",
+        live_apmc_benchmark: "ಲೈವ್ ಮಂಡಿ ದರ ಹೋಲಿಕೆ:",
+        brand_tagline: "ಮಧ್ಯವರ್ತಿ ರಹಿತ ಕೋಲ್ಡ್-ಚೈನ್ ಪೂರೈಕೆ ವ್ಯವಸ್ಥೆ",
+        sih_ps33_badge: "ಸ್ಮಾರ್ಟ್ ಇಂಡಿಯಾ ಹ್ಯಾಕಥಾನ್ 2026 • ಸಮಸ್ಯೆ 33",
+        nav_orders: "ಕೇಂದ್ರ ಆದೇಶಗಳು",
+        nav_farmer: "ಕಿಸಾನ್ ಕೇಂದ್ರ",
+        nav_buyer: "ಖರೀದಿದಾರ ವ್ಯಾಪಾರ",
+        nav_matrix: "ಉತ್ಪನ್ನ ಮ್ಯಾಟ್ರಿಕ್ಸ್",
+        nav_calculator: "ಲಾಭ ಕ್ಯಾಲ್ಕುಲೇಟರ್",
+        nav_coder: "3-ಸರ್ವರ್ APIಗಳು",
+        btn_lock_signout: "ಲಾಕ್ / ಸೈನ್ ಔಟ್",
+        hero_title_pre: "ಹೊಲದಿಂದ ನೇರವಾಗಿ ಗ್ರಾಹಕರಿಗೆ",
+        hero_title_post: "ಮಧ್ಯವರ್ತಿಗಳ ನಷ್ಟ ನಿವಾರಣೆ",
+        hero_desc: "3 ಮೀಸಲಾದ SQLite ಮೈಕ್ರೋಸರ್ವರ್‌ಗಳು, ತ್ವರಿತ T+0 ಬ್ಯಾಂಕ್ ವರ್ಗಾವಣೆ, AI ಗುಣಮಟ್ಟ ಪರೀಕ್ಷೆ ಮತ್ತು ಲೈವ್ GPS ಕೋಲ್ಡ್-ಚೈನ್ ಟ್ರ್ಯಾಕಿಂಗ್.",
+        farmer_fpo_title: "ನಾಸಿಕ್ ದ್ರಾಕ್ಷಿ ಬೆಳೆಗಾರರ ​​FPO",
+        wallet_bal_title: "ಲಭ್ಯವಿರುವ ವ್ಯಾಲೆಟ್ ಬ್ಯಾಲೆನ್ಸ್",
+        t0_settlement_badge: "⚡ ತಕ್ಷಣದ T+0 ನೇರ ಬ್ಯಾಂಕ್ ಪಾವತಿ",
+        withdraw_btn: "ಹಣ ಹಿಂಪಡೆಯಿರಿ",
+        list_crop_btn: "ಹೊಸ ಬೆಳೆ ಪಟ್ಟಿ ಮಾಡಿ",
+        cv_scanner_title: "AI ಬ್ರಿಕ್ಸ್ ಶುಗರ್ & ಗುಣಮಟ್ಟ ಸ್ಕ್ಯಾನರ್",
+        cv_scanner_sub: "ಸಕ್ಕರೆ ಅಂಶ ಮತ್ತು ಗುಣಮಟ್ಟವನ್ನು ತಿಳಿಯಲು ಬೆಳೆಯ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+        run_ai_scan_btn: "AI ಗುಣಮಟ್ಟ ಸ್ಕ್ಯಾನ್ ರನ್ ಮಾಡಿ",
+        buyer_market_title: "ನೇರ ಕೋಲ್ಡ್ ಚೈನ್ ಮಾರುಕಟ್ಟೆ",
+        buyer_market_sub: "ಉತ್ತಮ ಗುಣಮಟ್ಟದ ಕೃಷಿ ಉತ್ಪನ್ನಗಳನ್ನು ನೇರವಾಗಿ ಖರೀದಿಸಿ.",
+        orders_manifest_title: "ಲೈವ್ ಕೋಲ್ಡ್ ಚೈನ್ GPS ಟ್ರ್ಯಾಕಿಂಗ್",
+        orders_manifest_sub: "ತಾಪಮಾನ, ತೇವಾಂಶ ಮತ್ತು ಮಾರ್ಗಗಳನ್ನು ನೈಜ ಸಮಯದಲ್ಲಿ ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ.",
+        matrix_title: "ಮಂಡಿ ಮತ್ತು ಅಗ್ರಿಫ್ಲೋ ದರ ಹೋಲಿಕೆ",
+        matrix_sub: "ಮಧ್ಯವರ್ತಿಗಳನ್ನು ತೆಗೆದುಹಾಕುವುದರಿಂದ ರೈತರಿಗೆ ಸಿಗುವ ಹೆಚ್ಚುವರಿ ಲಾಭ.",
+        export_csv_btn: "CSV ವರದಿ ಡೌನ್‌ಲೋಡ್ ಮಾಡಿ",
+        calc_title: "ಲಾಭ ಮತ್ತು ಉಳಿತಾಯ ಕ್ಯಾಲ್ಕುಲೇಟರ್",
+        calc_sub: "ಸಾಂಪ್ರದಾಯಿಕ ಮಧ್ಯವರ್ತಿಗಳನ್ನು ತಪ್ಪಿಸಿ ಹೆಚ್ಚುವರಿ ಆದಾಯವನ್ನು ಲೆಕ್ಕಹಾಕಿ.",
+        otp_speech_text: "ಅಗ್ರಿಫ್ಲೋ AI ಪರಿಶೀಲನಾ ಕೋಡ್ ಒಂದು ಎರಡು ಒಂಬತ್ತು ಐದು. ನೇರ ಲಾಗಿನ್ ದೃಢೀಕರಿಸಲಾಗಿದೆ."
+      },
+      bn: {
+        auth_title: "প্রবেশ করতে আপনার ভূমিকা নির্বাচন করুন",
+        auth_subtitle: "⚡ ১-ক্লিক সরাসরি অ্যাক্সেস • পাসওয়ার্ডের প্রয়োজন নেই",
+        auth_hero_btn: "১-ক্লিক তাত্ক্ষণিক প্রবেশ (কৃষক)",
+        auth_hero_sub: "রমেশ পাটিল • নাসিক FPO • ₹১,৮৪,৫০০ ব্যালেন্স",
+        role_farmer_label: "কৃষক",
+        role_buyer_label: "সোর্সিং ক্রেতা",
+        role_driver_label: "রিফার ড্রাইভার",
+        role_qc_label: "কোয়ালিটি অফিসার",
+        enter_arrow: "প্রবেশ ➔",
+        voice_login_title: "গ্রামীণ ভয়েস লগইন",
+        voice_login_sub: "আপনার ভাষায় OTP অডিও শুনুন",
+        voice_speak_btn: "OTP শুনুন",
+        microservers_ready: "৩টি মাইক্রোসার্ভার প্রস্তুত",
+        sun_mode_btn: "ডে মোড",
+        sun_mode_full: "সানলাইট ফিল্ড মোড",
+        engine_label: "ইঞ্জিন:",
+        live_apmc_benchmark: "লাইভ মান্ডি দর তুলনা:",
+        brand_tagline: "দালাল-মুক্ত কোল্ড-চেন সরবরাহ প্রোটোকল",
+        sih_ps33_badge: "স্মার্ট ইন্ডিয়া হ্যাকাথন ২০২৬ • সমস্যা ৩৩",
+        nav_orders: "সেন্ট্রাল অর্ডার",
+        nav_farmer: "কৃষক স্টেশন",
+        nav_buyer: "ক্রেতা বাণিজ্য",
+        nav_matrix: "ফসল তুলনা মেট্রিক্স",
+        nav_calculator: "লাভ ক্যালকুলেটর",
+        nav_coder: "৩-সার্ভার API",
+        btn_lock_signout: "লক / সাইন আউট",
+        hero_title_pre: "খামার থেকে খাবার টেবিলে",
+        hero_title_post: "দালালদের ক্ষতি দূরীকরণ",
+        hero_desc: "৩টি ডেডিকেটেড SQLite মাইক্রোসার্ভার, তাৎক্ষণিক T+0 ব্যাঙ্ক পেমেন্ট, AI গুণমান মূল্যায়ন এবং লাইভ GPS কোল্ড-চেন ট্র্যাকিং।",
+        farmer_fpo_title: "নাসিক আঙ্গুর চাষী FPO",
+        wallet_bal_title: "উপলব্ধ ওয়ালেট ব্যালেন্স",
+        t0_settlement_badge: "⚡ তাৎক্ষণিক T+0 সরাসরি ব্যাঙ্ক সেটেলমেন্ট",
+        withdraw_btn: "টাকা তুলুন",
+        list_crop_btn: "নতুন ফসল তালিকাভুক্ত করুন",
+        cv_scanner_title: "AI ব্রিক্স সুগার এবং কোয়ালিটি স্ক্যানার",
+        cv_scanner_sub: "চিনির মাত্রা এবং গুণমান জানতে ফসলের ছবি আপলোড করুন।",
+        run_ai_scan_btn: "AI কোয়ালিটি স্ক্যান চালান",
+        buyer_market_title: "সরাসরি কোল্ড-চেন প্রকিউরমেন্ট মার্কেট",
+        buyer_market_sub: "সরাসরি খামার থেকে সতেজ ফসল ক্রয় করুন।",
+        orders_manifest_title: "লাইভ কোল্ড-চেন GPS ট্র্যাকিং",
+        orders_manifest_sub: "তাপমাত্রা, আর্দ্রতা এবং ডেলিভারি ট্র্যাক করুন।",
+        matrix_title: "মান্ডি বনাম এগ্রিফ্লো লাইভ দর মেট্রিক্স",
+        matrix_sub: "মধ্যস্বত্বভোগীদের বাদ দিয়ে কৃষকদের অতিরিক্ত আয়ের তুলনা।",
+        export_csv_btn: "CSV রিপোর্ট ডাউনলোড করুন",
+        calc_title: "লাভ এবং সঞ্চয় ক্যালকুলেটর",
+        calc_sub: "মান্ডির দালালদের এড়িয়ে অতিরিক্ত উপার্জনের হিসাব করুন।",
+        otp_speech_text: "এগ্রিফ্লো এআই ওটিপি কোড এক দুই নয় পাঁচ। সরাসরি লগইন নিশ্চিত করা হয়েছে।"
+      },
+      mr: {
+        auth_title: "प्रवेश करण्यासाठी आपली भूमिका निवडा",
+        auth_subtitle: "⚡ १-क्लिक थेट प्रवेश • पासवर्डची आवश्यकता नाही",
+        auth_hero_btn: "१-क्लिक झटपट प्रवेश (शेतकरी)",
+        auth_hero_sub: "रमेश पाटील • नाशिक FPO • ₹१,८४,५०० शिल्लक",
+        role_farmer_label: "शेतकरी",
+        role_buyer_label: "खरेदीदार",
+        role_driver_label: "रीफर ड्रायव्हर",
+        role_qc_label: "गुणवत्ता अधिकारी",
+        enter_arrow: "प्रवेश ➔",
+        voice_login_title: "ग्रामीण व्हॉईस लॉगिन",
+        voice_login_sub: "आपल्या भाषेत OTP ऑडिओ संदेश ऐका",
+        voice_speak_btn: "OTP ऐका",
+        microservers_ready: "३ मायक्रोसर्व्हर ऑनलाइन",
+        sun_mode_btn: "डे मोड",
+        sun_mode_full: "सनलाईट फील्ड मोड",
+        engine_label: "इंजिन:",
+        live_apmc_benchmark: "थेट बाजारभाव तुलना:",
+        brand_tagline: "दलाली-मुक्त थेट शेतीमाल पुरवठा प्रणाली",
+        sih_ps33_badge: "स्मार्ट इंडिया हॅकाथॉन २०२६ • समस्या ३३",
+        nav_orders: "केंद्रीय ऑर्डर्स",
+        nav_farmer: "शेतकरी केंद्र",
+        nav_buyer: "खरेदीदार व्यापार",
+        nav_matrix: "शेतमाल तुलना",
+        nav_calculator: "नफा कॅल्क्युलेटर",
+        nav_coder: "३-सर्व्हर API",
+        btn_lock_signout: "लॉक / साइन आउट",
+        hero_title_pre: "शेतातून थेट ग्राहकांपर्यंत",
+        hero_title_post: "दलालांचे नुकसान पूर्णपणे नष्ट",
+        hero_desc: "३ स्वतंत्र SQLite मायक्रोसर्व्हर्स, त्वरित T+0 बँक ट्रान्सफर, AI संगणक दृष्टीने गुणवत्ता तपासणी आणि थेट GPS रीफर ट्रॅकिंग.",
+        farmer_fpo_title: "नाशिक द्राक्ष बागायतदार FPO",
+        wallet_bal_title: "उपलब्ध वॉलेट शिल्लक",
+        t0_settlement_badge: "⚡ त्वरित T+0 थेट बँक सेटलमेंट",
+        withdraw_btn: "पैसे काढा",
+        list_crop_btn: "नवीन शेतमाल नोंदवा",
+        cv_scanner_title: "AI ब्रिक्स साखर आणि गुणवत्ता स्कॅनर",
+        cv_scanner_sub: "साखरेचे प्रमाण, पिकण्याची टक्केवारी आणि निर्यात दर्जा तपासण्यासाठी फोटो अपलोड करा.",
+        run_ai_scan_btn: "AI गुणवत्ता तपासणी सुरू करा",
+        buyer_market_title: "थेट शीतगृह खरेदी बाजार",
+        buyer_market_sub: "स्मार्ट एस्क्रो करारासह थेट शेतातील ताजी फळे आणि भाजीपाला खरेदी करा.",
+        orders_manifest_title: "थेट शीतगृह वाहन आणि GPS ट्रॅकिंग",
+        orders_manifest_sub: "तापमान, आर्द्रता आणि पुरवठा मार्गाचे थेट निरीक्षण करा.",
+        matrix_title: "बाजार समिती विरूद्ध ऍग्रीफ्लो दर तक्ता",
+        matrix_sub: "दलाल हटवल्यामुळे शेतकऱ्यांना मिळणाऱ्या अतिरिक्त नफ्याची तुलना.",
+        export_csv_btn: "CSV अहवाल डाउनलोड करा",
+        calc_title: "नफा आणि बचत कॅल्क्युलेटर",
+        calc_sub: "मध्यस्थांना वगळून मिळणाऱ्या अतिरिक्त नफ्याची मोजणी करा.",
+        otp_speech_text: "ऍग्रीफ्लो एआय पडताळणी कोड एक दोन नऊ पाच आहे. थेट लॉगिन मंजूर."
+      },
+      gu: {
+        auth_title: "પ્રવેશવા માટે તમારી ભૂમિકા પસંદ કરો",
+        auth_subtitle: "⚡ ૧-ક્લિક સીધો પ્રવેશ • કોઈ પાસવર્ડ જરૂરી નથી",
+        auth_hero_btn: "૧-ક્લિક ત્વરિત પ્રવેશ (ખેડૂત)",
+        auth_hero_sub: "રમેશ પાટીલ • નાસિક FPO • ₹૧,૮૪,૫૦૦ બેલેન્સ",
+        role_farmer_label: "ખેડૂત",
+        role_buyer_label: "ખરીદનાર",
+        role_driver_label: "રીફર ડ્રાઈવર",
+        role_qc_label: "ગુણવત્તા અધિકારી",
+        enter_arrow: "પ્રવેશ ➔",
+        voice_login_title: "ગ્રામીણ વૉઇસ લૉગિન",
+        voice_login_sub: "તમારી ભાષામાં OTP ઑડિયો સાંભળો",
+        voice_speak_btn: "OTP બોલો",
+        microservers_ready: "૩ માઇક્રોસર્વર તૈયાર છે",
+        sun_mode_btn: "ડે મોડ",
+        sun_mode_full: "સનલાઇટ ફીલ્ડ મોડ",
+        engine_label: "એન્જિન:",
+        live_apmc_benchmark: "લાઈવ માર્કેટ યાર્ડ ભાવ:",
+        brand_tagline: "દલાલ મુક્ત કોલ્ડ-ચેઇન સપ્લાય સિસ્ટમ",
+        sih_ps33_badge: "સ્માર્ટ ઇન્ડિયા હેકાથોન ૨૦૨૬ • સમસ્યા ૩૩",
+        nav_orders: "કેન્દ્રીય ઓર્ડર",
+        nav_farmer: "ખેડૂત મથક",
+        nav_buyer: "ખરીદનાર વેપાર",
+        nav_matrix: "પાક સરખામણી",
+        nav_calculator: "નફા કેલ્ક્યુલેટર",
+        nav_coder: "૩-સર્વર API",
+        btn_lock_signout: "લૉક / સાઇન આઉટ",
+        hero_title_pre: "ખેતરેથી સીધું ગ્રાહક સુધી",
+        hero_title_post: "વચેટિયાઓના નુકસાનનો અંત",
+        hero_desc: "૩ સમર્પિત SQLite માઇક્રોસર્વર્સ, ત્વરિત T+0 બેંક ટ્રાન્સફર, AI ગુણવત્તા સ્કેન અને લાઇવ GPS રીફર ટ્રેકિંગ.",
+        farmer_fpo_title: "નાસિક દ્રાક્ષ ઉત્પાદક FPO",
+        wallet_bal_title: "ઉપલબ્ધ વૉલેટ બેલેન્સ",
+        t0_settlement_badge: "⚡ ત્વરિત T+0 ડાયરેક્ટ બેંક સેટલમેન્ટ",
+        withdraw_btn: "નાણાં ઉપાડો",
+        list_crop_btn: "નવો પાક ઉમેરો",
+        cv_scanner_title: "AI બ્રિક્સ સુગર અને ગુણવત્તા સ્કેનર",
+        cv_scanner_sub: "ખાંડનું પ્રમાણ અને નિકાસ ગુણવત્તા તપાસવા માટે પાકનો ફોટો અપલોડ કરો.",
+        run_ai_scan_btn: "AI ગુણવત્તા સ્કેન શરૂ કરો",
+        buyer_market_title: "ડાયરેક્ટ કોલ્ડ-ચેઇન માર્કેટ",
+        buyer_market_sub: "ખેતરમાંથી સીધી તાજી પેદાશ ખરીદો.",
+        orders_manifest_title: "લાઇવ કોલ્ડ-ચેઇન GPS ટ્રેકિંગ",
+        orders_manifest_sub: "તાપમાન, ભેજ અને વાહનની સ્થિતિનું નિરીક્ષણ કરો.",
+        matrix_title: "માર્કેટ યાર્ડ વિરુદ્ધ એગ્રીફ્લો ભાવ",
+        matrix_sub: "વચેટિયાઓને દૂર કરવાથી ખેડૂતોને મળતો વધારાનો નફો.",
+        export_csv_btn: "CSV રિપોર્ટ ડાઉનલોડ કરો",
+        calc_title: "નફો અને બચત કેલ્ક્યુલેટર",
+        calc_sub: "પરંપરાગત વચેટિયાઓને ટાળીને વધારાની કમાણીની ગણતરી કરો.",
+        otp_speech_text: "એગ્રીફ્લો એઆઈ વેરિફિકેશન કોડ એક બે નવ પાંચ છે. સીધો પ્રવેશ મંજૂર."
+      },
+      pa: {
+        auth_title: "ਦਾਖਲ ਹੋਣ ਲਈ ਆਪਣੀ ਭੂਮਿਕਾ ਚੁਣੋ",
+        auth_subtitle: "⚡ 1-ਕਲਿੱਕ ਸਿੱਧੀ ਪਹੁੰਚ • ਕੋਈ ਪਾਸਵਰਡ ਦੀ ਲੋੜ ਨਹੀਂ",
+        auth_hero_btn: "1-ਕਲਿੱਕ ਤੁਰੰਤ ਦਾਖਲਾ (ਕਿਸਾਨ)",
+        auth_hero_sub: "ਰਮੇਸ਼ ਪਾਟਿਲ • ਨਾਸਿਕ FPO • ₹1,84,500 ਬਕਾਇਆ",
+        role_farmer_label: "ਕਿਸਾਨ",
+        role_buyer_label: "ਖਰੀਦਦਾਰ",
+        role_driver_label: "ਰੀਫਰ ਡਰਾਈਵਰ",
+        role_qc_label: "ਕੁਆਲਿਟੀ ਅਫਸਰ",
+        enter_arrow: "ਦਾਖਲ ਹੋਵੋ ➔",
+        voice_login_title: "ਪੇਂਡੂ ਵੌਇਸ ਲੌਗਇਨ",
+        voice_login_sub: "ਆਪਣੀ ਭਾਸ਼ਾ ਵਿੱਚ OTP ਆਡੀਓ ਸੁਣੋ",
+        voice_speak_btn: "OTP ਸੁਣੋ",
+        microservers_ready: "3 ਮਾਈਕ੍ਰੋਸਰਵਰ ਤਿਆਰ ਹਨ",
+        sun_mode_btn: "ਡੇ ਮੋਡ",
+        sun_mode_full: "ਸਨਲਾਈਟ ਫੀਲਡ ਮੋਡ",
+        engine_label: "ਇੰਜਣ:",
+        live_apmc_benchmark: "ਲਾਈਵ ਮੰਡੀ ਰੇਟ ਤੁਲਨਾ:",
+        brand_tagline: "ਦਲਾਲ-ਮੁਕਤ ਕੋਲਡ ਚੇਨ ਸਪਲਾਈ ਸਿਸਟਮ",
+        sih_ps33_badge: "ਸਮਾਰਟ ਇੰਡੀਆ ਹੈਕਾਥੌਨ 2026 • ਸਮੱਸਿਆ 33",
+        nav_orders: "ਕੇਂਦਰੀ ਆਰਡਰ",
+        nav_farmer: "ਕਿਸਾਨ ਸਟੇਸ਼ਨ",
+        nav_buyer: "ਖਰੀਦਦਾਰ ਵਪਾਰ",
+        nav_matrix: "ਫਸਲ ਤੁਲਨਾ ਮੈਟ੍ਰਿਕਸ",
+        nav_calculator: "ਮੁਨਾਫਾ ਕੈਲਕੁਲੇਟਰ",
+        nav_coder: "3-ਸਰਵਰ API",
+        btn_lock_signout: "ਲਾਕ / ਸਾਈਨ ਆਉਟ",
+        hero_title_pre: "ਖੇਤ ਤੋਂ ਸਿੱਧਾ ਖਪਤਕਾਰ ਤੱਕ",
+        hero_title_post: "ਵਿਚੋਲਿਆਂ ਦੇ ਨੁਕਸਾਨ ਦਾ ਖਾਤਮਾ",
+        hero_desc: "3 ਸਮਰਪਿਤ SQLite ਮਾਈਕ੍ਰੋਸਰਵਰ, ਤੁਰੰਤ T+0 ਬੈਂਕ ਭੁਗਤਾਨ, AI ਕੁਆਲਿਟੀ ਟੈਸਟਿੰਗ ਅਤੇ ਲਾਈਵ GPS ਕੋਲਡ-ਚੇਨ ਟਰੈਕਿੰਗ।",
+        farmer_fpo_title: "ਨਾਸਿਕ ਅੰਗੂਰ ਉਤਪਾਦਕ FPO",
+        wallet_bal_title: "ਉਪਲਬਧ ਵਾਲਿਟ ਬਕਾਇਆ",
+        t0_settlement_badge: "⚡ ਤੁਰੰਤ T+0 ਸਿੱਧਾ ਬੈਂਕ ਭੁਗਤਾਨ",
+        withdraw_btn: "ਪੈਸੇ ਕਢਵਾਓ",
+        list_crop_btn: "ਨਵੀਂ ਫਸਲ ਸੂਚੀਬੱਧ ਕਰੋ",
+        cv_scanner_title: "AI ਬ੍ਰਿਕਸ ਸ਼ੂਗਰ ਅਤੇ ਕੁਆਲਿਟੀ ਸਕੈਨਰ",
+        cv_scanner_sub: "ਮਿਠਾਸ ਅਤੇ ਗੁਣਵੱਤਾ ਜਾਣਨ ਲਈ ਫਸਲ ਦੀ ਫੋਟੋ ਅਪਲੋਡ ਕਰੋ।",
+        run_ai_scan_btn: "AI ਕੁਆਲਿਟੀ ਸਕੈਨ ਚਲਾਓ",
+        buyer_market_title: "ਸਿੱਧਾ ਕੋਲਡ-ਚੇਨ ਬਾਜ਼ਾਰ",
+        buyer_market_sub: "ਸਿੱਧੇ ਖੇਤਾਂ ਵਿੱਚੋਂ ਤਾਜ਼ਾ ਉਪਜ ਖਰੀਦੋ।",
+        orders_manifest_title: "ਲਾਈਵ ਕੋਲਡ ਚੇਨ GPS ਟਰੈਕਿੰਗ",
+        orders_manifest_sub: "ਤਾਪਮਾਨ, ਨਮੀ ਅਤੇ ਵਾਹਨ ਦੀ ਸਥਿਤੀ ਦੀ ਨਿਗਰਾਨੀ ਕਰੋ।",
+        matrix_title: "ਮੰਡੀ ਬਨਾਮ ਐਗਰੀਫਲੋ ਲਾਈਵ ਰੇਟ",
+        matrix_sub: "ਵਿਚੋਲਿਆਂ ਨੂੰ ਹਟਾ ਕੇ ਕਿਸਾਨਾਂ ਨੂੰ ਮਿਲਣ ਵਾਲਾ ਵਾਧੂ ਲਾਭ।",
+        export_csv_btn: "CSV ਰਿਪੋਰਟ ਡਾਊਨਲੋਡ ਕਰੋ",
+        calc_title: "ਮੁਨਾਫਾ ਅਤੇ ਬੱਚਤ ਕੈਲਕੁਲੇਟਰ",
+        calc_sub: "ਰਵਾਇਤੀ ਵਿਚੋਲਿਆਂ ਤੋਂ ਬਚ ਕੇ ਵਾਧੂ ਕਮਾਈ ਦੀ ਗਣਨਾ ਕਰੋ।",
+        otp_speech_text: "ਐਗਰੀਫਲੋ ਏਆਈ ਵੈਰੀਫਿਕੇਸ਼ਨ ਕੋਡ ਇੱਕ ਦੋ ਨੌਂ ਪੰਜ ਹੈ। ਸਿੱਧਾ ਲੌਗਇਨ ਪੁਸ਼ਟੀ ਕੀਤੀ ਗਈ।"
+      },
+      or: {
+        auth_title: "ପ୍ରବେଶ କରିବାକୁ ଆପଣଙ୍କର ଭୂମିକା ଚୟନ କରନ୍ତୁ",
+        auth_subtitle: "⚡ 1-କ୍ଲିକ୍ ସିଧାସଳଖ ପ୍ରବେଶ • କୌଣସି ପାସୱାର୍ଡ ଆବଶ୍ୟକ ନାହିଁ",
+        auth_hero_btn: "1-କ୍ଲିକ୍ ତୁରନ୍ତ ପ୍ରବେଶ (କୃଷକ)",
+        auth_hero_sub: "ରମେଶ ପାଟିଲ • ନାସିକ FPO • ₹1,84,500 ବାଲାନ୍ସ",
+        role_farmer_label: "କୃଷକ",
+        role_buyer_label: "କ୍ରେତା",
+        role_driver_label: "ରିଫର୍ ଡ୍ରାଇଭର",
+        role_qc_label: "ଗୁଣବତ୍ତା ଅଧିକାରୀ",
+        enter_arrow: "ପ୍ରବେଶ ➔",
+        voice_login_title: "ଗ୍ରାମୀଣ ଭଏସ ଲଗଇନ",
+        voice_login_sub: "ଆପଣଙ୍କ ଭାଷାରେ OTP ଅଡିଓ ଶୁଣନ୍ତୁ",
+        voice_speak_btn: "OTP ଶୁଣନ୍ତୁ",
+        microservers_ready: "3 ଟି ମାଇକ୍ରୋସର୍ଭର ପ୍ରସ୍ତୁତ",
+        sun_mode_btn: "ଡେ ମୋଡ୍",
+        sun_mode_full: "ସନଲାଇଟ୍ ଫିଲ୍ଡ ମୋଡ୍",
+        engine_label: "ଇଞ୍ଜିନ୍:",
+        live_apmc_benchmark: "ଲାଇଭ୍ ମଣ୍ଡି ମୂଲ୍ୟ ତୁଳନା:",
+        brand_tagline: "ମଧ୍ୟସ୍ଥି-ମୁକ୍ତ କୋଲ୍ଡ-ଚେନ୍ ଯୋଗାଣ ବ୍ୟବସ୍ଥା",
+        sih_ps33_badge: "ସ୍ମାର୍ଟ ଇଣ୍ଡିଆ ହାକାଥନ୍ 2026 • ସମସ୍ୟା 33",
+        nav_orders: "କେନ୍ଦ୍ରୀୟ ଅର୍ଡର",
+        nav_farmer: "କୃଷକ କେନ୍ଦ୍ର",
+        nav_buyer: "କ୍ରେତା ବାଣିଜ୍ୟ",
+        nav_matrix: "ଫସଲ ତୁଳନା ମାଟ୍ରିକ୍ସ",
+        nav_calculator: "ଲାଭ କାଲକୁଲେଟର",
+        nav_coder: "3-ସର୍ଭର API",
+        btn_lock_signout: "ଲକ୍ / ସାଇନ୍ ଆଉଟ୍",
+        hero_title_pre: "କ୍ଷେତରୁ ସିଧାସଳଖ ଗ୍ରାହକଙ୍କ ପାଖକୁ",
+        hero_title_post: "ଦଲାଲଙ୍କ କ୍ଷତିର ସମାପ୍ତି",
+        hero_desc: "3 ଟି ଉତ୍ସର୍ଗୀକୃତ SQLite ମାଇକ୍ରୋସର୍ଭର, ତୁରନ୍ତ T+0 ବ୍ୟାଙ୍କ ସେଟେଲମେଣ୍ଟ, AI ଗୁଣବତ୍ତା ପରୀକ୍ଷଣ ଏବଂ ଲାଇଭ୍ GPS ଟ୍ରାକିଂ।",
+        farmer_fpo_title: "ନାସିକ ଅଙ୍ଗୁର ଚାଷୀ FPO",
+        wallet_bal_title: "ଉପଲବ୍ଧ ୱାଲେଟ୍ ବାଲାନ୍ସ",
+        t0_settlement_badge: "⚡ ତୁରନ୍ତ T+0 ପ୍ରତ୍ୟକ୍ଷ ବ୍ୟାଙ୍କ ପେମେଣ୍ଟ",
+        withdraw_btn: "ଟଙ୍କା ଉଠାନ୍ତୁ",
+        list_crop_btn: "ନୂତନ ଫସଲ ତାଲିକାଭୁକ୍ତ କରନ୍ତୁ",
+        cv_scanner_title: "AI ବ୍ରିକ୍ସ ସୁଗାର ଏବଂ ଗୁଣବତ୍ତା ସ୍କାନର",
+        cv_scanner_sub: "ମିଠା ପରିମାଣ ଏବଂ ଗୁଣବତ୍ତା ଜାଣିବା ପାଇଁ ଫଟୋ ଅପଲୋଡ୍ କରନ୍ତୁ।",
+        run_ai_scan_btn: "AI ଗୁଣବତ୍ତା ସ୍କାନ୍ ଚଲାନ୍ତୁ",
+        buyer_market_title: "ସିଧାସଳଖ କୋଲ୍ଡ-ଚେନ୍ ବଜାର",
+        buyer_market_sub: "ସିଧାସଳଖ କ୍ଷେତରୁ ତାଜା ଫସଲ କିଣନ୍ତୁ।",
+        orders_manifest_title: "ଲାଇଭ୍ କୋଲ୍ଡ-ଚେନ୍ GPS ଟ୍ରାକିଂ",
+        orders_manifest_sub: "ତାପମାତ୍ରା, ଆର୍ଦ୍ରତା ଏବଂ ଗାଡିର ସ୍ଥିତି ନିରୀକ୍ଷଣ କରନ୍ତୁ।",
+        matrix_title: "ମଣ୍ଡି ବନାମ ଏଗ୍ରିଫ୍ଲୋ ମୂଲ୍ୟ ତୁଳନା",
+        matrix_sub: "ମଧ୍ୟସ୍ଥିମାନଙ୍କୁ ହଟାଇବା ଦ୍ୱାରା କୃଷକମାନଙ୍କୁ ମିଳୁଥିବା ଅତିରିକ୍ତ ଲାଭ।",
+        export_csv_btn: "CSV ରିପୋର୍ଟ ଡାଉନଲୋଡ୍ କରନ୍ତୁ",
+        calc_title: "ଲାଭ ଏବଂ ସଞ୍ଚୟ କାଲକୁଲେଟର",
+        calc_sub: "ପାରମ୍ପରିକ ମଧ୍ୟସ୍ଥିମାନଙ୍କୁ ଏଡ଼ାଇ ଅତିରିକ୍ତ ରୋଜଗାର ଗଣନା କରନ୍ତୁ।",
+        otp_speech_text: "ଏଗ୍ରିଫ୍ଲୋ AI ଯାଞ୍ଚ କୋଡ୍ ଏକ ଦୁଇ ନଅ ପାଞ୍ଚ ଅଟେ। ପ୍ରତ୍ୟକ୍ଷ ଲଗଇନ୍ ନିଶ୍ଚିତ ହୋଇଛି।"
+      }
+    };
+
+    // Current active language
+    let currentAppLanguage = localStorage.getItem('agriflow_lang') || 'en';
+
+    // Helper: Translate Key
+    function t(key) {
+      if (agriTranslations[currentAppLanguage] && agriTranslations[currentAppLanguage][key]) {
+        return agriTranslations[currentAppLanguage][key];
+      }
+      if (agriTranslations['en'] && agriTranslations['en'][key]) {
+        return agriTranslations['en'][key];
+      }
+      return key;
+    }
+
+    // Change Language function
+    function changeLanguage(langCode) {
+      if (!agriTranslations[langCode]) {
+        langCode = 'en';
+      }
+      currentAppLanguage = langCode;
+      localStorage.setItem('agriflow_lang', langCode);
+
+      // Sync both dropdowns if present
+      const loginSelect = document.getElementById('login-lang-select');
+      if (loginSelect) loginSelect.value = langCode;
+      const topSelect = document.getElementById('top-lang-select');
+      if (topSelect) topSelect.value = langCode;
+
+      // Update all DOM elements with data-i18n
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (key && agriTranslations[currentAppLanguage] && agriTranslations[currentAppLanguage][key]) {
+          el.textContent = agriTranslations[currentAppLanguage][key];
+        }
+      });
+
+      // Update placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (key && agriTranslations[currentAppLanguage] && agriTranslations[currentAppLanguage][key]) {
+          el.setAttribute('placeholder', agriTranslations[currentAppLanguage][key]);
+        }
+      });
+
+      console.log(`🌐 Language switched to: ${langCode}`);
+    }
+
+    // Spoken Audio OTP supporting all languages
+    function speakCurrentOtp(otp) {
+      if (!('speechSynthesis' in window)) {
+        alert(`OTP: ${otp} (Speech synthesis not supported in this browser)`);
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const langLocales = {
+        en: 'en-IN',
+        ta: 'ta-IN',
+        hi: 'hi-IN',
+        ml: 'ml-IN',
+        te: 'te-IN',
+        kn: 'kn-IN',
+        bn: 'bn-IN',
+        mr: 'mr-IN',
+        gu: 'gu-IN',
+        pa: 'pa-IN',
+        or: 'or-IN'
+      };
+
+      const promptText = t('otp_speech_text');
+      const utterance = new SpeechSynthesisUtterance(promptText);
+      utterance.lang = langLocales[currentAppLanguage] || 'en-IN';
+      utterance.rate = 0.88;
+      utterance.pitch = 1.0;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
     const AppState = {
       isAuthenticated: false, // Strict initial lock: Must login to open complete web app!
       isSunlightMode: false,
@@ -2355,6 +3024,7 @@
 
     // --- Application Initialization ---
     window.addEventListener('DOMContentLoaded', () => {
+      changeLanguage(currentAppLanguage);
       renderOrdersManifest();
       renderBuyerCatalog();
       renderMasterMatrix();

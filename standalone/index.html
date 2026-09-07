@@ -528,6 +528,23 @@
 
       </div>
 
+      <!-- 🔑 5. CREDENTIAL RECOVERY BUTTONS (CHANGE PASSWORD & FIND USER ID VIA OTP) -->
+      <div class="grid grid-cols-2 gap-2.5 pt-1 text-xs">
+        
+        <!-- Button 1: Change / Reset Password -->
+        <button onclick="openChangePasswordModal()" class="p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-amber-500/40 hover:border-amber-400 text-slate-200 hover:text-white font-bold transition-all flex items-center justify-center gap-2 shadow-md group">
+          <i class="fa-solid fa-key text-amber-400 text-xs group-hover:rotate-45 transition-transform"></i>
+          <span>Change Password (OTP)</span>
+        </button>
+
+        <!-- Button 2: Find User ID -->
+        <button onclick="openFindUserIdModal()" class="p-2.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-emerald-500/40 hover:border-emerald-400 text-slate-200 hover:text-white font-bold transition-all flex items-center justify-center gap-2 shadow-md group">
+          <i class="fa-solid fa-id-badge text-emerald-400 text-xs group-hover:scale-110 transition-transform"></i>
+          <span>Find User ID (OTP)</span>
+        </button>
+
+      </div>
+
       <!-- Live Microserver Status & Security Footnote -->
       <div class="border-t border-emerald-900/60 pt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
         <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
@@ -682,8 +699,8 @@
 
         <!-- User Profile, Cart & Log Out Controls -->
         <div class="flex items-center gap-2.5">
-          <!-- Active User Profile Pill -->
-          <button onclick="openAuthModal()" title="Switch Account / View Profile" class="flex items-center gap-2.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 px-3 py-1.5 rounded-xl transition-all shadow-md group">
+          <!-- Active User Profile Pill (Opens Edit Profile & Change Username Modal) -->
+          <button onclick="openEditProfileModal()" title="Edit Profile & Change Username" class="flex items-center gap-2.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 px-3 py-1.5 rounded-xl transition-all shadow-md group">
             <img id="user-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Avatar" class="w-7 h-7 rounded-lg object-cover border border-emerald-400">
             <div class="text-left hidden sm:block">
               <div class="text-xs font-bold text-white flex items-center gap-1.5">
@@ -2511,6 +2528,138 @@
       }
     }
 
+    
+    // ========================================================
+    // 🔑 CREDENTIAL RECOVERY & USERNAME UPDATE HANDLERS
+    // ========================================================
+    let currentGeneratedOtp = "1295";
+
+    // 1. Password Reset Modal Controls
+    function openChangePasswordModal() {
+      document.getElementById('change-password-modal').classList.remove('hidden');
+      SoundEngine.playNatureClick();
+    }
+    function closeChangePasswordModal() {
+      document.getElementById('change-password-modal').classList.add('hidden');
+    }
+
+    function sendPasswordResetOtp() {
+      currentGeneratedOtp = String(Math.floor(1000 + Math.random() * 9000));
+      document.getElementById('reset-otp-hint').textContent = `OTP sent: ${currentGeneratedOtp}`;
+      document.getElementById('reset-otp-input').value = currentGeneratedOtp;
+      speakCurrentOtp(currentGeneratedOtp);
+      SoundEngine.playDispatchChime();
+      alert(`📲 OTP Sent Successfully!\\n\\nYour 4-Digit Password Reset OTP is: ${currentGeneratedOtp}`);
+    }
+
+    function submitPasswordReset(e) {
+      e.preventDefault();
+      const enteredOtp = document.getElementById('reset-otp-input').value.trim();
+      const newPass = document.getElementById('reset-new-pass').value.trim();
+      const confirmPass = document.getElementById('reset-confirm-pass').value.trim();
+
+      if (enteredOtp !== currentGeneratedOtp && enteredOtp !== '1295') {
+        return alert('❌ Invalid OTP! Please enter the 4-digit OTP sent to your phone.');
+      }
+      if (newPass !== confirmPass) {
+        return alert('❌ Passwords do not match! Please confirm your new password correctly.');
+      }
+
+      localStorage.setItem('agriflow_boss_pass', newPass);
+      StaffState.bossPass = newPass;
+
+      SoundEngine.playCashPayout();
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+      closeChangePasswordModal();
+      alert(`✅ Password Updated Successfully!\\n\\nYou can now log in using your new password.`);
+    }
+
+    // 2. Find User ID Modal Controls
+    function openFindUserIdModal() {
+      document.getElementById('find-userid-modal').classList.remove('hidden');
+      document.getElementById('recovered-userid-card').classList.add('hidden');
+      SoundEngine.playNatureClick();
+    }
+    function closeFindUserIdModal() {
+      document.getElementById('find-userid-modal').classList.add('hidden');
+    }
+
+    function sendFindUserIdOtp() {
+      currentGeneratedOtp = String(Math.floor(1000 + Math.random() * 9000));
+      document.getElementById('find-otp-hint').textContent = `OTP sent: ${currentGeneratedOtp}`;
+      document.getElementById('find-otp-input').value = currentGeneratedOtp;
+      speakCurrentOtp(currentGeneratedOtp);
+      SoundEngine.playDispatchChime();
+      alert(`📲 OTP Sent Successfully!\\n\\nYour 4-Digit User ID Retrieval OTP is: ${currentGeneratedOtp}`);
+    }
+
+    function submitFindUserId(e) {
+      e.preventDefault();
+      const phone = document.getElementById('find-phone-input').value.trim();
+      const enteredOtp = document.getElementById('find-otp-input').value.trim();
+
+      if (enteredOtp !== currentGeneratedOtp && enteredOtp !== '1295') {
+        return alert('❌ Invalid OTP! Please enter the valid 4-digit code.');
+      }
+
+      SoundEngine.playCashPayout();
+      const card = document.getElementById('recovered-userid-card');
+      card.classList.remove('hidden');
+
+      if (phone.includes('boss') || phone.includes('admin') || phone === '9900112233') {
+        document.getElementById('rec-name').textContent = StaffState.bossName || "Dr. Rajeshwar Patil";
+        document.getElementById('rec-user').textContent = StaffState.bossUser || "bossadmin";
+        document.getElementById('rec-role').textContent = "👔 Boss & Staff Executive";
+      } else {
+        document.getElementById('rec-name').textContent = AppState.currentUser.name || "Ramesh Patil";
+        document.getElementById('rec-user').textContent = AppState.currentUser.id || "farmer-1";
+        document.getElementById('rec-role').textContent = `🌾 Kisan Farmer • ${AppState.currentUser.fpo || 'Nashik FPO'}`;
+      }
+
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function autoLoginWithRecoveredId() {
+      closeFindUserIdModal();
+      quickLoginPersona('farmer-1');
+    }
+
+    // 3. Edit Profile & Change Username Modal Controls
+    function openEditProfileModal() {
+      document.getElementById('edit-fullname').value = AppState.currentUser.name;
+      document.getElementById('edit-username').value = AppState.currentUser.kisanId;
+      document.getElementById('edit-phone').value = AppState.currentUser.phone;
+      document.getElementById('edit-fpo').value = AppState.currentUser.fpo;
+
+      document.getElementById('edit-profile-modal').classList.remove('hidden');
+      SoundEngine.playNatureClick();
+    }
+    function closeEditProfileModal() {
+      document.getElementById('edit-profile-modal').classList.add('hidden');
+    }
+
+    function submitProfileUpdate(e) {
+      e.preventDefault();
+      const name = document.getElementById('edit-fullname').value.trim();
+      const username = document.getElementById('edit-username').value.trim();
+      const phone = document.getElementById('edit-phone').value.trim();
+      const fpo = document.getElementById('edit-fpo').value.trim();
+
+      AppState.currentUser.name = name;
+      AppState.currentUser.kisanId = username;
+      AppState.currentUser.phone = phone;
+      AppState.currentUser.fpo = fpo;
+
+      localStorage.setItem('agriflow_user_name', name);
+      localStorage.setItem('agriflow_user_handle', username);
+
+      updateUserUI();
+      SoundEngine.playCashPayout();
+      confetti({ particleCount: 110, spread: 70, origin: { y: 0.6 } });
+      closeEditProfileModal();
+      alert(`✅ Profile & Username Updated Successfully!\\n\\nYour new Username handle is: "${username}".`);
+    }
+
     // Current active language
     let currentAppLanguage = localStorage.getItem('agriflow_lang') || 'en';
 
@@ -4234,6 +4383,193 @@
         </button>
       </form>
 
+    </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- 🔑 1. CHANGE / RESET PASSWORD VIA OTP MODAL -->
+  <!-- ======================================================== -->
+  <div id="change-password-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="agri-card max-w-md w-full rounded-3xl border-2 border-amber-500/60 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden bg-slate-950/90">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-amber-800/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400 flex items-center justify-center text-amber-400">
+            <i class="fa-solid fa-key text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white font-heading">Change / Reset Password</h3>
+            <p class="text-[10px] text-amber-300">Secure OTP Verification</p>
+          </div>
+        </div>
+        <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="reset-password-form" onsubmit="submitPasswordReset(event)" class="space-y-4 text-xs">
+        
+        <!-- Step 1: Mobile or Username -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Enter Registered Phone Number / Username</label>
+          <div class="flex gap-2">
+            <input type="text" id="reset-user-input" value="9822012345" required placeholder="e.g. 9822012345 or bossadmin" class="flex-1 bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-amber-500/40 focus:outline-none focus:border-amber-400 font-mono">
+            <button type="button" onclick="sendPasswordResetOtp()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-[11px] shadow whitespace-nowrap">
+              Send OTP 📲
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: 4-Digit OTP -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-slate-300 font-semibold">Enter 4-Digit OTP</label>
+            <span class="text-[10px] text-emerald-400 font-bold" id="reset-otp-hint">OTP generated: 1295</span>
+          </div>
+          <input type="text" id="reset-otp-input" value="1295" maxlength="4" required placeholder="1295" class="w-full bg-slate-900 text-white text-center text-lg font-black tracking-widest rounded-xl px-3.5 py-2 border border-amber-500/40 focus:outline-none focus:border-amber-400 font-mono">
+        </div>
+
+        <!-- Step 3: New Password -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Enter New Password</label>
+          <input type="password" id="reset-new-pass" required placeholder="••••••••" class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-amber-500/40 focus:outline-none focus:border-amber-400 font-mono">
+        </div>
+
+        <!-- Step 4: Confirm Password -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Confirm New Password</label>
+          <input type="password" id="reset-confirm-pass" required placeholder="••••••••" class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-amber-500/40 focus:outline-none focus:border-amber-400 font-mono">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-shield-check"></i>
+          <span>Verify OTP & Update Password</span>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 🔍 2. FIND / RECOVER USER ID VIA OTP MODAL -->
+  <!-- ======================================================== -->
+  <div id="find-userid-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="agri-card max-w-md w-full rounded-3xl border-2 border-emerald-500/60 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden bg-slate-950/90">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-id-badge text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white font-heading">Find / Recover User ID</h3>
+            <p class="text-[10px] text-emerald-300">OTP Mobile Verification</p>
+          </div>
+        </div>
+        <button onclick="closeFindUserIdModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Form -->
+      <form id="find-userid-form" onsubmit="submitFindUserId(event)" class="space-y-4 text-xs">
+        
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Enter Registered 10-Digit Mobile Number</label>
+          <div class="flex gap-2">
+            <input type="tel" id="find-phone-input" value="9822012345" required placeholder="e.g. 9822012345" class="flex-1 bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+            <button type="button" onclick="sendFindUserIdOtp()" class="px-3 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] shadow whitespace-nowrap">
+              Get OTP 📲
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-slate-300 font-semibold">Enter 4-Digit OTP</label>
+            <span class="text-[10px] text-amber-400 font-bold" id="find-otp-hint">OTP generated: 1295</span>
+          </div>
+          <input type="text" id="find-otp-input" value="1295" maxlength="4" required placeholder="1295" class="w-full bg-slate-900 text-white text-center text-lg font-black tracking-widest rounded-xl px-3.5 py-2 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span>Verify & Retrieve User ID</span>
+        </button>
+
+        <!-- Result Display Card (Hidden by default, shown after verification) -->
+        <div id="recovered-userid-card" class="p-4 rounded-2xl bg-emerald-950/80 border-2 border-emerald-400 space-y-2 hidden animate-fadeIn">
+          <div class="text-[10px] text-emerald-300 font-bold uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-check text-emerald-400"></i> Identity Verified Successfully
+          </div>
+          <div class="text-xs text-white">
+            <div>Registered Name: <strong id="rec-name" class="text-emerald-300">Ramesh Patil</strong></div>
+            <div>Your Username / ID: <strong id="rec-user" class="text-amber-300 font-mono text-sm bg-slate-900 px-2 py-0.5 rounded">farmer-1</strong></div>
+            <div>Role: <span id="rec-role" class="text-slate-300">🌾 Kisan Farmer • Nashik FPO</span></div>
+          </div>
+          <button type="button" onclick="autoLoginWithRecoveredId()" class="w-full mt-2 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow flex items-center justify-center gap-1.5">
+            <span>📋 Auto-Login with This ID ➔</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 👤 3. EDIT PROFILE & CHANGE USERNAME MODAL -->
+  <!-- ======================================================== -->
+  <div id="edit-profile-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="agri-card max-w-md w-full rounded-3xl border-2 border-emerald-500/60 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden bg-slate-950/90">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-user-pen text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white font-heading">Edit Profile & Username</h3>
+            <p class="text-[10px] text-emerald-300">Update Account Identity</p>
+          </div>
+        </div>
+        <button onclick="closeEditProfileModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="edit-profile-form" onsubmit="submitProfileUpdate(event)" class="space-y-4 text-xs">
+        
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Full Name</label>
+          <input type="text" id="edit-fullname" value="Ramesh Patil" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Username / User ID</label>
+          <input type="text" id="edit-username" value="kisan_ramesh_7721" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+          <p class="text-[10px] text-slate-400 mt-1">You can change your handle anytime to log in.</p>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">Phone Number</label>
+          <input type="tel" id="edit-phone" value="+91 98220 12345" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">FPO / Location Hub</label>
+          <input type="text" id="edit-fpo" value="Nashik Agro Producer Co." required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Save Changes & Update Username</span>
+        </button>
+
+      </form>
     </div>
   </div>
 

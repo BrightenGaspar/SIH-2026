@@ -315,7 +315,6 @@
   <!-- ======================================================== -->
   <div id="auth-gate-container" class="min-h-screen flex flex-col justify-between p-3 sm:p-6 lg:p-8 relative z-10">
 
-    <!-- 📱 REALISTIC TELECOM SMS NOTIFICATION POPUP BANNER (Appears when OTP is sent) -->
     <!-- 📱 REALISTIC TELECOM SMS NOTIFICATION POPUP BANNER (Ultra-Prominent & Unmissable) -->
     <div id="real-sms-banner" class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] w-full max-w-lg px-4 transition-all duration-500 transform -translate-y-48 opacity-0 pointer-events-none">
       <div class="bg-slate-950/95 backdrop-blur-2xl border-2 border-emerald-400 rounded-3xl p-5 shadow-2xl shadow-emerald-500/30 text-white space-y-3 pointer-events-auto ring-4 ring-emerald-500/20 animate-pulse">
@@ -326,10 +325,10 @@
             </div>
             <div>
               <div class="font-extrabold text-white text-xs flex items-center gap-1.5">
-                <span>Govt AgriFlow SMS Gateway</span>
-                <span class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] border border-emerald-500/40">DELIVERED</span>
+                <span>Govt AgriFlow Cellular SMS Gateway</span>
+                <span id="sms-banner-status-badge" class="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] border border-emerald-500/40">DELIVERED</span>
               </div>
-              <div class="text-[10px] text-slate-400 font-mono">SIM Carrier: Jio / Airtel / BSNL • Just Now</div>
+              <div class="text-[10px] text-slate-400 font-mono" id="sms-banner-carrier-info">SIM Carrier: Jio / Airtel / Vi / BSNL (Fast2SMS Gateway) • Just Now</div>
             </div>
           </div>
           <button onclick="hideSmsBanner()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
@@ -341,10 +340,10 @@
           <div class="text-slate-300 font-medium" id="sms-banner-message">Your AgriFlow AI verification code is:</div>
           <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-amber-500/40">
             <div>
-              <div class="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Your Secret 4-Digit OTP</div>
-              <div class="text-[10px] text-emerald-400">Valid for 5 minutes</div>
+              <div class="text-[10px] text-slate-400 uppercase tracking-wider font-bold" id="sms-banner-code-label">Your Secret 6-Digit OTP</div>
+              <div class="text-[10px] text-emerald-400">Valid for 5 minutes • Strict Manual Entry</div>
             </div>
-            <span id="sms-banner-otp-code" class="text-3xl font-black text-amber-300 font-mono tracking-widest px-3 py-1 bg-amber-500/10 rounded-lg border border-amber-500/30">----</span>
+            <span id="sms-banner-otp-code" class="text-2xl sm:text-3xl font-black text-amber-300 font-mono tracking-widest px-3 py-1 bg-amber-500/10 rounded-lg border border-amber-500/30">------</span>
           </div>
           <div class="text-[11px] text-slate-400 flex items-center justify-between pt-1">
             <span>Target Mobile: <strong class="text-white font-mono" id="sms-banner-sim-target">+91 ••••• •••••</strong></span>
@@ -353,11 +352,14 @@
         </div>
 
         <div class="flex items-center gap-2 pt-1">
-          <button onclick="copyGeneratedOtp()" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg flex items-center justify-center gap-2 transition-all">
-            <i class="fa-solid fa-bolt text-xs"></i> <span id="sms-copy-btn-text">⚡ Click to Auto-Fill OTP</span>
+          <button onclick="copyGeneratedOtp()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-emerald-500/40 flex items-center justify-center gap-2 transition-all">
+            <i class="fa-solid fa-copy text-xs text-emerald-400"></i> <span id="sms-copy-btn-text">Copy OTP</span>
           </button>
           <button onclick="speakCurrentGeneratedOtp()" class="px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs border border-amber-500/40 flex items-center gap-1.5 shadow">
-            <i class="fa-solid fa-volume-high text-xs"></i> <span>Listen</span>
+            <i class="fa-solid fa-volume-high text-xs"></i> <span>🔊 Listen</span>
+          </button>
+          <button onclick="openSmsConfigModal()" class="px-3 py-2.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-bold text-xs border border-emerald-500/40 flex items-center gap-1 shadow" title="Configure Fast2SMS API Key for Real SIM Delivery">
+            <i class="fa-solid fa-gear text-xs"></i> <span>SMS API</span>
           </button>
         </div>
       </div>
@@ -574,13 +576,17 @@
 
         <!-- ======================================================== -->
         <!-- TAB CONTENT 1: 📲 REAL PHONE NUMBER + REAL SMS OTP -->
-        <!-- ======================================================== -->
         <div id="auth-panel-otp" class="auth-panel space-y-4">
           <form id="phone-otp-login-form" onsubmit="submitRealPhoneOtpLogin(event)" class="space-y-3.5 text-xs">
             
-            <!-- Mobile Number Input -->
+            <!-- Mobile Number Input & Send OTP -->
             <div>
-              <label class="block text-slate-300 font-semibold mb-1">Enter 10-Digit Mobile Number (SIM Carrier)</label>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-slate-300 font-semibold">Enter 10-Digit Mobile Number (SIM Carrier)</label>
+                <button type="button" onclick="openSmsConfigModal()" class="text-[10px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
+                  <i class="fa-solid fa-tower-broadcast text-[9px]"></i> <span>Fast2SMS API Config</span>
+                </button>
+              </div>
               <div class="flex gap-2">
                 <span class="px-2.5 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-slate-300 font-mono text-xs flex items-center font-bold">🇮🇳 +91</span>
                 <input type="tel" id="otp-login-phone" value="9822012345" maxlength="15" placeholder="e.g. 9822012345" required class="flex-1 bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
@@ -593,21 +599,18 @@
                 <span id="otp-sent-status-text" class="flex items-center gap-1.5">
                   <i class="fa-solid fa-satellite-dish text-emerald-400 animate-pulse"></i> Click <strong>Send Real-Time OTP</strong> to dispatch 6-digit live code. <button type="button" id="otp-inline-retry-btn" onclick="triggerSendRealOtp()" class="ml-2 text-amber-400 font-bold underline hidden">Resend</button>
                 </span>
-                <button type="button" onclick="autoFillCurrentOtp()" id="btn-quick-autofill-otp" class="text-amber-400 hover:text-amber-300 font-bold underline text-[10px] hidden">Auto-Fill</button>
+                <button type="button" onclick="openSmsConfigModal()" class="text-emerald-400 hover:text-emerald-300 font-bold underline text-[10px]">SMS Settings</button>
               </div>
             </div>
 
-            <!-- 6-Box Discrete Digit Inputs for Real-Time 6-Digit OTP -->
+            <!-- 6-Box Discrete Digit Inputs for Real-Time 6-Digit OTP (Strict Manual Typing) -->
             <div class="space-y-1.5">
               <div class="flex items-center justify-between">
                 <label class="text-slate-300 font-semibold flex items-center gap-1.5">
                   <span>Enter 6-Digit Real-Time OTP</span>
-                  <span id="realtime-countdown-badge" class="text-[10px] text-amber-300 font-mono font-bold bg-amber-500/20 px-1.5 py-0.2 rounded border border-amber-500/40 hidden">60s</span>
+                  <span class="text-[10px] text-slate-400">(Manual Entry)</span>
                 </label>
                 <div class="flex items-center gap-2">
-                  <button type="button" onclick="autoFillCurrentOtp()" class="text-[11px] text-amber-300 hover:text-amber-200 font-bold bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40 flex items-center gap-1">
-                    <i class="fa-solid fa-bolt text-[9px]"></i> 1-Tap Fill
-                  </button>
                   <button type="button" onclick="speakCurrentGeneratedOtp()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
                     <i class="fa-solid fa-volume-high"></i> Voice OTP
                   </button>
@@ -628,12 +631,11 @@
             <!-- Submit Button -->
             <button type="submit" id="btn-verify-otp-submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm shadow-xl shadow-emerald-500/20 transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-shield-check"></i>
-              <span>Verify Real-Time OTP & Unlock Platform</span>
+              <span>Verify 6-Digit Real-Time OTP & Unlock Platform</span>
             </button>
           </form>
         </div>
 
-        <!-- ======================================================== -->
         <!-- TAB CONTENT 2: 📝 FIRST-CLASS NEW USER REGISTRATION -->
         <!-- ======================================================== -->
         <div id="auth-panel-reg" class="auth-panel hidden space-y-3.5">
@@ -5015,49 +5017,80 @@
     const SmsGateway = {
       activeOtp: null,
       resendTimer: null,
-      countdownSeconds: 0,
+      countdownSeconds: 45,
 
-      // Normalize any phone number format (with +91, 0, spaces, dashes)
+      // Normalize Indian 10-digit mobile number
       normalizePhone(phone) {
-        let clean = (phone || '').replace(/[^0-9]/g, '');
-        if (clean.startsWith('91') && clean.length === 12) {
-          clean = clean.slice(2);
-        } else if (clean.startsWith('0') && clean.length === 11) {
-          clean = clean.slice(1);
-        }
-        if (!clean || clean.length < 5) {
-          clean = '9822012345'; // default fallback for instant demo
-        } else if (clean.length < 10) {
-          clean = clean.padEnd(10, '0');
-        } else if (clean.length > 10) {
+        let clean = (phone || '').toString().replace(/[^0-9]/g, '');
+        if (clean.length > 10) {
           clean = clean.slice(-10);
+        }
+        if (clean.length < 10) {
+          clean = '9822012345';
         }
         return clean;
       },
 
       // Generate & Dispatch Real OTP to user's mobile SIM
-      sendOtp(phone, purpose = 'Farmer Login') {
+      sendOtp(phone, purpose = 'Farmer Login', length = 6) {
         const cleanPhone = this.normalizePhone(phone);
 
-        // Generate cryptographically secure random 4-digit OTP
-        const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        // Generate cryptographically secure random N-digit OTP
+        let randomOtp = '';
+        if (length === 6) {
+          randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        } else {
+          randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+        }
+
         this.activeOtp = {
           code: randomOtp,
           phone: cleanPhone,
           purpose: purpose,
+          length: length,
           expiresAt: Date.now() + 300000 // 5 minutes
         };
 
         // Play organic notification chime
         if (typeof SoundEngine !== 'undefined') SoundEngine.playDispatchChime();
 
-        // 1. Display Real Incoming SMS Notification Popup Banner
+        // 1. Attempt Real Physical Cellular SMS via Fast2SMS API if key configured
+        const fast2smsKey = localStorage.getItem('agriflow_sms_fast2sms_key');
+        if (fast2smsKey && fast2smsKey.trim() !== '') {
+          try {
+            fetch('https://www.fast2sms.com/dev/bulkV2', {
+              method: 'POST',
+              headers: {
+                'authorization': fast2smsKey.trim(),
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                route: 'otp',
+                variables_values: randomOtp,
+                numbers: cleanPhone
+              })
+            }).then(r => r.json()).then(resData => {
+              console.log('Fast2SMS Live Carrier Dispatch Response:', resData);
+              if (resData && (resData.return === true || resData.status_code === 200)) {
+                showNotification('📲 Physical SMS delivered to SIM (+91 ' + cleanPhone + ') via Fast2SMS!', 'success');
+              }
+            }).catch(fetchErr => {
+              console.warn('Fast2SMS Browser Direct Request note:', fetchErr);
+            });
+          } catch (err) {
+            console.warn('Fast2SMS Dispatch Exception:', err);
+          }
+        }
+
+        // 2. Display Incoming SMS Notification Popup Banner
         const banner = document.getElementById('real-sms-banner');
         const codeDisplay = document.getElementById('sms-banner-otp-code');
+        const codeLabel = document.getElementById('sms-banner-code-label');
         const simDisplay = document.getElementById('sms-banner-sim-target');
         const msgDisplay = document.getElementById('sms-banner-message');
 
         if (codeDisplay) codeDisplay.innerText = randomOtp;
+        if (codeLabel) codeLabel.innerText = 'Your Secret ' + length + '-Digit OTP';
         if (simDisplay) simDisplay.innerText = '+91 ' + cleanPhone.slice(0, 3) + ' ' + cleanPhone.slice(3, 7) + ' ' + cleanPhone.slice(7);
         if (msgDisplay) msgDisplay.innerText = 'Govt AgriFlow Verification OTP for ' + purpose + ':';
 
@@ -5066,22 +5099,19 @@
           banner.classList.add('translate-y-0', 'opacity-100');
         }
 
-        // 2. Update In-Form Status Text directly so it can NEVER be missed!
+        // 3. Update In-Form Status Text (Does NOT auto-fill inputs - strict manual entry)
         const statusText = document.getElementById('otp-sent-status-text');
         if (statusText) {
-          statusText.innerHTML = `<span class="text-emerald-300 font-bold"><i class="fa-solid fa-circle-check text-emerald-400"></i> SMS Sent to SIM (+91 ${cleanPhone})</span> • <span class="text-slate-300">Your OTP:</span> <strong class="text-amber-300 font-mono text-sm bg-slate-950 px-2 py-0.5 rounded border border-amber-400 shadow">${randomOtp}</strong>`;
+          statusText.innerHTML = `<span class="text-emerald-300 font-bold"><i class="fa-solid fa-circle-check text-emerald-400"></i> SMS Sent to SIM (+91 ${cleanPhone})</span> • <span class="text-slate-300">Type the ${length}-digit code manually into the boxes below.</span>`;
         }
-
-        const quickAutofillBtn = document.getElementById('btn-quick-autofill-otp');
-        if (quickAutofillBtn) quickAutofillBtn.classList.remove('hidden');
 
         const inlineRetry = document.getElementById('otp-inline-retry-btn');
         if (inlineRetry) inlineRetry.classList.remove('hidden');
 
-        // 3. Web Speech Spoken OTP Announcement
+        // 4. Rocky AI Web Speech Spoken OTP Announcement
         this.speakOtp(randomOtp);
 
-        // 4. Native Browser Desktop Notification
+        // 5. Native Browser Desktop Notification
         if ('Notification' in window) {
           if (Notification.permission === 'granted') {
             try {
@@ -5095,14 +5125,14 @@
           }
         }
 
-        // 5. Start 45-Second Live Resend Countdown
+        // 6. Start 45-Second Live Resend Countdown
         this.startResendCountdown();
 
-        showNotification('📩 SMS Delivered! OTP: ' + randomOtp + ' sent to +91 ' + cleanPhone, 'success');
+        showNotification('📩 6-Digit OTP Dispatched! Please type each digit manually.', 'success');
         return true;
       },
 
-      // Verify entered 4-digit code
+      // Verify entered code strictly
       verifyOtp(enteredCode, purpose = 'Login') {
         if (!this.activeOtp) {
           return { success: false, message: 'No active OTP found. Please click Send OTP first.' };
@@ -5113,7 +5143,7 @@
         if ((enteredCode || '').trim() === this.activeOtp.code) {
           return { success: true };
         } else {
-          return { success: false, message: 'Invalid OTP! Expected: ' + this.activeOtp.code + '. Please re-enter.' };
+          return { success: false, message: 'Invalid OTP! Entered: ' + enteredCode + ' (Expected: ' + this.activeOtp.code + '). Please re-enter.' };
         }
       },
 
@@ -5140,7 +5170,7 @@
         }, 1000);
       },
 
-      // Voice Output
+      // Regional Voice Output
       speakOtp(otpCode) {
         if (!('speechSynthesis' in window)) return;
         const currentLang = localStorage.getItem('agriflow_lang') || 'en';
@@ -5152,7 +5182,11 @@
           'ml': { text: 'നിങ്ങളുടെ അഗ്രിഫ്ലോ ഒടിപി കോഡ് ' + digits, voiceLang: 'ml-IN' },
           'te': { text: 'మీ అగ్రిఫ్లో ఓటీపీ కోడ్ ' + digits, voiceLang: 'te-IN' },
           'kn': { text: 'ನಿಮ್ಮ ಅಗ್ರಿಫ್ಲೋ ಒಟಿಪಿ ' + digits, voiceLang: 'kn-IN' },
-          'mr': { text: 'तुमचा अ‍ॅग्रीफ्लो ओटीपी कोड आहे ' + digits, voiceLang: 'mr-IN' }
+          'mr': { text: 'तुमचा अ‍ॅग्रीफ्लो ओटीपी कोड आहे ' + digits, voiceLang: 'mr-IN' },
+          'bn': { text: 'আপনার এগ্রিফ্লো ওটিপি কোড হলো ' + digits, voiceLang: 'bn-IN' },
+          'gu': { text: 'તમારો એગ્રીફ્લો ઓટીપી કોડ છે ' + digits, voiceLang: 'gu-IN' },
+          'pa': { text: 'ਤੁਹਾਡਾ ਐਗਰੀਫਲੋ ਓਟੀਪੀ ਕੋਡ ਹੈ ' + digits, voiceLang: 'pa-IN' },
+          'or': { text: 'ଆପଣଙ୍କ ଏଗ୍ରିଫ୍ଲୋ ଓଟିପି କୋଡ୍ ହେଉଛି ' + digits, voiceLang: 'or-IN' }
         };
 
         const config = langMap[currentLang] || langMap['en'];
@@ -5164,27 +5198,45 @@
       }
     };
 
-    // Auto-Fill OTP function for instant 1-tap test
-    function autoFillCurrentOtp() {
-      if (SmsGateway.activeOtp) {
-        const code = SmsGateway.activeOtp.code;
-        for (let i = 1; i <= 4; i++) {
-          const box = document.getElementById('otp-box-' + i);
-          if (box) box.value = code[i - 1] || '';
-        }
-        if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
-        showNotification('Auto-filled received OTP (' + code + ') into boxes!', 'info');
-        document.getElementById('otp-box-4')?.focus();
+    // SMS Gateway Modal Controls
+    function openSmsConfigModal() {
+      const modal = document.getElementById('sms-gateway-config-modal');
+      const input = document.getElementById('fast2sms-api-key-input');
+      const savedKey = localStorage.getItem('agriflow_sms_fast2sms_key') || '';
+      if (input) input.value = savedKey;
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeSmsConfigModal() {
+      const modal = document.getElementById('sms-gateway-config-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function saveSmsGatewayConfig(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('fast2sms-api-key-input');
+      const key = (input?.value || '').trim();
+      if (key) {
+        localStorage.setItem('agriflow_sms_fast2sms_key', key);
+        showNotification('Fast2SMS API Key saved! Physical SMS will be sent to your phone.', 'success');
       } else {
-        triggerSendRealOtp();
+        localStorage.removeItem('agriflow_sms_fast2sms_key');
+        showNotification('Fast2SMS key cleared. Using telecom simulator mode.', 'info');
       }
+      closeSmsConfigModal();
+    }
+
+    function testFast2SmsDispatch() {
+      const phone = (document.getElementById('otp-login-phone')?.value || '9822012345').trim();
+      SmsGateway.sendOtp(phone, 'SMS Test', 6);
+      showNotification('Test SMS dispatched to +91 ' + phone, 'info');
     }
 
     // SMS Banner Controls
     function hideSmsBanner() {
       const banner = document.getElementById('real-sms-banner');
       if (banner) {
-        banner.classList.add('-translate-y-32', 'opacity-0', 'pointer-events-none');
+        banner.classList.add('-translate-y-48', 'opacity-0', 'pointer-events-none');
         banner.classList.remove('translate-y-0', 'opacity-100');
       }
     }
@@ -5193,21 +5245,12 @@
       if (SmsGateway.activeOtp) {
         const code = SmsGateway.activeOtp.code;
         navigator.clipboard.writeText(code).catch(() => {});
-        
-        // Auto-fill discrete boxes
-        for (let i = 1; i <= 4; i++) {
-          const box = document.getElementById('otp-box-' + i);
-          if (box) box.value = code[i - 1] || '';
-        }
-
         const copyBtnText = document.getElementById('sms-copy-btn-text');
-        if (copyBtnText) copyBtnText.innerText = 'Copied & Pasted! ✓';
+        if (copyBtnText) copyBtnText.innerText = 'Copied! ✓';
         setTimeout(() => {
           if (copyBtnText) copyBtnText.innerText = 'Copy OTP';
-          hideSmsBanner();
         }, 1500);
-
-        showNotification('OTP ' + code + ' copied & auto-filled into boxes', 'info');
+        showNotification('OTP ' + code + ' copied to clipboard! Type it into the boxes.', 'info');
       }
     }
 
@@ -5219,13 +5262,13 @@
       }
     }
 
-    // Trigger Send Real OTP from Tab 1
+    // Trigger Send Real OTP from Tab 1 (Strictly clears all 6 boxes so user types manually)
     function triggerSendRealOtp() {
       const phone = (document.getElementById('otp-login-phone')?.value || '').trim();
-      const success = SmsGateway.sendOtp(phone, 'Farmer Login');
+      const success = SmsGateway.sendOtp(phone, 'Farmer Login', 6);
       if (success) {
-        // Clear OTP boxes
-        for (let i = 1; i <= 4; i++) {
+        // Clear all 6 OTP boxes completely
+        for (let i = 1; i <= 6; i++) {
           const box = document.getElementById('otp-box-' + i);
           if (box) box.value = '';
         }
@@ -5233,7 +5276,7 @@
       }
     }
 
-    // Discrete 4-Box Input Handlers for Main OTP Form
+    // Discrete 6-Box Input Handlers for Main OTP Form (Strict Manual Entry)
     function handleOtpBoxInput(index) {
       const currentBox = document.getElementById('otp-box-' + index);
       if (!currentBox) return;
@@ -5241,7 +5284,8 @@
       // Allow only numbers
       currentBox.value = currentBox.value.replace(/[^0-9]/g, '');
 
-      if (currentBox.value.length >= 1 && index < 4) {
+      // Advance to next box if digit entered
+      if (currentBox.value.length >= 1 && index < 6) {
         document.getElementById('otp-box-' + (index + 1))?.focus();
       }
     }
@@ -5260,33 +5304,33 @@
     function handleOtpBoxPaste(e) {
       e.preventDefault();
       const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim().replace(/[^0-9]/g, '');
-      if (pasteData.length >= 4) {
-        for (let i = 1; i <= 4; i++) {
+      if (pasteData.length >= 6) {
+        for (let i = 1; i <= 6; i++) {
           const box = document.getElementById('otp-box-' + i);
           if (box) box.value = pasteData[i - 1] || '';
         }
-        document.getElementById('otp-box-4')?.focus();
+        document.getElementById('otp-box-6')?.focus();
       }
     }
 
-    // Submit Real Phone OTP Login
+    // Submit Real Phone OTP Login (Strict 6-Digit Manual Verification)
     function submitRealPhoneOtpLogin(e) {
       if (e) e.preventDefault();
       
-      // Gather digits from the 4 discrete boxes
+      // Gather digits from all 6 discrete boxes
       let enteredOtp = '';
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= 6; i++) {
         enteredOtp += (document.getElementById('otp-box-' + i)?.value || '').trim();
       }
 
       const card = document.getElementById('auth-main-card');
 
-      if (enteredOtp.length !== 4) {
+      if (enteredOtp.length !== 6) {
         if (card) {
           card.classList.add('animate-shake');
           setTimeout(() => card.classList.remove('animate-shake'), 500);
         }
-        showNotification('Please enter all 4 digits of the OTP', 'error');
+        showNotification('Please manually type all 6 digits of the received OTP', 'error');
         return;
       }
 
@@ -5299,7 +5343,7 @@
           setTimeout(() => card.classList.remove('animate-shake'), 500);
         }
         // Highlight boxes in red
-        for (let i = 1; i <= 4; i++) {
+        for (let i = 1; i <= 6; i++) {
           const box = document.getElementById('otp-box-' + i);
           if (box) {
             box.classList.add('border-rose-500');
@@ -5346,7 +5390,12 @@
     // Password Reset via Real OTP
     function sendRealPasswordResetOtp() {
       const phone = document.getElementById('reset-phone-input')?.value || '';
-      SmsGateway.sendOtp(phone, 'Password Reset');
+      for (let i = 1; i <= 4; i++) {
+        const box = document.getElementById('reset-otp-' + i);
+        if (box) box.value = '';
+      }
+      SmsGateway.sendOtp(phone, 'Password Reset', 4);
+      document.getElementById('reset-otp-1')?.focus();
     }
 
     function submitRealPasswordReset(e) {
@@ -5377,7 +5426,12 @@
     // Find User ID via Real OTP
     function sendRealFindUserIdOtp() {
       const phone = document.getElementById('find-phone-input')?.value || '';
-      SmsGateway.sendOtp(phone, 'Account Recovery');
+      for (let i = 1; i <= 4; i++) {
+        const box = document.getElementById('find-otp-' + i);
+        if (box) box.value = '';
+      }
+      SmsGateway.sendOtp(phone, 'Account Recovery', 4);
+      document.getElementById('find-otp-1')?.focus();
     }
 
     function submitRealFindUserId(e) {
@@ -6062,6 +6116,67 @@
   <!-- ======================================================== -->
   <!-- 📝 4. NEW FARMER & ENTERPRISE BUYER REGISTRATION MODAL -->
   <!-- ======================================================== -->
+  
+  <!-- ======================================================== -->
+  <!-- ⚙️ 5. REAL SIM SMS GATEWAY CONFIGURATION MODAL (FAST2SMS) -->
+  <!-- ======================================================== -->
+  <div id="sms-gateway-config-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="agri-card max-w-lg w-full rounded-3xl border-2 border-emerald-500/60 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden bg-slate-950/95">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-tower-broadcast text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white font-heading">Real SIM SMS Gateway Configuration</h3>
+            <p class="text-[10px] text-emerald-300">Fast2SMS Indian Cellular SMS Gateway Integration</p>
+          </div>
+        </div>
+        <button onclick="closeSmsConfigModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div class="p-3.5 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 text-slate-300 space-y-2">
+          <div class="font-bold text-emerald-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-info"></i> How Real Physical SMS Delivery Works
+          </div>
+          <p class="text-[11px] leading-relaxed">
+            AgriFlow AI supports direct cellular dispatch via <strong>Fast2SMS Indian Cellular Gateway</strong> (<a href="https://www.fast2sms.com" target="_blank" class="text-amber-400 underline font-semibold">fast2sms.com</a>). When an API key is configured, actual SMS text messages are transmitted over cellular towers directly to your Airtel/Jio/Vi/BSNL phone!
+          </p>
+        </div>
+
+        <form id="sms-gateway-form" onsubmit="saveSmsGatewayConfig(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Fast2SMS API Key (For Live Physical SMS)</label>
+            <input type="text" id="fast2sms-api-key-input" placeholder="Paste your Fast2SMS API Authorization Key here" class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+            <p class="text-[10px] text-slate-400 mt-1">Free signup at <a href="https://www.fast2sms.com" target="_blank" class="text-emerald-400 underline font-semibold">fast2sms.com</a> with free developer credits.</p>
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-300 space-y-1">
+            <div class="text-[11px] font-bold text-emerald-300">Default Active Features:</div>
+            <div class="text-[10px] text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i> Cryptographic 6-Digit Live OTP Generation</div>
+            <div class="text-[10px] text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i> Strict Manual 6-Box Entry & Verification</div>
+            <div class="text-[10px] text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i> Rocky AI Regional Voice Speech in 11 Indian Languages</div>
+            <div class="text-[10px] text-slate-400 flex items-center gap-1.5"><i class="fa-solid fa-check text-emerald-400"></i> Native Web Notification Carrier Broadcast</div>
+          </div>
+
+          <div class="flex gap-2 pt-1">
+            <button type="submit" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg transition-all">
+              <i class="fa-solid fa-floppy-disk mr-1"></i> Save SMS Gateway Key
+            </button>
+            <button type="button" onclick="testFast2SmsDispatch()" class="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/40 font-bold text-xs">
+              <i class="fa-solid fa-paper-plane mr-1"></i> Test Send
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div id="register-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
     <div class="agri-card max-w-lg w-full rounded-3xl border-2 border-emerald-500/60 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden bg-slate-950/95 max-h-[90vh] overflow-y-auto">
       

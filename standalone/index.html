@@ -309,29 +309,48 @@
   <!-- 🔐 1. ULTRA-EASY & DEAD-SIMPLE 1-TAP LOGIN LAUNCHPAD -->
   <!-- (Website only opens into full app once logged in) -->
   <!-- ======================================================== -->
-  <div id="auth-gate-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative z-20 transition-all duration-500">
-    <div class="agri-card max-w-lg w-full rounded-3xl border-2 border-emerald-500/50 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden">
+    <!-- ======================================================== -->
+  <!-- 🔐 1. ULTRA-PERFECT, GORGEOUS & DEAD-SIMPLE 1-TAP LOGIN LAUNCHPAD -->
+  <!-- (Website only opens into full app once logged in) -->
+  <!-- ======================================================== -->
+  <div id="auth-gate-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 relative z-20 transition-all duration-500">
+    
+    <!-- Ambient Radial Glow Behind the Card -->
+    <div class="absolute w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-3xl pointer-events-none -z-10 animate-pulse"></div>
+    <div class="absolute w-[400px] h-[400px] bg-amber-500/10 rounded-full blur-3xl pointer-events-none -z-10 translate-x-32 translate-y-32"></div>
+
+    <div class="agri-card max-w-xl w-full rounded-[32px] border-2 border-emerald-400/60 p-6 sm:p-9 space-y-6 shadow-[0_30px_100px_rgba(0,0,0,0.85)] relative overflow-hidden backdrop-blur-2xl bg-slate-950/85">
       
-      <!-- Brand Header -->
-      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-amber-400 p-0.5 shadow-lg shadow-emerald-500/20">
-            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-              <i class="fa-solid fa-seedling text-emerald-400 text-xl"></i>
+      <!-- Top Subtle Gold & Emerald Accent Bar -->
+      <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-300 to-amber-400"></div>
+
+      <!-- Brand & Global Accessibility Controls Header -->
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4 pt-1">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-400 to-amber-400 p-0.5 shadow-xl shadow-emerald-500/30 group">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center relative overflow-hidden">
+              <i class="fa-solid fa-seedling text-emerald-400 text-2xl group-hover:scale-110 transition-transform"></i>
+              <div class="absolute inset-0 bg-emerald-400/10 animate-ping rounded-full pointer-events-none"></div>
             </div>
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <span class="font-heading font-extrabold text-2xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
+              <span class="font-heading font-black text-2xl sm:text-3xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 font-mono font-bold">AI</span></span>
             </div>
-            <p class="text-[11px] text-emerald-300 font-medium">Smart India Hackathon 2026 • PS-33</p>
+            <p class="text-[11px] text-emerald-300 font-semibold flex items-center gap-1.5 mt-0.5">
+              <i class="fa-solid fa-award text-amber-400"></i> Smart India Hackathon 2026 • Problem Statement 33
+            </p>
           </div>
         </div>
 
+        <!-- Top Utility Controls: Language & Sunlight Mode -->
         <div class="flex items-center gap-2">
-          <!-- 🌐 Language Selector in Login -->
+          
+          <!-- 🌐 11-Language Selector with Native Flags -->
           <div class="relative">
-            <select id="login-lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-900/90 text-emerald-300 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold py-1.5 pl-2.5 pr-7 rounded-xl cursor-pointer focus:outline-none focus:ring-1 focus:ring-emerald-400 shadow">
+            <select id="login-lang-select" onchange="changeLanguage(this.value)" class="appearance-none bg-slate-900/90 hover:bg-slate-800 text-emerald-300 border border-emerald-500/50 hover:border-emerald-400 text-xs font-bold py-1.5 pl-2.5 pr-7 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-md transition-all">
               <option value="en">🇬🇧 English</option>
               <option value="ta">🇮🇳 தமிழ் (Tamil)</option>
               <option value="hi">🇮🇳 हिन्दी (Hindi)</option>
@@ -349,119 +368,173 @@
             </div>
           </div>
 
-          <button onclick="toggleSunlightMode()" class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-amber-300 text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-1 shadow">
+          <!-- Sunlight Field Mode -->
+          <button onclick="toggleSunlightMode()" title="Toggle High Contrast Sunlight Mode" class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/40 text-amber-300 text-xs font-bold transition-all flex items-center gap-1 shadow-md">
             <i class="fa-solid fa-sun text-xs"></i>
             <span class="hidden sm:inline" data-i18n="sun_mode_btn">Sun Mode</span>
           </button>
         </div>
       </div>
 
-      <!-- Welcome Title -->
-      <div class="text-center space-y-1">
-        <h2 class="text-xl sm:text-2xl font-black text-white font-heading">
+      <!-- Multilingual Greetings & Welcome Banner -->
+      <div class="text-center space-y-1 bg-gradient-to-r from-emerald-950/60 via-slate-900/80 to-emerald-950/60 py-2 px-4 rounded-2xl border border-emerald-500/20">
+        <h2 class="text-lg sm:text-xl font-black text-white font-heading flex items-center justify-center gap-2">
+          <span>🌾</span>
           <span data-i18n="auth_title">Select Your Role to Enter</span>
+          <span>⚡</span>
         </h2>
-        <p class="text-xs text-emerald-300/90 font-medium">
+        <p class="text-xs text-emerald-300 font-medium">
           <span data-i18n="auth_subtitle">⚡ 1-Click Direct Access • No Password Required</span>
         </p>
       </div>
 
-      <!-- 🌟 1. GIANT 1-CLICK FAST LAUNCH HERO BUTTON -->
-      <button onclick="quickLoginPersona('farmer-1')" class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm shadow-xl hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-between group">
-        <div class="flex items-center gap-2.5">
-          <span class="text-xl">🌾</span>
+      <!-- 🌟 1. GIANT 1-CLICK FAST LAUNCH HERO BUTTON (FARMER RAMESH PATIL) -->
+      <button onclick="quickLoginPersona('farmer-1')" class="w-full py-4 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm shadow-[0_10px_30px_rgba(16,185,129,0.35)] hover:shadow-[0_15px_40px_rgba(16,185,129,0.5)] transition-all transform hover:-translate-y-1 flex items-center justify-between group border-2 border-emerald-300">
+        <div class="flex items-center gap-3.5">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Ramesh Patil" class="w-12 h-12 rounded-2xl object-cover border-2 border-slate-950 shadow-md">
+            <span class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-700 border-2 border-slate-950 flex items-center justify-center text-white text-[8px]">
+              <i class="fa-solid fa-check"></i>
+            </span>
+          </div>
           <div class="text-left">
-            <div class="font-extrabold leading-tight text-slate-950"><span data-i18n="auth_hero_btn">1-CLICK INSTANT ENTRY (Kisan Farmer)</span></div>
-            <div class="text-[10px] font-semibold text-slate-900/80"><span data-i18n="auth_hero_sub">Ramesh Patil • Nashik FPO • ₹1,84,500 Balance</span></div>
+            <div class="font-black text-base text-slate-950 leading-tight flex items-center gap-1.5">
+              <span data-i18n="auth_hero_btn">1-CLICK INSTANT ENTRY (Kisan Farmer)</span>
+              <span class="text-xs">➔</span>
+            </div>
+            <div class="text-[11px] font-bold text-slate-900/90 mt-0.5">
+              Ramesh Patil • Nashik FPO • <strong class="text-emerald-950 bg-emerald-300/60 px-1.5 py-0.2 rounded font-mono">₹1,84,500 Available</strong>
+            </div>
           </div>
         </div>
-        <div class="w-8 h-8 rounded-xl bg-slate-950/20 flex items-center justify-center text-slate-950 font-bold text-sm">
-          <i class="fa-solid fa-arrow-right group-hover:translate-x-0.5 transition-transform"></i>
+        <div class="w-10 h-10 rounded-2xl bg-slate-950/20 group-hover:bg-slate-950/30 flex items-center justify-center text-slate-950 font-bold text-base shadow transition-all">
+          <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
         </div>
       </button>
 
-      <!-- 🌟 2. 4 SIMPLE 1-TAP ROLE BUTTONS -->
-      <div class="space-y-2 pt-1">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+      <!-- 🌟 2. 4 SIMPLE 1-TAP ROLE BUTTONS (GRID) -->
+      <div class="space-y-2.5">
+        <div class="text-[11px] text-slate-400 font-bold uppercase tracking-wider text-center">Or choose your direct stakeholder role:</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           
           <!-- Role 1: Kisan Farmer -->
           <button onclick="quickLoginPersona('farmer-1')" class="p-3.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-500/50 hover:border-emerald-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
             <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-10 h-10 rounded-xl object-cover border border-emerald-400">
+              <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-10 h-10 rounded-xl object-cover border border-emerald-400 shadow">
               <div>
                 <div class="font-bold text-white group-hover:text-emerald-300">Ramesh Patil</div>
                 <div class="text-[10px] text-emerald-400 font-semibold">🌾 <span data-i18n="role_farmer_label">Kisan Farmer</span></div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors"><span data-i18n="enter_arrow">Enter ➔</span></span>
+            <span class="px-2.5 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors shadow">
+              <span data-i18n="enter_arrow">Enter ➔</span>
+            </span>
           </button>
 
           <!-- Role 2: Institutional Buyer -->
           <button onclick="quickLoginPersona('buyer-1')" class="p-3.5 rounded-2xl bg-blue-950/80 hover:bg-blue-900 border-2 border-blue-500/50 hover:border-blue-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
             <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-10 h-10 rounded-xl object-cover border border-blue-400">
+              <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-10 h-10 rounded-xl object-cover border border-blue-400 shadow">
               <div>
                 <div class="font-bold text-white group-hover:text-blue-300">BigBasket</div>
                 <div class="text-[10px] text-blue-400 font-semibold">🛒 <span data-i18n="role_buyer_label">Sourcing Buyer</span></div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 group-hover:bg-blue-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+            <span class="px-2.5 py-1 rounded-xl bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 group-hover:bg-blue-500 group-hover:text-slate-950 transition-colors shadow">
+              <span data-i18n="enter_arrow">Enter ➔</span>
+            </span>
           </button>
 
           <!-- Role 3: Reefer Logistics Driver -->
           <button onclick="quickLoginPersona('logistics-1')" class="p-3.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border-2 border-amber-500/50 hover:border-amber-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
             <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-10 h-10 rounded-xl object-cover border border-amber-400">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-10 h-10 rounded-xl object-cover border border-amber-400 shadow">
               <div>
                 <div class="font-bold text-white group-hover:text-amber-300">Suresh Mane</div>
                 <div class="text-[10px] text-amber-400 font-semibold">🚚 <span data-i18n="role_driver_label">Reefer Driver</span></div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+            <span class="px-2.5 py-1 rounded-xl bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors shadow">
+              <span data-i18n="enter_arrow">Enter ➔</span>
+            </span>
           </button>
 
           <!-- Role 4: Quality Control Officer -->
           <button onclick="quickLoginPersona('qc-1')" class="p-3.5 rounded-2xl bg-purple-950/80 hover:bg-purple-900 border-2 border-purple-500/50 hover:border-purple-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
             <div class="flex items-center gap-3">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-10 h-10 rounded-xl object-cover border border-purple-400">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-10 h-10 rounded-xl object-cover border border-purple-400 shadow">
               <div>
                 <div class="font-bold text-white group-hover:text-purple-300">Dr. Swaminathan</div>
                 <div class="text-[10px] text-purple-400 font-semibold">🔬 <span data-i18n="role_qc_label">QC Officer</span></div>
               </div>
             </div>
-            <span class="px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+            <span class="px-2.5 py-1 rounded-xl bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors shadow">
+              <span data-i18n="enter_arrow">Enter ➔</span>
+            </span>
           </button>
 
         </div>
       </div>
 
-      <!-- 🎙️ 3. OPTIONAL SPOKEN AUDIO OTP DEMO (ACCESSIBILITY) -->
-      <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20 flex items-center justify-between text-xs">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-volume-high text-amber-400 text-base animate-pulse"></i>
-          <div>
-            <div class="text-white font-semibold"><span data-i18n="voice_login_title">Rural Voice Login Demo</span></div>
-            <div class="text-[10px] text-slate-400"><span data-i18n="voice_login_sub">Hear voice OTP audio in your language</span></div>
+      <!-- 👔 3. BOSS & EXECUTIVE STAFF PORTAL BUTTON (MPIN GUARDED) -->
+      <button onclick="openStaffAuthModal()" class="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-purple-950/90 via-slate-900 to-purple-950/90 hover:from-purple-900 hover:to-indigo-950 border-2 border-purple-500/60 hover:border-purple-400 text-purple-200 hover:text-white text-xs font-bold transition-all flex items-center justify-between shadow-xl group">
+        <div class="flex items-center gap-2.5">
+          <div class="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-400 flex items-center justify-center text-amber-400">
+            <i class="fa-solid fa-user-tie text-xs"></i>
+          </div>
+          <div class="text-left">
+            <div class="font-black text-white group-hover:text-purple-300 flex items-center gap-1.5">
+              <span>👔 Boss & Staff Executive Portal</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">MPIN SECURED</span>
+            </div>
+            <div class="text-[10px] text-purple-300/80">View Total Farmer Earnings, Margin Savings & Bank UTR Ledger</div>
           </div>
         </div>
-        <button onclick="speakCurrentOtp('1295')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow transition-all flex items-center gap-1">
-          <i class="fa-solid fa-play text-[10px]"></i> <span data-i18n="voice_speak_btn">Speak OTP</span>
-        </button>
-      </div>
-
-      <!-- 👔 Boss / Staff Executive MPIN Access Button on Login Screen -->
-      <button onclick="openStaffAuthModal()" class="w-full py-2.5 px-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-purple-500/50 hover:border-purple-400 text-purple-300 hover:text-white text-xs font-bold transition-all flex items-center justify-between shadow-lg">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-amber-400 text-sm"></i>
-          <span>👔 Boss & Staff Executive Login (MPIN Secured)</span>
-        </div>
-        <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">Audit Ledger ➔</span>
+        <span class="px-2.5 py-1 rounded-xl bg-purple-500/30 text-purple-200 text-[10px] font-bold border border-purple-400/40 group-hover:bg-purple-500 group-hover:text-slate-950 transition-all">
+          Audit Ledger ➔
+        </span>
       </button>
 
-      <!-- Live Server Footnote -->
-      <div class="border-t border-emerald-900/60 pt-3 flex items-center justify-between text-[11px] text-slate-400">
-        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-circle-check"></i> <span data-i18n="microservers_ready">3 Microservers Ready</span></span>
-        <span class="text-slate-300 font-mono">SQLite3 Protocol</span>
+      <!-- 🎙️ 4. RURAL ACCESSIBILITY BAR: VOICE OTP + 24x7 KISAN HELPLINE -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+        
+        <!-- Spoken Voice OTP -->
+        <div class="bg-slate-950/90 p-3 rounded-2xl border border-emerald-500/30 flex items-center justify-between text-xs shadow-md">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-volume-high text-amber-400 text-base animate-pulse"></i>
+            <div>
+              <div class="text-white font-bold text-[11px]"><span data-i18n="voice_login_title">Rural Voice Login</span></div>
+              <div class="text-[10px] text-slate-400"><span data-i18n="voice_login_sub">Hear OTP audio prompt</span></div>
+            </div>
+          </div>
+          <button onclick="speakCurrentOtp('1295')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs shadow transition-all flex items-center gap-1">
+            <i class="fa-solid fa-play text-[9px]"></i> <span data-i18n="voice_speak_btn">Speak OTP</span>
+          </button>
+        </div>
+
+        <!-- 24x7 Toll-Free Call Center Direct Dial -->
+        <div class="bg-slate-950/90 p-3 rounded-2xl border border-emerald-500/30 flex items-center justify-between text-xs shadow-md">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-phone-volume text-emerald-400 text-base animate-bounce"></i>
+            <div>
+              <div class="text-white font-bold text-[11px]">Kisan Helpline</div>
+              <div class="text-[10px] text-emerald-300 font-mono">1800-180-1551 (Free)</div>
+            </div>
+          </div>
+          <a href="tel:18001801551" class="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow transition-all flex items-center gap-1">
+            <i class="fa-solid fa-phone text-[9px]"></i> Call
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Live Microserver Status & Security Footnote -->
+      <div class="border-t border-emerald-900/60 pt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+        <span class="flex items-center gap-1.5 text-emerald-400 font-bold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span data-i18n="microservers_ready">3 Microservers Ready (:5001, :5002, :5003)</span>
+        </span>
+        <span class="text-slate-300 font-mono text-[10px] bg-slate-900 px-2 py-0.5 rounded border border-emerald-500/20">SQLite3 Binary DB • T+0 RBI Verified</span>
       </div>
 
     </div>

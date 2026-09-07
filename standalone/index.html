@@ -65,7 +65,7 @@
     }
     
     /* ======================================================== */
-    /* 🌿 DYNAMIC SWAYING NATURISTIC TREE & BACKGROUND ANIMATION */
+    /* 🌿 VIVID & CRYSTAL-CLEAR SWAYING NATURISTIC TREE & BACKGROUND */
     /* ======================================================== */
     .nature-background-wrapper {
       position: fixed;
@@ -73,50 +73,63 @@
       z-index: 0;
       overflow: hidden;
       pointer-events: none;
-      background: #021a13;
+      background: #022218;
     }
 
-    /* Primary Layer: High-Definition Naturistic Farm Landscape */
+    /* Primary Layer: High-Definition Naturistic Farm Landscape with Vibrant Sun Rays */
     .nature-landscape-bg {
       position: absolute;
       inset: -5%;
       width: 110%;
       height: 110%;
       background: 
-        radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.28) 0%, transparent 45%),
-        radial-gradient(circle at 80% 60%, rgba(245, 158, 11, 0.22) 0%, transparent 45%),
-        linear-gradient(180deg, rgba(2, 44, 34, 0.88) 0%, rgba(5, 20, 15, 0.94) 50%, rgba(2, 12, 9, 0.98) 100%),
-        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&auto=format&fit=crop&q=80') center/cover no-repeat;
+        radial-gradient(circle at 80% 20%, rgba(251, 191, 36, 0.40) 0%, transparent 45%),
+        radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.45) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(2, 34, 24, 0.42) 0%, rgba(2, 22, 16, 0.65) 50%, rgba(1, 14, 10, 0.85) 100%),
+        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&auto=format&fit=crop&q=85') center/cover no-repeat;
       animation: landscapeBreathe 18s ease-in-out infinite alternate;
       transform-origin: center center;
     }
 
-    /* Secondary Layer: Majestic Agricultural Tree Overlay with Realistic Wind Sway */
+    /* Secondary Layer: High-Clarity Majestic Tree Overlay with Wind Sway */
     .nature-tree-overlay {
       position: absolute;
-      bottom: -40px;
-      right: -30px;
-      width: 620px;
-      height: 620px;
-      opacity: 0.35;
-      background: url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=800&auto=format&fit=crop&q=80') center/contain no-repeat;
-      filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.3)) hue-rotate(-15deg);
-      animation: treeSwayWind 8s ease-in-out infinite alternate;
+      bottom: -30px;
+      right: -20px;
+      width: 700px;
+      height: 720px;
+      opacity: 0.88;
+      background: url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1000&auto=format&fit=crop&q=85') center/contain no-repeat;
+      filter: drop-shadow(0 0 35px rgba(16, 185, 129, 0.65)) brightness(1.2) contrast(1.15);
+      animation: treeSwayWind 7s ease-in-out infinite alternate;
       transform-origin: bottom center;
     }
 
-    /* Left Foliage Branch Sway */
+    /* Left Foliage Branch Sway with High Clarity */
     .nature-left-branch {
       position: absolute;
-      top: -20px;
-      left: -40px;
-      width: 500px;
-      height: 500px;
-      opacity: 0.25;
-      background: url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800&auto=format&fit=crop&q=80') center/contain no-repeat;
-      filter: drop-shadow(0 0 25px rgba(52, 211, 153, 0.25));
-      animation: branchSwayWind 10s ease-in-out infinite alternate;
+      top: -10px;
+      left: -20px;
+      width: 580px;
+      height: 580px;
+      opacity: 0.78;
+      background: url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=900&auto=format&fit=crop&q=85') center/contain no-repeat;
+      filter: drop-shadow(0 0 30px rgba(52, 211, 153, 0.45)) brightness(1.15);
+      animation: branchSwayWind 9s ease-in-out infinite alternate;
       transform-origin: top left;
+    }
+
+    /* Dynamic Illustrated Tree Canopy Layer for Guaranteed Sharp Rendering */
+    .svg-tree-canopy {
+      position: absolute;
+      bottom: 0;
+      right: 2%;
+      width: 480px;
+      height: 600px;
+      opacity: 0.75;
+      animation: treeSwayWind 7s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+      filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.6));
     }
 
     /* Tree Wind Sway Animations */
@@ -125,16 +138,16 @@
         transform: rotate(0deg) scale(1) translateY(0px) skewX(0deg);
       }
       25% {
-        transform: rotate(1.8deg) scale(1.02) translateY(-4px) skewX(-1.2deg);
+        transform: rotate(2.4deg) scale(1.02) translateY(-6px) skewX(-1.5deg);
       }
       50% {
-        transform: rotate(-1.2deg) scale(0.99) translateY(2px) skewX(0.8deg);
+        transform: rotate(-1.6deg) scale(0.99) translateY(3px) skewX(1.0deg);
       }
       75% {
-        transform: rotate(2.4deg) scale(1.03) translateY(-6px) skewX(-1.5deg);
+        transform: rotate(3.0deg) scale(1.03) translateY(-8px) skewX(-2.0deg);
       }
       100% {
-        transform: rotate(-0.8deg) scale(1.01) translateY(0px) skewX(0.5deg);
+        transform: rotate(-1.2deg) scale(1.01) translateY(0px) skewX(0.8deg);
       }
     }
 
@@ -143,10 +156,10 @@
         transform: rotate(0deg) translateY(0px);
       }
       50% {
-        transform: rotate(2.5deg) translateY(6px);
+        transform: rotate(3.2deg) translateY(8px);
       }
       100% {
-        transform: rotate(-1.8deg) translateY(-4px);
+        transform: rotate(-2.2deg) translateY(-5px);
       }
     }
 
@@ -159,10 +172,11 @@
       }
     }
 
-    /* Drifting Organic Leaf Particle */
+    /* Drifting Organic Leaf Particle with Vibrant Green & Gold */
     .leaf-particle {
       position: absolute;
-      color: rgba(52, 211, 153, 0.4);
+      color: rgba(52, 211, 153, 0.85);
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
       animation: floatLeaf linear infinite;
     }
 
@@ -171,14 +185,14 @@
         transform: translateY(-50px) translateX(0) rotate(0deg);
         opacity: 0;
       }
-      20% {
-        opacity: 0.7;
+      15% {
+        opacity: 0.95;
       }
-      80% {
-        opacity: 0.7;
+      85% {
+        opacity: 0.95;
       }
       100% {
-        transform: translateY(105vh) translateX(160px) rotate(360deg);
+        transform: translateY(105vh) translateX(180px) rotate(420deg);
         opacity: 0;
       }
     }
@@ -190,7 +204,7 @@
     }
     .sunlight-mode .nature-background-wrapper {
       background: #f1f5f9 !important;
-      opacity: 0.15;
+      opacity: 0.25;
     }
     .sunlight-mode .agri-card {
       background: #ffffff !important;
@@ -214,21 +228,21 @@
       border-color: #94a3b8 !important;
     }
 
-    /* Glassmorphism Cards */
+    /* Glassmorphism Cards: Translucent so the swaying tree is clearly visible behind */
     .agri-card {
-      background: rgba(3, 25, 18, 0.88);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(52, 211, 153, 0.25);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      background: rgba(3, 24, 18, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.10);
     }
     .agri-card-hover {
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .agri-card-hover:hover {
       transform: translateY(-4px);
-      border-color: rgba(52, 211, 153, 0.55);
-      box-shadow: 0 25px 60px rgba(16, 185, 129, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      border-color: rgba(52, 211, 153, 0.65);
+      box-shadow: 0 25px 60px rgba(16, 185, 129, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.18);
     }
 
     /* Marquee animation for Mandi rate ticker */
@@ -249,24 +263,48 @@
 <body class="text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white relative transition-colors duration-300">
 
   <!-- ======================================================== -->
-  <!-- 🌿 LIVE SWAYING TREE & NATURISTIC BACKGROUND LAYERS -->
+  <!-- 🌿 VIVID SWAYING TREE & NATURISTIC BACKGROUND LAYERS -->
   <!-- ======================================================== -->
   <div class="nature-background-wrapper">
-    <!-- Breathing Landscape Base -->
+    <!-- 1. Breathing High-Definition Agricultural Landscape Base -->
     <div class="nature-landscape-bg"></div>
 
-    <!-- Swaying Tree in the Wind (Right Side) -->
+    <!-- 2. Primary High-Definition Swaying Tree (Right) -->
     <div class="nature-tree-overlay"></div>
 
-    <!-- Swaying Foliage Branch (Left Top) -->
+    <!-- 3. Crisp SVG Lush Green Tree Structure (Guarantees Crystal-Clear Visibility) -->
+    <div class="svg-tree-canopy hidden sm:block">
+      <svg viewBox="0 0 400 500" class="w-full h-full drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Tree Trunk & Roots -->
+        <path d="M190 500 C190 420 175 360 160 300 C150 250 165 200 185 140 C195 200 220 250 225 300 C235 360 215 420 215 500 Z" fill="#3e2723" opacity="0.95"/>
+        <path d="M175 360 C140 330 110 320 80 310 C105 325 135 345 165 375 Z" fill="#2d1d19"/>
+        <path d="M210 330 C245 300 280 290 320 275 C285 295 250 315 215 345 Z" fill="#2d1d19"/>
+        <path d="M185 230 C150 190 120 180 85 160 C120 180 150 205 180 240 Z" fill="#3e2723"/>
+        <path d="M195 200 C225 160 260 145 305 125 C265 150 230 175 195 210 Z" fill="#3e2723"/>
+
+        <!-- Lush Green Foliage Clusters with Gradients -->
+        <circle cx="185" cy="110" r="75" fill="#059669" opacity="0.85"/>
+        <circle cx="130" cy="160" r="65" fill="#10b981" opacity="0.9"/>
+        <circle cx="250" cy="150" r="70" fill="#047857" opacity="0.9"/>
+        <circle cx="180" cy="190" r="85" fill="#10b981" opacity="0.85"/>
+        <circle cx="95" cy="220" r="55" fill="#34d399" opacity="0.8"/>
+        <circle cx="280" cy="210" r="60" fill="#059669" opacity="0.85"/>
+        <circle cx="195" cy="80" r="50" fill="#34d399" opacity="0.85"/>
+        <circle cx="145" cy="100" r="55" fill="#6ee7b7" opacity="0.75"/>
+        <circle cx="230" cy="95" r="55" fill="#10b981" opacity="0.85"/>
+        <circle cx="170" cy="150" r="50" fill="#a7f3d0" opacity="0.6"/>
+      </svg>
+    </div>
+
+    <!-- 4. Top-Left Swaying Foliage Branch -->
     <div class="nature-left-branch"></div>
 
-    <!-- Drifting Organic Leaves -->
-    <i class="fa-solid fa-leaf leaf-particle text-xs" style="left: 10%; animation-duration: 14s; animation-delay: 0s;"></i>
-    <i class="fa-solid fa-seedling leaf-particle text-sm" style="left: 30%; animation-duration: 18s; animation-delay: 3s;"></i>
-    <i class="fa-solid fa-leaf leaf-particle text-xs" style="left: 55%; animation-duration: 12s; animation-delay: 1.5s;"></i>
-    <i class="fa-solid fa-wheat-awn leaf-particle text-sm" style="left: 75%; animation-duration: 16s; animation-delay: 5s;"></i>
-    <i class="fa-solid fa-leaf leaf-particle text-xs" style="left: 90%; animation-duration: 20s; animation-delay: 2s;"></i>
+    <!-- 5. Drifting Organic Leaves -->
+    <i class="fa-solid fa-leaf leaf-particle text-sm text-emerald-400" style="left: 8%; animation-duration: 12s; animation-delay: 0s;"></i>
+    <i class="fa-solid fa-seedling leaf-particle text-base text-amber-300" style="left: 28%; animation-duration: 16s; animation-delay: 2s;"></i>
+    <i class="fa-solid fa-leaf leaf-particle text-xs text-emerald-300" style="left: 52%; animation-duration: 11s; animation-delay: 1s;"></i>
+    <i class="fa-solid fa-wheat-awn leaf-particle text-base text-amber-400" style="left: 72%; animation-duration: 15s; animation-delay: 4s;"></i>
+    <i class="fa-solid fa-leaf leaf-particle text-sm text-emerald-400" style="left: 88%; animation-duration: 18s; animation-delay: 1.5s;"></i>
   </div>
 
   <!-- ======================================================== -->
@@ -327,7 +365,7 @@
 
         <div class="grid grid-cols-2 gap-2.5 text-xs">
           <!-- Role 1: Farmer -->
-          <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-2xl bg-emerald-950/60 hover:bg-emerald-900/80 border border-emerald-500/40 hover:border-emerald-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+          <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/40 hover:border-emerald-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
             <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-11 h-11 rounded-xl object-cover border border-emerald-400">
             <div>
               <div class="font-bold text-white group-hover:text-emerald-300 transition-colors">Ramesh Patil</div>
@@ -337,7 +375,7 @@
           </button>
 
           <!-- Role 2: Buyer -->
-          <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-2xl bg-blue-950/60 hover:bg-blue-900/80 border border-blue-500/40 hover:border-blue-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+          <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-2xl bg-blue-950/70 hover:bg-blue-900/90 border border-blue-500/40 hover:border-blue-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
             <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-11 h-11 rounded-xl object-cover border border-blue-400">
             <div>
               <div class="font-bold text-white group-hover:text-blue-300 transition-colors">BigBasket Sourcing</div>
@@ -347,7 +385,7 @@
           </button>
 
           <!-- Role 3: Logistics -->
-          <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-2xl bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/40 hover:border-amber-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+          <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-2xl bg-amber-950/70 hover:bg-amber-900/90 border border-amber-500/40 hover:border-amber-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
             <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-11 h-11 rounded-xl object-cover border border-amber-400">
             <div>
               <div class="font-bold text-white group-hover:text-amber-300 transition-colors">Suresh Mane</div>
@@ -357,7 +395,7 @@
           </button>
 
           <!-- Role 4: QC Officer -->
-          <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-2xl bg-purple-950/60 hover:bg-purple-900/80 border border-purple-500/40 hover:border-purple-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
+          <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-2xl bg-purple-950/70 hover:bg-purple-900/90 border border-purple-500/40 hover:border-purple-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
             <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-11 h-11 rounded-xl object-cover border border-purple-400">
             <div>
               <div class="font-bold text-white group-hover:text-purple-300 transition-colors">Dr. Swaminathan</div>

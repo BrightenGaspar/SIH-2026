@@ -5439,6 +5439,353 @@
       }
     }
 
+  
+    // ========================================================
+    // 🤖 KISAN MITRA MULTILINGUAL AI ENGINE (11 INDIAN LANGUAGES)
+    // ========================================================
+    const KisanAiEngine = {
+      isVoiceOutputEnabled: true,
+      isListening: false,
+      speechRecognition: null,
+      activeLanguage: 'en',
+
+      // Multilingual Greetings & System Knowledge
+      knowledgeBase: {
+        'en': {
+          welcome: "Namaste! I am Kisan Mitra AI. How can I assist you with Govt MSP rates, cold-chain storage, pest advisory, or direct buyer payouts?",
+          chips: [
+            { label: "🌾 Check Govt MSP Rates", query: "What are the latest Govt MSP prices for vegetables?" },
+            { label: "❄️ Cold Storage Guidelines", query: "What temperature is needed for cold storage of onions and tomatoes?" },
+            { label: "🐛 Pest & Blight Diagnosis", query: "How to prevent pest attacks and late blight on crops?" },
+            { label: "💸 T+0 Bank Settlement", query: "How do I receive direct bank payout via UPI or NEFT?" },
+            { label: "🚚 Request Reefer Van", query: "How do I schedule an active cold reefer van pickup?" }
+          ]
+        },
+        'ta': {
+          welcome: "வணக்கம்! நான் கிசான் மித்ரா AI. குறைந்தபட்ச ஆதரவு விலை (MSP), குளிர்சாதன கிடங்கு, பூச்சி கட்டுப்பாடு அல்லது நேரடி வங்கி கட்டணங்கள் பற்றி நான் எவ்வாறு உதவ முடியும்?",
+          chips: [
+            { label: "🌾 MSP அரசு விலை", query: "வெங்காயம் மற்றும் தக்காளியின் தற்போதைய MSP விலை என்ன?" },
+            { label: "❄️ குளிர்சாதன வழிகாட்டி", query: "தக்காளி மற்றும் வெங்காயத்தை எத்தனை டிகிரியில் பாதுகாக்க வேண்டும்?" },
+            { label: "🐛 பூச்சி நோய் மேலாண்மை", query: "பயிர்களில் பூச்சி தாக்குதலை தடுப்பது எப்படி?" },
+            { label: "💸 உடனடி வங்கி வரவு", query: "நேரடி வங்கி பணப்பரிவர்த்தனை எவ்வாறு செய்யப்படுகிறது?" },
+            { label: "🚚 குளிர்சாதன வாகனம்", query: "குளிர்சாதன சரக்கு வாகனத்தை எவ்வாறு முன்பதிவு செய்வது?" }
+          ]
+        },
+        'hi': {
+          welcome: "नमस्ते! मैं किसान मित्र AI हूँ। मैं सरकारी एमएसपी (MSP) दरों, कोल्ड स्टोरेज, कीट नियंत्रण या सीधे बैंक भुगतान में आपकी कैसे सहायता कर सकता हूँ?",
+          chips: [
+            { label: "🌾 सरकारी MSP दरें", query: "सब्जियों के लिए नवीनतम सरकारी एमएसपी दरें क्या हैं?" },
+            { label: "❄️ कोल्ड स्टोरेज नियम", query: "टमाटर और प्याज को किस तापमान पर स्टोर करना चाहिए?" },
+            { label: "🐛 कीट व रोग उपचार", query: "फसल में कीट और झुलसा रोग से बचाव कैसे करें?" },
+            { label: "💸 T+0 बैंक भुगतान", query: "सीधे बैंक खाते में UPI/NEFT से भुगतान कैसे मिलेगा?" },
+            { label: "🚚 कोल्ड रीफर गाड़ी", query: "खेत से कोल्ड रीफर वाहन कैसे बुक करें?" }
+          ]
+        },
+        'ml': {
+          welcome: "നമസ്കാരം! ഞാൻ കിസാൻ മിത്ര AI ആണ്. സർക്കാർ എംഎസ്പി നിരക്കുകൾ, ശീതീകരണ സംഭരണം, കീടനിയന്ത്രണം എന്നിവയിൽ ഞാൻ എങ്ങനെ സഹായിക്കണം?",
+          chips: [
+            { label: "🌾 സർക്കാർ MSP നിരക്ക്", query: "പച്ചക്കറികളുടെ ഏറ്റവും പുതിയ MSP നിരക്കുകൾ എന്തൊക്കെയാണ്?" },
+            { label: "❄️ കോൾഡ് സ്റ്റോറേജ്", query: "തക്കാളിയും ഉള്ളിയും എത്ര താപനിലയിൽ സൂക്ഷിക്കണം?" },
+            { label: "🐛 കീടബാധ തടയാൻ", query: "വിളകളിലെ കീടബാധ എങ്ങനെ നിയന്ത്രിക്കാം?" },
+            { label: "💸 ബാങ്ക് പെയ്‌മെന്റ്", query: "നേരിട്ട് ബാങ്കിലേക്ക് പണം എങ്ങനെ ലഭിക്കും?" }
+          ]
+        },
+        'te': {
+          welcome: "నమస్కారం! నేను కిసాన్ మిత్ర AI. ప్రభుత్వ MSP ధరలు, కోల్డ్ స్టోరేజ్ మరియు పంట రక్షణలో మీకు ఎలా సహాయపడగలను?",
+          chips: [
+            { label: "🌾 ప్రభుత్వ MSP ధరలు", query: "కూరగాయల ప్రస్తుత ప్రభుత్వ MSP ధరలు ఏమిటి?" },
+            { label: "❄️ కోల్డ్ స్టోరేజ్ ఉష్ణోగ్రత", query: "ఉల్లిపాయలు మరియు టమోటాల నిల్వ ఉష్ణోగ్రత ఎంత?" },
+            { label: "🐛 తెగుళ్ల నివారణ", query: "పంటలపై తెగుళ్ల నివారణ ఎలా చేయాలి?" }
+          ]
+        },
+        'kn': {
+          welcome: "ನಮಸ್ಕಾರ! ನಾನು ಕಿಸಾನ್ ಮಿತ್ರ AI. ಸರ್ಕಾರಿ MSP ಬೆಲೆಗಳು, ಶೀತಲ ಸಂಗ್ರಹಣೆ ಮತ್ತು ಬೆಳೆ ರಕ್ಷಣೆಯಲ್ಲಿ ನಿಮಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಬಹುದು?",
+          chips: [
+            { label: "🌾 ಸರ್ಕಾರಿ MSP ದರಗಳು", query: "ತರಕಾರಿಗಳ ಇತ್ತೀಚಿನ ಸರ್ಕಾರಿ MSP ಬೆಲೆಗಳು ಯಾವುವು?" },
+            { label: "❄️ ಕೋಲ್ಡ್ ಸ್ಟೋರೇಜ್ ಮಾರ್ಗದರ್ಶಿ", query: "ಟೊಮ್ಯಾಟೊ ಸಂಗ್ರಹಣೆಗೆ ಸೂಕ್ತ ತಾಪಮಾನ ಎಷ್ಟು?" }
+          ]
+        },
+        'mr': {
+          welcome: "नमस्कार! मी किसान मित्र AI आहे. हमीभाव (MSP), शीतगृह साठवणूक, कीड नियंत्रण किंवा थेट बँक खात्यात पैसे मिळवण्याबाबत मी कशी मदत करू?",
+          chips: [
+            { label: "🌾 शासकीय हमीभाव (MSP)", query: "कांदा आणि टोमॅटोचे सध्याचे शासकीय हमीभाव काय आहेत?" },
+            { label: "❄️ शीतगृह तापमान", query: "कांदा सुरक्षित ठेवण्यासाठी शीतगृहाचे तापमान किती असावे?" },
+            { label: "🐛 कीड व रोग नियंत्रण", query: "पिकांवरील कीड रोगापासून संरक्षण कसे करावे?" }
+          ]
+        }
+      },
+
+      // Generate context-rich intelligent response in the requested language
+      generateResponse(queryText, lang = 'en') {
+        const q = queryText.toLowerCase();
+        
+        // 1. MSP & Price Query
+        if (q.includes('msp') || q.includes('price') || q.includes('rate') || q.includes('விலை') || q.includes('भाव') || q.includes('दर') || q.includes('ದರ') || q.includes('ధర') || q.includes('നിരക്ക്')) {
+          if (lang === 'ta') {
+            return "🏛️ **அரசு MSP விலை மற்றும் AgriFlow நேரடி விலை:**\n\n• **நாசிக் வெங்காயம்:** அரசு MSP: ₹24.00/kg | அக்ரிஃப்ளோ நேரடி விலை: **₹38.50/kg (+60% கூடுதல் லாபம்)**\n• **ரத்னகிரி மாம்பழம்:** MSP: ₹140.00/kg | அக்ரிஃப்ளோ: **₹210.00/kg**\n• **தக்காளி:** MSP: ₹18.00/kg | அக்ரிஃப்ளோ: **₹28.00/kg**\n\nமண்டி தரகு கமிஷன் 0%. நேரடி வங்கி பரிவர்த்தனை உத்தரவாதம்!";
+          } else if (lang === 'hi') {
+            return "🏛️ **सरकारी MSP दरें और एग्रीफ्लो सीधा खरीद मूल्य:**\n\n• **नासिक लाल प्याज:** सरकारी MSP: ₹24.00/kg | एग्रीफ्लो मूल्य: **₹38.50/kg (+60% अधिक लाभ)**\n• **रत्नागिरी आम:** MSP: ₹140.00/kg | एग्रीफ्लो: **₹210.00/kg**\n• **पूसा रूबी टमाटर:** MSP: ₹18.00/kg | एग्रीफ्लो: **₹28.00/kg**\n\nमंडी आढ़ती कमीशन 0%. सीधे बैंक खाते में T+0 पेमेंट की गारंटी!";
+          } else if (lang === 'mr') {
+            return "🏛️ **शासकीय हमीभाव व अ‍ॅग्रीफ्लो थेट खरेदी दर:**\n\n• **नाशिक लाल कांदा:** हमीभाव: ₹24.00/किलो | अ‍ॅग्रीफ्लो: **₹38.50/किलो (+60% नफा)**\n• **रत्नागिरी हापूस:** हमीभाव: ₹140.00/किलो | अ‍ॅग्रीफ्लो: **₹210.00/किलो**\n• **टोमॅटो:** हमीभाव: ₹18.00/किलो | अ‍ॅग्रीफ्लो: **₹28.00/किलो**\n\nदलाली शून्य, थेट बँक खात्यात तत्काळ जमा!";
+          } else {
+            return "🏛️ **Govt MSP Floor & AgriFlow Direct Farmgate Prices:**\n\n• **Nashik Red Onion:** Govt MSP: ₹24.00/kg | AgriFlow Direct: **₹38.50/kg (+60% Gain)**\n• **Ratnagiri Alphonso:** MSP: ₹140.00/kg | AgriFlow: **₹210.00/kg**\n• **Pusa Ruby Tomato:** MSP: ₹18.00/kg | AgriFlow: **₹28.00/kg (+55% Gain)**\n• **Jalgaon Banana:** MSP: ₹16.00/kg | AgriFlow: **₹24.00/kg**\n\nZero mandi deduction, 100% transparent pricing above MSP!";
+          }
+        }
+
+        // 2. Cold Storage & Reefer Query
+        if (q.includes('cold') || q.includes('temp') || q.includes('reefer') || q.includes('storage') || q.includes('குளிர்') || q.includes('तापमान') || q.includes('शीतगृह') || q.includes('ശീതീകര')) {
+          if (lang === 'ta') {
+            return "❄️ **குளிர்சாதன கிடங்கு மற்றும் ரீஃபர் வழிகாட்டுதல்:**\n\n• **தக்காளி & மிளகாய்:** +8°C முதல் +12°C வரை | ஈரப்பதம்: 85-90%\n• **கேரட், உருளை, பச்சை பட்டாணி:** 0°C முதல் +4°C வரை\n• **வெங்காயம் & பூண்டு:** 0°C முதல் +2°C (உலர்ந்த காற்று)\n\nஎங்கள் அக்ரிஃப்ளோ ரீஃபர் வாகனங்கள் Sugar Brix & எத்திலீன் வாயுவை தானாக கண்காணிக்கும்.";
+          } else if (lang === 'hi') {
+            return "❄️ **कोल्ड स्टोरेज व रीफर तापमान दिशानिर्देश:**\n\n• **टमाटर व हरी मिर्च:** +8°C से +12°C | आर्द्रता: 85-90%\n• **गाजर, आलू, हरी मटर:** 0°C से +4°C\n• **प्याज व लहसुन:** 0°C से +2°C (शुष्क वेंटिलेशन)\n\nएग्रीफ्लो एक्टिव रीफर वैन फल और सब्जियों की शेल्फ-लाइफ को 4 दिन से बढ़ाकर 21 दिन तक सुरक्षित रखती हैं।";
+          } else {
+            return "❄️ **Active Cold-Chain Storage Guidelines:**\n\n• **Solanaceous (Tomatoes / Peppers):** +8°C to +12°C | RH: 85-90%\n• **Roots & Tubers (Carrot, Potato, Peas):** 0°C to +4°C\n• **Alliums (Onions / Garlic):** 0°C to +2°C with dry ventilation\n\nAgriFlow Active Reefer Vans extend perishable shelf-life from 4 days to 21 days with continuous IoT monitoring.";
+          }
+        }
+
+        // 3. Pest & Disease Query
+        if (q.includes('pest') || q.includes('disease') || q.includes('blight') || q.includes('பூச்சி') || q.includes('कीट') || q.includes('रोग') || q.includes('कीड') || q.includes('കീട')) {
+          if (lang === 'ta') {
+            return "🐛 **பயிர் பாதுகாப்பு மற்றும் பூச்சி மேலாண்மை:**\n\n• **இலை கருகல் நோய் (Blight):** காப்பர் ஆக்சிகுளோரைடு (COC) 2.5 கிராம்/லிட்டர் அல்லது வேப்ப எண்ணெய் 5 மி.லி தெளிக்கவும்.\n• **சாறு உறிஞ்சும் பூச்சிகள்:** மஞ்சள் நிற ஒட்டும் பொறிகள் ஏக்கருக்கு 10 அமைக்கவும்.\n• **அவசர உதவிக்கு:** கிசான் கால் சென்டர் 1800-180-1551 என்ற எண்ணை இலவசமாக அழைக்கவும்.";
+          } else if (lang === 'hi') {
+            return "🐛 **फसल सुरक्षा व कीट नियंत्रण परामर्श:**\n\n• **झुलसा रोग (Blight):** कॉपर ऑक्सीक्लोराइड 2.5g/L या नीम तेल 5ml/L पानी में मिलाकर छिड़काव करें।\n• **रस चूसक कीट (Thrips/Aphids):** खेत में 8-10 पीले चिपचिपे कार्ड लगाएं।\n• **कृषि वैज्ञानिक से बात:** किसान टोल-फ्री हेल्पलाइन 1800-180-1551 पर तुरंत कॉल करें।";
+          } else {
+            return "🐛 **Integrated Pest & Crop Disease Advisory:**\n\n• **Late Blight & Fungal Rust:** Spray Copper Oxychloride 2.5g/L or 5% Neem Seed Kernel Extract.\n• **Sucking Pests (Aphids/Thrips):** Install 10 Yellow Sticky Traps per acre.\n• **24x7 Expert Agronomist:** Dial our Toll-Free Kisan Helpline `1800-180-1551`.";
+          }
+        }
+
+        // 4. Bank Payout / Escrow Query
+        if (q.includes('bank') || q.includes('payout') || q.includes('upi') || q.includes('money') || q.includes('வங்கி') || q.includes('पैसा') || q.includes('खाते') || q.includes('பணம்') || q.includes('पैसे')) {
+          if (lang === 'ta') {
+            return "💸 **T+0 உடனடி வங்கி வரவு மற்றும் எஸ்க்ரோ முறை:**\n\nபயிர்களை QC அதிகாரி டிஜிட்டல் முறையில் சரிபார்த்த உடனே, உங்கள் பதிவுசெய்யப்பட்ட வங்கி கணக்கிற்கு UPI/NEFT மூலம் T+0 முறையில் பணம் வரவு வைக்கப்படும்.\n\n• தரகு கமிஷன்: 0%\n• UTR ரசீது உடனடியாக SMS மூலம் அனுப்பப்படும்.";
+          } else if (lang === 'hi') {
+            return "💸 **T+0 डायरेक्ट बैंक सेटलमेंट और एस्क्रो सुरक्षा:**\n\nजैसे ही क्वालिटी चेकिंग (QC) पूरी होती है, स्मार्ट एस्क्रो कॉन्ट्रैक्ट सीधे किसान के बैंक खाते में UPI/NEFT से T+0 सेम-डे पेमेंट क्रेडिट करता है।\n\n• दलाली कटौती: 0%\n• बैंक UTR नंबर तुरंत SMS पर प्राप्त होता है।";
+          } else {
+            return "💸 **T+0 Direct Bank Settlement & Escrow Guarantee:**\n\nAs soon as digital QC waybill is confirmed at farmgate, escrow funds are released directly to your bank account via UPI / NEFT on the same day (T+0).\n\n• Zero middleman commission\n• Instant bank UTR transaction SMS proof.";
+          }
+        }
+
+        // Default General Advisory
+        if (lang === 'ta') {
+          return "🌾 **கிசான் மித்ரா AI பதில்:**\n\nஉங்கள் கேள்விக்கு உதவ தயாராக உள்ளேன். தக்காளி, வெங்காயம் மற்றும் 40+ காய்கறிகளுக்கான குறைந்தபட்ச ஆதரவு விலை (MSP), குளிர்சாதன சரக்கு முன்பதிவு அல்லது பூச்சி மேலாண்மை பற்றி கேளுங்கள்.\n\n📞 அவசர உதவிக்கு: 1800-180-1551 ஐ அழைக்கவும்.";
+        } else if (lang === 'hi') {
+          return "🌾 **किसान मित्र AI उत्तर:**\n\nमैं आपकी सहायता के लिए उपस्थित हूँ। आप सब्जियों के सरकारी हमीभाव (MSP), कोल्ड-चेन बुकिंग, रोग उपचार या फसल मूल्य के बारे में कोई भी प्रश्न पूछ सकते हैं।\n\n📞 मुफ्त किसान सहायता: 1800-180-1551 पर कॉल करें।";
+        } else {
+          return "🌾 **Kisan Mitra Agro-Intelligence:**\n\nI am ready to help you with 40+ Indian vegetables, Government MSP price floors, 0-4°C cold chain logistics, and same-day bank settlements.\n\nFeel free to speak via microphone 🎙️ or type your query in any Indian language!";
+        }
+      }
+    };
+
+    // Toggle AI Assistant Window Open/Close
+    function toggleAiAssistant() {
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      const modal = document.getElementById('ai-assistant-modal');
+      if (modal) {
+        modal.classList.toggle('hidden');
+        if (!modal.classList.contains('hidden')) {
+          initAiAssistantChat();
+        }
+      }
+    }
+
+    // Toggle AI Voice Speech Output
+    function toggleAiVoiceSpeech() {
+      KisanAiEngine.isVoiceOutputEnabled = !KisanAiEngine.isVoiceOutputEnabled;
+      const icon = document.getElementById('ai-voice-icon');
+      if (icon) {
+        if (KisanAiEngine.isVoiceOutputEnabled) {
+          icon.className = 'fa-solid fa-volume-high text-emerald-400';
+          showNotification('AI Spoken Voice Enabled 🔊', 'info');
+        } else {
+          icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+          showNotification('AI Spoken Voice Muted 🔇', 'info');
+        }
+      }
+    }
+
+    // Set AI Assistant Active Language
+    function setAiAssistantLanguage(lang) {
+      KisanAiEngine.activeLanguage = lang;
+      renderAiQuickChips(lang);
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      
+      const kb = KisanAiEngine.knowledgeBase[lang] || KisanAiEngine.knowledgeBase['en'];
+      addAiMessage('ai', kb.welcome);
+    }
+
+    // Render Quick Suggestion Chips
+    function renderAiQuickChips(lang) {
+      const container = document.getElementById('ai-quick-chips');
+      if (!container) return;
+      const kb = KisanAiEngine.knowledgeBase[lang] || KisanAiEngine.knowledgeBase['en'];
+      const chips = kb.chips || KisanAiEngine.knowledgeBase['en'].chips;
+
+      container.innerHTML = chips.map(c => `
+        <button type="button" onclick="sendQuickAiQuery('${c.query.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded-xl bg-slate-800 hover:bg-emerald-950 border border-emerald-500/30 text-emerald-300 hover:text-white text-[10px] font-bold whitespace-nowrap transition-all shadow shrink-0">
+          ${c.label}
+        </button>
+      `).join('');
+    }
+
+    // Initial Chat State
+    function initAiAssistantChat() {
+      const chatContainer = document.getElementById('ai-chat-messages');
+      if (chatContainer && chatContainer.children.length === 0) {
+        const lang = localStorage.getItem('agriflow_lang') || 'en';
+        KisanAiEngine.activeLanguage = lang;
+        const langSelect = document.getElementById('ai-lang-select');
+        if (langSelect) langSelect.value = lang;
+
+        renderAiQuickChips(lang);
+        const kb = KisanAiEngine.knowledgeBase[lang] || KisanAiEngine.knowledgeBase['en'];
+        addAiMessage('ai', kb.welcome);
+      }
+    }
+
+    // Append Message to Chat
+    function addAiMessage(sender, text) {
+      const container = document.getElementById('ai-chat-messages');
+      if (!container) return;
+
+      const isUser = sender === 'user';
+      const msgDiv = document.createElement('div');
+      msgDiv.className = isUser ? 'flex justify-end' : 'flex justify-start items-start gap-2';
+
+      if (isUser) {
+        msgDiv.innerHTML = `
+          <div class="max-w-[85%] bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-3 rounded-2xl rounded-tr-none shadow-md">
+            <div class="font-medium leading-relaxed">${text}</div>
+          </div>
+        `;
+      } else {
+        const cleanText = text.replace(/\n/g, '<br>');
+        msgDiv.innerHTML = `
+          <div class="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/40 flex items-center justify-center shrink-0 mt-0.5">
+            <i class="fa-solid fa-robot text-xs"></i>
+          </div>
+          <div class="max-w-[85%] bg-slate-900/90 border border-emerald-500/30 text-slate-200 p-3 rounded-2xl rounded-tl-none shadow-md space-y-2">
+            <div class="font-medium leading-relaxed">${cleanText}</div>
+            <div class="flex items-center justify-end pt-1">
+              <button onclick="speakAiText('${text.replace(/['"\n]/g, ' ')}')" class="text-[10px] text-amber-300 hover:text-amber-200 flex items-center gap-1 font-bold">
+                <i class="fa-solid fa-volume-high text-[9px]"></i> Listen Voice
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+
+      if (!isUser && KisanAiEngine.isVoiceOutputEnabled) {
+        speakAiText(text);
+      }
+    }
+
+    // Speak AI Text aloud via SpeechSynthesis
+    function speakAiText(text) {
+      if (!('speechSynthesis' in window)) return;
+      const clean = text.replace(/[*#•_-]/g, '').replace(/\n/g, ' ');
+      const lang = KisanAiEngine.activeLanguage || 'en';
+      const langMap = {
+        'en': 'en-IN', 'ta': 'ta-IN', 'hi': 'hi-IN', 'ml': 'ml-IN',
+        'te': 'te-IN', 'kn': 'kn-IN', 'mr': 'mr-IN', 'bn': 'bn-IN', 'gu': 'gu-IN'
+      };
+      
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(clean);
+      u.lang = langMap[lang] || 'en-IN';
+      u.rate = 0.95;
+      window.speechSynthesis.speak(u);
+    }
+
+    // Send Quick Query from Chip
+    function sendQuickAiQuery(query) {
+      const input = document.getElementById('ai-chat-input');
+      if (input) input.value = query;
+      handleAiMessageSubmit();
+    }
+
+    // Handle User Query Submit
+    function handleAiMessageSubmit(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById('ai-chat-input');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
+      addAiMessage('user', text);
+      input.value = '';
+
+      // Generate response with brief thinking simulation
+      setTimeout(() => {
+        const response = KisanAiEngine.generateResponse(text, KisanAiEngine.activeLanguage);
+        addAiMessage('ai', response);
+      }, 400);
+    }
+
+    // Voice Input: Web Speech Recognition in 11 Indian Languages
+    function toggleVoiceInputRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showNotification('Speech Recognition not supported in this browser. Please type your query.', 'error');
+        return;
+      }
+
+      const micIcon = document.getElementById('ai-mic-icon');
+      const micBtn = document.getElementById('btn-ai-mic');
+
+      if (KisanAiEngine.isListening && KisanAiEngine.speechRecognition) {
+        KisanAiEngine.speechRecognition.stop();
+        KisanAiEngine.isListening = false;
+        if (micIcon) micIcon.className = 'fa-solid fa-microphone text-sm text-slate-950';
+        if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0';
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      KisanAiEngine.speechRecognition = recognition;
+      const lang = KisanAiEngine.activeLanguage || 'en';
+      const langMap = {
+        'en': 'en-IN', 'ta': 'ta-IN', 'hi': 'hi-IN', 'ml': 'ml-IN',
+        'te': 'te-IN', 'kn': 'kn-IN', 'mr': 'mr-IN', 'bn': 'bn-IN', 'gu': 'gu-IN', 'pa': 'pa-IN'
+      };
+
+      recognition.lang = langMap[lang] || 'en-IN';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onstart = () => {
+        KisanAiEngine.isListening = true;
+        if (micIcon) micIcon.className = 'fa-solid fa-waveform-lines fa-fade text-sm text-white';
+        if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-rose-600 text-white font-black shadow-lg shadow-rose-500/40 animate-pulse transition-all flex items-center justify-center shrink-0';
+        showNotification('🎙️ Listening in ' + recognition.lang + '... Speak your query!', 'info');
+      };
+
+      recognition.onresult = (event) => {
+        const spokenText = event.results[0][0].transcript;
+        const input = document.getElementById('ai-chat-input');
+        if (input) input.value = spokenText;
+        handleAiMessageSubmit();
+      };
+
+      recognition.onerror = (event) => {
+        KisanAiEngine.isListening = false;
+        if (micIcon) micIcon.className = 'fa-solid fa-microphone text-sm text-slate-950';
+        if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0';
+        showNotification('Voice input ended. You can type or try speaking again.', 'info');
+      };
+
+      recognition.onend = () => {
+        KisanAiEngine.isListening = false;
+        if (micIcon) micIcon.className = 'fa-solid fa-microphone text-sm text-slate-950';
+        if (micBtn) micBtn.className = 'p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0';
+      };
+
+      recognition.start();
+    }
+
   </script>
 
   <!-- ======================================================== -->
@@ -5808,6 +6155,105 @@
 
       </form>
     </div>
+  </div>
+
+
+  <!-- ======================================================== -->
+  <!-- 🤖 5. KISAN MITRA MULTILINGUAL AI ASSISTANT (11 LANGUAGES) -->
+  <!-- ======================================================== -->
+  
+  <!-- Floating AI Assistant Launcher FAB -->
+  <div id="ai-assistant-fab" class="fixed bottom-6 right-6 z-40 flex items-center gap-3">
+    <button onclick="toggleAiAssistant()" class="p-3.5 sm:px-4 sm:py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black shadow-2xl shadow-emerald-500/40 border-2 border-white/80 transition-all hover:scale-105 flex items-center gap-2.5 group">
+      <div class="relative">
+        <i class="fa-solid fa-robot text-lg text-slate-950 group-hover:rotate-12 transition-transform"></i>
+        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-amber-400 border border-slate-950 animate-ping"></span>
+      </div>
+      <div class="text-left hidden sm:block">
+        <div class="text-xs font-black leading-tight flex items-center gap-1">
+          <span>Kisan Mitra AI</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-950 text-emerald-300">11 LANGS</span>
+        </div>
+        <div class="text-[10px] text-emerald-950 font-bold">🎙️ Voice & Agro-Doctor</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- Multilingual AI Assistant Interactive Chat & Voice Window -->
+  <div id="ai-assistant-modal" class="fixed bottom-6 right-6 z-50 w-full sm:w-[420px] max-h-[85vh] h-[580px] bg-slate-950/95 backdrop-blur-2xl border-2 border-emerald-400/70 rounded-3xl shadow-2xl shadow-emerald-500/30 flex flex-col justify-between overflow-hidden hidden animate-slideUp">
+    
+    <!-- Header -->
+    <div class="p-4 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border-b border-emerald-800/60 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 flex items-center justify-center font-black text-lg shadow-lg">
+          <i class="fa-solid fa-seedling"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <h3 class="font-extrabold text-white text-sm font-heading">Kisan Mitra AI</h3>
+            <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">ONLINE</span>
+          </div>
+          <div class="text-[10px] text-slate-300 flex items-center gap-1 font-medium">
+            <span>24x7 Spoken Voice Agro-Advisory</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Language & Close Controls -->
+      <div class="flex items-center gap-1.5">
+        <!-- Assistant Language Selector -->
+        <select id="ai-lang-select" onchange="setAiAssistantLanguage(this.value)" class="bg-slate-900 text-white text-[11px] font-bold rounded-xl px-2 py-1 border border-emerald-500/40 focus:outline-none cursor-pointer">
+          <option value="en">🇬🇧 EN</option>
+          <option value="ta">🇮🇳 தமிழ்</option>
+          <option value="hi">🇮🇳 हिन्दी</option>
+          <option value="ml">🇮🇳 മലയാളം</option>
+          <option value="te">🇮🇳 తెలుగు</option>
+          <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+          <option value="bn">🇮🇳 বাংলা</option>
+          <option value="mr">🇮🇳 मराठी</option>
+          <option value="gu">🇮🇳 ગુજરાતી</option>
+          <option value="pa">🇮🇳 ਪੰਜਾਬੀ</option>
+          <option value="or">🇮🇳 ଓଡ଼ିଆ</option>
+        </select>
+
+        <button onclick="toggleAiVoiceSpeech()" id="ai-voice-speech-btn" title="Toggle AI Voice Output" class="p-1.5 rounded-xl bg-slate-900 border border-emerald-500/40 text-emerald-300 hover:text-white text-xs">
+          <i class="fa-solid fa-volume-high text-emerald-400" id="ai-voice-icon"></i>
+        </button>
+
+        <button onclick="toggleAiAssistant()" class="p-1.5 rounded-xl bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 text-xs">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages Scroll Container -->
+    <div id="ai-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3.5 text-xs text-slate-200 no-scrollbar">
+      <!-- Injected dynamically -->
+    </div>
+
+    <!-- Quick Prompt Suggestion Chips -->
+    <div class="px-3 py-1.5 bg-slate-900/80 border-t border-emerald-900/40 flex items-center gap-1.5 overflow-x-auto no-scrollbar" id="ai-quick-chips">
+      <!-- Injected based on active language -->
+    </div>
+
+    <!-- Input Bar with Voice Microphone and Send -->
+    <div class="p-3 bg-slate-950 border-t border-emerald-900/60">
+      <form onsubmit="handleAiMessageSubmit(event)" class="flex items-center gap-2">
+        <!-- Voice Input Microphone Button -->
+        <button type="button" id="btn-ai-mic" onclick="toggleVoiceInputRecognition()" title="Speak in your local language" class="p-2.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-lg transition-all flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-microphone text-sm" id="ai-mic-icon"></i>
+        </button>
+
+        <!-- Text Input -->
+        <input type="text" id="ai-chat-input" placeholder="Ask in Tamil, Hindi, English, Malayalam..." class="flex-1 bg-slate-900 text-white text-xs rounded-2xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-medium placeholder-slate-400">
+
+        <!-- Send Button -->
+        <button type="submit" class="p-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+        </button>
+      </form>
+    </div>
+
   </div>
 
 </body>

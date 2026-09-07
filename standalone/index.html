@@ -2109,13 +2109,687 @@
         }
       ],
       crops: [
-        { id: "crop-1", name: "Nashik Red Onion (Garwa)", variety: "Allium Cepa (Grade A+)", farmer: "Ramesh Patil", location: "Nashik, MH", stockTons: 24.5, directPrice: 28.50, mandiPrice: 17.80, farmerGain: "+60.1%", brix: "12.8° Bx", shelfLifeDays: 90, reeferTemp: "+2 to +4°C", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600" },
-        { id: "crop-2", name: "Ratnagiri Alphonso Mango", variety: "Mangifera Indica (GI)", farmer: "Sanjay Sawant", location: "Ratnagiri, MH", stockTons: 8.0, directPrice: 145.00, mandiPrice: 88.00, farmerGain: "+64.8%", brix: "19.5° Bx", shelfLifeDays: 14, reeferTemp: "+10 to +12°C", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600" },
-        { id: "crop-3", name: "Jalgaon Cavendish Banana", variety: "Musa Acuminata AAA", farmer: "Kishore Chaudhari", location: "Jalgaon, MH", stockTons: 38.0, directPrice: 22.00, mandiPrice: 13.50, farmerGain: "+63.0%", brix: "21.0° Bx", shelfLifeDays: 21, reeferTemp: "+13 to +14°C", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" },
-        { id: "crop-4", name: "Sangli Thompson Seedless Grapes", variety: "Vitis Vinifera EuroGAP", farmer: "Nitin Shinde", location: "Sangli, MH", stockTons: 15.0, directPrice: 78.00, mandiPrice: 48.00, farmerGain: "+62.5%", brix: "18.2° Bx", shelfLifeDays: 45, reeferTemp: "-0.5 to 0°C", image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600" },
-        { id: "crop-5", name: "Solapur Bhagwa Pomegranate", variety: "Punica Granatum Deep Red", farmer: "Ganesh Kadam", location: "Solapur, MH", stockTons: 18.5, directPrice: 115.00, mandiPrice: 72.00, farmerGain: "+59.7%", brix: "16.4° Bx", shelfLifeDays: 60, reeferTemp: "+5 to +6°C", image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600" },
-        { id: "crop-6", name: "Pusa Ruby Polyhouse Tomato", variety: "Solanum Lycopersicum Firm", farmer: "Sunita Jadhav", location: "Pune, MH", stockTons: 12.0, directPrice: 32.00, mandiPrice: 18.50, farmerGain: "+73.0%", brix: "5.6° Bx", shelfLifeDays: 18, reeferTemp: "+8 to +10°C", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600" }
-      ],
+        {
+                "id": "veg-onion-red",
+                "name": "Nashik Red Onion (Garwa)",
+                "vernacular": "नासिक लाल प्याज / வெங்காயம் / ഉള്ളി",
+                "category": "Allium & Bulbs",
+                "variety": "Allium Cepa (Garwa Grade A+)",
+                "farmer": "Ramesh Patil",
+                "location": "Lasalgaon, Nashik, MH",
+                "stockTons": 24.5,
+                "directPrice": 28.5,
+                "mandiPrice": 17.8,
+                "farmerGain": "+60.1%",
+                "brix": "12.8° Bx",
+                "shelfLifeDays": 90,
+                "reeferTemp": "+2 to +4°C",
+                "image": "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600"
+        },
+        {
+                "id": "veg-tomato-polyhouse",
+                "name": "Pusa Ruby Polyhouse Tomato",
+                "vernacular": "टमाटर / தக்காளி / തക്കാളി / టమోటా",
+                "category": "Solanaceous",
+                "variety": "Solanum Lycopersicum Firm Grade A",
+                "farmer": "Sunita Jadhav",
+                "location": "Khed, Pune, MH",
+                "stockTons": 16.0,
+                "directPrice": 32.0,
+                "mandiPrice": 18.5,
+                "farmerGain": "+73.0%",
+                "brix": "5.8° Bx",
+                "shelfLifeDays": 18,
+                "reeferTemp": "+8 to +10°C",
+                "image": "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600"
+        },
+        {
+                "id": "veg-potato-kufri",
+                "name": "Agra Kufri Jyoti Potato",
+                "vernacular": "आलू / உருளைக்கிழங்கு / ഉരുളക്കിഴങ്ങ് / బంగాళాదుంప",
+                "category": "Roots & Tubers",
+                "variety": "Solanum Tuberosum (Export Grade)",
+                "farmer": "Harishankar Sharma",
+                "location": "Agra Hub, UP",
+                "stockTons": 45.0,
+                "directPrice": 24.0,
+                "mandiPrice": 14.5,
+                "farmerGain": "+65.5%",
+                "brix": "18.5% Dry Matter",
+                "shelfLifeDays": 120,
+                "reeferTemp": "+7 to +8°C",
+                "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600"
+        },
+        {
+                "id": "veg-carrot-ooty",
+                "name": "Ooty Kuroda Sweet Carrot",
+                "vernacular": "गाजर / கேரட் / കാരറ്റ് / క్యారెట్",
+                "category": "Roots & Tubers",
+                "variety": "Daucus Carota Deep Orange",
+                "farmer": "Muthusamy Chettiar",
+                "location": "Ooty Nilgiris, TN",
+                "stockTons": 18.0,
+                "directPrice": 42.0,
+                "mandiPrice": 25.0,
+                "farmerGain": "+68.0%",
+                "brix": "9.5° Bx",
+                "shelfLifeDays": 35,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5c317?w=600"
+        },
+        {
+                "id": "veg-cauliflower-pusa",
+                "name": "Pusa Deepali Cauliflower",
+                "vernacular": "फूलगोभी / காலிஃபிளவர் / കോളിഫ്ലവർ",
+                "category": "Cruciferous",
+                "variety": "Brassica Oleracea Botrytis Snow White",
+                "farmer": "Jagjit Singh",
+                "location": "Jalandhar, Punjab",
+                "stockTons": 22.0,
+                "directPrice": 36.0,
+                "mandiPrice": 21.0,
+                "farmerGain": "+71.4%",
+                "brix": "6.2° Bx",
+                "shelfLifeDays": 21,
+                "reeferTemp": "+0 to +1°C",
+                "image": "https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?w=600"
+        },
+        {
+                "id": "veg-cabbage-golden",
+                "name": "Golden Acre Cabbage",
+                "vernacular": "पत्तागोभी / முட்டைக்கோஸ் / കാബേജ്",
+                "category": "Cruciferous",
+                "variety": "Brassica Oleracea Capitata Crisp",
+                "farmer": "Balwant Rao",
+                "location": "Belagavi, Karnataka",
+                "stockTons": 30.0,
+                "directPrice": 22.0,
+                "mandiPrice": 12.5,
+                "farmerGain": "+76.0%",
+                "brix": "5.4° Bx",
+                "shelfLifeDays": 30,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?w=600"
+        },
+        {
+                "id": "veg-brinjal-pusa",
+                "name": "Pusa Purple Long Brinjal / Eggplant",
+                "vernacular": "बैंगन / கத்தரிக்காய் / വഴുതനങ്ങ / వంకాయ",
+                "category": "Solanaceous",
+                "variety": "Solanum Melongena Glossy Violet",
+                "farmer": "Narayan Das",
+                "location": "Varanasi, UP",
+                "stockTons": 14.0,
+                "directPrice": 34.0,
+                "mandiPrice": 19.0,
+                "farmerGain": "+78.9%",
+                "brix": "5.0° Bx",
+                "shelfLifeDays": 14,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1628773822503-930a8449c25f?w=600"
+        },
+        {
+                "id": "veg-okra-sawani",
+                "name": "Pusa Sawani Okra / Lady's Finger",
+                "vernacular": "भिंडी / வெண்டைக்காய் / വെണ്ടയ്ക്ക / బెండకాయ",
+                "category": "Pods & Legumes",
+                "variety": "Abelmoschus Esculentus Tender Green",
+                "farmer": "Govindbhai Patel",
+                "location": "Anand, Gujarat",
+                "stockTons": 12.5,
+                "directPrice": 46.0,
+                "mandiPrice": 26.0,
+                "farmerGain": "+76.9%",
+                "brix": "7.0° Bx",
+                "shelfLifeDays": 10,
+                "reeferTemp": "+8 to +10°C",
+                "image": "https://images.unsplash.com/photo-1425543103986-22abb7d7e8d2?w=600"
+        },
+        {
+                "id": "veg-chilli-guntur",
+                "name": "Guntur Jwala Green Chilli",
+                "vernacular": "हरी मिर्च / பச்சை மிளகாய் / പച്ചമുളക് / పచ్చిమిర్చి",
+                "category": "Solanaceous",
+                "variety": "Capsicum Annuum Hot Pungent Grade A",
+                "farmer": "Venkateshwarlu Reddy",
+                "location": "Guntur, AP",
+                "stockTons": 15.0,
+                "directPrice": 68.0,
+                "mandiPrice": 38.0,
+                "farmerGain": "+78.9%",
+                "brix": "8.5° Bx",
+                "shelfLifeDays": 21,
+                "reeferTemp": "+7 to +9°C",
+                "image": "https://images.unsplash.com/photo-1588252303782-cb80119abd6d?w=600"
+        },
+        {
+                "id": "veg-capsicum-kolar",
+                "name": "California Wonder Green Capsicum",
+                "vernacular": "शिमला मिर्च / குடைமிளகாய் / ക്യാപ്സിക്കം / బెంగళూరు మిర్చి",
+                "category": "Solanaceous",
+                "variety": "Capsicum Annuum Grossum Blocky",
+                "farmer": "Suresh Gowda",
+                "location": "Kolar Polyhouse, Karnataka",
+                "stockTons": 10.0,
+                "directPrice": 58.0,
+                "mandiPrice": 32.0,
+                "farmerGain": "+81.3%",
+                "brix": "6.8° Bx",
+                "shelfLifeDays": 25,
+                "reeferTemp": "+7 to +10°C",
+                "image": "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?w=600"
+        },
+        {
+                "id": "veg-peas-himachal",
+                "name": "Himachal Azad Sweet Green Peas",
+                "vernacular": "हरी मटर / பச்சை பட்டாணி / പച്ചപ്പട്ടാണി / బఠానీలు",
+                "category": "Pods & Legumes",
+                "variety": "Pisum Sativum Sweet Pods",
+                "farmer": "Kuldeep Thakur",
+                "location": "Solan, HP",
+                "stockTons": 20.0,
+                "directPrice": 74.0,
+                "mandiPrice": 42.0,
+                "farmerGain": "+76.2%",
+                "brix": "14.2° Bx",
+                "shelfLifeDays": 18,
+                "reeferTemp": "+0 to +1°C",
+                "image": "https://images.unsplash.com/photo-1587735243615-c03f25aaff15?w=600"
+        },
+        {
+                "id": "veg-beans-french",
+                "name": "Ooty French String Beans",
+                "vernacular": "फ्रेंच बीन्स / பீன்ஸ் / ബീൻസ് / బీన్స్",
+                "category": "Pods & Legumes",
+                "variety": "Phaseolus Vulgaris Tender Stringless",
+                "farmer": "Selvanathan Pillai",
+                "location": "Ketti Valley, Nilgiris, TN",
+                "stockTons": 8.5,
+                "directPrice": 65.0,
+                "mandiPrice": 38.0,
+                "farmerGain": "+71.1%",
+                "brix": "6.5° Bx",
+                "shelfLifeDays": 15,
+                "reeferTemp": "+4 to +6°C",
+                "image": "https://images.unsplash.com/photo-1558818498-28c1e002b655?w=600"
+        },
+        {
+                "id": "veg-drumstick-pkm1",
+                "name": "PKM-1 Annual Drumstick / Moringa",
+                "vernacular": "सहजन / முருங்கைக்காய் / മുരിങ്ങക്കായ / ములక్కాడ",
+                "category": "Pods & Legumes",
+                "variety": "Moringa Oleifera Long Pod Grade A",
+                "farmer": "Senthil Kumar",
+                "location": "Aravakurichi, Karur, TN",
+                "stockTons": 14.0,
+                "directPrice": 55.0,
+                "mandiPrice": 30.0,
+                "farmerGain": "+83.3%",
+                "brix": "8.0° Bx",
+                "shelfLifeDays": 14,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600"
+        },
+        {
+                "id": "veg-bottle-gourd",
+                "name": "Pusa Naveen Bottle Gourd / Lauki",
+                "vernacular": "लौकी / சுரைக்காய் / ചുരക്ക / సొరకాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Lagenaria Siceraria Cylindrical Green",
+                "farmer": "Ramavtar Meena",
+                "location": "Alwar, Rajasthan",
+                "stockTons": 18.0,
+                "directPrice": 26.0,
+                "mandiPrice": 14.0,
+                "farmerGain": "+85.7%",
+                "brix": "4.2° Bx",
+                "shelfLifeDays": 16,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?w=600"
+        },
+        {
+                "id": "veg-bitter-gourd",
+                "name": "Pusa Do Mausami Bitter Gourd / Karela",
+                "vernacular": "करेला / பாகற்காய் / പാവയ്ക്ക / కాకరకాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Momordica Charantia Dark Green Prickly",
+                "farmer": "Bhaskar Rao",
+                "location": "Warangal, Telangana",
+                "stockTons": 9.0,
+                "directPrice": 48.0,
+                "mandiPrice": 28.0,
+                "farmerGain": "+71.4%",
+                "brix": "5.0° Bx",
+                "shelfLifeDays": 15,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1622206151226-18ca2c9ab4a1?w=600"
+        },
+        {
+                "id": "veg-ridge-gourd",
+                "name": "Pusa Nasdar Ridge Gourd / Turai",
+                "vernacular": "तोरई / பீர்க்கங்காய் / പീച്ചിങ്ങ / బీరకాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Luffa Acutangula Ribbed",
+                "farmer": "Chhotelal Yadav",
+                "location": "Jabalpur, MP",
+                "stockTons": 7.5,
+                "directPrice": 38.0,
+                "mandiPrice": 22.0,
+                "farmerGain": "+72.7%",
+                "brix": "4.8° Bx",
+                "shelfLifeDays": 12,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1598511726623-d2e9996892f0?w=600"
+        },
+        {
+                "id": "veg-snake-gourd",
+                "name": "PKM-1 Coimbatore Snake Gourd",
+                "vernacular": "चिचिंडा / புடலங்காய் / പടവലങ്ങ / పొట్లకాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Trichosanthes Cucumerina Long Striped",
+                "farmer": "K. Thangavel",
+                "location": "Pollachi, TN",
+                "stockTons": 11.0,
+                "directPrice": 32.0,
+                "mandiPrice": 18.0,
+                "farmerGain": "+77.8%",
+                "brix": "4.0° Bx",
+                "shelfLifeDays": 14,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=600"
+        },
+        {
+                "id": "veg-cucumber-polyhouse",
+                "name": "Japanese Long Green Crisp Cucumber",
+                "vernacular": "खीरा / வெள்ளரிக்காய் / വെള്ളരിക്ക / దోసకాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Cucumis Sativus Crisp Salad Grade",
+                "farmer": "Ankit Deshmukh",
+                "location": "Sangli Polyhouse, MH",
+                "stockTons": 16.5,
+                "directPrice": 28.0,
+                "mandiPrice": 16.0,
+                "farmerGain": "+75.0%",
+                "brix": "4.5° Bx",
+                "shelfLifeDays": 20,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1604977042946-1eecc30f269e?w=600"
+        },
+        {
+                "id": "veg-pumpkin-chandan",
+                "name": "Arka Chandan Pumpkin / Kaddu",
+                "vernacular": "कद्दू / பரங்கிக்காய் / മത്തങ്ങ / గుమ్మడికాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Cucurbita Moschata High Carotene",
+                "farmer": "Basavaraj Patil",
+                "location": "Dharwad, Karnataka",
+                "stockTons": 35.0,
+                "directPrice": 22.0,
+                "mandiPrice": 12.0,
+                "farmerGain": "+83.3%",
+                "brix": "8.5° Bx",
+                "shelfLifeDays": 90,
+                "reeferTemp": "+10 to +13°C",
+                "image": "https://images.unsplash.com/photo-1506917728037-b6fb01c751a1?w=600"
+        },
+        {
+                "id": "veg-ash-gourd",
+                "name": "Kerala KAU Ash Gourd / Petha",
+                "vernacular": "पेठा / சாம்பல் பூசணி / കുമ്പളങ്ങ / బూడిద గుమ్మడి",
+                "category": "Gourds & Cucurbits",
+                "variety": "Benincasa Hispida Wax Gourd",
+                "farmer": "Unnikrishnan Nair",
+                "location": "Palakkad, Kerala",
+                "stockTons": 28.0,
+                "directPrice": 25.0,
+                "mandiPrice": 14.0,
+                "farmerGain": "+78.6%",
+                "brix": "4.0° Bx",
+                "shelfLifeDays": 120,
+                "reeferTemp": "+12 to +14°C",
+                "image": "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=600"
+        },
+        {
+                "id": "veg-spinach-palak",
+                "name": "Pusa Jyoti Tender Spinach / Palak",
+                "vernacular": "पालक / பசலைக்கீரை / ചീര / పాలకూర",
+                "category": "Leafy Greens",
+                "variety": "Spinacia Oleracea Broad Tender Leaves",
+                "farmer": "Satish Chandra",
+                "location": "Meerut, UP",
+                "stockTons": 6.5,
+                "directPrice": 35.0,
+                "mandiPrice": 18.0,
+                "farmerGain": "+94.4%",
+                "brix": "5.2° Bx",
+                "shelfLifeDays": 8,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600"
+        },
+        {
+                "id": "veg-fenugreek-methi",
+                "name": "Nagaur Kasuri Methi / Fenugreek Leaves",
+                "vernacular": "मेथी / வெந்தயக்கீரை / ഉലുവയില / మెంతికూర",
+                "category": "Leafy Greens",
+                "variety": "Trigonella Foenum-graecum Aromatic",
+                "farmer": "Ramkishan Choudhary",
+                "location": "Nagaur, Rajasthan",
+                "stockTons": 5.0,
+                "directPrice": 42.0,
+                "mandiPrice": 22.0,
+                "farmerGain": "+90.9%",
+                "brix": "6.0° Bx",
+                "shelfLifeDays": 7,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1608686207856-001b95cf60ca?w=600"
+        },
+        {
+                "id": "veg-coriander-pant",
+                "name": "Pant Haritima Fresh Coriander Leaves",
+                "vernacular": "धनिया / கொத்தமல்லி தழை / മല്ലിയില / కొత్తిమీర",
+                "category": "Leafy Greens",
+                "variety": "Coriandrum Sativum Essential Aroma",
+                "farmer": "Devendra Lodha",
+                "location": "Kota, Rajasthan",
+                "stockTons": 4.8,
+                "directPrice": 50.0,
+                "mandiPrice": 25.0,
+                "farmerGain": "+100.0%",
+                "brix": "7.2° Bx",
+                "shelfLifeDays": 10,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=600"
+        },
+        {
+                "id": "veg-mint-peppermint",
+                "name": "Desi Fragrant Mint Leaves / Pudina",
+                "vernacular": "पुदीना / புதினா / പുതിന / పుదీనా",
+                "category": "Leafy Greens",
+                "variety": "Mentha Spicata High Menthol",
+                "farmer": "Manoj Kushwaha",
+                "location": "Barabanki, UP",
+                "stockTons": 4.2,
+                "directPrice": 55.0,
+                "mandiPrice": 28.0,
+                "farmerGain": "+96.4%",
+                "brix": "6.8° Bx",
+                "shelfLifeDays": 9,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?w=600"
+        },
+        {
+                "id": "veg-curry-leaves",
+                "name": "Senkampu Fresh Curry Leaves",
+                "vernacular": "कढ़ी पत्ता / கருவேப்பிலை / കറിവേപ്പില / కరివేపాకు",
+                "category": "Leafy Greens",
+                "variety": "Murraya Koenigii Deep Green Fragrant",
+                "farmer": "Velumani Gounder",
+                "location": "Mettupalayam, TN",
+                "stockTons": 3.5,
+                "directPrice": 60.0,
+                "mandiPrice": 30.0,
+                "farmerGain": "+100.0%",
+                "brix": "8.5° Bx",
+                "shelfLifeDays": 15,
+                "reeferTemp": "+5 to +7°C",
+                "image": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600"
+        },
+        {
+                "id": "veg-shallots-dindigul",
+                "name": "Dindigul Country Shallots / Sambar Onion",
+                "vernacular": "சின்ன வெங்காயம் / सांभर प्याज / ചെറിയ ഉള്ളി / సాంబార్ ఉల్లిపాయ",
+                "category": "Allium & Bulbs",
+                "variety": "Allium Cepa Aggregatum Country Grade",
+                "farmer": "Palanisamy Nadar",
+                "location": "Reddiarchatram, Dindigul, TN",
+                "stockTons": 15.0,
+                "directPrice": 62.0,
+                "mandiPrice": 36.0,
+                "farmerGain": "+72.2%",
+                "brix": "15.5° Bx",
+                "shelfLifeDays": 75,
+                "reeferTemp": "+2 to +4°C",
+                "image": "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600"
+        },
+        {
+                "id": "veg-garlic-yamuna",
+                "name": "Yamuna Safed MP Garlic",
+                "vernacular": "लहसुन / பூண்டு / വെളുത്തുള്ളി / వెల్లుల్లి",
+                "category": "Allium & Bulbs",
+                "variety": "Allium Sativum Bold Cloves Grade A",
+                "farmer": "Radheshyam Patidar",
+                "location": "Mandsaur, MP",
+                "stockTons": 22.0,
+                "directPrice": 130.0,
+                "mandiPrice": 80.0,
+                "farmerGain": "+62.5%",
+                "brix": "32.0° Bx",
+                "shelfLifeDays": 180,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1540148426945-6cf22a6b2383?w=600"
+        },
+        {
+                "id": "veg-ginger-wayanad",
+                "name": "Wayanad Rio Ginger Rhizomes",
+                "vernacular": "अदरक / இஞ்சி / ഇഞ്ചി / అల్లం",
+                "category": "Spices & Essentials",
+                "variety": "Zingiber Officinale Low Fiber Spicy",
+                "farmer": "Mathew Joseph",
+                "location": "Sultan Bathery, Wayanad, Kerala",
+                "stockTons": 16.0,
+                "directPrice": 95.0,
+                "mandiPrice": 58.0,
+                "farmerGain": "+63.8%",
+                "brix": "12.0° Bx",
+                "shelfLifeDays": 60,
+                "reeferTemp": "+12 to +14°C",
+                "image": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600"
+        },
+        {
+                "id": "veg-turmeric-erode",
+                "name": "Salem Erode Gold Fresh Turmeric",
+                "vernacular": "कच्ची हल्दी / பச்சை மஞ்சள் / പച്ചമഞ്ഞൾ / పసుపు కొమ్ము",
+                "category": "Spices & Essentials",
+                "variety": "Curcuma Longa High Curcumin 5.2%",
+                "farmer": "Periyasamy Thevar",
+                "location": "Kodumudi, Erode, TN",
+                "stockTons": 18.0,
+                "directPrice": 85.0,
+                "mandiPrice": 52.0,
+                "farmerGain": "+63.5%",
+                "brix": "14.5° Bx",
+                "shelfLifeDays": 90,
+                "reeferTemp": "+12 to +14°C",
+                "image": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600"
+        },
+        {
+                "id": "veg-radish-chetki",
+                "name": "Pusa Chetki White Radish / Mooli",
+                "vernacular": "मूली / முள்ளங்கி / മുള്ളങ്കി / ముల్లంగి",
+                "category": "Roots & Tubers",
+                "variety": "Raphanus Sativus Pungent Crisp",
+                "farmer": "Om Prakash Saini",
+                "location": "Sonepat, Haryana",
+                "stockTons": 20.0,
+                "directPrice": 22.0,
+                "mandiPrice": 12.0,
+                "farmerGain": "+83.3%",
+                "brix": "4.8° Bx",
+                "shelfLifeDays": 21,
+                "reeferTemp": "+0 to +1°C",
+                "image": "https://images.unsplash.com/photo-1598170845058-32b9d6a5c317?w=600"
+        },
+        {
+                "id": "veg-beetroot-ooty",
+                "name": "Detroit Dark Red Ooty Beetroot",
+                "vernacular": "चुकंदर / பீட்ரூட் / ബീറ്റ്റൂട്ട് / బీట్‌రూట్",
+                "category": "Roots & Tubers",
+                "variety": "Beta Vulgaris Deep Crimson",
+                "farmer": "Krishnan Nair",
+                "location": "Coonoor, Nilgiris, TN",
+                "stockTons": 14.0,
+                "directPrice": 38.0,
+                "mandiPrice": 22.0,
+                "farmerGain": "+72.7%",
+                "brix": "11.2° Bx",
+                "shelfLifeDays": 45,
+                "reeferTemp": "+0 to +2°C",
+                "image": "https://images.unsplash.com/photo-1593105544559-ecb03bf76f82?w=600"
+        },
+        {
+                "id": "veg-yam-suran",
+                "name": "Gajendra Elephant Foot Yam / Suran",
+                "vernacular": "जिमीकंद / சேனைக்கிழங்கு / ചേന / కంద",
+                "category": "Roots & Tubers",
+                "variety": "Amorphophallus Paeoniifolius Non-Acrid",
+                "farmer": "N. Subba Rao",
+                "location": "Kovvur, East Godavari, AP",
+                "stockTons": 25.0,
+                "directPrice": 40.0,
+                "mandiPrice": 24.0,
+                "farmerGain": "+66.7%",
+                "brix": "22.0% Starch",
+                "shelfLifeDays": 120,
+                "reeferTemp": "+13 to +15°C",
+                "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600"
+        },
+        {
+                "id": "veg-arbi-colocasia",
+                "name": "Satamukhi Colocasia / Arbi",
+                "vernacular": "अरबी / சேப்பங்கிழங்கு / ചേമ്പ് / చామదుంప",
+                "category": "Roots & Tubers",
+                "variety": "Colocasia Esculenta Taro Corms",
+                "farmer": "Binod Kumar Jha",
+                "location": "Muzaffarpur, Bihar",
+                "stockTons": 12.0,
+                "directPrice": 45.0,
+                "mandiPrice": 26.0,
+                "farmerGain": "+73.1%",
+                "brix": "24.0% Starch",
+                "shelfLifeDays": 60,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600"
+        },
+        {
+                "id": "veg-sweet-potato",
+                "name": "Sree Bhadra Sweet Potato",
+                "vernacular": "शकरकंद / சர்க்கரைவள்ளி / മധുരക്കിഴങ്ങ് / చిలగడదుంప",
+                "category": "Roots & Tubers",
+                "variety": "Ipomoea Batatas Rose Skin Yellow Flesh",
+                "farmer": "Chandrasekharan Pillai",
+                "location": "Kollam, Kerala",
+                "stockTons": 17.5,
+                "directPrice": 34.0,
+                "mandiPrice": 20.0,
+                "farmerGain": "+70.0%",
+                "brix": "13.8° Bx",
+                "shelfLifeDays": 60,
+                "reeferTemp": "+13 to +15°C",
+                "image": "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=600"
+        },
+        {
+                "id": "veg-cluster-beans-guar",
+                "name": "Pusa Navbahar Cluster Beans / Guar",
+                "vernacular": "ग्वार फली / கொத்தவரங்காய் / കൊത്തവര / గోరుచిక్కుడు",
+                "category": "Pods & Legumes",
+                "variety": "Cyamopsis Tetragonoloba Tender Pods",
+                "farmer": "Nemichand Bishnoi",
+                "location": "Jodhpur, Rajasthan",
+                "stockTons": 8.0,
+                "directPrice": 44.0,
+                "mandiPrice": 25.0,
+                "farmerGain": "+76.0%",
+                "brix": "6.2° Bx",
+                "shelfLifeDays": 12,
+                "reeferTemp": "+7 to +10°C",
+                "image": "https://images.unsplash.com/photo-1558818498-28c1e002b655?w=600"
+        },
+        {
+                "id": "veg-broad-beans-avarakkai",
+                "name": "Pusa Sumeet Country Broad Beans / Avarai",
+                "vernacular": "அவரைக்காய் / बाकला / അമരപ്പയർ / చిక్కుడుకాయ",
+                "category": "Pods & Legumes",
+                "variety": "Lablab Purpureus Country Flat Pods",
+                "farmer": "Chinnasamy Gounder",
+                "location": "Pollachi, TN",
+                "stockTons": 9.5,
+                "directPrice": 48.0,
+                "mandiPrice": 28.0,
+                "farmerGain": "+71.4%",
+                "brix": "7.0° Bx",
+                "shelfLifeDays": 14,
+                "reeferTemp": "+4 to +6°C",
+                "image": "https://images.unsplash.com/photo-1558818498-28c1e002b655?w=600"
+        },
+        {
+                "id": "veg-raw-banana",
+                "name": "Monthan Raw Cooking Plantain",
+                "vernacular": "வாழக்காய் / कच्चा केला / പച്ചക്കായ / అరటికాయ",
+                "category": "Spices & Essentials",
+                "variety": "Musa ABB Culinary Plantain Grade",
+                "farmer": "R. Murugesan",
+                "location": "Thiruvaiyaru, Thanjavur, TN",
+                "stockTons": 26.0,
+                "directPrice": 24.0,
+                "mandiPrice": 14.0,
+                "farmerGain": "+71.4%",
+                "brix": "8.0° Bx Starch",
+                "shelfLifeDays": 21,
+                "reeferTemp": "+13 to +14°C",
+                "image": "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600"
+        },
+        {
+                "id": "veg-raw-papaya",
+                "name": "Taiwan 786 Raw Cooking Papaya",
+                "vernacular": "பப்பாளிக்காய் / कच्चा पपीता / പച്ചപ്പപ്പായ / బొప్పాయికాయ",
+                "category": "Gourds & Cucurbits",
+                "variety": "Carica Papaya Thick Firm Green Flesh",
+                "farmer": "Venkat Rao",
+                "location": "Vijayawada, AP",
+                "stockTons": 19.0,
+                "directPrice": 22.0,
+                "mandiPrice": 12.5,
+                "farmerGain": "+76.0%",
+                "brix": "6.5° Bx",
+                "shelfLifeDays": 28,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1517282009859-f000ec3b26fe?w=600"
+        },
+        {
+                "id": "veg-broccoli-exotic",
+                "name": "Exotic Green Crown Broccoli",
+                "vernacular": "ब्रोकली / பச்சை பூக்கோசு / ബ്രൊക്കോളി",
+                "category": "Cruciferous",
+                "variety": "Brassica Oleracea Italica Premium Crowns",
+                "farmer": "Joginder Brar",
+                "location": "Shimla & Nilgiris Hub",
+                "stockTons": 6.0,
+                "directPrice": 88.0,
+                "mandiPrice": 45.0,
+                "farmerGain": "+95.6%",
+                "brix": "7.5° Bx",
+                "shelfLifeDays": 21,
+                "reeferTemp": "+0 to +1°C",
+                "image": "https://images.unsplash.com/photo-1459411621453-7b03977f4bfc?w=600"
+        },
+        {
+                "id": "veg-tapioca-cassava",
+                "name": "Mulluvadi Salem Tapioca / Cassava",
+                "vernacular": "மரவள்ளிக்கிழங்கு / कसावा / കപ്പ / కర్రపెండలం",
+                "category": "Roots & Tubers",
+                "variety": "Manihot Esculenta High Starch Tubers",
+                "farmer": "Ganesan Perumal",
+                "location": "Attur, Salem, TN",
+                "stockTons": 32.0,
+                "directPrice": 20.0,
+                "mandiPrice": 11.5,
+                "farmerGain": "+73.9%",
+                "brix": "28.0% Starch",
+                "shelfLifeDays": 30,
+                "reeferTemp": "+10 to +12°C",
+                "image": "https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600"
+        }
+],
       selectedVoiceLang: "hi",
       chartInstance: null,
       leafletMap: null,
@@ -2514,46 +3188,101 @@
     }
 
     // --- Render Buyer Catalog ---
+    let activeVegCategory = 'all';
+
+    function setVegCategory(cat) {
+      activeVegCategory = cat;
+      document.querySelectorAll('.cat-pill').forEach(p => {
+        p.classList.remove('bg-emerald-500', 'text-slate-950', 'shadow');
+        p.classList.add('bg-slate-900', 'text-slate-300', 'border', 'border-emerald-500/20');
+      });
+      const activePill = document.getElementById('cat-pill-' + cat);
+      if (activePill) {
+        activePill.classList.remove('bg-slate-900', 'text-slate-300', 'border', 'border-emerald-500/20');
+        activePill.classList.add('bg-emerald-500', 'text-slate-950', 'shadow');
+      }
+      filterBuyerCatalog();
+    }
+
+    function filterBuyerCatalog() {
+      const searchInput = document.getElementById('buyer-search-input');
+      const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+      const filtered = AppState.crops.filter(c => {
+        const matchesCategory = activeVegCategory === 'all' || c.category === activeVegCategory;
+        const matchesQuery = !query || 
+          c.name.toLowerCase().includes(query) || 
+          (c.vernacular && c.vernacular.toLowerCase().includes(query)) ||
+          c.variety.toLowerCase().includes(query) || 
+          c.farmer.toLowerCase().includes(query) || 
+          c.location.toLowerCase().includes(query);
+        return matchesCategory && matchesQuery;
+      });
+
+      renderBuyerCatalogGrid(filtered);
+    }
+
+    // --- Render Buyer Catalog Grid ---
     function renderBuyerCatalog() {
+      filterBuyerCatalog();
+    }
+
+    function renderBuyerCatalogGrid(cropsList) {
       const grid = document.getElementById('buyer-catalog-grid');
       if (!grid) return;
 
-      grid.innerHTML = AppState.crops.map(c => `
-        <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden agri-card-hover flex flex-col justify-between">
-          <div class="relative h-44 overflow-hidden">
-            <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">
-            <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-emerald-400 text-emerald-300 font-bold text-xs">
-              ${c.farmerGain} Farmer Uplift
+      if (!cropsList || cropsList.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 bg-slate-900/50 rounded-3xl border border-emerald-500/20">
+            <i class="fa-solid fa-leaf text-4xl text-emerald-400/50 mb-3"></i>
+            <div class="text-base font-bold text-white">No vegetables matching your search</div>
+            <div class="text-xs text-slate-400 mt-1">Try searching for Tomato, Onion, Palak, Potato, Ginger, Garlic or Carrot</div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = cropsList.map(c => `
+        <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden agri-card-hover flex flex-col justify-between shadow-xl">
+          <div class="relative h-44 overflow-hidden group">
+            <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-emerald-400 text-emerald-300 font-bold text-xs shadow-lg">
+              ${c.farmerGain} Uplift
+            </div>
+            <div class="absolute top-3 left-3 px-2 py-0.5 rounded-lg bg-slate-950/80 text-amber-300 font-bold text-[10px] border border-amber-500/40">
+              ${c.category}
             </div>
             <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-emerald-950/90 text-emerald-300 font-mono text-[11px] border border-emerald-500/40">
               <i class="fa-solid fa-snowflake mr-1"></i>${c.reeferTemp}
             </div>
           </div>
 
-          <div class="p-5 space-y-4">
+          <div class="p-5 space-y-3.5">
             <div>
-              <div class="text-[11px] text-slate-400 font-mono">${c.variety}</div>
-              <h3 class="font-bold text-white text-base mt-0.5 font-heading">${c.name}</h3>
-              <div class="text-xs text-slate-300 mt-1"><i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>${c.location} • Farmer: ${c.farmer}</div>
+              <div class="text-[10px] text-emerald-400 font-mono font-semibold">${c.variety}</div>
+              <h3 class="font-bold text-white text-base mt-0.5 font-heading leading-tight">${c.name}</h3>
+              <div class="text-[11px] text-amber-300/80 font-medium">${c.vernacular || ''}</div>
+              <div class="text-xs text-slate-300 mt-1"><i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>${c.location} • <span class="text-slate-400">Farmer: ${c.farmer}</span></div>
             </div>
 
             <div class="grid grid-cols-2 gap-2 bg-slate-900/80 p-3 rounded-2xl text-xs border border-emerald-500/20">
               <div>
-                <div class="text-[10px] text-slate-400 uppercase">Direct Price</div>
-                <div class="text-lg font-extrabold text-emerald-400 font-mono">₹${c.directPrice.toFixed(2)}/kg</div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">AgriFlow Direct</div>
+                <div class="text-lg font-black text-emerald-400 font-mono">₹${c.directPrice.toFixed(2)}/kg</div>
               </div>
               <div>
-                <div class="text-[10px] text-slate-400 uppercase">Mandi Benchmark</div>
+                <div class="text-[10px] text-slate-400 uppercase font-semibold">Mandi Rate</div>
                 <div class="text-sm font-semibold text-rose-400 line-through font-mono">₹${c.mandiPrice.toFixed(2)}/kg</div>
               </div>
             </div>
 
-            <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
+            <div class="flex items-center justify-between text-xs text-slate-300 font-mono bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-500/10">
               <span>Brix: <strong class="text-amber-400">${c.brix}</strong></span>
-              <span>Shelf-Life: <strong class="text-emerald-400">${c.shelfLifeDays} Days</strong></span>
+              <span>Shelf: <strong class="text-emerald-400">${c.shelfLifeDays} Days</strong></span>
+              <span>Stock: <strong class="text-white">${c.stockTons}T</strong></span>
             </div>
 
-            <button onclick="addToBuyerCart('${c.id}')" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+            <button onclick="addToBuyerCart('${c.id}')" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2">
               <i class="fa-solid fa-cart-plus"></i>
               <span>Add to Procurement Basket</span>
             </button>
@@ -2562,190 +3291,23 @@
       `).join('');
     }
 
-    // --- Render Master Matrix Table ---
-    function renderMasterMatrix() {
-      const tbody = document.getElementById('matrix-tbody');
-      if (!tbody) return;
-
-      tbody.innerHTML = AppState.crops.map(c => `
-        <tr class="hover:bg-emerald-950/40 transition-colors">
-          <td class="py-3 px-4 font-bold text-white">${c.name}<div class="text-[10px] text-slate-400 font-normal">${c.variety}</div></td>
-          <td class="py-3 px-4">${c.location}<div class="text-[10px] text-emerald-400">${c.farmer}</div></td>
-          <td class="py-3 px-4 font-mono font-bold">${c.stockTons} T</td>
-          <td class="py-3 px-4 font-mono font-bold text-emerald-400">₹${c.directPrice.toFixed(2)}</td>
-          <td class="py-3 px-4 font-mono text-slate-400">₹${c.mandiPrice.toFixed(2)}</td>
-          <td class="py-3 px-4 font-mono font-bold text-emerald-400">${c.farmerGain}</td>
-          <td class="py-3 px-4 font-mono text-amber-400">${c.brix}</td>
-          <td class="py-3 px-4 font-mono text-blue-300">${c.reeferTemp}</td>
-          <td class="py-3 px-4 font-mono">${c.shelfLifeDays} Days</td>
-        </tr>
+    // --- Dynamic Arbitrage Calculator Logic for all 40+ Vegetables ---
+    function initCalcDropdown() {
+      const select = document.getElementById('calc-crop');
+      if (!select) return;
+      select.innerHTML = AppState.crops.map(c => `
+        <option value="${c.id}">${c.name} (Direct: ₹${c.directPrice.toFixed(2)} / Mandi: ₹${c.mandiPrice.toFixed(2)})</option>
       `).join('');
     }
 
-    // --- Cart & Checkout Management ---
-    function toggleCartDrawer() {
-      const drawer = document.getElementById('cart-drawer');
-      drawer.classList.toggle('translate-x-full');
-      renderCartDrawerItems();
-    }
-
-    function addToBuyerCart(cropId) {
-      const crop = AppState.crops.find(c => c.id === cropId);
-      if (!crop) return;
-
-      SoundEngine.playDispatchChime();
-      AppState.cart.push({
-        id: crop.id,
-        name: crop.name,
-        quantityTons: 5,
-        pricePerKg: crop.directPrice,
-        farmerName: crop.farmer,
-        farmerPhone: "+91 98220 12345"
-      });
-
-      document.getElementById('cart-counter').textContent = AppState.cart.length;
-      const countEl = document.getElementById('buyer-catalog-cart-count');
-      if (countEl) countEl.textContent = AppState.cart.length;
-
-      confetti({ particleCount: 40, spread: 60, origin: { y: 0.9, x: 0.9 } });
-      toggleCartDrawer();
-    }
-
-    function renderCartDrawerItems() {
-      const list = document.getElementById('cart-items-list');
-      if (!list) return;
-
-      let total = 0;
-      list.innerHTML = AppState.cart.map((item, idx) => {
-        const itemVal = item.quantityTons * 1000 * item.pricePerKg;
-        total += itemVal;
-
-        return `
-          <div class="p-3 rounded-2xl bg-slate-900 border border-emerald-500/20 flex items-center justify-between text-xs">
-            <div>
-              <div class="font-bold text-white">${item.name}</div>
-              <div class="text-slate-400 text-[11px]">${item.quantityTons} Tons • ₹${item.pricePerKg}/kg</div>
-              <div class="text-emerald-400 font-mono font-bold">₹${itemVal.toLocaleString('en-IN')}</div>
-            </div>
-            <button onclick="removeCartItem(${idx})" class="text-rose-400 hover:text-rose-300 p-2">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
-        `;
-      }).join('');
-
-      document.getElementById('cart-total-display').textContent = `₹${total.toLocaleString('en-IN')}`;
-    }
-
-    function removeCartItem(idx) {
-      AppState.cart.splice(idx, 1);
-      document.getElementById('cart-counter').textContent = AppState.cart.length;
-      renderCartDrawerItems();
-    }
-
-    async function checkoutCartOrders() {
-      if (AppState.cart.length === 0) return alert('Your basket is empty!');
-
-      SoundEngine.playCashPayout();
-      try {
-        const res = await fetch('http://localhost:5002/api/buyer/orders/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: AppState.cart,
-            deliveryBay: 'Bhiwandi Central Bay 4'
-          })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          console.log("Written orders to SQLite:", data);
-        }
-      } catch (e) {
-        console.log("Local fallback checkout.");
-      }
-
-      AppState.cart.forEach(item => {
-        AppState.orders.unshift({
-          id: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-          commodity: item.name,
-          quantityTons: item.quantityTons,
-          pricePerKg: item.pricePerKg,
-          totalValue: item.quantityTons * 1000 * item.pricePerKg,
-          stageIndex: 0,
-          stageName: "Escrow Locked",
-          stageColor: "amber",
-          farmer: { name: item.farmerName, phone: item.farmerPhone, kisanId: "KISAN-MH-7721", farm: "Lasalgaon Hub", slot: "Scheduled" },
-          buyer: { name: AppState.currentUser.name, phone: AppState.currentUser.phone, company: "BigBasket", depot: "Bhiwandi Bay 4", slot: "Tomorrow" },
-          logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+4.2 C", humidity: "68%", status: "Assigned", eta: "3 hrs" },
-          qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Bay 3", status: "Escrow Locked", certNo: "QC-2026-9904" }
-        });
-      });
-
-      AppState.cart = [];
-      document.getElementById('cart-counter').textContent = '0';
-      toggleCartDrawer();
-      switchPersona('orders');
-      renderOrdersManifest();
-      confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
-    }
-
-    // --- Schedule Pickup from Farmer Station ---
-    async function submitPickupSchedule(e) {
-      e.preventDefault();
-      const cropName = document.getElementById('pickup-crop').value;
-      const volume = document.getElementById('pickup-volume').value;
-      const slot = document.getElementById('pickup-slot').value;
-
-      SoundEngine.playDispatchChime();
-
-      try {
-        await fetch('http://localhost:5001/api/farmer/schedule-pickup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            farmerName: AppState.currentUser.name,
-            phone: AppState.currentUser.phone,
-            cropName,
-            quantityTons: volume,
-            pickupSlot: slot
-          })
-        });
-      } catch (err) {
-        console.log("Local order added.");
-      }
-
-      AppState.orders.unshift({
-        id: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
-        commodity: cropName,
-        quantityTons: parseFloat(volume),
-        pricePerKg: 28.50,
-        totalValue: parseFloat(volume) * 1000 * 28.50,
-        stageIndex: 0,
-        stageName: "Escrow Locked",
-        stageColor: "amber",
-        farmer: { name: AppState.currentUser.name, phone: AppState.currentUser.phone, kisanId: AppState.currentUser.kisanId, farm: "Lasalgaon Hub", slot: slot },
-        buyer: { name: "BigBasket Direct Sourcing", phone: "+91 99001 12233", company: "BigBasket Pvt Ltd", depot: "Bhiwandi Mega Depot", slot: "Next Morning" },
-        logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+3.8 C", humidity: "70%", status: "Assigned", eta: "4 hrs" },
-        qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Bay 3", status: "Escrow Locked", certNo: "QC-2026-9905" }
-      });
-
-      alert(`✅ Cold Reefer Pickup Scheduled for ${volume} Tons of ${cropName}!`);
-      switchPersona('orders');
-      renderOrdersManifest();
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-    }
-
-    // --- Arbitrage Calculator Logic ---
     function runArbitrageCalc() {
-      const crop = document.getElementById('calc-crop').value;
+      const cropId = document.getElementById('calc-crop').value;
       const vol = parseFloat(document.getElementById('calc-volume').value);
       document.getElementById('calc-vol-label').textContent = `${vol} Tons`;
 
-      let mandiRate = 17.80, directRate = 28.50;
-      if (crop === 'mango') { mandiRate = 88.00; directRate = 145.00; }
-      else if (crop === 'tomato') { mandiRate = 18.50; directRate = 32.00; }
-      else if (crop === 'banana') { mandiRate = 13.50; directRate = 22.00; }
+      const crop = AppState.crops.find(c => c.id === cropId) || AppState.crops[0];
+      const mandiRate = crop.mandiPrice;
+      const directRate = crop.directPrice;
 
       document.getElementById('calc-mandi-rate').textContent = `₹${mandiRate.toFixed(2)}/kg`;
       document.getElementById('calc-direct-rate').textContent = `₹${directRate.toFixed(2)}/kg`;
@@ -3026,6 +3588,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       changeLanguage(currentAppLanguage);
       renderOrdersManifest();
+      initCalcDropdown();
       renderBuyerCatalog();
       renderMasterMatrix();
       checkMicroserversHealth();

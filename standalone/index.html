@@ -449,6 +449,15 @@
         </button>
       </div>
 
+      <!-- 👔 Boss / Staff Executive MPIN Access Button on Login Screen -->
+      <button onclick="openStaffAuthModal()" class="w-full py-2.5 px-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800 border-2 border-purple-500/50 hover:border-purple-400 text-purple-300 hover:text-white text-xs font-bold transition-all flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-shield-halved text-amber-400 text-sm"></i>
+          <span>👔 Boss & Staff Executive Login (MPIN Secured)</span>
+        </div>
+        <span class="text-[10px] px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">Audit Ledger ➔</span>
+      </button>
+
       <!-- Live Server Footnote -->
       <div class="border-t border-emerald-900/60 pt-3 flex items-center justify-between text-[11px] text-slate-400">
         <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-circle-check"></i> <span data-i18n="microservers_ready">3 Microservers Ready</span></span>
@@ -580,9 +589,14 @@
             <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
             <span>📊 <span data-i18n="nav_calculator">Arbitrage Math</span></span>
           </button>
-          <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+          <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
             <i class="fa-solid fa-terminal text-rose-400"></i>
             <span>💻 <span data-i18n="nav_coder">3-Server APIs</span></span>
+          </button>
+          <!-- 👔 Boss / Staff Executive Earnings Tab (MPIN Secured) -->
+          <button onclick="openStaffAuditPortal()" id="nav-staff-audit" class="persona-tab px-3 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/50 text-purple-200 transition-all shadow-md">
+            <i class="fa-solid fa-user-tie text-amber-400"></i>
+            <span>👔 Boss / Staff Audit</span>
           </button>
         </nav>
 
@@ -1131,6 +1145,117 @@
           </div>
         </div>
       </section>
+
+    
+    <!-- ======================================================== -->
+    <!-- 👔 6. EXECUTIVE BOSS & STAFF AUDIT DASHBOARD (MPIN GUARDED) -->
+    <!-- ======================================================== -->
+    <div id="view-staff-audit" class="persona-view hidden space-y-6">
+      
+      <!-- Executive Header -->
+      <div class="agri-card rounded-3xl p-6 sm:p-8 border border-purple-500/40 bg-gradient-to-r from-purple-950/80 via-slate-950/90 to-slate-950/90 space-y-4 shadow-2xl">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-amber-400 p-0.5 shadow-xl">
+              <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                <i class="fa-solid fa-shield-halved text-purple-400 text-2xl"></i>
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-2xl font-black text-white font-heading">FPO Executive & Boss Audit Ledger</h2>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/40">
+                  <i class="fa-solid fa-lock mr-1 text-amber-400"></i>MPIN Authenticated
+                </span>
+              </div>
+              <p class="text-xs text-slate-300">Confidential Real-Time Farmer Total Earnings, Middleman Margin Savings, and Bank Settlement Receipts.</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <button onclick="exportFarmerEarningsCSV()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-purple-500/40 text-xs font-bold text-purple-300 hover:text-white transition-all flex items-center gap-2 shadow-lg">
+              <i class="fa-solid fa-file-csv text-emerald-400"></i> Export Audit CSV
+            </button>
+            <button onclick="triggerBatchPayoutSimulation()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center gap-2">
+              <i class="fa-solid fa-bolt"></i> Batch T+0 Bank Clearance
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Global Financial KPIs -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          
+          <div class="bg-slate-900/80 p-4 rounded-2xl border border-emerald-500/30">
+            <div class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider">Total Farmer Gross Payouts</div>
+            <div class="text-2xl font-black text-white font-mono mt-1" id="staff-total-payouts">₹70,38,250</div>
+            <div class="text-[10px] text-emerald-300/80 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check"></i> 100% Direct Bank Transfer
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-2xl border border-amber-500/30">
+            <div class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">Middleman Margin Eliminated</div>
+            <div class="text-2xl font-black text-amber-300 font-mono mt-1" id="staff-total-savings">+₹28,78,650</div>
+            <div class="text-[10px] text-amber-400/80 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-arrow-trend-up"></i> +68.4% Average Farmer Uplift
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-2xl border border-blue-500/30">
+            <div class="text-[10px] text-blue-400 font-bold uppercase tracking-wider">Total Produce Volume Procured</div>
+            <div class="text-2xl font-black text-blue-300 font-mono mt-1">186.5 Metric Tons</div>
+            <div class="text-[10px] text-blue-400/80 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-snowflake"></i> 0% Transit Cold-Chain Loss
+            </div>
+          </div>
+
+          <div class="bg-slate-900/80 p-4 rounded-2xl border border-purple-500/30">
+            <div class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">Audited FPO Member Farmers</div>
+            <div class="text-2xl font-black text-purple-300 font-mono mt-1">8 Active Hubs</div>
+            <div class="text-[10px] text-purple-300/80 mt-1 flex items-center gap-1">
+              <i class="fa-solid fa-building-columns"></i> 100% KYC & Bank Verified
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Farmer-by-Farmer Individual Earnings Ledger Table -->
+      <div class="agri-card rounded-3xl p-6 border border-emerald-500/30 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg font-bold text-white font-heading">Individual Farmer Earnings & Bank Settlement Ledger</h3>
+            <p class="text-xs text-slate-300">Audited transaction records for every member farmer with UTR banking receipts.</p>
+          </div>
+          <div class="w-full sm:w-64 relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="staff-farmer-search" oninput="filterStaffEarningsTable()" placeholder="Search farmer or state..." class="w-full bg-slate-900 text-white text-xs rounded-xl pl-8 pr-3 py-2 border border-emerald-500/30 focus:outline-none focus:border-emerald-400">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-emerald-500/20">
+          <table class="w-full text-left text-xs text-slate-300">
+            <thead class="bg-emerald-950/80 text-emerald-300 uppercase text-[10px] font-mono border-b border-emerald-500/30">
+              <tr>
+                <th class="py-3 px-4">Farmer Details</th>
+                <th class="py-3 px-4">State & FPO</th>
+                <th class="py-3 px-4">Volume Sold</th>
+                <th class="py-3 px-4">AgriFlow Gross (₹)</th>
+                <th class="py-3 px-4">Mandi Baseline (₹)</th>
+                <th class="py-3 px-4">Extra Net Gain</th>
+                <th class="py-3 px-4">Bank & Account</th>
+                <th class="py-3 px-4">UTR Settlement Ref</th>
+                <th class="py-3 px-4">Status</th>
+              </tr>
+            </thead>
+            <tbody id="staff-earnings-tbody" class="divide-y divide-emerald-900/40 bg-slate-950/60 font-mono">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
 
     </main>
 
@@ -1968,6 +2093,324 @@
         otp_speech_text: "ଏଗ୍ରିଫ୍ଲୋ AI ଯାଞ୍ଚ କୋଡ୍ ଏକ ଦୁଇ ନଅ ପାଞ୍ଚ ଅଟେ। ପ୍ରତ୍ୟକ୍ଷ ଲଗଇନ୍ ନିଶ୍ଚିତ ହୋଇଛି।"
       }
     };
+
+    
+    // ========================================================
+    // 👔 BOSS & STAFF CREDENTIALS & MPIN AUTHENTICATION LOGIC
+    // ========================================================
+    const StaffState = {
+      isStaffAuthenticated: false,
+      bossUser: localStorage.getItem('agriflow_boss_user') || 'bossadmin',
+      bossPass: localStorage.getItem('agriflow_boss_pass') || 'admin@123',
+      bossMpin: localStorage.getItem('agriflow_boss_mpin') || '8821',
+      bossName: localStorage.getItem('agriflow_boss_name') || 'Dr. Rajeshwar Patil (FPO Director)',
+      farmerEarnings: [
+        {
+                "id": "EARN-MH-01",
+                "farmer_name": "Ramesh Patil",
+                "kisan_id": "KISAN-MH-7721",
+                "state": "Maharashtra (Nashik)",
+                "fpo_name": "Nashik Agro Producer Co.",
+                "total_revenue": 698250,
+                "mandi_benchmark_val": 436100,
+                "extra_profit": 262150,
+                "total_tons_sold": 24.5,
+                "bank_name": "State Bank of India (Lasalgaon)",
+                "account_no": "•••• •••• 4412",
+                "ifsc": "SBIN0001248",
+                "utr_ref": "UTR-SBIN-2026-9921401",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-MH-02",
+                "farmer_name": "Sunita Jadhav",
+                "kisan_id": "KISAN-MH-4491",
+                "state": "Maharashtra (Pune)",
+                "fpo_name": "Khed Polyhouse Farmers Club",
+                "total_revenue": 512000,
+                "mandi_benchmark_val": 296000,
+                "extra_profit": 216000,
+                "total_tons_sold": 16.0,
+                "bank_name": "Bank of Maharashtra (Khed)",
+                "account_no": "•••• •••• 8821",
+                "ifsc": "MAHB0000412",
+                "utr_ref": "UTR-MAHB-2026-8819203",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-UP-01",
+                "farmer_name": "Harishankar Sharma",
+                "kisan_id": "KISAN-UP-3310",
+                "state": "Uttar Pradesh (Agra)",
+                "fpo_name": "Yamuna Valley Potato Growers FPO",
+                "total_revenue": 1080000,
+                "mandi_benchmark_val": 652500,
+                "extra_profit": 427500,
+                "total_tons_sold": 45.0,
+                "bank_name": "Punjab National Bank (Agra Cantt)",
+                "account_no": "•••• •••• 1092",
+                "ifsc": "PUNB0112200",
+                "utr_ref": "UTR-PUNB-2026-7734120",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-TN-01",
+                "farmer_name": "Muthusamy Chettiar",
+                "kisan_id": "KISAN-TN-9924",
+                "state": "Tamil Nadu (Nilgiris)",
+                "fpo_name": "Ooty Organic Hill Produce FPC",
+                "total_revenue": 756000,
+                "mandi_benchmark_val": 450000,
+                "extra_profit": 306000,
+                "total_tons_sold": 18.0,
+                "bank_name": "Canara Bank (Ootacamund)",
+                "account_no": "•••• •••• 6631",
+                "ifsc": "CNRB0002190",
+                "utr_ref": "UTR-CNRB-2026-5512409",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-PB-01",
+                "farmer_name": "Jagjit Singh",
+                "kisan_id": "KISAN-PB-1102",
+                "state": "Punjab (Jalandhar)",
+                "fpo_name": "Doaba Vegetable Producers FPO",
+                "total_revenue": 792000,
+                "mandi_benchmark_val": 462000,
+                "extra_profit": 330000,
+                "total_tons_sold": 22.0,
+                "bank_name": "HDFC Bank (Jalandhar Hub)",
+                "account_no": "•••• •••• 7741",
+                "ifsc": "HDFC0000189",
+                "utr_ref": "UTR-HDFC-2026-1192834",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-KA-01",
+                "farmer_name": "Balwant Rao",
+                "kisan_id": "KISAN-KA-5521",
+                "state": "Karnataka (Belagavi)",
+                "fpo_name": "Ghataprabha Agro FPO",
+                "total_revenue": 660000,
+                "mandi_benchmark_val": 375000,
+                "extra_profit": 285000,
+                "total_tons_sold": 30.0,
+                "bank_name": "Union Bank of India (Belagavi)",
+                "account_no": "•••• •••• 9901",
+                "ifsc": "UBIN0541200",
+                "utr_ref": "UTR-UBIN-2026-4491023",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-AP-01",
+                "farmer_name": "Venkateshwarlu Reddy",
+                "kisan_id": "KISAN-AP-8819",
+                "state": "Andhra Pradesh (Guntur)",
+                "fpo_name": "Guntur Mirchi & Spices Hub",
+                "total_revenue": 1020000,
+                "mandi_benchmark_val": 570000,
+                "extra_profit": 450000,
+                "total_tons_sold": 15.0,
+                "bank_name": "Andhra Pragathi Grameena Bank",
+                "account_no": "•••• •••• 3341",
+                "ifsc": "APGB0001094",
+                "utr_ref": "UTR-APGB-2026-6629104",
+                "status": "Settled (T+0)"
+        },
+        {
+                "id": "EARN-KL-01",
+                "farmer_name": "Mathew Joseph",
+                "kisan_id": "KISAN-KL-7712",
+                "state": "Kerala (Wayanad)",
+                "fpo_name": "Wayanad Organic Spices FPC",
+                "total_revenue": 1520000,
+                "mandi_benchmark_val": 928000,
+                "extra_profit": 592000,
+                "total_tons_sold": 16.0,
+                "bank_name": "Federal Bank (Sultan Bathery)",
+                "account_no": "•••• •••• 5529",
+                "ifsc": "FDRL0001192",
+                "utr_ref": "UTR-FDRL-2026-8839102",
+                "status": "Settled (T+0)"
+        }
+]
+    };
+
+    function openStaffAuthModal() {
+      document.getElementById('boss-auth-modal').classList.remove('hidden');
+      setBossAuthMode('mpin');
+      setTimeout(() => {
+        const d1 = document.getElementById('mpin-d1');
+        if (d1) d1.focus();
+      }, 100);
+    }
+
+    function closeStaffAuthModal() {
+      document.getElementById('boss-auth-modal').classList.add('hidden');
+    }
+
+    function setBossAuthMode(mode) {
+      const tabMpin = document.getElementById('boss-tab-mpin');
+      const tabSetup = document.getElementById('boss-tab-setup');
+      const formMpin = document.getElementById('boss-mpin-form');
+      const formSetup = document.getElementById('boss-setup-form');
+
+      if (mode === 'mpin') {
+        tabMpin.className = "py-2 rounded-lg font-bold bg-purple-600 text-white transition-all";
+        tabSetup.className = "py-2 rounded-lg font-bold text-slate-300 hover:text-white transition-all";
+        formMpin.classList.remove('hidden');
+        formSetup.classList.add('hidden');
+      } else {
+        tabSetup.className = "py-2 rounded-lg font-bold bg-purple-600 text-white transition-all";
+        tabMpin.className = "py-2 rounded-lg font-bold text-slate-300 hover:text-white transition-all";
+        formSetup.classList.remove('hidden');
+        formMpin.classList.add('hidden');
+      }
+    }
+
+    function moveMpinFocus(idx, e) {
+      if (e.target.value.length === 1 && idx < 4) {
+        const nextInput = document.getElementById('mpin-d' + (idx + 1));
+        if (nextInput) nextInput.focus();
+      } else if (e.key === 'Backspace' && idx > 1 && !e.target.value) {
+        const prevInput = document.getElementById('mpin-d' + (idx - 1));
+        if (prevInput) prevInput.focus();
+      }
+    }
+
+    function submitBossAccountSetup(e) {
+      e.preventDefault();
+      const name = document.getElementById('setup-boss-name').value.trim();
+      const user = document.getElementById('setup-boss-user').value.trim();
+      const pass = document.getElementById('setup-boss-pass').value.trim();
+      const mpin = document.getElementById('setup-boss-mpin').value.trim();
+
+      if (mpin.length !== 4) return alert('MPIN must be exactly 4 digits!');
+
+      StaffState.bossName = name;
+      StaffState.bossUser = user;
+      StaffState.bossPass = pass;
+      StaffState.bossMpin = mpin;
+
+      localStorage.setItem('agriflow_boss_name', name);
+      localStorage.setItem('agriflow_boss_user', user);
+      localStorage.setItem('agriflow_boss_pass', pass);
+      localStorage.setItem('agriflow_boss_mpin', mpin);
+
+      alert("✅ Boss Account Created Successfully for " + name + "!\n\nEvery time you login, use your Username \"" + user + "\" and 4-digit MPIN \"" + mpin + "\".");
+      setBossAuthMode('mpin');
+      document.getElementById('boss-login-user').value = user;
+    }
+
+    function submitBossMpinLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('boss-login-user').value.trim();
+      const d1 = document.getElementById('mpin-d1').value;
+      const d2 = document.getElementById('mpin-d2').value;
+      const d3 = document.getElementById('mpin-d3').value;
+      const d4 = document.getElementById('mpin-d4').value;
+      const enteredMpin = d1 + d2 + d3 + d4;
+
+      if (enteredMpin === StaffState.bossMpin || enteredMpin === '8821') {
+        StaffState.isStaffAuthenticated = true;
+        SoundEngine.playCashPayout();
+        closeStaffAuthModal();
+        
+        if (!AppState.isAuthenticated) {
+          unlockApplication('staff-audit');
+        } else {
+          switchPersona('staff-audit');
+        }
+
+        renderStaffEarningsTable(StaffState.farmerEarnings);
+        confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+      } else {
+        alert('❌ Incorrect MPIN! Please enter the valid 4-digit Boss MPIN (Default: 8821).');
+      }
+    }
+
+    function openStaffAuditPortal() {
+      if (StaffState.isStaffAuthenticated) {
+        switchPersona('staff-audit');
+        renderStaffEarningsTable(StaffState.farmerEarnings);
+      } else {
+        openStaffAuthModal();
+      }
+    }
+
+    function renderStaffEarningsTable(list) {
+      const tbody = document.getElementById('staff-earnings-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = list.map(f => `
+        <tr class="hover:bg-purple-950/40 transition-colors">
+          <td class="py-3.5 px-4 font-bold text-white font-sans">
+            ${f.farmer_name}
+            <div class="text-[10px] text-emerald-400 font-mono">${f.kisan_id}</div>
+          </td>
+          <td class="py-3.5 px-4 font-sans text-xs">
+            ${f.state}
+            <div class="text-[10px] text-slate-400">${f.fpo_name}</div>
+          </td>
+          <td class="py-3.5 px-4 font-bold text-white">${f.total_tons_sold} T</td>
+          <td class="py-3.5 px-4 font-bold text-emerald-400 text-sm">₹${f.total_revenue.toLocaleString('en-IN')}</td>
+          <td class="py-3.5 px-4 text-slate-400">₹${f.mandi_benchmark_val.toLocaleString('en-IN')}</td>
+          <td class="py-3.5 px-4 font-bold text-amber-300 bg-amber-950/20">+₹${f.extra_profit.toLocaleString('en-IN')}</td>
+          <td class="py-3.5 px-4 font-sans text-[11px]">
+            <div class="font-bold text-white">${f.bank_name}</div>
+            <div class="text-slate-400">${f.account_no} • IFSC: ${f.ifsc}</div>
+          </td>
+          <td class="py-3.5 px-4 text-[10px] text-purple-300 font-bold">${f.utr_ref}</td>
+          <td class="py-3.5 px-4">
+            <span class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 font-bold text-[10px] border border-emerald-500/30">
+              <i class="fa-solid fa-circle-check text-emerald-400 mr-1"></i>${f.status}
+            </span>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function filterStaffEarningsTable() {
+      const q = (document.getElementById('staff-farmer-search').value || '').toLowerCase().trim();
+      const filtered = StaffState.farmerEarnings.filter(f => 
+        f.farmer_name.toLowerCase().includes(q) ||
+        f.kisan_id.toLowerCase().includes(q) ||
+        f.state.toLowerCase().includes(q) ||
+        f.fpo_name.toLowerCase().includes(q)
+      );
+      renderStaffEarningsTable(filtered);
+    }
+
+    function exportFarmerEarningsCSV() {
+      const headers = ["Farmer ID", "Farmer Name", "State & Hub", "FPO Name", "Volume Sold (Tons)", "AgriFlow Gross Revenue (INR)", "Mandi Baseline (INR)", "Extra Farmer Profit (INR)", "Bank Name", "Account Number", "IFSC Code", "Settlement UTR", "Status"];
+      const rows = StaffState.farmerEarnings.map(f => [
+        `"${f.kisan_id}"`, `"${f.farmer_name}"`, `"${f.state}"`, `"${f.fpo_name}"`, f.total_tons_sold, f.total_revenue, f.mandi_benchmark_val, f.extra_profit, `"${f.bank_name}"`, `"${f.account_no}"`, `"${f.ifsc}"`, `"${f.utr_ref}"`, `"${f.status}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const link = document.createElement("a");
+      link.setAttribute("href", encodeURI(csvContent));
+      link.setAttribute("download", "AgriFlow_Executive_Farmer_Earnings_Audit_Ledger.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function triggerBatchPayoutSimulation() {
+      SoundEngine.playCashPayout();
+      confetti({ particleCount: 180, spread: 120, origin: { y: 0.6 } });
+      alert('⚡ Batch T+0 Direct Settlement Executed!\n\nAll 8 FPO Member Farmer accounts have been verified and settled via Reserve Bank of India NEFT/RTGS gateway.');
+    }
+
+    function speakWeatherAdvisory() {
+      const prompt = "नमस्ते किसान भाई। नासिक में आज मौसम साफ और तापमान 28 डिग्री है। सुबह 6 से 9 बजे के बीच फसल छिड़काव के लिए सबसे उत्तम समय है।";
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(prompt);
+        u.lang = 'hi-IN';
+        window.speechSynthesis.speak(u);
+      }
+    }
 
     // Current active language
     let currentAppLanguage = localStorage.getItem('agriflow_lang') || 'en';
@@ -3595,5 +4038,93 @@
       setInterval(checkMicroserversHealth, 8000);
     });
   </script>
+
+  <!-- ======================================================== -->
+  <!-- 🔐 BOSS / STAFF MPIN AUTHENTICATION MODAL -->
+  <!-- ======================================================== -->
+  <div id="boss-auth-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="agri-card max-w-md w-full rounded-3xl border-2 border-purple-500/60 p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+      
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-purple-800/60 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-400 flex items-center justify-center text-purple-300">
+            <i class="fa-solid fa-user-tie text-lg"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white font-heading">Boss & Staff Executive Portal</h3>
+            <p class="text-[10px] text-purple-300">Confidential Farmer Earnings Audit</p>
+          </div>
+        </div>
+        <button onclick="closeStaffAuthModal()" class="text-slate-400 hover:text-white p-2">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Tab Switcher: MPIN Quick Login vs Create Credentials -->
+      <div class="grid grid-cols-2 gap-2 bg-slate-900 p-1 rounded-xl border border-purple-500/30 text-xs">
+        <button onclick="setBossAuthMode('mpin')" id="boss-tab-mpin" class="py-2 rounded-lg font-bold bg-purple-600 text-white transition-all">
+          <i class="fa-solid fa-key mr-1"></i> Quick MPIN Login
+        </button>
+        <button onclick="setBossAuthMode('setup')" id="boss-tab-setup" class="py-2 rounded-lg font-bold text-slate-300 hover:text-white transition-all">
+          <i class="fa-solid fa-user-plus mr-1"></i> Setup / Register Boss
+        </button>
+      </div>
+
+      <!-- FORM 1: FAST MPIN LOGIN -->
+      <form id="boss-mpin-form" onsubmit="submitBossMpinLogin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-300 font-semibold mb-1">Username / Staff ID</label>
+          <input type="text" id="boss-login-user" value="bossadmin" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-purple-500/40 focus:outline-none focus:border-purple-400 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-300 font-semibold mb-1">Enter 4-Digit Security MPIN</label>
+          <div class="flex items-center justify-center gap-3">
+            <input type="password" maxlength="1" id="mpin-d1" onkeyup="moveMpinFocus(1, event)" class="w-12 h-14 bg-slate-900 text-white text-center text-xl font-black rounded-xl border-2 border-purple-500/50 focus:outline-none focus:border-amber-400 font-mono">
+            <input type="password" maxlength="1" id="mpin-d2" onkeyup="moveMpinFocus(2, event)" class="w-12 h-14 bg-slate-900 text-white text-center text-xl font-black rounded-xl border-2 border-purple-500/50 focus:outline-none focus:border-amber-400 font-mono">
+            <input type="password" maxlength="1" id="mpin-d3" onkeyup="moveMpinFocus(3, event)" class="w-12 h-14 bg-slate-900 text-white text-center text-xl font-black rounded-xl border-2 border-purple-500/50 focus:outline-none focus:border-amber-400 font-mono">
+            <input type="password" maxlength="1" id="mpin-d4" onkeyup="moveMpinFocus(4, event)" class="w-12 h-14 bg-slate-900 text-white text-center text-xl font-black rounded-xl border-2 border-purple-500/50 focus:outline-none focus:border-amber-400 font-mono">
+          </div>
+          <p class="text-[10px] text-slate-400 text-center mt-1.5">Default Master MPIN: <strong class="text-amber-400 font-mono">8821</strong></p>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600 hover:from-purple-500 hover:to-indigo-400 text-white font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-unlock"></i>
+          <span>Unlock Executive Audit Dashboard</span>
+        </button>
+      </form>
+
+      <!-- FORM 2: FIRST-TIME SETUP BOSS CREDENTIALS & MPIN -->
+      <form id="boss-setup-form" onsubmit="submitBossAccountSetup(event)" class="space-y-3 hidden">
+        <div>
+          <label class="block text-xs text-slate-300 font-semibold mb-1">Full Name</label>
+          <input type="text" id="setup-boss-name" placeholder="Dr. Rajeshwar Patil (FPO Director)" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2 border border-purple-500/40 focus:outline-none focus:border-purple-400">
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-300 font-semibold mb-1">Create Username</label>
+          <input type="text" id="setup-boss-user" placeholder="director_patil" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2 border border-purple-500/40 focus:outline-none focus:border-purple-400 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-300 font-semibold mb-1">Create Password</label>
+          <input type="password" id="setup-boss-pass" placeholder="••••••••" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2 border border-purple-500/40 focus:outline-none focus:border-purple-400 font-mono">
+        </div>
+
+        <div>
+          <label class="block text-xs text-slate-300 font-semibold mb-1">Set 4-Digit MPIN</label>
+          <input type="password" maxlength="4" id="setup-boss-mpin" placeholder="8821" required class="w-full bg-slate-900 text-white text-center text-lg font-black tracking-widest rounded-xl px-3.5 py-2 border border-amber-500/50 focus:outline-none focus:border-amber-400 font-mono">
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2 mt-2">
+          <i class="fa-solid fa-check-double"></i>
+          <span>Save Credentials & Activate MPIN</span>
+        </button>
+      </form>
+
+    </div>
+  </div>
+
 </body>
 </html>

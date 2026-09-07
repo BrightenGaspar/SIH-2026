@@ -70,7 +70,7 @@
     .nature-background-wrapper {
       position: fixed;
       inset: 0;
-      z-index: -10;
+      z-index: 0;
       overflow: hidden;
       pointer-events: none;
       background: #021a13;
@@ -216,7 +216,7 @@
 
     /* Glassmorphism Cards */
     .agri-card {
-      background: rgba(3, 25, 18, 0.84);
+      background: rgba(3, 25, 18, 0.86);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
       border: 1px solid rgba(52, 211, 153, 0.25);
@@ -270,891 +270,109 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- 1. LIVE APMC MANDI BENCHMARK & MULTI-SERVER TICKER -->
+  <!-- 🔐 1. STRICT INITIAL AUTHENTICATION GATE / LOGIN PORTAL -->
+  <!-- (Website only opens into full app once logged in) -->
   <!-- ======================================================== -->
-  <div class="bg-slate-950/95 border-b border-emerald-500/20 py-1.5 px-4 text-[11px] overflow-hidden flex items-center z-20">
-    <div class="flex items-center gap-2 font-bold text-amber-400 shrink-0 pr-4 border-r border-emerald-900/60 z-10 bg-slate-950">
-      <i class="fa-solid fa-satellite-dish animate-pulse text-emerald-400"></i>
-      <span>LIVE APMC BENCHMARK:</span>
-    </div>
-    <div class="overflow-hidden relative w-full">
-      <div class="animate-marquee whitespace-nowrap text-slate-300 font-mono flex gap-8">
-        <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
-        <span>🥭 Ratnagiri APMC: <strong class="text-rose-400">₹88.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹145.00/kg (+64.8%)</strong></span>
-        <span>🍅 Pune Vashi APMC: <strong class="text-rose-400">₹18.50/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹32.00/kg (+73.0%)</strong></span>
-        <span>🍇 Sangli EuroGAP: <strong class="text-rose-400">₹48.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹78.00/kg (+62.5%)</strong></span>
-        <span>🥔 Khanna Mandi: <strong class="text-rose-400">₹13.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹21.00/kg (+61.5%)</strong></span>
-        <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- 2. TOP TELEMETRY & 3-SQLITE MICROSERVER STATUS BAR -->
-  <!-- ======================================================== -->
-  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/25 shadow-xl">
-    <div class="bg-emerald-950/90 border-b border-emerald-900/60 px-4 py-1 text-xs flex flex-wrap items-center justify-between gap-2 text-emerald-300">
-      <div class="flex items-center gap-4 flex-wrap">
-        <span class="flex items-center gap-1.5 font-bold text-emerald-400 font-heading">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          <span>SIH-2026 LIVE NODE: PS-33</span>
-        </span>
-        <div class="flex items-center gap-3 text-[11px]">
-          <!-- Microserver 1: Farmer -->
-          <div id="status-farmer-server" class="flex items-center gap-1.5 bg-emerald-900/50 px-2 py-0.5 rounded border border-emerald-500/30">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-            <span>🌾 Farmer Svr :5001 [SQLite]</span>
-            <span class="text-emerald-400 font-mono text-[10px]" id="badge-farmer-status">ONLINE</span>
-          </div>
-          <!-- Microserver 2: Buyer -->
-          <div id="status-buyer-server" class="flex items-center gap-1.5 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-500/30 text-blue-300">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
-            <span>🛒 Buyer Svr :5002 [SQLite]</span>
-            <span class="text-blue-400 font-mono text-[10px]" id="badge-buyer-status">ONLINE</span>
-          </div>
-          <!-- Microserver 3: Logistics -->
-          <div id="status-logistics-server" class="flex items-center gap-1.5 bg-amber-900/40 px-2 py-0.5 rounded border border-amber-500/30 text-amber-300">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-            <span>🚛 Logistics :5003 [SQLite]</span>
-            <span class="text-amber-400 font-mono text-[10px]" id="badge-logistics-status">ONLINE</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3 text-[11px]">
-        <button onclick="toggleSunlightMode()" class="px-2.5 py-0.5 rounded bg-slate-900 border border-emerald-500/40 text-amber-300 font-bold hover:bg-slate-800 transition-all flex items-center gap-1">
-          <i class="fa-solid fa-sun text-xs"></i>
-          <span id="sunlight-mode-label">Sunlight Field Mode</span>
-        </button>
-        <span class="text-slate-400"><i class="fa-solid fa-database mr-1 text-emerald-400"></i>Engine: <strong class="text-emerald-300 font-mono">SQLite3 Binary DB</strong></span>
-      </div>
-    </div>
-
-    <!-- Main Navigation Bar -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-      <!-- Brand Logo -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="switchPersona('orders')">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-amber-500 p-0.5 shadow-lg shadow-emerald-500/20">
-          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-            <i class="fa-solid fa-seedling text-emerald-400 text-lg"></i>
-          </div>
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <span class="font-heading font-extrabold text-xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
-          </div>
-          <p class="text-[10px] text-emerald-400/80 font-medium tracking-wide">ZERO-MIDDLEMAN REEFER SUPPLY PROTOCOL</p>
-        </div>
-      </div>
-
-      <!-- Navigation Tabs -->
-      <nav class="hidden md:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-emerald-500/20">
-        <button onclick="switchPersona('orders')" id="nav-orders" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all bg-emerald-600 text-white shadow-md">
-          <i class="fa-solid fa-boxes-packing"></i>
-          <span>Central Orders</span>
-        </button>
-        <button onclick="switchPersona('farmer')" id="nav-farmer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
-          <i class="fa-solid fa-tractor text-amber-400"></i>
-          <span>🌾 Farmer Station</span>
-        </button>
-        <button onclick="switchPersona('buyer')" id="nav-buyer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
-          <i class="fa-solid fa-store text-blue-400"></i>
-          <span>🛒 Buyer Trade</span>
-        </button>
-        <button onclick="switchPersona('matrix')" id="nav-matrix" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
-          <i class="fa-solid fa-table-list text-purple-400"></i>
-          <span>📋 Produce Matrix</span>
-        </button>
-        <button onclick="switchPersona('calculator')" id="nav-calculator" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
-          <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
-          <span>📊 Arbitrage Math</span>
-        </button>
-        <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
-          <i class="fa-solid fa-terminal text-rose-400"></i>
-          <span>💻 3-Server APIs</span>
-        </button>
-      </nav>
-
-      <!-- User Profile & Farmer-Friendly Auth Trigger -->
-      <div class="flex items-center gap-3">
-        <!-- Active User Profile Pill -->
-        <button onclick="openAuthModal()" class="flex items-center gap-2.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 px-3 py-1.5 rounded-xl transition-all shadow-md group">
-          <img id="user-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Avatar" class="w-7 h-7 rounded-lg object-cover border border-emerald-400">
-          <div class="text-left hidden sm:block">
-            <div class="text-xs font-bold text-white flex items-center gap-1.5">
-              <span id="user-display-name">Ramesh Patil</span>
-              <span id="user-role-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">KISAN</span>
-            </div>
-            <div class="text-[10px] text-emerald-400/80 font-mono" id="user-display-sub">KISAN-MH-7721 • Nashik</div>
-          </div>
-          <i class="fa-solid fa-chevron-down text-[10px] text-emerald-400 group-hover:translate-y-0.5 transition-transform"></i>
-        </button>
-
-        <!-- Cart Quick View (Buyer Persona) -->
-        <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-400 text-slate-200 transition-all">
-          <i class="fa-solid fa-basket-shopping text-emerald-400"></i>
-          <span id="cart-counter" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] flex items-center justify-center shadow-lg">1</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- ======================================================== -->
-  <!-- MAIN CONTENT (FLOATING OVER THE SWAYING TREE BACKDROP) -->
-  <!-- ======================================================== -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 relative z-10">
-
-    <!-- Unified Vision Hero Header -->
-    <div class="relative overflow-hidden rounded-3xl agri-card p-6 sm:p-8 border border-emerald-500/30">
-      <div class="absolute -right-10 -bottom-10 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
-      <div class="absolute -left-10 -top-10 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+  <div id="auth-gate-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative z-20 transition-all duration-500">
+    <div class="agri-card max-w-xl w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
       
-      <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-        <div class="space-y-3 max-w-2xl">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
-            <i class="fa-solid fa-award text-amber-400"></i>
-            <span>Smart India Hackathon 2026 • Problem Statement 33</span>
+      <!-- Top SIH-2026 Header Banner -->
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-amber-400 p-0.5 shadow-lg shadow-emerald-500/20">
+            <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+              <i class="fa-solid fa-seedling text-emerald-400 text-xl"></i>
+            </div>
           </div>
-          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-heading">
-            Eliminating Farm-to-Fork <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">Intermediary Loss</span>
-          </h1>
-          <p class="text-sm text-slate-300 leading-relaxed">
-            Running on <strong class="text-white">3 Dedicated SQLite Microservers</strong> with dynamic balance payouts, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant <strong class="text-emerald-400">T+0 direct payouts</strong>.
-          </p>
-        </div>
-
-        <!-- Quick 1-Click Action Cards for the 3 Personas -->
-        <div class="grid grid-cols-3 gap-3 w-full lg:w-auto">
-          <button onclick="switchPersona('farmer')" class="p-3.5 rounded-2xl bg-emerald-900/40 hover:bg-emerald-800/60 border border-emerald-500/30 text-left transition-all group">
-            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-wheat-awn"></i>
-            </div>
-            <div class="text-xs font-bold text-white">🌾 Farmer</div>
-            <div class="text-[10px] text-emerald-300/80">Voice OTP & Ripeness</div>
-          </button>
-
-          <button onclick="switchPersona('buyer')" class="p-3.5 rounded-2xl bg-blue-900/40 hover:bg-blue-800/60 border border-blue-500/30 text-left transition-all group">
-            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-cart-flatbed"></i>
-            </div>
-            <div class="text-xs font-bold text-white">🛒 Buyer</div>
-            <div class="text-[10px] text-blue-300/80">Escrow & Catalog</div>
-          </button>
-
-          <button onclick="switchPersona('orders')" class="p-3.5 rounded-2xl bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/30 text-left transition-all group">
-            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-              <i class="fa-solid fa-truck-fast"></i>
-            </div>
-            <div class="text-xs font-bold text-white">🚛 Logistics</div>
-            <div class="text-[10px] text-amber-300/80">Assigned Manifest</div>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ======================================================== -->
-    <!-- VIEW 1: CENTRAL ASSIGNED ORDERS CONSOLE (persona-view-orders) -->
-    <!-- ======================================================== -->
-    <section id="view-orders" class="persona-view space-y-6">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-            <i class="fa-solid fa-boxes-packing text-emerald-400"></i>
-            <span>Central Orders & Neatly Assigned Manifest Console</span>
-          </h2>
-          <p class="text-xs text-slate-300 mt-1">Live synchronized SQLite relational database with all 4 assigned columns: Farmer, Buyer, Reefer Fleet, and QC Bay.</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="refreshOrdersFromLogisticsServer()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-xs font-semibold text-emerald-300 hover:bg-emerald-950 flex items-center gap-2 transition-all">
-            <i class="fa-solid fa-rotate text-emerald-400"></i>
-            <span>Sync Logistics Svr :5003</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Orders Container -->
-      <div id="orders-manifest-container" class="space-y-6">
-        <!-- Rendered dynamically -->
-      </div>
-    </section>
-
-    <!-- ======================================================== -->
-    <!-- VIEW 2: FARMER COMMAND STATION (persona-view-farmer) -->
-    <!-- ======================================================== -->
-    <section id="view-farmer" class="persona-view hidden space-y-8">
-      <!-- Farmer Header Card -->
-      <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-        <div class="flex items-center gap-4">
-          <img id="farmer-header-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200" alt="Farmer" class="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg">
           <div>
             <div class="flex items-center gap-2">
-              <h2 class="text-2xl font-bold text-white font-heading" id="farmer-header-name">Ramesh Patil</h2>
-              <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Verified Kisan Partner</span>
+              <span class="font-heading font-extrabold text-2xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
             </div>
-            <p class="text-xs text-slate-300 mt-0.5" id="farmer-header-fpo">Nashik Agro Producer Co. • Lasalgaon Hub</p>
-            <div class="flex items-center gap-3 mt-2 text-xs">
-              <span class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>4.92 / 5.0 Rating</span>
-              <span class="text-slate-400">•</span>
-              <span class="text-emerald-400 font-bold"><i class="fa-solid fa-truck-ramp-box mr-1"></i>142.5 Tons Direct Dispatched</span>
-            </div>
+            <p class="text-[11px] text-emerald-300/90 font-medium">Smart India Hackathon 2026 • Problem Statement 33</p>
           </div>
         </div>
 
-        <!-- Wallet Balance Card with Instant Dynamic Withdrawal -->
-        <div class="bg-gradient-to-br from-emerald-950 to-slate-900 p-5 rounded-2xl border border-emerald-500/40 min-w-[290px] shadow-xl">
-          <div class="text-[11px] text-emerald-300 uppercase tracking-wider font-semibold flex items-center justify-between">
-            <span>e-RUPI Kisan Wallet Balance</span>
-            <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">PORT 5001</span>
-          </div>
-          <div class="text-3xl font-extrabold text-white mt-1 font-mono transition-all duration-300" id="farmer-wallet-display">₹1,84,500</div>
-          <div class="flex items-center justify-between mt-3 text-xs">
-            <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> T+0 Instant Payout</span>
-            <button onclick="openWithdrawModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1">
-              <i class="fa-solid fa-building-columns"></i>
-              <span>Withdraw</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Optical Canvas AI Computer Vision Studio -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Left: AI Optical Studio with Real Canvas Analysis -->
-        <div class="lg:col-span-7 agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-5">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                <i class="fa-solid fa-camera text-emerald-400"></i>
-              </div>
-              <div>
-                <h3 class="font-bold text-white text-lg font-heading">AI Optical Ripeness & Sugar Brix Studio</h3>
-                <p class="text-xs text-slate-300">HTML5 Canvas Pixel Histogram & NIR Estimation</p>
-              </div>
-            </div>
-            <span class="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">Model v4.2 NIR</span>
-          </div>
-
-          <!-- Image Upload / Sample Selector for Real Canvas Analysis -->
-          <div class="space-y-3">
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-slate-300 font-semibold">1. Select Sample or Upload Crop Photo:</span>
-              <label class="cursor-pointer px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-500/30 text-emerald-300 font-semibold text-[11px] flex items-center gap-1">
-                <i class="fa-solid fa-upload"></i> Upload Photo
-                <input type="file" id="crop-image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-              </label>
-            </div>
-
-            <div class="grid grid-cols-4 gap-2">
-              <button onclick="analyzeSampleImage('onion')" id="btn-crop-onion" class="crop-btn p-2 rounded-xl bg-emerald-800/80 border border-emerald-400 text-xs font-bold text-white text-center">🧅 Red Onion</button>
-              <button onclick="analyzeSampleImage('mango')" id="btn-crop-mango" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🥭 Alphonso</button>
-              <button onclick="analyzeSampleImage('tomato')" id="btn-crop-tomato" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🍅 Poly Tomato</button>
-              <button onclick="analyzeSampleImage('banana')" id="btn-crop-banana" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🍌 Cavendish</button>
-            </div>
-          </div>
-
-          <!-- Image Preview & Canvas Processing Area -->
-          <div class="relative bg-slate-950/80 rounded-2xl border border-emerald-500/20 p-3 flex flex-col sm:flex-row items-center gap-4">
-            <div class="relative w-36 h-36 rounded-xl overflow-hidden border border-emerald-500/40 shrink-0">
-              <img id="preview-crop-img" src="https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400" alt="Crop Preview" class="w-full h-full object-cover">
-              <canvas id="hidden-cv-canvas" width="120" height="120" class="hidden"></canvas>
-              <div class="absolute inset-0 bg-emerald-500/10 border-2 border-emerald-400/50 rounded-xl pointer-events-none flex items-center justify-center">
-                <span class="text-[9px] bg-slate-950/90 text-emerald-400 px-1.5 py-0.5 rounded font-mono">NIR SCAN</span>
-              </div>
-            </div>
-
-            <div class="flex-1 space-y-2 text-xs w-full">
-              <div class="flex justify-between">
-                <span class="text-slate-400">Optical Color Ratio (RGB):</span>
-                <span class="text-emerald-400 font-mono font-bold" id="cv-color-ratio">R: 62% • G: 24% • B: 14%</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">Skin Chlorophyll Degradation:</span>
-                <span class="text-amber-400 font-mono font-bold" id="cv-chlorophyll">35% Residual</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">AI Quality Classification:</span>
-                <span class="text-emerald-400 font-bold" id="cv-quality-grade">Grade A+ (Export Quality)</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-slate-400">AI Confidence Score:</span>
-                <span class="text-blue-400 font-mono font-bold">99.4% (Certified)</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Interactive Ripeness Slider -->
-          <div class="bg-slate-900/80 p-4 rounded-2xl border border-emerald-500/20 space-y-3">
-            <div class="flex justify-between items-center text-xs font-semibold">
-              <span class="text-slate-300">Fine-Tune Ripeness Index:</span>
-              <span class="text-emerald-400 font-bold font-mono text-sm" id="ripeness-percent-label">65% (Optimal Export)</span>
-            </div>
-            <input type="range" min="10" max="100" value="65" id="ripeness-slider" oninput="updateRipenessStudio(this.value)" class="w-full accent-emerald-400 cursor-pointer">
-            <div class="flex justify-between text-[10px] text-slate-400 font-mono">
-              <span>Raw Harvest (10%)</span>
-              <span>Prime Export (65%)</span>
-              <span>Fully Ripe (85%)</span>
-              <span>Overripe (100%)</span>
-            </div>
-          </div>
-
-          <!-- Readouts Grid -->
-          <div class="grid grid-cols-3 gap-3 text-center">
-            <div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/20">
-              <div class="text-[10px] text-slate-400 uppercase">Brix Sugar Index</div>
-              <div class="text-lg font-bold text-amber-400 font-mono mt-0.5" id="val-brix">12.8° Bx</div>
-            </div>
-            <div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/20">
-              <div class="text-[10px] text-slate-400 uppercase">Ethylene Emission</div>
-              <div class="text-lg font-bold text-blue-400 font-mono mt-0.5" id="val-ethylene">0.08 ppm</div>
-            </div>
-            <div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/20">
-              <div class="text-[10px] text-slate-400 uppercase">Safe Shelf-Life</div>
-              <div class="text-lg font-bold text-emerald-400 font-mono mt-0.5" id="val-shelflife">75 Days</div>
-            </div>
-          </div>
-
-          <!-- Multilingual Voice Advisor -->
-          <div class="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <button onclick="playRipenessAudio()" class="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transition-transform active:scale-95">
-                <i class="fa-solid fa-volume-high text-lg"></i>
-              </button>
-              <div>
-                <div class="text-xs font-bold text-amber-300">Kisan Audio Advisor (आवाज़ सलाह)</div>
-                <div class="text-[11px] text-slate-300" id="audio-advisor-text">"यह प्याज एक्सपोर्ट के लिए सर्वोत्तम ग्रेड A+ है। 2 दिन में लोडिंग करें।"</div>
-              </div>
-            </div>
-            <div class="flex gap-1">
-              <button onclick="setVoiceLang('hi')" class="px-2 py-1 rounded text-[10px] bg-amber-500/20 text-amber-300 font-bold">हिन्दी</button>
-              <button onclick="setVoiceLang('en')" class="px-2 py-1 rounded text-[10px] bg-slate-800 text-slate-300 font-bold">EN</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: 14-Day Degradation Chart & Payouts Ledger -->
-        <div class="lg:col-span-5 space-y-6">
-          <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col justify-between space-y-4">
-            <div>
-              <h3 class="font-bold text-white text-base flex items-center gap-2 font-heading">
-                <i class="fa-solid fa-chart-line text-amber-400"></i>
-                <span>14-Day Quality Degradation Curve</span>
-              </h3>
-              <p class="text-xs text-slate-400 mt-0.5">Reefer (+4°C) vs Ambient (+34°C) Comparison</p>
-            </div>
-
-            <div class="relative h-56 w-full">
-              <canvas id="degradationChart"></canvas>
-            </div>
-
-            <div class="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
-              <i class="fa-solid fa-snowflake text-emerald-400"></i>
-              <span>Active Cold-Chain adds <strong>+45 Days</strong> of export shelf-life.</span>
-            </div>
-          </div>
-
-          <!-- Live Payouts History Table -->
-          <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
-            <div class="flex items-center justify-between">
-              <h4 class="font-bold text-white text-sm flex items-center gap-2 font-heading">
-                <i class="fa-solid fa-receipt text-emerald-400"></i>
-                <span>Recent e-RUPI Payout Settlements</span>
-              </h4>
-              <span class="text-[10px] text-emerald-400 font-mono">T+0 SETTLED</span>
-            </div>
-            <div id="payout-history-list" class="space-y-2 text-xs">
-              <div class="p-2.5 rounded-xl bg-slate-900/80 border border-emerald-500/20 flex justify-between items-center">
-                <div>
-                  <div class="font-bold text-white">₹2,56,000 Payout Settled</div>
-                  <div class="text-[10px] text-slate-400 font-mono">Ref: UPI-2026-992144 • SBI ...8821</div>
-                </div>
-                <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">COMPLETED</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Schedule Farmgate Milk-Run Pickup Form -->
-      <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-4">
-        <div class="flex items-center justify-between">
-          <h3 class="font-bold text-white text-lg flex items-center gap-2 font-heading">
-            <i class="fa-solid fa-truck-pickup text-emerald-400"></i>
-            <span>Schedule Farmgate Milk-Run Reefer Pickup</span>
-          </h3>
-          <span class="text-xs text-slate-400 font-mono">Connected to Farmer Server :5001</span>
-        </div>
-
-        <form id="pickup-form" onsubmit="submitPickupSchedule(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Crop Variety</label>
-            <select id="pickup-crop" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400">
-              <option value="Nashik Red Onion (Garwa Export)">Nashik Red Onion (Garwa)</option>
-              <option value="Ratnagiri Alphonso Mango (GI)">Ratnagiri Alphonso Mango</option>
-              <option value="Pusa Ruby Polyhouse Tomato">Pusa Ruby Polyhouse Tomato</option>
-              <option value="Sangli Seedless Thompson Grapes">Sangli Thompson Grapes</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Harvest Volume (Metric Tons)</label>
-            <input type="number" id="pickup-volume" min="1" max="50" step="0.5" value="10.0" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-1">Preferred Pickup Window</label>
-            <select id="pickup-slot" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400">
-              <option value="Morning Slot (06:00 AM - 09:00 AM)">Morning Slot (06:00 AM - 09:00 AM)</option>
-              <option value="Afternoon Slot (01:00 PM - 04:00 PM)">Afternoon Slot (01:00 PM - 04:00 PM)</option>
-              <option value="Evening Slot (06:00 PM - 09:00 PM)">Evening Slot (06:00 PM - 09:00 PM)</option>
-            </select>
-          </div>
-
-          <div class="flex items-end">
-            <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
-              <i class="fa-solid fa-calendar-check"></i>
-              <span>Dispatch Reefer Truck</span>
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Live GPS Milk-Run Radar Leaflet Map -->
-      <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div>
-            <h3 class="font-bold text-white text-lg flex items-center gap-2 font-heading">
-              <i class="fa-solid fa-route text-emerald-400"></i>
-              <span>Live Milk-Run GPS Telematics Radar</span>
-            </h3>
-            <p class="text-xs text-slate-300">Vehicle: <strong class="text-emerald-400 font-mono">MH-15-EG-8821</strong> • Driver: Suresh Mane (+91 97661 23456)</p>
-          </div>
-          <div class="flex items-center gap-2 text-xs font-mono">
-            <button onclick="startTruckAnimation()" id="btn-truck-anim" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition-all flex items-center gap-1.5">
-              <i class="fa-solid fa-play text-[10px]"></i>
-              <span>Simulate Highway Transit</span>
-            </button>
-            <span class="px-2.5 py-1 rounded-lg bg-emerald-950 border border-emerald-500/30 text-emerald-300" id="live-speed-badge">Speed: 58 km/h</span>
-            <span class="px-2.5 py-1 rounded-lg bg-blue-950 border border-blue-500/30 text-blue-300" id="live-temp-badge">Temp: +4.2°C</span>
-          </div>
-        </div>
-
-        <div id="radarMap" class="w-full h-80 rounded-2xl border border-emerald-500/30 z-0"></div>
-      </div>
-    </section>
-
-    <!-- ======================================================== -->
-    <!-- VIEW 3: BUYER DIRECT PROCUREMENT TRADE FLOOR (persona-view-buyer) -->
-    <!-- ======================================================== -->
-    <section id="view-buyer" class="persona-view hidden space-y-8">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-            <i class="fa-solid fa-cart-flatbed text-blue-400"></i>
-            <span>Institutional Buyer Procurement Floor</span>
-          </h2>
-          <p class="text-xs text-slate-300 mt-1">Direct farmgate sourcing backed by Buyer Microservice (Port 5002) with smart contract escrow.</p>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <select id="buyer-sort" onchange="sortBuyerCatalog(this.value)" class="bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
-            <option value="gain">Sort by Farmer Gain %</option>
-            <option value="price_asc">Price: Low to High</option>
-            <option value="price_desc">Price: High to Low</option>
-            <option value="shelflife">Longest Shelf Life</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Live Cold Chamber IoT Telemetry Banner -->
-      <div class="agri-card p-5 rounded-2xl border border-blue-500/30 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-        <div class="p-3 rounded-xl bg-slate-900/80">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Chamber Temperature</div>
-          <div class="text-xl font-extrabold text-blue-400 font-mono mt-1">+4.1°C</div>
-          <div class="text-[10px] text-emerald-400">Target ±0.5°C</div>
-        </div>
-        <div class="p-3 rounded-xl bg-slate-900/80">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Relative Humidity</div>
-          <div class="text-xl font-extrabold text-emerald-400 font-mono mt-1">88.5%</div>
-          <div class="text-[10px] text-slate-400">Optimal Hydration</div>
-        </div>
-        <div class="p-3 rounded-xl bg-slate-900/80">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Ethylene Gas Level</div>
-          <div class="text-xl font-extrabold text-amber-400 font-mono mt-1">0.06 ppm</div>
-          <div class="text-[10px] text-emerald-400">Below Critical Threshold</div>
-        </div>
-        <div class="p-3 rounded-xl bg-slate-900/80">
-          <div class="text-[10px] text-slate-400 uppercase font-semibold">Spoilage Risk Factor</div>
-          <div class="text-xl font-extrabold text-emerald-400 font-mono mt-1">0.02%</div>
-          <div class="text-[10px] text-emerald-400">Ultra Safe</div>
-        </div>
-      </div>
-
-      <!-- Buyer Produce Catalog Grid -->
-      <div id="buyer-catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- Injected via JavaScript -->
-      </div>
-    </section>
-
-    <!-- ======================================================== -->
-    <!-- VIEW 4: MASTER PRODUCE MATRIX (persona-view-matrix) -->
-    <!-- ======================================================== -->
-    <section id="view-matrix" class="persona-view hidden space-y-6">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-            <i class="fa-solid fa-table-list text-purple-400"></i>
-            <span>Master Produce & Variety Matrix</span>
-          </h2>
-          <p class="text-xs text-slate-300 mt-1">Complete multi-crop agronomic specifications, target direct prices, and cold storage parameters from SQLite.</p>
-        </div>
-        <button onclick="exportMatrixCSV()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all">
-          <i class="fa-solid fa-file-csv text-sm"></i>
-          <span>Export Master CSV</span>
+        <button onclick="toggleSunlightMode()" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-emerald-500/40 text-amber-300 text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-1 shadow">
+          <i class="fa-solid fa-sun text-xs"></i>
+          <span class="hidden sm:inline">Sun Mode</span>
         </button>
       </div>
 
-      <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden shadow-2xl">
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-200">
-            <thead class="bg-emerald-950/90 text-emerald-300 uppercase tracking-wider font-semibold border-b border-emerald-500/30">
-              <tr>
-                <th class="py-3.5 px-4">Commodity & Variety</th>
-                <th class="py-3.5 px-4">Location & Farmer</th>
-                <th class="py-3.5 px-4">Stock (Tons)</th>
-                <th class="py-3.5 px-4">Direct Price</th>
-                <th class="py-3.5 px-4">Mandi Benchmark</th>
-                <th class="py-3.5 px-4 text-emerald-400">Farmer Gain</th>
-                <th class="py-3.5 px-4">Sugar Brix</th>
-                <th class="py-3.5 px-4">Reefer Temp</th>
-                <th class="py-3.5 px-4">Shelf Life</th>
-              </tr>
-            </thead>
-            <tbody id="matrix-tbody" class="divide-y divide-emerald-900/40">
-              <!-- Injected dynamically -->
-            </tbody>
-          </table>
+      <!-- Live Microservices Status Pills -->
+      <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20 space-y-1.5">
+        <div class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold flex items-center justify-between">
+          <span>Active SQLite Microserver Cluster:</span>
+          <span class="text-emerald-400 font-mono text-[10px] flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> NODE LIVE</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+          <div class="bg-emerald-950/60 p-1.5 rounded-lg border border-emerald-500/30 text-center">
+            <span class="text-emerald-400 font-bold">🌾 Farmer :5001</span>
+          </div>
+          <div class="bg-blue-950/60 p-1.5 rounded-lg border border-blue-500/30 text-center">
+            <span class="text-blue-400 font-bold">🛒 Buyer :5002</span>
+          </div>
+          <div class="bg-amber-950/60 p-1.5 rounded-lg border border-amber-500/30 text-center">
+            <span class="text-amber-400 font-bold">🚛 Logistics :5003</span>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- ======================================================== -->
-    <!-- VIEW 5: MIDDLEMAN ARBITRAGE CALCULATOR (persona-view-calculator) -->
-    <!-- ======================================================== -->
-    <section id="view-calculator" class="persona-view hidden space-y-6">
+      <!-- Portal Welcome Message -->
       <div>
-        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-          <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
-          <span>Transparent Middleman Arbitrage Elimination Model</span>
-        </h2>
-        <p class="text-xs text-slate-300 mt-1">Mathematical comparison of traditional 5-tier mandi deductions vs AgriFlow direct smart contract protocol.</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Traditional APMC Mandi Model -->
-        <div class="agri-card p-6 rounded-3xl border border-rose-500/30 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="font-bold text-rose-400 text-base flex items-center gap-2">
-              <i class="fa-solid fa-xmark-circle"></i>
-              <span>Traditional Mandi System (5 Intermediaries)</span>
-            </h3>
-            <span class="text-xs px-2.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40">Baseline</span>
-          </div>
-
-          <div class="space-y-2.5 text-xs">
-            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
-              <span class="text-slate-300">1. Village Kaccha Arthiya Commission</span>
-              <span class="text-rose-400 font-mono">-8.0%</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
-              <span class="text-slate-300">2. APMC Mandi Tax & Cess</span>
-              <span class="text-rose-400 font-mono">-6.5%</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
-              <span class="text-slate-300">3. Physical Spoilage in Open Trucks</span>
-              <span class="text-rose-400 font-mono">-28.0%</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
-              <span class="text-slate-300">4. Unofficial Loading/Unloading Batta</span>
-              <span class="text-rose-400 font-mono">-5.0%</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
-              <span class="text-slate-300">5. Multi-tier Wholesaler Markups</span>
-              <span class="text-rose-400 font-mono">-12.5%</span>
-            </div>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-rose-950/60 border border-rose-500/30 flex justify-between items-center">
-            <span class="font-bold text-slate-200 text-xs">Farmer Net Realization:</span>
-            <span class="text-xl font-extrabold text-rose-400 font-mono">₹17.80 / kg</span>
-          </div>
-        </div>
-
-        <!-- AgriFlow Protocol Model -->
-        <div class="agri-card p-6 rounded-3xl border border-emerald-500/40 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="font-bold text-emerald-400 text-base flex items-center gap-2">
-              <i class="fa-solid fa-check-circle"></i>
-              <span>AgriFlow Protocol (Zero Middlemen)</span>
-            </h3>
-            <span class="text-xs px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">+59% Gain</span>
-          </div>
-
-          <div class="space-y-2.5 text-xs">
-            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
-              <span class="text-slate-300">1. Direct Farmgate Reefer Pickup</span>
-              <span class="text-emerald-400 font-mono">₹0 Commission</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
-              <span class="text-slate-300">2. Active Cold-Chain Spoilage Loss</span>
-              <span class="text-emerald-400 font-mono">&lt; 0.5% (Saved)</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
-              <span class="text-slate-300">3. Direct Sourcing Contract with Buyer</span>
-              <span class="text-emerald-400 font-mono">Transparent</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
-              <span class="text-slate-300">4. Automated Smart Escrow Settlement</span>
-              <span class="text-emerald-400 font-mono">T+0 Instant</span>
-            </div>
-            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
-              <span class="text-slate-300">5. Protocol Network Fee</span>
-              <span class="text-amber-400 font-mono">1.2% Only</span>
-            </div>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex justify-between items-center">
-            <span class="font-bold text-slate-200 text-xs">Farmer Net Realization:</span>
-            <span class="text-2xl font-extrabold text-emerald-400 font-mono">₹28.50 / kg (+60.1%)</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ======================================================== -->
-    <!-- VIEW 6: 3 INDIVIDUAL MICROSERVERS API SANDBOX (persona-view-coder) -->
-    <!-- ======================================================== -->
-    <section id="view-coder" class="persona-view hidden space-y-6">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
-            <i class="fa-solid fa-terminal text-rose-400"></i>
-            <span>3 Dedicated Microservers REST API Sandbox</span>
-          </h2>
-          <p class="text-xs text-slate-300 mt-1">Live interactive REST API console for testing all 3 individual microservices (:5001, :5002, :5003).</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 font-mono">Storage: SQLite3 (servers/agriflow.db)</span>
-        </div>
-      </div>
-
-      <!-- 3 Columns for 3 Individual Microservers -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <!-- Column 1: Farmer Server (Port 5001) -->
-        <div class="agri-card p-4 rounded-2xl border border-emerald-500/40 space-y-2.5">
-          <div class="flex items-center justify-between border-b border-emerald-800/60 pb-2">
-            <div class="font-bold text-emerald-300 text-xs flex items-center gap-1.5">
-              <i class="fa-solid fa-wheat-awn"></i> 1. Farmer Svr (:5001)
-            </div>
-            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-mono">PORT 5001</span>
-          </div>
-          <button onclick="testApiEndpoint('farmer_crops')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950 border border-emerald-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-emerald-400 font-mono">GET /api/farmer/crops</div>
-            <div class="text-[10px] text-slate-400">List all 8 crops from SQLite</div>
-          </button>
-          <button onclick="testApiEndpoint('farmer_otp')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950 border border-emerald-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-emerald-400 font-mono">POST /api/farmer/auth/send-otp</div>
-            <div class="text-[10px] text-slate-400">Generate spoken voice OTP</div>
-          </button>
-          <button onclick="testApiEndpoint('farmer_withdraw')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-emerald-950 border border-emerald-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-emerald-400 font-mono">POST /api/farmer/withdraw</div>
-            <div class="text-[10px] text-slate-400">Deduct wallet balance in SQLite</div>
-          </button>
-        </div>
-
-        <!-- Column 2: Buyer Server (Port 5002) -->
-        <div class="agri-card p-4 rounded-2xl border border-blue-500/40 space-y-2.5">
-          <div class="flex items-center justify-between border-b border-blue-800/60 pb-2">
-            <div class="font-bold text-blue-300 text-xs flex items-center gap-1.5">
-              <i class="fa-solid fa-cart-shopping"></i> 2. Buyer Svr (:5002)
-            </div>
-            <span class="text-[9px] px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 font-mono">PORT 5002</span>
-          </div>
-          <button onclick="testApiEndpoint('buyer_catalog')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950 border border-blue-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-blue-400 font-mono">GET /api/buyer/catalog</div>
-            <div class="text-[10px] text-slate-400">Direct sourcing catalog with sorting</div>
-          </button>
-          <button onclick="testApiEndpoint('buyer_chamber')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950 border border-blue-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-blue-400 font-mono">GET /api/buyer/chamber-iot</div>
-            <div class="text-[10px] text-slate-400">Live cold chamber IoT sensors</div>
-          </button>
-          <button onclick="testApiEndpoint('buyer_invoices')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-blue-950 border border-blue-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-blue-400 font-mono">GET /api/buyer/invoices</div>
-            <div class="text-[10px] text-slate-400">GST tax invoices & bills</div>
-          </button>
-        </div>
-
-        <!-- Column 3: Logistics Server (Port 5003) -->
-        <div class="agri-card p-4 rounded-2xl border border-amber-500/40 space-y-2.5">
-          <div class="flex items-center justify-between border-b border-amber-800/60 pb-2">
-            <div class="font-bold text-amber-300 text-xs flex items-center gap-1.5">
-              <i class="fa-solid fa-truck-fast"></i> 3. Logistics Svr (:5003)
-            </div>
-            <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 font-mono">PORT 5003</span>
-          </div>
-          <button onclick="testApiEndpoint('logistics_telematics')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-amber-950 border border-amber-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-amber-400 font-mono">GET /api/logistics/telematics</div>
-            <div class="text-[10px] text-slate-400">Reefer truck MH-15 GPS stream</div>
-          </button>
-          <button onclick="testApiEndpoint('logistics_manifest')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-amber-950 border border-amber-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-amber-400 font-mono">GET /api/logistics/orders/manifest</div>
-            <div class="text-[10px] text-slate-400">4-way assigned manifest table</div>
-          </button>
-          <button onclick="testApiEndpoint('logistics_bays')" class="w-full text-left p-2.5 rounded-xl bg-slate-900 hover:bg-amber-950 border border-amber-500/20 text-xs text-slate-200 transition-all">
-            <div class="font-bold text-amber-400 font-mono">GET /api/logistics/qc-bays</div>
-            <div class="text-[10px] text-slate-400">Cold bay allocations & temps</div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Live JSON Console -->
-      <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
-        <div class="flex justify-between items-center text-xs font-mono">
-          <span class="text-emerald-400 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span id="api-status-label">HTTP 200 OK — Ready</span>
-          </span>
-          <span class="text-slate-400" id="api-latency-label">Latency: 2.4ms</span>
-        </div>
-        <pre id="api-json-display" class="bg-slate-950 p-4 rounded-2xl text-emerald-400 font-mono text-xs overflow-x-auto max-h-96 border border-emerald-950">{
-  "message": "Click any endpoint above to send live HTTP requests to the 3 microservers.",
-  "microservers": [
-    { "role": "🌾 Farmer Server", "port": 5001, "status": "online" },
-    { "role": "🛒 Buyer Server", "port": 5002, "status": "online" },
-    { "role": "🚛 Logistics Server", "port": 5003, "status": "online" }
-  ]
-}</pre>
-      </div>
-    </section>
-  </main>
-
-  <!-- ======================================================== -->
-  <!-- INTERACTIVE E-RUPI WITHDRAWAL MODAL -->
-  <!-- ======================================================== -->
-  <div id="withdraw-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="agri-card max-w-md w-full rounded-3xl border border-emerald-500/40 p-6 space-y-5 shadow-2xl relative">
-      <button onclick="closeWithdrawModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div>
-        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
-          <i class="fa-solid fa-bolt text-amber-400"></i>
-          <span>e-RUPI UPI DIRECT SETTLEMENT</span>
-        </div>
-        <h3 class="text-xl font-bold text-white mt-1 font-heading">Withdraw to Bank Account</h3>
-        <p class="text-xs text-slate-300">Instant direct transfer to farmer's registered bank account</p>
-      </div>
-
-      <!-- Account Info Card -->
-      <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/20 space-y-2 text-xs">
-        <div class="flex justify-between items-center">
-          <span class="text-slate-400">Target Bank Account:</span>
-          <span class="text-white font-bold">State Bank of India</span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="text-slate-400">Account Number:</span>
-          <span class="text-emerald-400 font-mono font-bold">•••• •••• 8821</span>
-        </div>
-        <div class="flex justify-between items-center">
-          <span class="text-slate-400">IFSC Code:</span>
-          <span class="text-slate-300 font-mono">SBIN0001234 (Lasalgaon)</span>
-        </div>
-        <div class="flex justify-between items-center border-t border-emerald-900/40 pt-2">
-          <span class="text-slate-400">Current Available Balance:</span>
-          <span class="text-amber-400 font-mono font-extrabold text-sm" id="modal-available-balance">₹1,84,500</span>
-        </div>
-      </div>
-
-      <!-- Withdrawal Amount Input -->
-      <div class="space-y-2">
-        <label class="block text-xs font-semibold text-slate-300">Enter Amount to Withdraw (₹):</label>
-        <input type="number" id="withdraw-amount-input" value="50000" class="w-full bg-slate-900 border border-emerald-500/40 rounded-xl px-3.5 py-2.5 text-base font-bold text-white font-mono focus:outline-none focus:border-emerald-400">
-        
-        <!-- Preset Amount Pills -->
-        <div class="grid grid-cols-3 gap-2 text-xs font-semibold">
-          <button onclick="setWithdrawAmount(25000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-emerald-900 border border-emerald-500/20 text-slate-300">₹25,000</button>
-          <button onclick="setWithdrawAmount(50000)" class="py-1.5 rounded-lg bg-slate-900 hover:bg-emerald-900 border border-emerald-500/20 text-slate-300">₹50,000</button>
-          <button onclick="setWithdrawAmount('full')" class="py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-400 text-emerald-300 font-bold">Withdraw All</button>
-        </div>
-      </div>
-
-      <!-- Confirm Action -->
-      <button onclick="confirmWithdrawal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-sm shadow-xl flex items-center justify-center gap-2 transition-all">
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        <span>Confirm Instant e-RUPI Payout ➔</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- UNIVERSAL FARMER-FRIENDLY AUTHENTICATION MODAL -->
-  <!-- ======================================================== -->
-  <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-    <div class="agri-card max-w-lg w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-6 shadow-2xl relative">
-      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <div>
-        <h3 class="text-2xl font-bold text-white flex items-center gap-2 font-heading">
+        <h3 class="text-xl font-bold text-white flex items-center gap-2 font-heading">
           <i class="fa-solid fa-fingerprint text-emerald-400"></i>
-          <span>Easy Login & Persona Access</span>
+          <span>Log In to Unlock Complete Application</span>
         </h3>
-        <p class="text-xs text-slate-300 mt-1">Designed for rural accessibility (Voice OTP, 1-Tap Kisan Smart Card & PIN)</p>
+        <p class="text-xs text-slate-300 mt-1">Select any farmer-friendly login method or 1-click evaluation persona below to enter:</p>
       </div>
 
       <!-- Auth Method Selector Tabs -->
       <div class="grid grid-cols-4 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/20 text-[11px] font-semibold text-center">
-        <button onclick="switchAuthTab('voice-otp')" id="tab-btn-voice-otp" class="auth-subtab py-2 rounded-xl bg-emerald-600 text-white font-bold">📱 Voice OTP</button>
-        <button onclick="switchAuthTab('qr-card')" id="tab-btn-qr-card" class="auth-subtab py-2 rounded-xl text-slate-300 hover:text-white">📷 Kisan Card</button>
-        <button onclick="switchAuthTab('dialer-pin')" id="tab-btn-dialer-pin" class="auth-subtab py-2 rounded-xl text-slate-300 hover:text-white">🔢 4-Digit PIN</button>
-        <button onclick="switchAuthTab('personas')" id="tab-btn-personas" class="auth-subtab py-2 rounded-xl text-slate-300 hover:text-white">⚡ 1-Click Role</button>
+        <button onclick="switchGateAuthTab('voice-otp')" id="gate-tab-btn-voice-otp" class="gate-auth-subtab py-2 rounded-xl bg-emerald-600 text-white font-bold transition-all">📱 Voice OTP</button>
+        <button onclick="switchGateAuthTab('qr-card')" id="gate-tab-btn-qr-card" class="gate-auth-subtab py-2 rounded-xl text-slate-300 hover:text-white transition-all">📷 Kisan Card</button>
+        <button onclick="switchGateAuthTab('dialer-pin')" id="gate-tab-btn-dialer-pin" class="gate-auth-subtab py-2 rounded-xl text-slate-300 hover:text-white transition-all">🔢 4-Digit PIN</button>
+        <button onclick="switchGateAuthTab('personas')" id="gate-tab-btn-personas" class="gate-auth-subtab py-2 rounded-xl text-slate-300 hover:text-white transition-all">⚡ 1-Click Role</button>
       </div>
 
       <!-- Tab 1: Voice & SMS OTP -->
-      <div id="subtab-voice-otp" class="space-y-4">
+      <div id="gate-subtab-voice-otp" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-300 mb-1">Mobile Number / मोबाइल नंबर</label>
           <div class="flex gap-2">
-            <span class="px-3 py-2 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs font-bold text-emerald-400">+91</span>
-            <input type="tel" id="login-phone" value="9822012345" class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
-            <button onclick="sendVoiceOtp()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all">Send OTP</button>
-          </div>
-        </div>
-
-        <div id="otp-input-section" class="space-y-2">
-          <label class="block text-xs font-semibold text-slate-300">Enter 4-Digit OTP / 4 अंकों का कोड</label>
-          <div class="flex gap-2">
-            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="1">
-            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="2">
-            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="9">
-            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="5">
-            
-            <button onclick="speakCurrentOtp()" title="Audio Readout (आवाज़ सुनें)" class="ml-auto w-12 h-12 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center text-lg shadow-md transition-transform active:scale-95">
-              <i class="fa-solid fa-volume-high"></i>
+            <span class="px-3 py-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs font-bold text-emerald-400 flex items-center">+91</span>
+            <input type="tel" id="gate-login-phone" value="9822012345" class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+            <button onclick="sendGateVoiceOtp()" class="px-3.5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Send OTP</span>
             </button>
           </div>
-          <p class="text-[11px] text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Demo OTP prefilled: <strong>1 2 9 5</strong></p>
         </div>
 
-        <button onclick="verifyOtpAndLogin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow-xl transition-all">
-          <i class="fa-solid fa-lock-open mr-2"></i> Verify & Enter AgriFlow
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-300">Enter 4-Digit OTP / 4 अंकों का कोड</label>
+          <div class="flex items-center gap-2">
+            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="1">
+            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="2">
+            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="9">
+            <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="5">
+            
+            <button onclick="speakCurrentOtp('1295')" title="Audio Readout (आवाज़ सुनें)" class="ml-auto px-3.5 h-12 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center gap-1.5 text-xs font-bold shadow-md transition-transform active:scale-95">
+              <i class="fa-solid fa-volume-high text-sm"></i>
+              <span>Spoken Hindi</span>
+            </button>
+          </div>
+          <p class="text-[11px] text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Demo OTP prefilled: <strong>1 2 9 5</strong> (Ramesh Patil • Nashik)</p>
+        </div>
+
+        <button onclick="verifyOtpAndUnlockApp()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 text-slate-950 font-extrabold text-sm shadow-xl hover:shadow-emerald-500/30 transition-all flex items-center justify-center gap-2">
+          <i class="fa-solid fa-lock-open text-base"></i>
+          <span>Verify OTP & Open AgriFlow Application</span>
         </button>
       </div>
 
       <!-- Tab 2: 1-Tap Kisan Green Card QR Scan -->
-      <div id="subtab-qr-card" class="hidden space-y-4">
-        <p class="text-xs text-slate-300">Tap your registered <strong>Kisan Green Card</strong> to login instantly with zero typing:</p>
+      <div id="gate-subtab-qr-card" class="hidden space-y-4">
+        <p class="text-xs text-slate-300">Tap your registered <strong>Kisan Green Card</strong> to login & enter directly:</p>
         
         <!-- Interactive Smart Green Card -->
         <div onclick="loginWithKisanCard('farmer-1')" class="cursor-pointer p-4 rounded-2xl bg-gradient-to-r from-emerald-950 to-emerald-900 border-2 border-emerald-400/80 shadow-2xl hover:scale-[1.02] transition-transform space-y-3">
@@ -1163,7 +381,7 @@
               <i class="fa-solid fa-seedling text-emerald-400 text-lg"></i>
               <span class="font-extrabold text-white text-xs tracking-wider font-heading">KISAN SMART CARD • MH GOVT</span>
             </div>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-bold">VERIFIED</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-bold">1-TAP UNLOCK</span>
           </div>
           <div class="flex items-center gap-3">
             <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-14 h-14 rounded-xl object-cover border border-emerald-400">
@@ -1173,11 +391,11 @@
               <div class="text-slate-300 text-[10px]">Nashik Agro FPO • 4.5 Acres</div>
             </div>
             <div class="ml-auto text-emerald-400 text-2xl">
-              <i class="fa-solid fa-qrcode"></i>
+              <i class="fa-solid fa-qrcode animate-pulse"></i>
             </div>
           </div>
-          <div class="text-center text-[11px] font-bold text-emerald-300 bg-emerald-950/60 py-1 rounded-lg">
-            👉 Tap Here to Login as Ramesh Patil
+          <div class="text-center text-[11px] font-bold text-emerald-300 bg-emerald-950/60 py-1.5 rounded-lg border border-emerald-500/30">
+            👉 Tap Here to Unlock App as Ramesh Patil
           </div>
         </div>
 
@@ -1187,64 +405,74 @@
             <div class="font-bold text-white">Sardar Balram Singh</div>
             <div class="text-slate-400 text-[10px]">KISAN-PB-3310 • Ludhiana, Punjab</div>
           </div>
-          <button class="ml-auto text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg font-bold">Select</button>
+          <button class="ml-auto text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg font-bold">1-Tap Unlock</button>
         </div>
       </div>
 
       <!-- Tab 3: 4-Digit Dialer PIN -->
-      <div id="subtab-dialer-pin" class="hidden space-y-4">
+      <div id="gate-subtab-dialer-pin" class="hidden space-y-4">
         <div class="text-center">
           <div class="text-xs text-slate-300">Enter Your 4-Digit Security PIN:</div>
-          <div class="text-2xl font-mono tracking-widest text-emerald-400 font-bold mt-2" id="pin-display">••••</div>
+          <div class="text-3xl font-mono tracking-widest text-emerald-400 font-bold mt-2" id="gate-pin-display">••••</div>
         </div>
 
         <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto">
-          <button onclick="pressPin('1')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">1</button>
-          <button onclick="pressPin('2')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">2</button>
-          <button onclick="pressPin('3')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">3</button>
-          <button onclick="pressPin('4')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">4</button>
-          <button onclick="pressPin('5')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">5</button>
-          <button onclick="pressPin('6')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">6</button>
-          <button onclick="pressPin('7')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">7</button>
-          <button onclick="pressPin('8')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">8</button>
-          <button onclick="pressPin('9')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">9</button>
-          <button onclick="clearPin()" class="h-12 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-400 font-bold text-xs">CLR</button>
-          <button onclick="pressPin('0')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">0</button>
-          <button onclick="submitPinLogin()" class="h-12 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500">OK</button>
+          <button onclick="pressGatePin('1')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">1</button>
+          <button onclick="pressGatePin('2')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">2</button>
+          <button onclick="pressGatePin('3')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">3</button>
+          <button onclick="pressGatePin('4')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">4</button>
+          <button onclick="pressGatePin('5')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">5</button>
+          <button onclick="pressGatePin('6')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">6</button>
+          <button onclick="pressGatePin('7')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">7</button>
+          <button onclick="pressGatePin('8')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">8</button>
+          <button onclick="pressGatePin('9')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">9</button>
+          <button onclick="clearGatePin()" class="h-12 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-400 font-bold text-xs">CLR</button>
+          <button onclick="pressGatePin('0')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">0</button>
+          <button onclick="submitGatePinLogin()" class="h-12 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500 flex items-center justify-center gap-1">
+            <i class="fa-solid fa-unlock"></i> OK
+          </button>
         </div>
       </div>
 
       <!-- Tab 4: 1-Click Role Switcher for Hackathon Jury -->
-      <div id="subtab-personas" class="hidden space-y-2">
+      <div id="gate-subtab-personas" class="hidden space-y-3">
         <p class="text-xs text-slate-300">Instantly authenticate as any ecosystem stakeholder for live evaluation:</p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-          <button onclick="quickLoginPersona('farmer-1')" class="p-2.5 rounded-xl bg-emerald-900/40 hover:bg-emerald-800 border border-emerald-500/30 text-left flex items-center gap-2.5">
-            <i class="fa-solid fa-wheat-awn text-emerald-400 text-base"></i>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-xl bg-emerald-900/40 hover:bg-emerald-800 border border-emerald-500/30 text-left flex items-center gap-2.5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-wheat-awn text-base"></i>
+            </div>
             <div>
               <div class="font-bold text-white">Ramesh Patil</div>
-              <div class="text-[10px] text-emerald-300">🌾 Kisan (Nashik)</div>
+              <div class="text-[10px] text-emerald-300">🌾 Kisan (Nashik Hub)</div>
             </div>
           </button>
 
-          <button onclick="quickLoginPersona('buyer-1')" class="p-2.5 rounded-xl bg-blue-900/40 hover:bg-blue-800 border border-blue-500/30 text-left flex items-center gap-2.5">
-            <i class="fa-solid fa-building text-blue-400 text-base"></i>
+          <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-xl bg-blue-900/40 hover:bg-blue-800 border border-blue-500/30 text-left flex items-center gap-2.5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-building text-base"></i>
+            </div>
             <div>
               <div class="font-bold text-white">BigBasket Lead</div>
               <div class="text-[10px] text-blue-300">🛒 Institutional Buyer</div>
             </div>
           </button>
 
-          <button onclick="quickLoginPersona('logistics-1')" class="p-2.5 rounded-xl bg-amber-900/40 hover:bg-amber-800 border border-amber-500/30 text-left flex items-center gap-2.5">
-            <i class="fa-solid fa-truck text-amber-400 text-base"></i>
+          <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-xl bg-amber-900/40 hover:bg-amber-800 border border-amber-500/30 text-left flex items-center gap-2.5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-truck text-base"></i>
+            </div>
             <div>
               <div class="font-bold text-white">Suresh Mane</div>
               <div class="text-[10px] text-amber-300">🚚 Reefer Fleet Driver</div>
             </div>
           </button>
 
-          <button onclick="quickLoginPersona('qc-1')" class="p-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-800 border border-purple-500/30 text-left flex items-center gap-2.5">
-            <i class="fa-solid fa-microscope text-purple-400 text-base"></i>
+          <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-xl bg-purple-900/40 hover:bg-purple-800 border border-purple-500/30 text-left flex items-center gap-2.5 transition-all">
+            <div class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center shrink-0">
+              <i class="fa-solid fa-microscope text-base"></i>
+            </div>
             <div>
               <div class="font-bold text-white">Dr. Swaminathan</div>
               <div class="text-[10px] text-purple-300">🔬 Senior QC Officer</div>
@@ -1252,12 +480,801 @@
           </button>
         </div>
       </div>
+
+      <!-- Trust Footer Inside Login Card -->
+      <div class="border-t border-emerald-900/60 pt-3 flex items-center justify-between text-[11px] text-slate-400">
+        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-shield-check"></i> Zero-Middleman Protocol</span>
+        <span>⚡ T+0 Direct Settlement</span>
+      </div>
+
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- DIGITAL WAYBILL & TAX INVOICE MODAL -->
+  <!-- 🌟 2. COMPLETE WEB APPLICATION (UNLOCKED ONLY AFTER LOGIN) -->
   <!-- ======================================================== -->
+  <div id="main-app-container" class="hidden flex-col min-h-screen relative z-10">
+
+    <!-- LIVE APMC MANDI BENCHMARK & MULTI-SERVER TICKER -->
+    <div class="bg-slate-950/95 border-b border-emerald-500/20 py-1.5 px-4 text-[11px] overflow-hidden flex items-center z-20">
+      <div class="flex items-center gap-2 font-bold text-amber-400 shrink-0 pr-4 border-r border-emerald-900/60 z-10 bg-slate-950">
+        <i class="fa-solid fa-satellite-dish animate-pulse text-emerald-400"></i>
+        <span>LIVE APMC BENCHMARK:</span>
+      </div>
+      <div class="overflow-hidden relative w-full">
+        <div class="animate-marquee whitespace-nowrap text-slate-300 font-mono flex gap-8">
+          <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
+          <span>🥭 Ratnagiri APMC: <strong class="text-rose-400">₹88.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹145.00/kg (+64.8%)</strong></span>
+          <span>🍅 Pune Vashi APMC: <strong class="text-rose-400">₹18.50/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹32.00/kg (+73.0%)</strong></span>
+          <span>🍇 Sangli EuroGAP: <strong class="text-rose-400">₹48.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹78.00/kg (+62.5%)</strong></span>
+          <span>🥔 Khanna Mandi: <strong class="text-rose-400">₹13.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹21.00/kg (+61.5%)</strong></span>
+          <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOP TELEMETRY & 3-SQLITE MICROSERVER STATUS BAR -->
+    <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/25 shadow-xl">
+      <div class="bg-emerald-950/90 border-b border-emerald-900/60 px-4 py-1 text-xs flex flex-wrap items-center justify-between gap-2 text-emerald-300">
+        <div class="flex items-center gap-4 flex-wrap">
+          <span class="flex items-center gap-1.5 font-bold text-emerald-400 font-heading">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>SIH-2026 LIVE NODE: PS-33</span>
+          </span>
+          <div class="flex items-center gap-3 text-[11px]">
+            <!-- Microserver 1: Farmer -->
+            <div id="status-farmer-server" class="flex items-center gap-1.5 bg-emerald-900/50 px-2 py-0.5 rounded border border-emerald-500/30">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span>🌾 Farmer Svr :5001 [SQLite]</span>
+              <span class="text-emerald-400 font-mono text-[10px]" id="badge-farmer-status">ONLINE</span>
+            </div>
+            <!-- Microserver 2: Buyer -->
+            <div id="status-buyer-server" class="flex items-center gap-1.5 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-500/30 text-blue-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+              <span>🛒 Buyer Svr :5002 [SQLite]</span>
+              <span class="text-blue-400 font-mono text-[10px]" id="badge-buyer-status">ONLINE</span>
+            </div>
+            <!-- Microserver 3: Logistics -->
+            <div id="status-logistics-server" class="flex items-center gap-1.5 bg-amber-900/40 px-2 py-0.5 rounded border border-amber-500/30 text-amber-300">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              <span>🚛 Logistics :5003 [SQLite]</span>
+              <span class="text-amber-400 font-mono text-[10px]" id="badge-logistics-status">ONLINE</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 text-[11px]">
+          <button onclick="toggleSunlightMode()" class="px-2.5 py-0.5 rounded bg-slate-900 border border-emerald-500/40 text-amber-300 font-bold hover:bg-slate-800 transition-all flex items-center gap-1">
+            <i class="fa-solid fa-sun text-xs"></i>
+            <span id="sunlight-mode-label">Sunlight Field Mode</span>
+          </button>
+          <span class="text-slate-400"><i class="fa-solid fa-database mr-1 text-emerald-400"></i>Engine: <strong class="text-emerald-300 font-mono">SQLite3 Binary DB</strong></span>
+        </div>
+      </div>
+
+      <!-- Main Navigation Bar -->
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <!-- Brand Logo -->
+        <div class="flex items-center gap-3 cursor-pointer" onclick="switchPersona('orders')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-amber-500 p-0.5 shadow-lg shadow-emerald-500/20">
+            <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+              <i class="fa-solid fa-seedling text-emerald-400 text-lg"></i>
+            </div>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-heading font-extrabold text-xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
+            </div>
+            <p class="text-[10px] text-emerald-400/80 font-medium tracking-wide">ZERO-MIDDLEMAN REEFER SUPPLY PROTOCOL</p>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden md:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-emerald-500/20">
+          <button onclick="switchPersona('orders')" id="nav-orders" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all bg-emerald-600 text-white shadow-md">
+            <i class="fa-solid fa-boxes-packing"></i>
+            <span>Central Orders</span>
+          </button>
+          <button onclick="switchPersona('farmer')" id="nav-farmer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+            <i class="fa-solid fa-tractor text-amber-400"></i>
+            <span>🌾 Farmer Station</span>
+          </button>
+          <button onclick="switchPersona('buyer')" id="nav-buyer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+            <i class="fa-solid fa-store text-blue-400"></i>
+            <span>🛒 Buyer Trade</span>
+          </button>
+          <button onclick="switchPersona('matrix')" id="nav-matrix" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+            <i class="fa-solid fa-table-list text-purple-400"></i>
+            <span>📋 Produce Matrix</span>
+          </button>
+          <button onclick="switchPersona('calculator')" id="nav-calculator" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+            <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
+            <span>📊 Arbitrage Math</span>
+          </button>
+          <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+            <i class="fa-solid fa-terminal text-rose-400"></i>
+            <span>💻 3-Server APIs</span>
+          </button>
+        </nav>
+
+        <!-- User Profile, Cart & Log Out Controls -->
+        <div class="flex items-center gap-2.5">
+          <!-- Active User Profile Pill -->
+          <button onclick="openAuthModal()" title="Switch Account / View Profile" class="flex items-center gap-2.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 px-3 py-1.5 rounded-xl transition-all shadow-md group">
+            <img id="user-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Avatar" class="w-7 h-7 rounded-lg object-cover border border-emerald-400">
+            <div class="text-left hidden sm:block">
+              <div class="text-xs font-bold text-white flex items-center gap-1.5">
+                <span id="user-display-name">Ramesh Patil</span>
+                <span id="user-role-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">KISAN</span>
+              </div>
+              <div class="text-[10px] text-emerald-400/80 font-mono" id="user-display-sub">KISAN-MH-7721 • Nashik</div>
+            </div>
+            <i class="fa-solid fa-chevron-down text-[10px] text-emerald-400 group-hover:translate-y-0.5 transition-transform"></i>
+          </button>
+
+          <!-- Cart Quick View (Buyer Persona) -->
+          <button onclick="toggleCartDrawer()" title="Procurement Basket" class="relative p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-400 text-slate-200 transition-all">
+            <i class="fa-solid fa-basket-shopping text-emerald-400"></i>
+            <span id="cart-counter" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] flex items-center justify-center shadow-lg">1</span>
+          </button>
+
+          <!-- Prominent Logout / Lock Application Button -->
+          <button onclick="logoutToAuthGate()" title="Lock Portal & Return to Login Screen" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 hover:text-white text-xs font-bold transition-all shadow-md">
+            <i class="fa-solid fa-lock"></i>
+            <span class="hidden sm:inline">Lock / Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8 relative z-10">
+
+      <!-- Unified Vision Hero Header -->
+      <div class="relative overflow-hidden rounded-3xl agri-card p-6 sm:p-8 border border-emerald-500/30">
+        <div class="absolute -right-10 -bottom-10 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-10 -top-10 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-3 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
+              <i class="fa-solid fa-award text-amber-400"></i>
+              <span>Smart India Hackathon 2026 • Problem Statement 33</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-heading">
+              Eliminating Farm-to-Fork <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">Intermediary Loss</span>
+            </h1>
+            <p class="text-sm text-slate-300 leading-relaxed">
+              Running on <strong class="text-white">3 Dedicated SQLite Microservers</strong> with dynamic balance payouts, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant <strong class="text-emerald-400">T+0 direct payouts</strong>.
+            </p>
+          </div>
+
+          <!-- Quick 1-Click Action Cards for the 3 Personas -->
+          <div class="grid grid-cols-3 gap-3 w-full lg:w-auto">
+            <button onclick="switchPersona('farmer')" class="p-3.5 rounded-2xl bg-emerald-900/40 hover:bg-emerald-800/60 border border-emerald-500/30 text-left transition-all group">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-wheat-awn"></i>
+              </div>
+              <div class="text-xs font-bold text-white">🌾 Farmer</div>
+              <div class="text-[10px] text-emerald-300/80">Voice OTP & Ripeness</div>
+            </button>
+
+            <button onclick="switchPersona('buyer')" class="p-3.5 rounded-2xl bg-blue-900/40 hover:bg-blue-800/60 border border-blue-500/30 text-left transition-all group">
+              <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cart-flatbed"></i>
+              </div>
+              <div class="text-xs font-bold text-white">🛒 Buyer</div>
+              <div class="text-[10px] text-blue-300/80">Escrow & Catalog</div>
+            </button>
+
+            <button onclick="switchPersona('orders')" class="p-3.5 rounded-2xl bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/30 text-left transition-all group">
+              <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-truck-fast"></i>
+              </div>
+              <div class="text-xs font-bold text-white">🚛 Logistics</div>
+              <div class="text-[10px] text-amber-300/80">Assigned Manifest</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 1: CENTRAL ASSIGNED ORDERS CONSOLE (persona-view-orders) -->
+      <section id="view-orders" class="persona-view space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+              <i class="fa-solid fa-boxes-packing text-emerald-400"></i>
+              <span>Central Orders & Neatly Assigned Manifest Console</span>
+            </h2>
+            <p class="text-xs text-slate-300 mt-1">Live synchronized SQLite relational database with all 4 assigned columns: Farmer, Buyer, Reefer Fleet, and QC Bay.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="refreshOrdersFromLogisticsServer()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-xs font-semibold text-emerald-300 hover:bg-emerald-950 flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-rotate text-emerald-400"></i>
+              <span>Sync Logistics Svr :5003</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Orders Container -->
+        <div id="orders-manifest-container" class="space-y-6">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+      <!-- VIEW 2: FARMER COMMAND STATION (persona-view-farmer) -->
+      <section id="view-farmer" class="persona-view hidden space-y-8">
+        <!-- Farmer Header Card -->
+        <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="flex items-center gap-4">
+            <img id="farmer-header-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200" alt="Farmer" class="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-2xl font-bold text-white font-heading" id="farmer-header-name">Ramesh Patil</h2>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Verified Kisan Partner</span>
+              </div>
+              <p class="text-xs text-slate-300 mt-0.5" id="farmer-header-fpo">Nashik Agro Producer Co. • Lasalgaon Hub</p>
+              <div class="flex items-center gap-3 mt-2 text-xs">
+                <span class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>4.92 / 5.0 Rating</span>
+                <span class="text-slate-400">•</span>
+                <span class="text-emerald-400 font-bold"><i class="fa-solid fa-truck-ramp-box mr-1"></i>142.5 Tons Direct Dispatched</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Wallet Balance Card with Instant Dynamic Withdrawal -->
+          <div class="bg-gradient-to-br from-emerald-950 to-slate-900 p-5 rounded-2xl border border-emerald-500/40 min-w-[290px] shadow-xl">
+            <div class="text-[11px] text-emerald-300 uppercase tracking-wider font-semibold flex items-center justify-between">
+              <span>e-RUPI Kisan Wallet Balance</span>
+              <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-mono">PORT 5001</span>
+            </div>
+            <div class="text-3xl font-extrabold text-white mt-1 font-mono transition-all duration-300" id="farmer-wallet-display">₹1,84,500</div>
+            <div class="flex items-center justify-between mt-3 text-xs">
+              <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> T+0 Instant Payout</span>
+              <button onclick="openWithdrawModal()" class="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md flex items-center gap-1">
+                <i class="fa-solid fa-building-columns"></i>
+                <span>Withdraw</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Optical Canvas AI Computer Vision Studio -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Left: AI Optical Studio with Real Canvas Analysis -->
+          <div class="lg:col-span-7 agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-5">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <i class="fa-solid fa-camera text-emerald-400"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-lg font-heading">AI Optical Ripeness & Sugar Brix Studio</h3>
+                  <p class="text-xs text-slate-300">HTML5 Canvas Pixel Histogram & NIR Estimation</p>
+                </div>
+              </div>
+              <span class="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">Model v4.2 NIR</span>
+            </div>
+
+            <!-- Image Upload / Sample Selector for Real Canvas Analysis -->
+            <div class="space-y-3">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-300 font-semibold">1. Select Sample or Upload Crop Photo:</span>
+                <label class="cursor-pointer px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-500/30 text-emerald-300 font-semibold text-[11px] flex items-center gap-1">
+                  <i class="fa-solid fa-upload"></i> Upload Photo
+                  <input type="file" id="crop-image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                </label>
+              </div>
+
+              <div class="grid grid-cols-4 gap-2">
+                <button onclick="analyzeSampleImage('onion')" id="btn-crop-onion" class="crop-btn p-2 rounded-xl bg-emerald-800/80 border border-emerald-400 text-xs font-bold text-white text-center">🧅 Red Onion</button>
+                <button onclick="analyzeSampleImage('mango')" id="btn-crop-mango" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🥭 Alphonso</button>
+                <button onclick="analyzeSampleImage('tomato')" id="btn-crop-tomato" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🍅 Poly Tomato</button>
+                <button onclick="analyzeSampleImage('banana')" id="btn-crop-banana" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🍌 Cavendish</button>
+              </div>
+            </div>
+
+            <!-- Image Preview & Canvas Processing Area -->
+            <div class="relative bg-slate-950/80 rounded-2xl border border-emerald-500/20 p-3 flex flex-col sm:flex-row items-center gap-4">
+              <div class="relative w-36 h-36 rounded-xl overflow-hidden border border-emerald-500/40 shrink-0">
+                <img id="preview-crop-img" src="https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400" alt="Crop Preview" class="w-full h-full object-cover">
+                <canvas id="hidden-cv-canvas" width="120" height="120" class="hidden"></canvas>
+                <div class="absolute inset-0 bg-emerald-500/10 border-2 border-emerald-400/50 rounded-xl pointer-events-none flex items-center justify-center">
+                  <span class="text-[9px] bg-slate-950/90 text-emerald-400 px-1.5 py-0.5 rounded font-mono">NIR SCAN</span>
+                </div>
+              </div>
+
+              <div class="flex-1 space-y-2 text-xs w-full">
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Optical Color Ratio (RGB):</span>
+                  <span class="text-emerald-400 font-mono font-bold" id="cv-color-ratio">R: 62% • G: 24% • B: 14%</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">Skin Chlorophyll Degradation:</span>
+                  <span class="text-amber-400 font-mono font-bold" id="cv-chlorophyll">35% Residual</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">AI Quality Classification:</span>
+                  <span class="text-emerald-400 font-bold" id="cv-quality-grade">Grade A+ (Export Quality)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-slate-400">AI Confidence Score:</span>
+                  <span class="text-blue-400 font-mono font-bold">99.4% (Certified)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Interactive Ripeness Slider -->
+            <div class="bg-slate-900/80 p-4 rounded-2xl border border-emerald-500/20 space-y-3">
+              <div class="flex justify-between items-center text-xs font-semibold">
+                <span class="text-slate-300">Fine-Tune Ripeness Index:</span>
+                <span class="text-emerald-400 font-bold font-mono text-sm" id="ripeness-percent-label">65% (Optimal Export)</span>
+              </div>
+              <input type="range" min="10" max="100" value="65" id="ripeness-slider" oninput="updateRipenessStudio(this.value)" class="w-full accent-emerald-400 cursor-pointer">
+              <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                <span>Raw Harvest (10%)</span>
+                <span>Prime Export (65%)</span>
+                <span>Fully Ripe (85%)</span>
+              </div>
+            </div>
+
+            <!-- Calculated Metrics Matrix -->
+            <div class="grid grid-cols-3 gap-3 text-center">
+              <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20">
+                <div class="text-[10px] text-slate-400 uppercase">Sugar Brix (°Bx)</div>
+                <div class="text-xl font-bold text-amber-400 font-mono mt-0.5" id="studio-brix-val">12.8° Bx</div>
+                <div class="text-[9px] text-emerald-400 mt-1"><i class="fa-solid fa-circle-check"></i> High Sweetness</div>
+              </div>
+              <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20">
+                <div class="text-[10px] text-slate-400 uppercase">Shelf-Life Left</div>
+                <div class="text-xl font-bold text-emerald-400 font-mono mt-0.5" id="studio-shelflife-val">84 Days</div>
+                <div class="text-[9px] text-slate-400 mt-1">Under +3°C Reefer</div>
+              </div>
+              <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20">
+                <div class="text-[10px] text-slate-400 uppercase">Ethylene Risk</div>
+                <div class="text-xl font-bold text-blue-400 font-mono mt-0.5" id="studio-ethylene-val">0.03 ppm</div>
+                <div class="text-[9px] text-emerald-400 mt-1">Ultra-Low Scrub</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Leaflet Live Reefer Radar & Degradation Chart -->
+          <div class="lg:col-span-5 space-y-6">
+            <!-- Leaflet Map Container -->
+            <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i class="fa-solid fa-satellite text-emerald-400"></i>
+                  <h3 class="font-bold text-white text-sm font-heading">Reefer Truck GPS Radar (MH-15-EG-8821)</h3>
+                </div>
+                <button onclick="startTruckAnimation()" id="btn-truck-anim" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-[11px] font-bold hover:bg-emerald-500 hover:text-slate-950 transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-play text-[10px]"></i> Simulate Transit
+                </button>
+              </div>
+
+              <!-- Map Div -->
+              <div id="radarMap" class="w-full h-56 rounded-2xl border border-emerald-500/20 overflow-hidden relative z-0"></div>
+
+              <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div class="bg-slate-900/80 p-2 rounded-xl border border-emerald-500/20 flex justify-between items-center">
+                  <span class="text-slate-400">Speed:</span>
+                  <span class="text-white font-bold" id="live-speed-badge">58 km/h</span>
+                </div>
+                <div class="bg-slate-900/80 p-2 rounded-xl border border-emerald-500/20 flex justify-between items-center">
+                  <span class="text-slate-400">Chamber Temp:</span>
+                  <span class="text-emerald-400 font-bold" id="live-temp-badge">+4.2°C</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Degradation Curve Chart -->
+            <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-bold text-white text-sm font-heading flex items-center gap-2">
+                  <i class="fa-solid fa-chart-line text-amber-400"></i>
+                  <span>Shelf-Life Decay (Ambient vs Active Reefer)</span>
+                </h3>
+              </div>
+              <div class="h-44 w-full">
+                <canvas id="degradationChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Farmgate Dispatch Scheduler Form -->
+        <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-white text-lg font-heading flex items-center gap-2">
+                <i class="fa-solid fa-truck-ramp-box text-emerald-400"></i>
+                <span>Direct Farmgate Dispatch Scheduler (Zero Mandi Intermediaries)</span>
+              </h3>
+              <p class="text-xs text-slate-300">Dispatches instantly link to SQLite Port 5001 with locked escrow price.</p>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40">Guaranteed T+0 Direct Settlement</span>
+          </div>
+
+          <form onsubmit="submitPickupSchedule(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+            <div>
+              <label class="block text-slate-400 mb-1 font-semibold">Commodity Type</label>
+              <select id="pickup-crop" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-400 font-medium">
+                <option value="Nashik Red Onion (Export Grade A+)">Nashik Red Onion (Export Grade A+)</option>
+                <option value="Ratnagiri Alphonso Mango (GI)">Ratnagiri Alphonso Mango (GI)</option>
+                <option value="Pusa Ruby Polyhouse Tomato">Pusa Ruby Polyhouse Tomato</option>
+                <option value="Jalgaon Cavendish Banana">Jalgaon Cavendish Banana</option>
+                <option value="Sangli Thompson Seedless Grapes">Sangli Thompson Seedless Grapes</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1 font-semibold">Volume (Metric Tons)</label>
+              <input type="number" id="pickup-volume" step="0.5" value="10.0" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-400 font-mono">
+            </div>
+
+            <div>
+              <label class="block text-slate-400 mb-1 font-semibold">Preferred Cold Reefer Slot</label>
+              <select id="pickup-slot" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-400 font-medium">
+                <option value="Tomorrow Morning 06:00 AM">Tomorrow Morning 06:00 AM</option>
+                <option value="Tomorrow Afternoon 02:00 PM">Tomorrow Afternoon 02:00 PM</option>
+                <option value="Immediate Emergency Cold Van (4 hrs)">Immediate Emergency Cold Van (4 hrs)</option>
+              </select>
+            </div>
+
+            <div class="flex items-end">
+              <button type="submit" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-calendar-check"></i>
+                <span>Confirm Pickup Request</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- VIEW 3: INSTITUTIONAL BUYER PROCUREMENT (persona-view-buyer) -->
+      <section id="view-buyer" class="persona-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+              <i class="fa-solid fa-store text-blue-400"></i>
+              <span>Direct Institutional Sourcing Catalog</span>
+            </h2>
+            <p class="text-xs text-slate-300 mt-1">Procure directly from verified FPOs at 25-30% lower than mandi landing costs with complete Sugar Brix & Cold Chain telemetry.</p>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button onclick="toggleCartDrawer()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>View Basket (<span id="buyer-catalog-cart-count">1</span>)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Buyer Catalog Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="buyer-catalog-grid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- VIEW 4: MASTER PRODUCE MATRIX (persona-view-matrix) -->
+      <section id="view-matrix" class="persona-view hidden space-y-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+              <i class="fa-solid fa-table-list text-purple-400"></i>
+              <span>Master Produce Quality & Cold Chain Matrix</span>
+            </h2>
+            <p class="text-xs text-slate-300 mt-1">Verified FPO crop stocks, Sugar Brix ratings, mandated reefer temperatures, and farmer arbitrage gains.</p>
+          </div>
+          <button onclick="exportMatrixCSV()" class="px-3.5 py-2 rounded-xl bg-slate-900 border border-emerald-500/40 text-xs font-semibold text-emerald-300 hover:bg-slate-800 flex items-center gap-2">
+            <i class="fa-solid fa-file-csv"></i> Export Matrix (.CSV)
+          </button>
+        </div>
+
+        <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-slate-950/90 text-emerald-300 uppercase tracking-wider font-semibold border-b border-emerald-900/60 font-mono text-[11px]">
+                <tr>
+                  <th class="py-3 px-4">Commodity / Variety</th>
+                  <th class="py-3 px-4">Origin Hub / FPO</th>
+                  <th class="py-3 px-4">Available Stock</th>
+                  <th class="py-3 px-4">Direct Price</th>
+                  <th class="py-3 px-4">Mandi Benchmark</th>
+                  <th class="py-3 px-4">Farmer Gain</th>
+                  <th class="py-3 px-4">Sugar Brix</th>
+                  <th class="py-3 px-4">Reefer Target</th>
+                  <th class="py-3 px-4">Shelf-Life</th>
+                </tr>
+              </thead>
+              <tbody id="matrix-tbody" class="divide-y divide-emerald-950/60">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: ARBITRAGE CALCULATOR (persona-view-calculator) -->
+      <section id="view-calculator" class="persona-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
+            <span>Middleman Intermediary Loss & Farmer Profit Arbitrage Engine</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Simulate real-world farmer revenue expansion by replacing 4 APMC middlemen with direct cold chain logistics.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-4">
+            <h3 class="font-bold text-white text-base font-heading">Arbitrage Simulation Parameters</h3>
+            
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">Harvest Commodity</label>
+              <select id="calc-crop" onchange="runArbitrageCalc()" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white">
+                <option value="onion">Nashik Red Onion (25T Harvest)</option>
+                <option value="mango">Ratnagiri Alphonso Mango (8T Harvest)</option>
+                <option value="tomato">Pusa Ruby Tomato (15T Harvest)</option>
+                <option value="banana">Cavendish Banana (30T Harvest)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs text-slate-300 mb-1">Harvest Quantity (Metric Tons): <span id="calc-vol-label" class="font-mono text-emerald-400 font-bold">25 Tons</span></label>
+              <input type="range" id="calc-volume" min="5" max="100" value="25" oninput="runArbitrageCalc()" class="w-full accent-emerald-400">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="bg-slate-950/80 p-3 rounded-xl border border-emerald-500/20">
+                <div class="text-slate-400 text-[10px]">APMC Mandi Rate</div>
+                <div class="text-lg font-bold text-rose-400 font-mono" id="calc-mandi-rate">₹17.80/kg</div>
+              </div>
+              <div class="bg-slate-950/80 p-3 rounded-xl border border-emerald-500/20">
+                <div class="text-slate-400 text-[10px]">AgriFlow Direct Rate</div>
+                <div class="text-lg font-bold text-emerald-400 font-mono" id="calc-direct-rate">₹28.50/kg</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col justify-between space-y-6">
+            <div>
+              <div class="text-xs text-slate-400 uppercase font-semibold">Net Direct Farmer Gain Comparison</div>
+              <div class="grid grid-cols-2 gap-4 mt-3">
+                <div class="p-4 rounded-2xl bg-rose-950/40 border border-rose-500/30 space-y-1">
+                  <div class="text-xs text-rose-300 font-bold">Traditional APMC Route</div>
+                  <div class="text-2xl font-extrabold text-white font-mono" id="calc-mandi-total">₹4,45,000</div>
+                  <div class="text-[10px] text-rose-300/80">38% Lost in Broker Commission & Spoilage</div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 space-y-1">
+                  <div class="text-xs text-emerald-300 font-bold">AgriFlow Direct Protocol</div>
+                  <div class="text-2xl font-extrabold text-emerald-400 font-mono" id="calc-direct-total">₹7,12,500</div>
+                  <div class="text-[10px] text-emerald-300/80">100% Retained + T+0 Instant Settlement</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-slate-950/80 p-4 rounded-2xl border border-emerald-500/30 flex items-center justify-between">
+              <div>
+                <div class="text-xs text-slate-400">Total Direct Farmer Extra Profit:</div>
+                <div class="text-3xl font-extrabold text-amber-400 font-mono mt-0.5" id="calc-diff-total">+₹2,67,500</div>
+              </div>
+              <div class="text-right">
+                <span class="text-xs px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 font-mono text-sm" id="calc-gain-percent">+60.1% Net Gain</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: 3-MICROSERVER API DEVELOPER TESTING SANDBOX (persona-view-coder) -->
+      <section id="view-coder" class="persona-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-terminal text-rose-400"></i>
+            <span>3-Microserver Live API Testing Sandbox (Node.js 24 SQLite)</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Interact directly with the 3 individual microservice backends on ports 5001, 5002, and 5003.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-5 space-y-3">
+            <div class="text-xs font-semibold text-slate-300">Select Microservice Action:</div>
+            
+            <div class="space-y-2">
+              <div class="text-[11px] font-bold text-emerald-400">🌾 Farmer Server (:5001)</div>
+              <button onclick="testApiEndpoint('farmer_crops')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs font-mono text-slate-200">
+                GET /api/farmer/crops
+              </button>
+              <button onclick="testApiEndpoint('farmer_otp')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs font-mono text-slate-200">
+                POST /api/farmer/auth/send-otp
+              </button>
+              <button onclick="testApiEndpoint('farmer_withdraw')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs font-mono text-slate-200">
+                POST /api/farmer/withdraw (₹50,000)
+              </button>
+            </div>
+
+            <div class="space-y-2 pt-2">
+              <div class="text-[11px] font-bold text-blue-400">🛒 Buyer Server (:5002)</div>
+              <button onclick="testApiEndpoint('buyer_catalog')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-blue-500/30 hover:border-blue-400 text-left text-xs font-mono text-slate-200">
+                GET /api/buyer/catalog
+              </button>
+              <button onclick="testApiEndpoint('buyer_chamber')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-blue-500/30 hover:border-blue-400 text-left text-xs font-mono text-slate-200">
+                GET /api/buyer/chamber-iot
+              </button>
+              <button onclick="testApiEndpoint('buyer_invoices')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-blue-500/30 hover:border-blue-400 text-left text-xs font-mono text-slate-200">
+                GET /api/buyer/invoices
+              </button>
+            </div>
+
+            <div class="space-y-2 pt-2">
+              <div class="text-[11px] font-bold text-amber-400">🚛 Logistics & QC Server (:5003)</div>
+              <button onclick="testApiEndpoint('logistics_telematics')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-left text-xs font-mono text-slate-200">
+                GET /api/logistics/telematics
+              </button>
+              <button onclick="testApiEndpoint('logistics_manifest')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-left text-xs font-mono text-slate-200">
+                GET /api/logistics/orders/manifest
+              </button>
+              <button onclick="testApiEndpoint('logistics_bays')" class="w-full p-2.5 rounded-xl bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-left text-xs font-mono text-slate-200">
+                GET /api/logistics/qc-bays
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7 agri-card p-5 rounded-3xl border border-emerald-500/30 flex flex-col justify-between space-y-4">
+            <div class="flex items-center justify-between border-b border-emerald-900/60 pb-3">
+              <span class="text-xs font-mono text-emerald-400" id="api-status-label">HTTP 200 OK — Standalone Connected</span>
+              <span class="text-[11px] font-mono text-slate-400" id="api-latency-label">Latency: 4.2ms</span>
+            </div>
+            
+            <pre id="api-json-display" class="bg-slate-950 p-4 rounded-2xl border border-emerald-500/20 text-[11px] text-emerald-300 font-mono overflow-x-auto max-h-96">
+{
+  "protocol": "AgriFlow AI SIH-2026",
+  "database": "SQLite3 Binary (servers/agriflow.db)",
+  "microservers": [
+    { "role": "farmer", "port": 5001 },
+    { "role": "buyer", "port": 5002 },
+    { "role": "logistics", "port": 5003 }
+  ],
+  "status": "Click any endpoint on the left to inspect raw JSON responses."
+}
+            </pre>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto bg-slate-950/90 border-t border-emerald-900/60 py-6 text-xs text-slate-400 relative z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-seedling text-emerald-400"></i>
+          <span>AgriFlow AI • Smart India Hackathon 2026 Decentralized Agri Protocol</span>
+        </div>
+        <div class="flex items-center gap-4 text-[11px]">
+          <span>🌾 14,200+ FPO Farmers</span>
+          <span>❄️ 100% Active Reefer Cold-Chain</span>
+          <span>⚡ T+0 Direct Settlements</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODALS (WITHDRAW, WAYBILL, AUTH MODAL, CART DRAWER) -->
+  <!-- ======================================================== -->
+
+  <!-- DYNAMIC WALLET WITHDRAWAL MODAL -->
+  <div id="withdraw-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="agri-card max-w-md w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-5 shadow-2xl relative">
+      <button onclick="closeWithdrawModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div>
+        <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">e-RUPI INSTANT SETTLEMENT (T+0)</span>
+        <h3 class="text-xl font-bold text-white mt-1 font-heading">Withdraw to Bank / e-RUPI</h3>
+        <p class="text-xs text-slate-300 mt-0.5">Live SQL transaction executing on Farmer Microserver Port 5001.</p>
+      </div>
+
+      <div class="bg-slate-900/90 p-4 rounded-2xl border border-emerald-500/20 space-y-2 text-xs">
+        <div class="flex justify-between">
+          <span class="text-slate-400">Available Kisan Balance:</span>
+          <span class="font-bold text-emerald-400 font-mono text-sm" id="modal-available-balance">₹1,84,500</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">Linked Bank Account:</span>
+          <span class="font-mono text-white">SBI A/c •••• 8821 (IFSC: SBIN0001234)</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-400">UPI / e-RUPI VPA:</span>
+          <span class="font-mono text-emerald-300">9822012345@kisanupi</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300">Withdrawal Amount (₹)</label>
+        <div class="relative">
+          <span class="absolute left-3.5 top-2.5 text-base text-emerald-400 font-bold">₹</span>
+          <input type="number" id="withdraw-amount-input" step="1000" value="50000" class="w-full bg-slate-900 border border-emerald-500/40 rounded-xl pl-8 pr-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-400">
+        </div>
+        <div class="flex gap-2 text-[11px] font-semibold">
+          <button onclick="setWithdrawAmount(10000)" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-emerald-500/20 text-slate-300 hover:text-white">₹10,000</button>
+          <button onclick="setWithdrawAmount(50000)" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-emerald-500/20 text-slate-300 hover:text-white">₹50,000</button>
+          <button onclick="setWithdrawAmount(100000)" class="px-2.5 py-1 rounded-lg bg-slate-900 border border-emerald-500/20 text-slate-300 hover:text-white">₹1,00,000</button>
+          <button onclick="setWithdrawAmount('full')" class="px-2.5 py-1 rounded-lg bg-emerald-950 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900">All Balance</button>
+        </div>
+      </div>
+
+      <button onclick="confirmWithdrawal()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-400 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+        <i class="fa-solid fa-paper-plane"></i>
+        <span>Transfer Immediately via e-RUPI</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL (INSIDE APP SWITCHER) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="agri-card max-w-lg w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-6 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div>
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2 font-heading">
+          <i class="fa-solid fa-arrows-rotate text-emerald-400"></i>
+          <span>Switch Active User / Persona</span>
+        </h3>
+        <p class="text-xs text-slate-300 mt-1">Switch between Farmer, Buyer, Logistics Driver, and QC Officer:</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+        <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-xl bg-emerald-900/40 hover:bg-emerald-800 border border-emerald-500/30 text-left flex items-center gap-2.5">
+          <i class="fa-solid fa-wheat-awn text-emerald-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">Ramesh Patil</div>
+            <div class="text-[10px] text-emerald-300">🌾 Kisan (Nashik)</div>
+          </div>
+        </button>
+
+        <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-xl bg-blue-900/40 hover:bg-blue-800 border border-blue-500/30 text-left flex items-center gap-2.5">
+          <i class="fa-solid fa-building text-blue-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">BigBasket Lead</div>
+            <div class="text-[10px] text-blue-300">🛒 Institutional Buyer</div>
+          </div>
+        </button>
+
+        <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-xl bg-amber-900/40 hover:bg-amber-800 border border-amber-500/30 text-left flex items-center gap-2.5">
+          <i class="fa-solid fa-truck text-amber-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">Suresh Mane</div>
+            <div class="text-[10px] text-amber-300">🚚 Reefer Fleet Driver</div>
+          </div>
+        </button>
+
+        <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-xl bg-purple-900/40 hover:bg-purple-800 border border-purple-500/30 text-left flex items-center gap-2.5">
+          <i class="fa-solid fa-microscope text-purple-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">Dr. Swaminathan</div>
+            <div class="text-[10px] text-purple-300">🔬 Senior QC Officer</div>
+          </div>
+        </button>
+      </div>
+
+      <div class="border-t border-emerald-900/60 pt-4 flex justify-between items-center">
+        <button onclick="logoutToAuthGate()" class="px-3.5 py-2 rounded-xl bg-rose-950/60 hover:bg-rose-900 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-lock"></i> Lock to Login Screen
+        </button>
+        <button onclick="closeAuthModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIGITAL WAYBILL & TAX INVOICE MODAL -->
   <div id="waybill-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="agri-card max-w-2xl w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
       <button onclick="closeWaybillModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
@@ -1323,9 +1340,7 @@
     </div>
   </div>
 
-  <!-- ======================================================== -->
   <!-- BUYER CART DRAWER -->
-  <!-- ======================================================== -->
   <div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-slate-950/95 backdrop-blur-xl border-l border-emerald-500/30 p-6 transform translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
     <div class="space-y-4">
       <div class="flex items-center justify-between border-b border-emerald-900/60 pb-3">
@@ -1355,23 +1370,6 @@
       </button>
     </div>
   </div>
-
-  <!-- ======================================================== -->
-  <!-- FOOTER -->
-  <!-- ======================================================== -->
-  <footer class="mt-auto bg-slate-950/90 border-t border-emerald-900/60 py-6 text-xs text-slate-400 relative z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <i class="fa-solid fa-seedling text-emerald-400"></i>
-        <span>AgriFlow AI • Smart India Hackathon 2026 Decentralized Agri Protocol</span>
-      </div>
-      <div class="flex items-center gap-4 text-[11px]">
-        <span>🌾 14,200+ FPO Farmers</span>
-        <span>❄️ 100% Active Reefer Cold-Chain</span>
-        <span>⚡ T+0 Direct Settlements</span>
-      </div>
-    </div>
-  </footer>
 
   <!-- ======================================================== -->
   <!-- MAIN CLIENT-SIDE SCRIPT: WEB AUDIO, CANVAS AI & SQLITE SYNC -->
@@ -1436,6 +1434,7 @@
 
     // Global Application State
     const AppState = {
+      isAuthenticated: false, // Strict initial lock: Must login to open complete web app!
       isSunlightMode: false,
       currentUser: {
         id: "farmer-1",
@@ -1447,7 +1446,7 @@
         walletBalance: 184500,
         avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
       },
-      currentPin: "",
+      currentGatePin: "",
       cart: [
         { id: "crop-1", name: "Nashik Red Onion (Export A+)", quantityTons: 10, pricePerKg: 28.50, farmerName: "Ramesh Patil", farmerPhone: "+91 98220 12345" }
       ],
@@ -1514,7 +1513,174 @@
     function toggleSunlightMode() {
       AppState.isSunlightMode = !AppState.isSunlightMode;
       document.body.classList.toggle('sunlight-mode', AppState.isSunlightMode);
-      document.getElementById('sunlight-mode-label').textContent = AppState.isSunlightMode ? "🌙 Night Vision Mode" : "☀️ Sunlight Field Mode";
+      const label = document.getElementById('sunlight-mode-label');
+      if (label) label.textContent = AppState.isSunlightMode ? "🌙 Night Vision Mode" : "☀️ Sunlight Field Mode";
+    }
+
+    // ========================================================
+    // 🔐 AUTHENTICATION GATE & APPLICATION UNLOCK LOGIC
+    // ========================================================
+    function unlockApplication(targetPersona) {
+      AppState.isAuthenticated = true;
+      SoundEngine.playCashPayout();
+
+      // Smoothly hide login gate and reveal full web app
+      const gate = document.getElementById('auth-gate-container');
+      const app = document.getElementById('main-app-container');
+
+      gate.classList.add('opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        gate.classList.add('hidden');
+        gate.classList.remove('opacity-0', 'pointer-events-none');
+        app.classList.remove('hidden');
+        app.classList.add('flex');
+        updateUserUI();
+        switchPersona(targetPersona || (AppState.currentUser.role === 'farmer' ? 'farmer' : (AppState.currentUser.role === 'buyer' ? 'buyer' : 'orders')));
+      }, 300);
+
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    }
+
+    function logoutToAuthGate() {
+      AppState.isAuthenticated = false;
+      SoundEngine.playDispatchChime();
+      closeAuthModal();
+
+      const gate = document.getElementById('auth-gate-container');
+      const app = document.getElementById('main-app-container');
+
+      app.classList.add('hidden');
+      app.classList.remove('flex');
+      gate.classList.remove('hidden');
+      gate.classList.remove('opacity-0', 'pointer-events-none');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchGateAuthTab(tabId) {
+      document.querySelectorAll('.gate-auth-subtab').forEach(b => {
+        b.classList.remove('bg-emerald-600', 'text-white', 'font-bold');
+        b.classList.add('text-slate-300');
+      });
+
+      const btn = document.getElementById('gate-tab-btn-' + tabId);
+      if (btn) {
+        btn.classList.add('bg-emerald-600', 'text-white', 'font-bold');
+        btn.classList.remove('text-slate-300');
+      }
+
+      document.getElementById('gate-subtab-voice-otp').classList.add('hidden');
+      document.getElementById('gate-subtab-qr-card').classList.add('hidden');
+      document.getElementById('gate-subtab-dialer-pin').classList.add('hidden');
+      document.getElementById('gate-subtab-personas').classList.add('hidden');
+
+      document.getElementById('gate-subtab-' + tabId).classList.remove('hidden');
+    }
+
+    async function sendGateVoiceOtp() {
+      const phone = document.getElementById('gate-login-phone').value;
+      SoundEngine.playDispatchChime();
+      try {
+        const res = await fetch('http://localhost:5001/api/farmer/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        speakCurrentOtp(data.otp);
+      } catch (e) {
+        speakCurrentOtp('1295');
+      }
+      alert('📲 Voice OTP Dispatched! Listen to audio prompt.');
+    }
+
+    function speakCurrentOtp(customOtp) {
+      const otpStr = customOtp || '1 2 9 5';
+      const prompt = `नमस्ते किसान भाई, एग्रीफ्लो लॉगिन ओटीपी है: ${otpStr.split('').join(' ')}`;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(prompt);
+        u.lang = 'hi-IN';
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function verifyOtpAndUnlockApp() {
+      AppState.currentUser = {
+        id: "farmer-1",
+        name: "Ramesh Patil",
+        role: "farmer",
+        phone: "9822012345",
+        kisanId: "KISAN-MH-7721",
+        fpo: "Nashik Agro Producer Co.",
+        walletBalance: 184500,
+        avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
+      };
+      unlockApplication('farmer');
+    }
+
+    function loginWithKisanCard(farmerId) {
+      if (farmerId === 'farmer-1') {
+        AppState.currentUser = {
+          id: "farmer-1",
+          name: "Ramesh Patil",
+          role: "farmer",
+          phone: "9822012345",
+          kisanId: "KISAN-MH-7721",
+          fpo: "Nashik Agro Producer Co.",
+          walletBalance: 184500,
+          avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
+        };
+      } else {
+        AppState.currentUser = {
+          id: "farmer-2",
+          name: "Sardar Balram Singh",
+          role: "farmer",
+          phone: "9814056789",
+          kisanId: "KISAN-PB-3310",
+          fpo: "Malwa Farmer Producer Org",
+          walletBalance: 412000,
+          avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150"
+        };
+      }
+      unlockApplication('farmer');
+    }
+
+    function pressGatePin(num) {
+      if (AppState.currentGatePin.length < 4) {
+        AppState.currentGatePin += num;
+        document.getElementById('gate-pin-display').textContent = '•'.repeat(AppState.currentGatePin.length);
+      }
+    }
+    function clearGatePin() {
+      AppState.currentGatePin = "";
+      document.getElementById('gate-pin-display').textContent = "••••";
+    }
+    function submitGatePinLogin() {
+      verifyOtpAndUnlockApp();
+    }
+
+    function quickLoginPersona(pId) {
+      if (pId === 'farmer-1') {
+        AppState.currentUser = { id: "farmer-1", name: "Ramesh Patil", role: "farmer", phone: "9822012345", kisanId: "KISAN-MH-7721", fpo: "Nashik FPO", walletBalance: 184500, avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" };
+        unlockApplication('farmer');
+      } else if (pId === 'buyer-1') {
+        AppState.currentUser = { id: "buyer-1", name: "BigBasket Sourcing", role: "buyer", phone: "9900112233", kisanId: "BUYER-CORP-01", fpo: "Retail Hub", walletBalance: 2500000, avatar: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" };
+        unlockApplication('buyer');
+      } else if (pId === 'logistics-1') {
+        AppState.currentUser = { id: "logistics-1", name: "Suresh Mane", role: "logistics", phone: "9766123456", kisanId: "FLEET-MH-15", fpo: "Reefer Driver", walletBalance: 32000, avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" };
+        unlockApplication('orders');
+      } else if (pId === 'qc-1') {
+        AppState.currentUser = { id: "qc-1", name: "Dr. Swaminathan", role: "qc", phone: "9444123456", kisanId: "QC-NASHIK-01", fpo: "Quality Hub", walletBalance: 75000, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" };
+        unlockApplication('orders');
+      }
+      closeAuthModal();
+    }
+
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
     }
 
     // --- Navigation & Persona Switching ---
@@ -1615,6 +1781,18 @@
       }
     }
 
+    function updateRipenessStudio(val) {
+      const pct = parseInt(val);
+      const brix = (6.0 + (pct * 0.12)).toFixed(1);
+      const shelfDays = Math.max(2, Math.round(110 - (pct * 0.95)));
+      const ethylene = (0.01 + (pct * 0.002)).toFixed(3);
+
+      document.getElementById('ripeness-percent-label').textContent = `${pct}% (${pct > 75 ? 'Prime Ripe' : pct > 50 ? 'Optimal Export' : 'Harvest Fresh'})`;
+      document.getElementById('studio-brix-val').textContent = `${brix}° Bx`;
+      document.getElementById('studio-shelflife-val').textContent = `${shelfDays} Days`;
+      document.getElementById('studio-ethylene-val').textContent = `${ethylene} ppm`;
+    }
+
     // --- Dynamic Wallet Withdrawal Modal & Live Decrement ---
     function openWithdrawModal() {
       document.getElementById('modal-available-balance').textContent = `₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')}`;
@@ -1649,18 +1827,21 @@
       const targetBal = prevBal - amount;
       AppState.currentUser.walletBalance = targetBal;
 
-      let current = prevBal;
-      const step = Math.ceil(amount / 20);
+      const display = document.getElementById('farmer-wallet-display');
+      let currentVal = prevBal;
+      const step = (prevBal - targetBal) / 20;
+
       const timer = setInterval(() => {
-        current -= step;
-        if (current <= targetBal) {
-          current = targetBal;
+        currentVal -= step;
+        if (currentVal <= targetBal) {
+          currentVal = targetBal;
           clearInterval(timer);
         }
-        document.getElementById('farmer-wallet-display').textContent = `₹${current.toLocaleString('en-IN')}`;
+        display.textContent = `₹${Math.round(currentVal).toLocaleString('en-IN')}`;
       }, 25);
 
-      // Call Farmer Server (:5001) to deduct in SQLite
+      confetti({ particleCount: 110, spread: 70, origin: { y: 0.6 } });
+
       try {
         const res = await fetch('http://localhost:5001/api/farmer/withdraw', {
           method: 'POST',
@@ -1672,29 +1853,11 @@
         });
         if (res.ok) {
           const data = await res.json();
-          console.log("SQLite Wallet Updated:", data);
+          console.log("Withdrawal SQL response:", data);
         }
-      } catch (e) {
-        console.log("Local wallet deduction executed.");
+      } catch (err) {
+        console.log("Local standalone withdrawal recorded.");
       }
-
-      // Prepend to transaction history list
-      const hist = document.getElementById('payout-history-list');
-      if (hist) {
-        const item = document.createElement('div');
-        item.className = "p-2.5 rounded-xl bg-slate-900/80 border border-emerald-500/20 flex justify-between items-center transition-all animate-pulse";
-        item.innerHTML = `
-          <div>
-            <div class="font-bold text-white">₹${amount.toLocaleString('en-IN')} Payout Settled</div>
-            <div class="text-[10px] text-slate-400 font-mono">Ref: UPI-eRUPI-${Math.floor(100000 + Math.random()*900000)} • SBI ...8821</div>
-          </div>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">SETTLED</span>
-        `;
-        hist.prepend(item);
-      }
-
-      confetti({ particleCount: 130, spread: 80, origin: { y: 0.6 } });
-      alert(`✅ Withdrawal of ₹${amount.toLocaleString('en-IN')} successfully settled to State Bank of India A/c ...8821! Remaining Wallet Balance: ₹${targetBal.toLocaleString('en-IN')}`);
     }
 
     // --- Render Orders Manifest ---
@@ -1702,101 +1865,88 @@
       const container = document.getElementById('orders-manifest-container');
       if (!container) return;
 
-      const stages = [
-        { name: "Escrow Locked", color: "amber", icon: "fa-shield-halved" },
-        { name: "QC Passed & Stamped", color: "purple", icon: "fa-microscope" },
-        { name: "Dispatched from Bay", color: "indigo", icon: "fa-dolly" },
-        { name: "Cold Transit", color: "blue", icon: "fa-truck-fast" },
-        { name: "Paid & Settled (T+0)", color: "emerald", icon: "fa-circle-check" }
-      ];
+      container.innerHTML = AppState.orders.map((ord, idx) => {
+        const stages = [
+          { name: "Escrow Locked", icon: "fa-shield-halved", color: "amber" },
+          { name: "QC Inspection", icon: "fa-microscope", color: "amber" },
+          { name: "Pre-Cooling Chamber", icon: "fa-snowflake", color: "blue" },
+          { name: "Cold Transit (IoT)", icon: "fa-truck-fast", color: "blue" },
+          { name: "Paid & Settled (T+0)", icon: "fa-circle-check", color: "emerald" }
+        ];
 
-      container.innerHTML = AppState.orders.map(ord => {
-        const stage = stages[ord.stageIndex] || stages[0];
-
-        const stageSteps = stages.map((s, sIdx) => {
-          const isPassed = sIdx <= ord.stageIndex;
-          const dotColor = isPassed ? 'bg-emerald-400 text-slate-950 font-bold' : 'bg-slate-800 text-slate-500';
-          const textColor = isPassed ? 'text-emerald-300 font-bold' : 'text-slate-500';
-
-          return `
-            <div class="flex flex-col items-center flex-1 text-center relative">
-              <div class="w-7 h-7 rounded-full ${dotColor} flex items-center justify-center text-xs font-bold shadow-md z-10">
-                ${isPassed ? '<i class="fa-solid fa-check text-[10px]"></i>' : (sIdx + 1)}
-              </div>
-              <div class="text-[10px] ${textColor} mt-1">${s.name}</div>
-            </div>
-          `;
-        }).join('');
+        const progressPercent = (ord.stageIndex / (stages.length - 1)) * 100;
 
         return `
-          <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-5">
-            <!-- Top Summary Header -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-emerald-900/60 pb-4">
+          <div class="agri-card rounded-3xl p-6 border border-emerald-500/30 space-y-6">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-emerald-800/60 pb-4">
               <div>
                 <div class="flex items-center gap-2">
-                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">${ord.id}</span>
-                  <h3 class="text-lg font-bold text-white font-heading">${ord.commodity}</h3>
+                  <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950/80 px-2.5 py-1 rounded-lg border border-emerald-500/30">${ord.id}</span>
+                  <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                    <i class="fa-solid fa-bolt mr-1 text-amber-400"></i>${ord.stageName}
+                  </span>
                 </div>
-                <div class="text-xs text-slate-300 mt-1">
-                  Volume: <strong class="text-white font-mono">${ord.quantityTons} Tons</strong> • Rate: <strong class="text-emerald-400 font-mono">₹${ord.pricePerKg.toFixed(2)}/kg</strong> • Escrow Total: <strong class="text-amber-300 font-mono">₹${ord.totalValue.toLocaleString('en-IN')}</strong>
-                </div>
+                <h3 class="text-lg font-bold text-white mt-1 font-heading">${ord.commodity} • ${ord.quantityTons} Metric Tons</h3>
               </div>
 
-              <!-- Action Buttons -->
-              <div class="flex items-center gap-2">
-                <button onclick="advanceOrderStage('${ord.id}')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center gap-1.5">
-                  <span>Advance Stage</span>
-                  <i class="fa-solid fa-arrow-right text-xs"></i>
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <div class="text-[11px] text-slate-400">Total Contract Value:</div>
+                  <div class="text-xl font-extrabold text-white font-mono">₹${ord.totalValue.toLocaleString('en-IN')}</div>
+                </div>
+                <button onclick="openWaybillModal('${ord.id}')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 text-xs font-semibold text-emerald-300 flex items-center gap-1.5 transition-all">
+                  <i class="fa-solid fa-file-invoice"></i> Waybill
                 </button>
-                <button onclick="openWaybillModal('${ord.id}')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 text-xs font-bold text-emerald-300 transition-all flex items-center gap-1.5">
-                  <i class="fa-solid fa-file-invoice"></i>
-                  <span>Waybill</span>
+                <button onclick="advanceOrderStage('${ord.id}')" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-forward-step"></i> Next Step
                 </button>
               </div>
             </div>
 
-            <!-- 5-Stage Visual Progress Bar -->
-            <div class="relative py-2">
-              <div class="absolute top-5 left-8 right-8 h-1 bg-slate-800 -z-0"></div>
-              <div class="absolute top-5 left-8 h-1 bg-emerald-500 -z-0 transition-all duration-500" style="width: ${(ord.stageIndex / 4) * 85}%"></div>
-              <div class="flex justify-between items-center relative z-10">
-                ${stageSteps}
+            <!-- Supply Chain 5-Stage Stepper Progress -->
+            <div class="space-y-2">
+              <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-emerald-500/20">
+                <div class="bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400 h-full transition-all duration-500 rounded-full" style="width: ${progressPercent}%"></div>
+              </div>
+              <div class="grid grid-cols-5 text-center text-[10px] gap-1">
+                ${stages.map((st, i) => `
+                  <div class="${i <= ord.stageIndex ? 'text-emerald-300 font-bold' : 'text-slate-400'} flex flex-col items-center">
+                    <i class="fa-solid ${st.icon} text-xs mb-0.5 ${i <= ord.stageIndex ? 'text-emerald-400' : 'text-slate-400'}"></i>
+                    <span>${st.name}</span>
+                  </div>
+                `).join('')}
               </div>
             </div>
 
-            <!-- 4-Way Assigned Manifest Grid -->
+            <!-- 4-Way Assigned Stakeholder Grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-              <!-- Col 1: Farmer -->
-              <div class="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/20 space-y-1">
+              <div class="p-3.5 rounded-2xl bg-slate-900/80 border border-emerald-500/20 space-y-1">
                 <div class="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1">
                   <i class="fa-solid fa-wheat-awn"></i> Assigned Farmer
                 </div>
                 <div class="font-bold text-white">${ord.farmer.name}</div>
                 <div class="text-slate-400 text-[11px]">${ord.farmer.farm}</div>
-                <div class="text-emerald-300 text-[10px] font-mono">${ord.farmer.phone}</div>
+                <div class="text-emerald-300 font-mono text-[10px]">${ord.farmer.phone}</div>
               </div>
 
-              <!-- Col 2: Buyer -->
               <div class="p-3.5 rounded-2xl bg-blue-950/60 border border-blue-500/20 space-y-1">
                 <div class="text-[10px] text-blue-400 font-bold uppercase flex items-center gap-1">
-                  <i class="fa-solid fa-store"></i> Assigned Buyer Depot
+                  <i class="fa-solid fa-building"></i> Assigned Buyer
                 </div>
                 <div class="font-bold text-white">${ord.buyer.name}</div>
                 <div class="text-slate-400 text-[11px]">${ord.buyer.depot}</div>
-                <div class="text-blue-300 text-[10px] font-mono">${ord.buyer.phone}</div>
+                <div class="text-blue-300 font-mono text-[10px]">Escrow Auto-Funded</div>
               </div>
 
-              <!-- Col 3: Logistics -->
               <div class="p-3.5 rounded-2xl bg-amber-950/60 border border-amber-500/20 space-y-1">
                 <div class="text-[10px] text-amber-400 font-bold uppercase flex items-center gap-1">
-                  <i class="fa-solid fa-truck-fast"></i> Assigned Reefer Fleet
+                  <i class="fa-solid fa-truck-fast"></i> Reefer Telematics
                 </div>
-                <div class="font-bold text-white font-mono">${ord.logistics.truckNo}</div>
-                <div class="text-slate-400 text-[11px]">Driver: ${ord.logistics.driver} (${ord.logistics.phone})</div>
-                <div class="text-amber-300 text-[10px] font-mono">Temp: ${ord.logistics.temp} • ${ord.logistics.status}</div>
+                <div class="font-bold text-white">${ord.logistics.truckNo} (${ord.logistics.driver})</div>
+                <div class="text-slate-400 text-[11px]">Chamber Temp: <strong class="text-emerald-400">${ord.logistics.temp}</strong></div>
+                <div class="text-amber-300 text-[10px]">${ord.logistics.status}</div>
               </div>
 
-              <!-- Col 4: QC Officer -->
               <div class="p-3.5 rounded-2xl bg-purple-950/60 border border-purple-500/20 space-y-1">
                 <div class="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1">
                   <i class="fa-solid fa-microscope"></i> Assigned QC & Bay
@@ -1932,6 +2082,9 @@
       });
 
       document.getElementById('cart-counter').textContent = AppState.cart.length;
+      const countEl = document.getElementById('buyer-catalog-cart-count');
+      if (countEl) countEl.textContent = AppState.cart.length;
+
       confetti({ particleCount: 40, spread: 60, origin: { y: 0.9, x: 0.9 } });
       toggleCartDrawer();
     }
@@ -2049,66 +2202,44 @@
         stageIndex: 0,
         stageName: "Escrow Locked",
         stageColor: "amber",
-        farmer: { name: AppState.currentUser.name, phone: AppState.currentUser.phone, kisanId: "KISAN-MH-7721", farm: "Lasalgaon Gate No. 4", slot },
-        buyer: { name: "BigBasket Institutional", phone: "+91 99001 12233", company: "BigBasket", depot: "Bhiwandi Bay 4", slot: "Scheduled" },
-        logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+4.2 C", humidity: "68%", status: "Assigned (En Route)", eta: "2 hrs" },
-        qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Cold Bay 3", status: "Awaiting Farm Arrival", certNo: "QC-2026-9905" }
+        farmer: { name: AppState.currentUser.name, phone: AppState.currentUser.phone, kisanId: AppState.currentUser.kisanId, farm: "Lasalgaon Hub", slot: slot },
+        buyer: { name: "BigBasket Direct Sourcing", phone: "+91 99001 12233", company: "BigBasket Pvt Ltd", depot: "Bhiwandi Mega Depot", slot: "Next Morning" },
+        logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+3.8 C", humidity: "70%", status: "Assigned", eta: "4 hrs" },
+        qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Bay 3", status: "Escrow Locked", certNo: "QC-2026-9905" }
       });
 
-      confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
-      alert(`✅ Pickup scheduled in SQLite database! Reefer Truck MH-15-EG-8821 dispatched for ${cropName} (${volume} Tons).`);
+      alert(`✅ Cold Reefer Pickup Scheduled for ${volume} Tons of ${cropName}!`);
+      switchPersona('orders');
       renderOrdersManifest();
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
-    // --- AI Ripeness Studio Controls & Chart ---
-    function updateRipenessStudio(val) {
-      const v = parseInt(val);
-      const label = document.getElementById('ripeness-percent-label');
-      const valBrix = document.getElementById('val-brix');
-      const valEthylene = document.getElementById('val-ethylene');
-      const valShelflife = document.getElementById('val-shelflife');
-      const advisorText = document.getElementById('audio-advisor-text');
-      const gradeText = document.getElementById('cv-quality-grade');
+    // --- Arbitrage Calculator Logic ---
+    function runArbitrageCalc() {
+      const crop = document.getElementById('calc-crop').value;
+      const vol = parseFloat(document.getElementById('calc-volume').value);
+      document.getElementById('calc-vol-label').textContent = `${vol} Tons`;
 
-      const brix = (v * 0.18 + 2.5).toFixed(1);
-      const ethylene = (v * 0.015 + 0.02).toFixed(2);
-      const shelfDays = Math.max(5, Math.floor(100 - (v * 0.8)));
+      let mandiRate = 17.80, directRate = 28.50;
+      if (crop === 'mango') { mandiRate = 88.00; directRate = 145.00; }
+      else if (crop === 'tomato') { mandiRate = 18.50; directRate = 32.00; }
+      else if (crop === 'banana') { mandiRate = 13.50; directRate = 22.00; }
 
-      let grade = "Grade A+ (Export Prime)";
-      if (v < 40) grade = "Grade C (Local Mandi)";
-      else if (v > 85) grade = "Grade B+ (Immediate Consumption)";
+      document.getElementById('calc-mandi-rate').textContent = `₹${mandiRate.toFixed(2)}/kg`;
+      document.getElementById('calc-direct-rate').textContent = `₹${directRate.toFixed(2)}/kg`;
 
-      label.textContent = `${v}% (${v < 40 ? 'Early Raw' : v < 75 ? 'Optimal Export' : 'Full Ripe'})`;
-      valBrix.textContent = `${brix}° Bx`;
-      valEthylene.textContent = `${ethylene} ppm`;
-      valShelflife.textContent = `${shelfDays} Days`;
-      gradeText.textContent = grade;
+      const mandiTotal = vol * 1000 * mandiRate;
+      const directTotal = vol * 1000 * directRate;
+      const diff = directTotal - mandiTotal;
+      const gainPct = ((diff / mandiTotal) * 100).toFixed(1);
 
-      if (AppState.selectedVoiceLang === 'hi') {
-        advisorText.textContent = `"शुगर ब्रिक्स ${brix} है। यह एक्सपोर्ट के लिए उपयुक्त है। शेल्फ-लाइफ ${shelfDays} दिन है।"`;
-      } else {
-        advisorText.textContent = `"NIR Brix is ${brix}. Optimal export quality window. Remaining shelf-life: ${shelfDays} days."`;
-      }
+      document.getElementById('calc-mandi-total').textContent = `₹${Math.round(mandiTotal).toLocaleString('en-IN')}`;
+      document.getElementById('calc-direct-total').textContent = `₹${Math.round(directTotal).toLocaleString('en-IN')}`;
+      document.getElementById('calc-diff-total').textContent = `+₹${Math.round(diff).toLocaleString('en-IN')}`;
+      document.getElementById('calc-gain-percent').textContent = `+${gainPct}% Net Gain`;
     }
 
-    function setVoiceLang(lang) {
-      AppState.selectedVoiceLang = lang;
-      const slider = document.getElementById('ripeness-slider');
-      updateRipenessStudio(slider.value);
-      playRipenessAudio();
-    }
-
-    function playRipenessAudio() {
-      const text = document.getElementById('audio-advisor-text').textContent.replace(/"/g, '');
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = AppState.selectedVoiceLang === 'hi' ? 'hi-IN' : 'en-IN';
-        utterance.rate = 0.95;
-        window.speechSynthesis.speak(utterance);
-      }
-    }
-
+    // --- Chart.js Degradation Graph ---
     function initDegradationChart() {
       const ctx = document.getElementById('degradationChart');
       if (!ctx) return;
@@ -2118,24 +2249,25 @@
       AppState.chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['Day 0', 'Day 2', 'Day 4', 'Day 6', 'Day 8', 'Day 10', 'Day 12', 'Day 14'],
+          labels: ['Day 0', 'Day 7', 'Day 14', 'Day 21', 'Day 30', 'Day 60', 'Day 90'],
           datasets: [
             {
-              label: 'AgriFlow Active Reefer (+4°C)',
-              data: [98, 96, 95, 93, 91, 89, 87, 85],
+              label: 'AgriFlow Active Reefer (+3°C / 0.03ppm C2H4)',
+              data: [100, 98, 96, 94, 91, 85, 78],
               borderColor: '#10b981',
-              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
               borderWidth: 3,
               fill: true,
               tension: 0.3
             },
             {
-              label: 'Traditional Open Truck (+34°C)',
-              data: [98, 84, 68, 52, 38, 22, 10, 2],
+              label: 'Traditional Ambient Mandi Transit (+32°C)',
+              data: [100, 72, 45, 18, 0, 0, 0],
               borderColor: '#f43f5e',
-              borderDash: [5, 5],
+              backgroundColor: 'rgba(244, 63, 94, 0.05)',
               borderWidth: 2,
-              fill: false,
+              borderDash: [5, 5],
+              fill: true,
               tension: 0.3
             }
           ]
@@ -2144,9 +2276,7 @@
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
-            legend: {
-              labels: { color: '#94a3b8', font: { size: 10 } }
-            }
+            legend: { labels: { color: '#cbd5e1', font: { size: 10 } } }
           },
           scales: {
             y: {
@@ -2231,150 +2361,11 @@
         const speed = Math.floor(52 + Math.random() * 12);
         const temp = +(4.0 + Math.random() * 0.4).toFixed(1);
 
-        document.getElementById('live-speed-badge').textContent = `Speed: ${speed} km/h`;
-        document.getElementById('live-temp-badge').textContent = `Temp: +${temp}°C`;
+        document.getElementById('live-speed-badge').textContent = `${speed} km/h`;
+        document.getElementById('live-temp-badge').textContent = `+${temp}°C`;
 
         step++;
       }, 1200);
-    }
-
-    // --- Farmer-Friendly Auth Modals & Functions ---
-    function openAuthModal() {
-      document.getElementById('auth-modal').classList.remove('hidden');
-    }
-    function closeAuthModal() {
-      document.getElementById('auth-modal').classList.add('hidden');
-    }
-
-    function switchAuthTab(tabId) {
-      document.querySelectorAll('.auth-subtab').forEach(b => {
-        b.classList.remove('bg-emerald-600', 'text-white', 'font-bold');
-        b.classList.add('text-slate-300');
-      });
-
-      const btn = document.getElementById('tab-btn-' + tabId);
-      if (btn) {
-        btn.classList.add('bg-emerald-600', 'text-white', 'font-bold');
-        btn.classList.remove('text-slate-300');
-      }
-
-      document.getElementById('subtab-voice-otp').classList.add('hidden');
-      document.getElementById('subtab-qr-card').classList.add('hidden');
-      document.getElementById('subtab-dialer-pin').classList.add('hidden');
-      document.getElementById('subtab-personas').classList.add('hidden');
-
-      document.getElementById('subtab-' + tabId).classList.remove('hidden');
-    }
-
-    async function sendVoiceOtp() {
-      const phone = document.getElementById('login-phone').value;
-      SoundEngine.playDispatchChime();
-      try {
-        const res = await fetch('http://localhost:5001/api/farmer/auth/send-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone })
-        });
-        const data = await res.json();
-        speakCurrentOtp(data.otp);
-      } catch (e) {
-        speakCurrentOtp('1295');
-      }
-      alert('📲 OTP Sent via SMS & Voice Call!');
-    }
-
-    function speakCurrentOtp(customOtp) {
-      const otpStr = customOtp || '1 2 9 5';
-      const prompt = `नमस्ते किसान भाई, एग्रीफ्लो लॉगिन ओटीपी है: ${otpStr.split('').join(' ')}`;
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const u = new SpeechSynthesisUtterance(prompt);
-        u.lang = 'hi-IN';
-        window.speechSynthesis.speak(u);
-      }
-    }
-
-    function verifyOtpAndLogin() {
-      SoundEngine.playCashPayout();
-      AppState.currentUser = {
-        id: "farmer-1",
-        name: "Ramesh Patil",
-        role: "farmer",
-        phone: "9822012345",
-        kisanId: "KISAN-MH-7721",
-        fpo: "Nashik Agro Producer Co.",
-        walletBalance: 184500,
-        avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
-      };
-      updateUserUI();
-      closeAuthModal();
-      switchPersona('farmer');
-      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
-    }
-
-    function loginWithKisanCard(farmerId) {
-      SoundEngine.playCashPayout();
-      if (farmerId === 'farmer-1') {
-        AppState.currentUser = {
-          id: "farmer-1",
-          name: "Ramesh Patil",
-          role: "farmer",
-          phone: "9822012345",
-          kisanId: "KISAN-MH-7721",
-          fpo: "Nashik Agro Producer Co.",
-          walletBalance: 184500,
-          avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
-        };
-      } else {
-        AppState.currentUser = {
-          id: "farmer-2",
-          name: "Sardar Balram Singh",
-          role: "farmer",
-          phone: "9814056789",
-          kisanId: "KISAN-PB-3310",
-          fpo: "Malwa Farmer Producer Org",
-          walletBalance: 412000,
-          avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150"
-        };
-      }
-      updateUserUI();
-      closeAuthModal();
-      switchPersona('farmer');
-      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
-    }
-
-    function pressPin(num) {
-      if (AppState.currentPin.length < 4) {
-        AppState.currentPin += num;
-        document.getElementById('pin-display').textContent = '•'.repeat(AppState.currentPin.length);
-      }
-    }
-    function clearPin() {
-      AppState.currentPin = "";
-      document.getElementById('pin-display').textContent = "••••";
-    }
-    function submitPinLogin() {
-      verifyOtpAndLogin();
-    }
-
-    function quickLoginPersona(pId) {
-      SoundEngine.playCashPayout();
-      if (pId === 'farmer-1') {
-        AppState.currentUser = { id: "farmer-1", name: "Ramesh Patil", role: "farmer", phone: "9822012345", kisanId: "KISAN-MH-7721", fpo: "Nashik FPO", walletBalance: 184500, avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" };
-        switchPersona('farmer');
-      } else if (pId === 'buyer-1') {
-        AppState.currentUser = { id: "buyer-1", name: "BigBasket Sourcing", role: "buyer", phone: "9900112233", kisanId: "BUYER-CORP-01", fpo: "Retail Hub", walletBalance: 2500000, avatar: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" };
-        switchPersona('buyer');
-      } else if (pId === 'logistics-1') {
-        AppState.currentUser = { id: "logistics-1", name: "Suresh Mane", role: "logistics", phone: "9766123456", kisanId: "FLEET-MH-15", fpo: "Reefer Driver", walletBalance: 32000, avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" };
-        switchPersona('orders');
-      } else if (pId === 'qc-1') {
-        AppState.currentUser = { id: "qc-1", name: "Dr. Swaminathan", role: "qc", phone: "9444123456", kisanId: "QC-NASHIK-01", fpo: "Quality Hub", walletBalance: 75000, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" };
-        switchPersona('orders');
-      }
-      updateUserUI();
-      closeAuthModal();
-      confetti({ particleCount: 70, spread: 60, origin: { y: 0.5 } });
     }
 
     function updateUserUI() {
@@ -2384,10 +2375,14 @@
       document.getElementById('user-role-badge').textContent = AppState.currentUser.role.toUpperCase();
 
       if (AppState.currentUser.role === 'farmer') {
-        document.getElementById('farmer-header-name').textContent = AppState.currentUser.name;
-        document.getElementById('farmer-header-avatar').src = AppState.currentUser.avatar;
-        document.getElementById('farmer-header-fpo').textContent = `${AppState.currentUser.fpo} • ${AppState.currentUser.kisanId}`;
-        document.getElementById('farmer-wallet-display').textContent = `₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')}`;
+        const nameEl = document.getElementById('farmer-header-name');
+        if (nameEl) nameEl.textContent = AppState.currentUser.name;
+        const avatarEl = document.getElementById('farmer-header-avatar');
+        if (avatarEl) avatarEl.src = AppState.currentUser.avatar;
+        const fpoEl = document.getElementById('farmer-header-fpo');
+        if (fpoEl) fpoEl.textContent = `${AppState.currentUser.fpo} • ${AppState.currentUser.kisanId}`;
+        const walletEl = document.getElementById('farmer-wallet-display');
+        if (walletEl) walletEl.textContent = `₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')}`;
       }
     }
 
@@ -2510,7 +2505,6 @@
       renderOrdersManifest();
       renderBuyerCatalog();
       renderMasterMatrix();
-      updateUserUI();
       checkMicroserversHealth();
       setInterval(checkMicroserversHealth, 8000);
     });

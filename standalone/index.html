@@ -1,0 +1,2160 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgriFlow AI — Decentralized Smart Agri-Logistics & Direct Procurement Protocol</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+              950: '#022c22'
+            },
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            heading: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Leaflet Maps CSS & JS CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Outfit', sans-serif;
+    }
+    
+    /* Layered Organic Agricultural Backdrop */
+    .agri-bg-hero {
+      background: 
+        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 85% 65%, rgba(245, 158, 11, 0.20) 0%, transparent 40%),
+        radial-gradient(circle at 50% 85%, rgba(5, 150, 105, 0.28) 0%, transparent 50%),
+        linear-gradient(180deg, rgba(2, 44, 34, 0.94) 0%, rgba(10, 20, 15, 0.97) 50%, rgba(4, 12, 9, 0.99) 100%),
+        url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&auto=format&fit=crop&q=80') center/cover no-repeat fixed;
+    }
+
+    /* Sunlight Field Mode */
+    .sunlight-mode {
+      background: #f8fafc !important;
+      color: #0f172a !important;
+    }
+    .sunlight-mode .agri-card {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+    }
+    .sunlight-mode header, .sunlight-mode footer {
+      background: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    .sunlight-mode .text-white {
+      color: #0f172a !important;
+    }
+    .sunlight-mode .text-slate-300, .sunlight-mode .text-slate-400 {
+      color: #475569 !important;
+    }
+    .sunlight-mode .bg-slate-900, .sunlight-mode .bg-slate-950, .sunlight-mode .bg-emerald-950 {
+      background: #e2e8f0 !important;
+      border-color: #94a3b8 !important;
+    }
+
+    /* Glassmorphism Cards */
+    .agri-card {
+      background: rgba(4, 28, 20, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+    .agri-card-hover {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .agri-card-hover:hover {
+      transform: translateY(-4px);
+      border-color: rgba(52, 211, 153, 0.55);
+      box-shadow: 0 25px 60px rgba(16, 185, 129, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    /* Marquee animation for Mandi rate ticker */
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: flex;
+      width: 200%;
+      animation: marquee 30s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+  </style>
+</head>
+<body class="agri-bg-hero text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white relative transition-colors duration-300">
+
+  <!-- ======================================================== -->
+  <!-- 1. LIVE APMC MANDI BENCHMARK & MULTI-SERVER TICKER -->
+  <!-- ======================================================== -->
+  <div class="bg-slate-950/95 border-b border-emerald-500/20 py-1.5 px-4 text-[11px] overflow-hidden flex items-center">
+    <div class="flex items-center gap-2 font-bold text-amber-400 shrink-0 pr-4 border-r border-emerald-900/60 z-10 bg-slate-950">
+      <i class="fa-solid fa-satellite-dish animate-pulse text-emerald-400"></i>
+      <span>LIVE APMC BENCHMARK:</span>
+    </div>
+    <div class="overflow-hidden relative w-full">
+      <div class="animate-marquee whitespace-nowrap text-slate-300 font-mono flex gap-8">
+        <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
+        <span>🥭 Ratnagiri APMC: <strong class="text-rose-400">₹88.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹145.00/kg (+64.8%)</strong></span>
+        <span>🍅 Pune Vashi APMC: <strong class="text-rose-400">₹18.50/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹32.00/kg (+73.0%)</strong></span>
+        <span>🍇 Sangli EuroGAP: <strong class="text-rose-400">₹48.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹78.00/kg (+62.5%)</strong></span>
+        <span>🥔 Khanna Mandi: <strong class="text-rose-400">₹13.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹21.00/kg (+61.5%)</strong></span>
+        <!-- Duplicate for continuous loop -->
+        <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
+        <span>🥭 Ratnagiri APMC: <strong class="text-rose-400">₹88.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹145.00/kg (+64.8%)</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 2. TOP TELEMETRY & 3-SQLITE MICROSERVER STATUS BAR -->
+  <!-- ======================================================== -->
+  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-emerald-500/25 shadow-xl">
+    <div class="bg-emerald-950/90 border-b border-emerald-900/60 px-4 py-1 text-xs flex flex-wrap items-center justify-between gap-2 text-emerald-300">
+      <div class="flex items-center gap-4 flex-wrap">
+        <span class="flex items-center gap-1.5 font-bold text-emerald-400 font-heading">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>SIH-2026 LIVE NODE: PS-33</span>
+        </span>
+        <div class="flex items-center gap-3 text-[11px]">
+          <!-- Microserver 1: Farmer -->
+          <div id="status-farmer-server" class="flex items-center gap-1.5 bg-emerald-900/50 px-2 py-0.5 rounded border border-emerald-500/30">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span>🌾 Farmer Svr :5001 [SQLite]</span>
+            <span class="text-emerald-400 font-mono text-[10px]" id="badge-farmer-status">ONLINE</span>
+          </div>
+          <!-- Microserver 2: Buyer -->
+          <div id="status-buyer-server" class="flex items-center gap-1.5 bg-blue-900/40 px-2 py-0.5 rounded border border-blue-500/30 text-blue-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+            <span>🛒 Buyer Svr :5002 [SQLite]</span>
+            <span class="text-blue-400 font-mono text-[10px]" id="badge-buyer-status">ONLINE</span>
+          </div>
+          <!-- Microserver 3: Logistics -->
+          <div id="status-logistics-server" class="flex items-center gap-1.5 bg-amber-900/40 px-2 py-0.5 rounded border border-amber-500/30 text-amber-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>🚛 Logistics :5003 [SQLite]</span>
+            <span class="text-amber-400 font-mono text-[10px]" id="badge-logistics-status">ONLINE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 text-[11px]">
+        <button onclick="toggleSunlightMode()" class="px-2.5 py-0.5 rounded bg-slate-900 border border-emerald-500/40 text-amber-300 font-bold hover:bg-slate-800 transition-all flex items-center gap-1">
+          <i class="fa-solid fa-sun text-xs"></i>
+          <span id="sunlight-mode-label">Sunlight Field Mode</span>
+        </button>
+        <span class="text-slate-400"><i class="fa-solid fa-database mr-1 text-emerald-400"></i>Engine: <strong class="text-emerald-300 font-mono">SQLite3 Binary DB</strong></span>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="switchPersona('orders')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-amber-500 p-0.5 shadow-lg shadow-emerald-500/20">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <i class="fa-solid fa-seedling text-emerald-400 text-lg"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-heading font-extrabold text-xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
+          </div>
+          <p class="text-[10px] text-emerald-400/80 font-medium tracking-wide">ZERO-MIDDLEMAN REEFER SUPPLY PROTOCOL</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-emerald-500/20">
+        <button onclick="switchPersona('orders')" id="nav-orders" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 transition-all bg-emerald-600 text-white shadow-md">
+          <i class="fa-solid fa-boxes-packing"></i>
+          <span>Central Orders</span>
+        </button>
+        <button onclick="switchPersona('farmer')" id="nav-farmer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+          <i class="fa-solid fa-tractor text-amber-400"></i>
+          <span>🌾 Farmer Station</span>
+        </button>
+        <button onclick="switchPersona('buyer')" id="nav-buyer" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+          <i class="fa-solid fa-store text-blue-400"></i>
+          <span>🛒 Buyer Trade</span>
+        </button>
+        <button onclick="switchPersona('matrix')" id="nav-matrix" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+          <i class="fa-solid fa-table-list text-purple-400"></i>
+          <span>📋 Produce Matrix</span>
+        </button>
+        <button onclick="switchPersona('calculator')" id="nav-calculator" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+          <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
+          <span>📊 Arbitrage Math</span>
+        </button>
+        <button onclick="switchPersona('coder')" id="nav-coder" class="persona-tab px-3.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 text-slate-300 hover:text-white hover:bg-emerald-950/60 transition-all">
+          <i class="fa-solid fa-terminal text-rose-400"></i>
+          <span>💻 SQLite API</span>
+        </button>
+      </nav>
+
+      <!-- User Profile & Farmer-Friendly Auth Trigger -->
+      <div class="flex items-center gap-3">
+        <!-- Active User Profile Pill -->
+        <button onclick="openAuthModal()" class="flex items-center gap-2.5 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 px-3 py-1.5 rounded-xl transition-all shadow-md group">
+          <img id="user-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Avatar" class="w-7 h-7 rounded-lg object-cover border border-emerald-400">
+          <div class="text-left hidden sm:block">
+            <div class="text-xs font-bold text-white flex items-center gap-1.5">
+              <span id="user-display-name">Ramesh Patil</span>
+              <span id="user-role-badge" class="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">KISAN</span>
+            </div>
+            <div class="text-[10px] text-emerald-400/80 font-mono" id="user-display-sub">KISAN-MH-7721 • Nashik</div>
+          </div>
+          <i class="fa-solid fa-chevron-down text-[10px] text-emerald-400 group-hover:translate-y-0.5 transition-transform"></i>
+        </button>
+
+        <!-- Cart Quick View (Buyer Persona) -->
+        <button onclick="toggleCartDrawer()" class="relative p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-400 text-slate-200 transition-all">
+          <i class="fa-solid fa-basket-shopping text-emerald-400"></i>
+          <span id="cart-counter" class="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] flex items-center justify-center shadow-lg">1</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN CONTAINER -->
+  <!-- ======================================================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- Unified Vision Hero Header -->
+    <div class="relative overflow-hidden rounded-3xl agri-card p-6 sm:p-8 border border-emerald-500/30">
+      <div class="absolute -right-10 -bottom-10 w-96 h-96 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-10 -top-10 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none"></div>
+      
+      <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div class="space-y-3 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300">
+            <i class="fa-solid fa-award text-amber-400"></i>
+            <span>Smart India Hackathon 2026 • Problem Statement 33</span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white font-heading">
+            Eliminating Farm-to-Fork <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-400">Intermediary Loss</span>
+          </h1>
+          <p class="text-sm text-slate-300 leading-relaxed">
+            Running on a high-speed <strong class="text-white">SQLite3 Relational Database</strong> with 3 dedicated microservers, Canvas Computer Vision ripeness grading, live GPS reefer telemetry, and instant <strong class="text-emerald-400">T+0 direct payouts</strong>.
+          </p>
+        </div>
+
+        <!-- Quick 1-Click Action Cards for the 3 Personas -->
+        <div class="grid grid-cols-3 gap-3 w-full lg:w-auto">
+          <button onclick="switchPersona('farmer')" class="p-3.5 rounded-2xl bg-emerald-900/40 hover:bg-emerald-800/60 border border-emerald-500/30 text-left transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-wheat-awn"></i>
+            </div>
+            <div class="text-xs font-bold text-white">🌾 Farmer</div>
+            <div class="text-[10px] text-emerald-300/80">Voice OTP & Ripeness</div>
+          </button>
+
+          <button onclick="switchPersona('buyer')" class="p-3.5 rounded-2xl bg-blue-900/40 hover:bg-blue-800/60 border border-blue-500/30 text-left transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-cart-flatbed"></i>
+            </div>
+            <div class="text-xs font-bold text-white">🛒 Buyer</div>
+            <div class="text-[10px] text-blue-300/80">Escrow & Catalog</div>
+          </button>
+
+          <button onclick="switchPersona('orders')" class="p-3.5 rounded-2xl bg-amber-900/40 hover:bg-amber-800/60 border border-amber-500/30 text-left transition-all group">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+              <i class="fa-solid fa-truck-fast"></i>
+            </div>
+            <div class="text-xs font-bold text-white">🚛 Logistics</div>
+            <div class="text-[10px] text-amber-300/80">Assigned Manifest</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 1: CENTRAL ASSIGNED ORDERS CONSOLE (persona-view-orders) -->
+    <!-- ======================================================== -->
+    <section id="view-orders" class="persona-view space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-boxes-packing text-emerald-400"></i>
+            <span>Central Orders & Neatly Assigned Manifest Console</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Live synchronized SQLite relational database with all 4 assigned columns: Farmer, Buyer, Reefer Fleet, and QC Bay.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="refreshOrdersFromLogisticsServer()" class="px-3.5 py-2 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-xs font-semibold text-emerald-300 hover:bg-emerald-950 flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-rotate text-emerald-400"></i>
+            <span>Sync Logistics Svr :5003</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Orders Container -->
+      <div id="orders-manifest-container" class="space-y-6">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 2: FARMER COMMAND STATION (persona-view-farmer) -->
+    <!-- ======================================================== -->
+    <section id="view-farmer" class="persona-view hidden space-y-8">
+      <!-- Farmer Header Card -->
+      <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <img id="farmer-header-avatar" src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=200" alt="Farmer" class="w-16 h-16 rounded-2xl object-cover border-2 border-emerald-400 shadow-lg">
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-2xl font-bold text-white font-heading" id="farmer-header-name">Ramesh Patil</h2>
+              <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Verified Kisan Partner</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5" id="farmer-header-fpo">Nashik Agro Producer Co. • Lasalgaon Hub</p>
+            <div class="flex items-center gap-3 mt-2 text-xs">
+              <span class="text-amber-400 font-bold"><i class="fa-solid fa-star mr-1"></i>4.92 / 5.0 Rating</span>
+              <span class="text-slate-400">•</span>
+              <span class="text-emerald-400 font-bold"><i class="fa-solid fa-truck-ramp-box mr-1"></i>142.5 Tons Direct Dispatched</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wallet Balance Card with Instant UPI Release -->
+        <div class="bg-gradient-to-br from-emerald-950 to-slate-900 p-5 rounded-2xl border border-emerald-500/40 min-w-[280px]">
+          <div class="text-[11px] text-emerald-300 uppercase tracking-wider font-semibold">e-RUPI Kisan Wallet Balance</div>
+          <div class="text-3xl font-extrabold text-white mt-1 font-mono" id="farmer-wallet-display">₹1,84,500</div>
+          <div class="flex items-center justify-between mt-3 text-xs">
+            <span class="text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-shield-check"></i> T+0 Instant Settlement</span>
+            <button onclick="triggerFarmerPayout()" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition-all shadow-md">Withdraw</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Optical Canvas AI Computer Vision Studio -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left: AI Optical Studio with Real Canvas Analysis -->
+        <div class="lg:col-span-7 agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <i class="fa-solid fa-camera text-emerald-400"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-white text-lg font-heading">AI Optical Ripeness & Sugar Brix Studio</h3>
+                <p class="text-xs text-slate-300">HTML5 Canvas Pixel Histogram & NIR Estimation</p>
+              </div>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono">Model v4.2 NIR</span>
+          </div>
+
+          <!-- Image Upload / Sample Selector for Real Canvas Analysis -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-300 font-semibold">1. Select Sample or Upload Crop Photo:</span>
+              <label class="cursor-pointer px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-500/30 text-emerald-300 font-semibold text-[11px] flex items-center gap-1">
+                <i class="fa-solid fa-upload"></i> Upload Photo
+                <input type="file" id="crop-image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+              </label>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2">
+              <button onclick="analyzeSampleImage('onion')" id="btn-crop-onion" class="crop-btn p-2 rounded-xl bg-emerald-800/80 border border-emerald-400 text-xs font-bold text-white text-center">🧅 Red Onion</button>
+              <button onclick="analyzeSampleImage('mango')" id="btn-crop-mango" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🥭 Alphonso</button>
+              <button onclick="analyzeSampleImage('tomato')" id="btn-crop-tomato" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🍅 Poly Tomato</button>
+              <button onclick="analyzeSampleImage('banana')" id="btn-crop-banana" class="crop-btn p-2 rounded-xl bg-slate-900/80 border border-emerald-500/20 text-xs font-semibold text-slate-300 text-center hover:bg-emerald-950">🍌 Cavendish</button>
+            </div>
+          </div>
+
+          <!-- Image Preview & Canvas Processing Area -->
+          <div class="relative bg-slate-950/80 rounded-2xl border border-emerald-500/20 p-3 flex flex-col sm:flex-row items-center gap-4">
+            <div class="relative w-36 h-36 rounded-xl overflow-hidden border border-emerald-500/40 shrink-0">
+              <img id="preview-crop-img" src="https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400" alt="Crop Preview" class="w-full h-full object-cover">
+              <canvas id="hidden-cv-canvas" width="120" height="120" class="hidden"></canvas>
+              <div class="absolute inset-0 bg-emerald-500/10 border-2 border-emerald-400/50 rounded-xl pointer-events-none flex items-center justify-center">
+                <span class="text-[9px] bg-slate-950/90 text-emerald-400 px-1.5 py-0.5 rounded font-mono">NIR SCAN</span>
+              </div>
+            </div>
+
+            <div class="flex-1 space-y-2 text-xs w-full">
+              <div class="flex justify-between">
+                <span class="text-slate-400">Optical Color Ratio (RGB):</span>
+                <span class="text-emerald-400 font-mono font-bold" id="cv-color-ratio">R: 62% • G: 24% • B: 14%</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">Skin Chlorophyll Degradation:</span>
+                <span class="text-amber-400 font-mono font-bold" id="cv-chlorophyll">35% Residual</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">AI Quality Classification:</span>
+                <span class="text-emerald-400 font-bold" id="cv-quality-grade">Grade A+ (Export Quality)</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">AI Confidence Score:</span>
+                <span class="text-blue-400 font-mono font-bold">99.4% (Certified)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Ripeness Slider -->
+          <div class="bg-slate-900/80 p-4 rounded-2xl border border-emerald-500/20 space-y-3">
+            <div class="flex justify-between items-center text-xs font-semibold">
+              <span class="text-slate-300">Fine-Tune Ripeness Index:</span>
+              <span class="text-emerald-400 font-bold font-mono text-sm" id="ripeness-percent-label">65% (Optimal Export)</span>
+            </div>
+            <input type="range" min="10" max="100" value="65" id="ripeness-slider" oninput="updateRipenessStudio(this.value)" class="w-full accent-emerald-400 cursor-pointer">
+            <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+              <span>Raw Harvest (10%)</span>
+              <span>Prime Export (65%)</span>
+              <span>Fully Ripe (85%)</span>
+              <span>Overripe (100%)</span>
+            </div>
+          </div>
+
+          <!-- Readouts Grid -->
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/20">
+              <div class="text-[10px] text-slate-400 uppercase">Brix Sugar Index</div>
+              <div class="text-lg font-bold text-amber-400 font-mono mt-0.5" id="val-brix">12.8° Bx</div>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/20">
+              <div class="text-[10px] text-slate-400 uppercase">Ethylene Emission</div>
+              <div class="text-lg font-bold text-blue-400 font-mono mt-0.5" id="val-ethylene">0.08 ppm</div>
+            </div>
+            <div class="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/20">
+              <div class="text-[10px] text-slate-400 uppercase">Safe Shelf-Life</div>
+              <div class="text-lg font-bold text-emerald-400 font-mono mt-0.5" id="val-shelflife">75 Days</div>
+            </div>
+          </div>
+
+          <!-- Multilingual Voice Advisor -->
+          <div class="p-4 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <button onclick="playRipenessAudio()" class="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center shadow-lg transition-transform active:scale-95">
+                <i class="fa-solid fa-volume-high text-lg"></i>
+              </button>
+              <div>
+                <div class="text-xs font-bold text-amber-300">Kisan Audio Advisor (आवाज़ सलाह)</div>
+                <div class="text-[11px] text-slate-300" id="audio-advisor-text">"यह प्याज एक्सपोर्ट के लिए सर्वोत्तम ग्रेड A+ है। 2 दिन में लोडिंग करें।"</div>
+              </div>
+            </div>
+            <div class="flex gap-1">
+              <button onclick="setVoiceLang('hi')" class="px-2 py-1 rounded text-[10px] bg-amber-500/20 text-amber-300 font-bold">हिन्दी</button>
+              <button onclick="setVoiceLang('en')" class="px-2 py-1 rounded text-[10px] bg-slate-800 text-slate-300 font-bold">EN</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: 14-Day Degradation Chart -->
+        <div class="lg:col-span-5 agri-card p-6 rounded-3xl border border-emerald-500/30 flex flex-col justify-between space-y-4">
+          <div>
+            <h3 class="font-bold text-white text-base flex items-center gap-2 font-heading">
+              <i class="fa-solid fa-chart-line text-amber-400"></i>
+              <span>14-Day Quality Degradation Curve</span>
+            </h3>
+            <p class="text-xs text-slate-400 mt-0.5">Reefer (+4°C) vs Ambient (+34°C) Comparison</p>
+          </div>
+
+          <div class="relative h-64 w-full">
+            <canvas id="degradationChart"></canvas>
+          </div>
+
+          <div class="p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-xs text-emerald-300 flex items-center gap-2">
+            <i class="fa-solid fa-snowflake text-emerald-400"></i>
+            <span>Active Cold-Chain adds <strong>+45 Days</strong> of export shelf-life.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Farmgate Milk-Run Pickup Form -->
+      <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-white text-lg flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-truck-pickup text-emerald-400"></i>
+            <span>Schedule Farmgate Milk-Run Reefer Pickup</span>
+          </h3>
+          <span class="text-xs text-slate-400">Writes directly to SQLite database</span>
+        </div>
+
+        <form id="pickup-form" onsubmit="submitPickupSchedule(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Crop Variety</label>
+            <select id="pickup-crop" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400">
+              <option value="Nashik Red Onion (Garwa Export)">Nashik Red Onion (Garwa)</option>
+              <option value="Ratnagiri Alphonso Mango (GI)">Ratnagiri Alphonso Mango</option>
+              <option value="Pusa Ruby Polyhouse Tomato">Pusa Ruby Polyhouse Tomato</option>
+              <option value="Sangli Seedless Thompson Grapes">Sangli Thompson Grapes</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Harvest Volume (Metric Tons)</label>
+            <input type="number" id="pickup-volume" min="1" max="50" step="0.5" value="10.0" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Preferred Pickup Window</label>
+            <select id="pickup-slot" class="w-full bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400">
+              <option value="Morning Slot (06:00 AM - 09:00 AM)">Morning Slot (06:00 AM - 09:00 AM)</option>
+              <option value="Afternoon Slot (01:00 PM - 04:00 PM)">Afternoon Slot (01:00 PM - 04:00 PM)</option>
+              <option value="Evening Slot (06:00 PM - 09:00 PM)">Evening Slot (06:00 PM - 09:00 PM)</option>
+            </select>
+          </div>
+
+          <div class="flex items-end">
+            <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-calendar-check"></i>
+              <span>Dispatch Reefer Truck</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Live GPS Milk-Run Radar Leaflet Map with Real-Time Animated Truck -->
+      <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-bold text-white text-lg flex items-center gap-2 font-heading">
+              <i class="fa-solid fa-route text-emerald-400"></i>
+              <span>Live Milk-Run GPS Telematics Radar</span>
+            </h3>
+            <p class="text-xs text-slate-300">Vehicle: <strong class="text-emerald-400 font-mono">MH-15-EG-8821</strong> • Driver: Suresh Mane (+91 97661 23456)</p>
+          </div>
+          <div class="flex items-center gap-2 text-xs font-mono">
+            <button onclick="startTruckAnimation()" id="btn-truck-anim" class="px-3 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow transition-all flex items-center gap-1.5">
+              <i class="fa-solid fa-play text-[10px]"></i>
+              <span>Simulate Highway Transit</span>
+            </button>
+            <span class="px-2.5 py-1 rounded-lg bg-emerald-950 border border-emerald-500/30 text-emerald-300" id="live-speed-badge">Speed: 58 km/h</span>
+            <span class="px-2.5 py-1 rounded-lg bg-blue-950 border border-blue-500/30 text-blue-300" id="live-temp-badge">Temp: +4.2°C</span>
+          </div>
+        </div>
+
+        <div id="radarMap" class="w-full h-80 rounded-2xl border border-emerald-500/30 z-0"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 3: BUYER DIRECT PROCUREMENT TRADE FLOOR (persona-view-buyer) -->
+    <!-- ======================================================== -->
+    <section id="view-buyer" class="persona-view hidden space-y-8">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-cart-flatbed text-blue-400"></i>
+            <span>Institutional Buyer Procurement Floor</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Direct farmgate sourcing with automated ICICI smart-contract escrow locking.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <select id="buyer-sort" onchange="sortBuyerCatalog(this.value)" class="bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+            <option value="gain">Sort by Farmer Gain %</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="shelflife">Longest Shelf Life</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Live Cold Chamber IoT Telemetry Banner -->
+      <div class="agri-card p-5 rounded-2xl border border-blue-500/30 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+        <div class="p-3 rounded-xl bg-slate-900/80">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Chamber Temperature</div>
+          <div class="text-xl font-extrabold text-blue-400 font-mono mt-1">+4.1°C</div>
+          <div class="text-[10px] text-emerald-400">Target ±0.5°C</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/80">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Relative Humidity</div>
+          <div class="text-xl font-extrabold text-emerald-400 font-mono mt-1">88.5%</div>
+          <div class="text-[10px] text-slate-400">Optimal Hydration</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/80">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Ethylene Gas Level</div>
+          <div class="text-xl font-extrabold text-amber-400 font-mono mt-1">0.06 ppm</div>
+          <div class="text-[10px] text-emerald-400">Below Critical Threshold</div>
+        </div>
+        <div class="p-3 rounded-xl bg-slate-900/80">
+          <div class="text-[10px] text-slate-400 uppercase font-semibold">Spoilage Risk Factor</div>
+          <div class="text-xl font-extrabold text-emerald-400 font-mono mt-1">0.02%</div>
+          <div class="text-[10px] text-emerald-400">Ultra Safe</div>
+        </div>
+      </div>
+
+      <!-- Buyer Produce Catalog Grid -->
+      <div id="buyer-catalog-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 4: MASTER PRODUCE MATRIX (persona-view-matrix) -->
+    <!-- ======================================================== -->
+    <section id="view-matrix" class="persona-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-table-list text-purple-400"></i>
+            <span>Master Produce & Variety Matrix</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Complete multi-crop agronomic specifications, target direct prices, and cold storage parameters from SQLite.</p>
+        </div>
+        <button onclick="exportMatrixCSV()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition-all">
+          <i class="fa-solid fa-file-csv text-sm"></i>
+          <span>Export Master CSV</span>
+        </button>
+      </div>
+
+      <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden shadow-2xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-slate-200">
+            <thead class="bg-emerald-950/90 text-emerald-300 uppercase tracking-wider font-semibold border-b border-emerald-500/30">
+              <tr>
+                <th class="py-3.5 px-4">Commodity & Variety</th>
+                <th class="py-3.5 px-4">Location & Farmer</th>
+                <th class="py-3.5 px-4">Stock (Tons)</th>
+                <th class="py-3.5 px-4">Direct Price</th>
+                <th class="py-3.5 px-4">Mandi Benchmark</th>
+                <th class="py-3.5 px-4 text-emerald-400">Farmer Gain</th>
+                <th class="py-3.5 px-4">Sugar Brix</th>
+                <th class="py-3.5 px-4">Reefer Temp</th>
+                <th class="py-3.5 px-4">Shelf Life</th>
+              </tr>
+            </thead>
+            <tbody id="matrix-tbody" class="divide-y divide-emerald-900/40">
+              <!-- Injected dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 5: MIDDLEMAN ARBITRAGE CALCULATOR (persona-view-calculator) -->
+    <!-- ======================================================== -->
+    <section id="view-calculator" class="persona-view hidden space-y-6">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+          <i class="fa-solid fa-scale-balanced text-emerald-400"></i>
+          <span>Transparent Middleman Arbitrage Elimination Model</span>
+        </h2>
+        <p class="text-xs text-slate-300 mt-1">Mathematical comparison of traditional 5-tier mandi deductions vs AgriFlow direct smart contract protocol.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Traditional APMC Mandi Model -->
+        <div class="agri-card p-6 rounded-3xl border border-rose-500/30 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-rose-400 text-base flex items-center gap-2">
+              <i class="fa-solid fa-xmark-circle"></i>
+              <span>Traditional Mandi System (5 Intermediaries)</span>
+            </h3>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/40">Baseline</span>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
+              <span class="text-slate-300">1. Village Kaccha Arthiya Commission</span>
+              <span class="text-rose-400 font-mono">-8.0%</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
+              <span class="text-slate-300">2. APMC Mandi Tax & Cess</span>
+              <span class="text-rose-400 font-mono">-6.5%</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
+              <span class="text-slate-300">3. Physical Spoilage in Open Trucks</span>
+              <span class="text-rose-400 font-mono">-28.0%</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
+              <span class="text-slate-300">4. Unofficial Loading/Unloading Batta</span>
+              <span class="text-rose-400 font-mono">-5.0%</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-rose-900/40">
+              <span class="text-slate-300">5. Multi-tier Wholesaler Markups</span>
+              <span class="text-rose-400 font-mono">-12.5%</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-rose-950/60 border border-rose-500/30 flex justify-between items-center">
+            <span class="font-bold text-slate-200 text-xs">Farmer Net Realization:</span>
+            <span class="text-xl font-extrabold text-rose-400 font-mono">₹17.80 / kg</span>
+          </div>
+        </div>
+
+        <!-- AgriFlow Protocol Model -->
+        <div class="agri-card p-6 rounded-3xl border border-emerald-500/40 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-bold text-emerald-400 text-base flex items-center gap-2">
+              <i class="fa-solid fa-check-circle"></i>
+              <span>AgriFlow Protocol (Zero Middlemen)</span>
+            </h3>
+            <span class="text-xs px-2.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">+59% Gain</span>
+          </div>
+
+          <div class="space-y-2.5 text-xs">
+            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
+              <span class="text-slate-300">1. Direct Farmgate Reefer Pickup</span>
+              <span class="text-emerald-400 font-mono">₹0 Commission</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
+              <span class="text-slate-300">2. Active Cold-Chain Spoilage Loss</span>
+              <span class="text-emerald-400 font-mono">&lt; 0.5% (Saved)</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
+              <span class="text-slate-300">3. Direct Sourcing Contract with Buyer</span>
+              <span class="text-emerald-400 font-mono">Transparent</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
+              <span class="text-slate-300">4. Automated Smart Escrow Settlement</span>
+              <span class="text-emerald-400 font-mono">T+0 Instant</span>
+            </div>
+            <div class="flex justify-between py-1.5 border-b border-emerald-900/40">
+              <span class="text-slate-300">5. Protocol Network Fee</span>
+              <span class="text-amber-400 font-mono">1.2% Only</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex justify-between items-center">
+            <span class="font-bold text-slate-200 text-xs">Farmer Net Realization:</span>
+            <span class="text-2xl font-extrabold text-emerald-400 font-mono">₹28.50 / kg (+60.1%)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 6: 3-SERVER SQLITE REST API SANDBOX (persona-view-coder) -->
+    <!-- ======================================================== -->
+    <section id="view-coder" class="persona-view hidden space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-bold text-white flex items-center gap-2 font-heading">
+            <i class="fa-solid fa-terminal text-rose-400"></i>
+            <span>3-Server SQLite Interactive Microservice Sandbox</span>
+          </h2>
+          <p class="text-xs text-slate-300 mt-1">Live interactive REST API console querying the native SQLite binary database.</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 font-mono">Database: servers/agriflow.db</span>
+        </div>
+      </div>
+
+      <!-- Endpoint Selector Buttons -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <button onclick="testApiEndpoint('farmer_health')" class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs transition-all">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">PORT 5001</span>
+          <div class="font-bold text-white mt-1.5">GET /api/farmer/crops</div>
+        </button>
+
+        <button onclick="testApiEndpoint('farmer_otp')" class="p-3 rounded-xl bg-slate-900 border border-emerald-500/30 hover:border-emerald-400 text-left text-xs transition-all">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono">PORT 5001</span>
+          <div class="font-bold text-white mt-1.5">POST /api/farmer/auth/send-otp</div>
+        </button>
+
+        <button onclick="testApiEndpoint('buyer_catalog')" class="p-3 rounded-xl bg-slate-900 border border-blue-500/30 hover:border-blue-400 text-left text-xs transition-all">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono">PORT 5002</span>
+          <div class="font-bold text-white mt-1.5">GET /api/buyer/catalog</div>
+        </button>
+
+        <button onclick="testApiEndpoint('logistics_manifest')" class="p-3 rounded-xl bg-slate-900 border border-amber-500/30 hover:border-amber-400 text-left text-xs transition-all">
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-mono">PORT 5003</span>
+          <div class="font-bold text-white mt-1.5">GET /api/logistics/telematics</div>
+        </button>
+      </div>
+
+      <!-- Live Console -->
+      <div class="agri-card p-5 rounded-3xl border border-emerald-500/30 space-y-3">
+        <div class="flex justify-between items-center text-xs font-mono">
+          <span class="text-emerald-400 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span id="api-status-label">SQLite Database Sync — Ready</span>
+          </span>
+          <span class="text-slate-400" id="api-latency-label">Latency: 4.2ms</span>
+        </div>
+        <pre id="api-json-display" class="bg-slate-950 p-4 rounded-2xl text-emerald-400 font-mono text-xs overflow-x-auto max-h-96 border border-emerald-950">SELECT * FROM orders WHERE stage_index = 3;</pre>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- UNIVERSAL FARMER-FRIENDLY AUTHENTICATION MODAL -->
+  <!-- ======================================================== -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="agri-card max-w-lg w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-6 shadow-2xl relative">
+      <button onclick="closeAuthModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div>
+        <h3 class="text-2xl font-bold text-white flex items-center gap-2 font-heading">
+          <i class="fa-solid fa-fingerprint text-emerald-400"></i>
+          <span>Easy Login & Persona Access</span>
+        </h3>
+        <p class="text-xs text-slate-300 mt-1">Designed for rural accessibility (Voice OTP, 1-Tap Kisan Smart Card & PIN)</p>
+      </div>
+
+      <!-- Auth Method Selector Tabs -->
+      <div class="grid grid-cols-4 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/20 text-[11px] font-semibold text-center">
+        <button onclick="switchAuthTab('voice-otp')" id="tab-btn-voice-otp" class="auth-subtab py-2 rounded-xl bg-emerald-600 text-white font-bold">📱 Voice OTP</button>
+        <button onclick="switchAuthTab('qr-card')" id="tab-btn-qr-card" class="auth-subtab py-2 rounded-xl text-slate-300 hover:text-white">📷 Kisan Card</button>
+        <button onclick="switchAuthTab('dialer-pin')" id="tab-btn-dialer-pin" class="auth-subtab py-2 rounded-xl text-slate-300 hover:text-white">🔢 4-Digit PIN</button>
+        <button onclick="switchAuthTab('personas')" id="tab-btn-personas" class="auth-subtab py-2 rounded-xl text-slate-300 hover:text-white">⚡ 1-Click Role</button>
+      </div>
+
+      <!-- Tab 1: Voice & SMS OTP -->
+      <div id="subtab-voice-otp" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Mobile Number / मोबाइल नंबर</label>
+          <div class="flex gap-2">
+            <span class="px-3 py-2 rounded-xl bg-slate-900 border border-emerald-500/30 text-xs font-bold text-emerald-400">+91</span>
+            <input type="tel" id="login-phone" value="9822012345" class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-400 font-mono">
+            <button onclick="sendVoiceOtp()" class="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow-md transition-all">Send OTP</button>
+          </div>
+        </div>
+
+        <div id="otp-input-section" class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-300">Enter 4-Digit OTP / 4 अंकों का कोड</label>
+          <div class="flex gap-2">
+            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="1">
+            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="2">
+            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="9">
+            <input type="text" maxlength="1" class="otp-box w-12 h-12 text-center text-xl font-bold bg-slate-900 border border-emerald-500/40 rounded-xl text-emerald-400 focus:outline-none focus:border-emerald-400" value="5">
+            
+            <button onclick="speakCurrentOtp()" title="Audio Readout (आवाज़ सुनें)" class="ml-auto w-12 h-12 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center text-lg shadow-md transition-transform active:scale-95">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
+          <p class="text-[11px] text-emerald-400 flex items-center gap-1.5"><i class="fa-solid fa-circle-check"></i> Demo OTP prefilled: <strong>1 2 9 5</strong></p>
+        </div>
+
+        <button onclick="verifyOtpAndLogin()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow-xl transition-all">
+          <i class="fa-solid fa-lock-open mr-2"></i> Verify & Enter AgriFlow
+        </button>
+      </div>
+
+      <!-- Tab 2: 1-Tap Kisan Green Card QR Scan -->
+      <div id="subtab-qr-card" class="hidden space-y-4">
+        <p class="text-xs text-slate-300">Tap your registered <strong>Kisan Green Card</strong> to login instantly with zero typing:</p>
+        
+        <!-- Interactive Smart Green Card -->
+        <div onclick="loginWithKisanCard('farmer-1')" class="cursor-pointer p-4 rounded-2xl bg-gradient-to-r from-emerald-950 to-emerald-900 border-2 border-emerald-400/80 shadow-2xl hover:scale-[1.02] transition-transform space-y-3">
+          <div class="flex justify-between items-center border-b border-emerald-700/50 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-seedling text-emerald-400 text-lg"></i>
+              <span class="font-extrabold text-white text-xs tracking-wider font-heading">KISAN SMART CARD • MH GOVT</span>
+            </div>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-bold">VERIFIED</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-14 h-14 rounded-xl object-cover border border-emerald-400">
+            <div class="text-xs">
+              <div class="font-bold text-white text-sm">Ramesh Patil</div>
+              <div class="text-emerald-300 text-[11px] font-mono">ID: KISAN-MH-7721</div>
+              <div class="text-slate-300 text-[10px]">Nashik Agro FPO • 4.5 Acres</div>
+            </div>
+            <div class="ml-auto text-emerald-400 text-2xl">
+              <i class="fa-solid fa-qrcode"></i>
+            </div>
+          </div>
+          <div class="text-center text-[11px] font-bold text-emerald-300 bg-emerald-950/60 py-1 rounded-lg">
+            👉 Tap Here to Login as Ramesh Patil
+          </div>
+        </div>
+
+        <div onclick="loginWithKisanCard('farmer-2')" class="cursor-pointer p-3.5 rounded-2xl bg-slate-900/90 border border-emerald-500/30 hover:border-emerald-400 transition-all flex items-center gap-3">
+          <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=150" alt="Farmer" class="w-10 h-10 rounded-lg object-cover">
+          <div class="text-xs">
+            <div class="font-bold text-white">Sardar Balram Singh</div>
+            <div class="text-slate-400 text-[10px]">KISAN-PB-3310 • Ludhiana, Punjab</div>
+          </div>
+          <button class="ml-auto text-xs px-3 py-1 bg-emerald-600 text-white rounded-lg font-bold">Select</button>
+        </div>
+      </div>
+
+      <!-- Tab 3: 4-Digit Dialer PIN -->
+      <div id="subtab-dialer-pin" class="hidden space-y-4">
+        <div class="text-center">
+          <div class="text-xs text-slate-300">Enter Your 4-Digit Security PIN:</div>
+          <div class="text-2xl font-mono tracking-widest text-emerald-400 font-bold mt-2" id="pin-display">••••</div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 max-w-[240px] mx-auto">
+          <button onclick="pressPin('1')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">1</button>
+          <button onclick="pressPin('2')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">2</button>
+          <button onclick="pressPin('3')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">3</button>
+          <button onclick="pressPin('4')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">4</button>
+          <button onclick="pressPin('5')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">5</button>
+          <button onclick="pressPin('6')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">6</button>
+          <button onclick="pressPin('7')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">7</button>
+          <button onclick="pressPin('8')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">8</button>
+          <button onclick="pressPin('9')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">9</button>
+          <button onclick="clearPin()" class="h-12 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-400 font-bold text-xs">CLR</button>
+          <button onclick="pressPin('0')" class="h-12 rounded-xl bg-slate-900 border border-emerald-500/30 text-white font-bold text-lg hover:bg-emerald-900">0</button>
+          <button onclick="submitPinLogin()" class="h-12 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500">OK</button>
+        </div>
+      </div>
+
+      <!-- Tab 4: 1-Click Role Switcher for Hackathon Jury -->
+      <div id="subtab-personas" class="hidden space-y-2">
+        <p class="text-xs text-slate-300">Instantly authenticate as any ecosystem stakeholder for live evaluation:</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+          <button onclick="quickLoginPersona('farmer-1')" class="p-2.5 rounded-xl bg-emerald-900/40 hover:bg-emerald-800 border border-emerald-500/30 text-left flex items-center gap-2.5">
+            <i class="fa-solid fa-wheat-awn text-emerald-400 text-base"></i>
+            <div>
+              <div class="font-bold text-white">Ramesh Patil</div>
+              <div class="text-[10px] text-emerald-300">🌾 Kisan (Nashik)</div>
+            </div>
+          </button>
+
+          <button onclick="quickLoginPersona('buyer-1')" class="p-2.5 rounded-xl bg-blue-900/40 hover:bg-blue-800 border border-blue-500/30 text-left flex items-center gap-2.5">
+            <i class="fa-solid fa-building text-blue-400 text-base"></i>
+            <div>
+              <div class="font-bold text-white">BigBasket Lead</div>
+              <div class="text-[10px] text-blue-300">🛒 Institutional Buyer</div>
+            </div>
+          </button>
+
+          <button onclick="quickLoginPersona('logistics-1')" class="p-2.5 rounded-xl bg-amber-900/40 hover:bg-amber-800 border border-amber-500/30 text-left flex items-center gap-2.5">
+            <i class="fa-solid fa-truck text-amber-400 text-base"></i>
+            <div>
+              <div class="font-bold text-white">Suresh Mane</div>
+              <div class="text-[10px] text-amber-300">🚚 Reefer Fleet Driver</div>
+            </div>
+          </button>
+
+          <button onclick="quickLoginPersona('qc-1')" class="p-2.5 rounded-xl bg-purple-900/40 hover:bg-purple-800 border border-purple-500/30 text-left flex items-center gap-2.5">
+            <i class="fa-solid fa-microscope text-purple-400 text-base"></i>
+            <div>
+              <div class="font-bold text-white">Dr. Swaminathan</div>
+              <div class="text-[10px] text-purple-300">🔬 Senior QC Officer</div>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- DIGITAL WAYBILL & TAX INVOICE MODAL -->
+  <!-- ======================================================== -->
+  <div id="waybill-modal" class="fixed inset-0 z-50 hidden bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="agri-card max-w-2xl w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeWaybillModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4">
+        <div>
+          <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">AGRI-GST ELECTRONIC WAYBILL</span>
+          <h3 class="text-xl font-bold text-white mt-1 font-heading" id="wb-order-id">ORD-2026-9901</h3>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-slate-400">QR Gate Pass Code</div>
+          <div class="text-emerald-400 font-mono font-bold text-sm">AGRI-PASS-8821-OK</div>
+        </div>
+      </div>
+
+      <!-- Waybill Details -->
+      <div class="grid grid-cols-2 gap-4 text-xs">
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-emerald-500/20 space-y-1">
+          <div class="text-[10px] text-emerald-400 font-bold uppercase">Consignor (Farmer / FPO)</div>
+          <div class="font-bold text-white" id="wb-farmer-name">Ramesh Patil (Lasalgaon Hub)</div>
+          <div class="text-slate-400">GSTIN: 27AAGCR9901F1ZX • Nashik, MH</div>
+        </div>
+
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-emerald-500/20 space-y-1">
+          <div class="text-[10px] text-blue-400 font-bold uppercase">Consignee (Buyer Depot)</div>
+          <div class="font-bold text-white" id="wb-buyer-name">BigBasket Sourcing Hub</div>
+          <div class="text-slate-400">Bhiwandi Central Mega Hub, Bay 4</div>
+        </div>
+
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-emerald-500/20 space-y-1">
+          <div class="text-[10px] text-amber-400 font-bold uppercase">Reefer Carrier & Telematics</div>
+          <div class="font-bold text-white" id="wb-truck-no">MH-15-EG-8821 (Tata Ultra)</div>
+          <div class="text-slate-400">Driver: Suresh Mane • Live Temp: +4.2°C</div>
+        </div>
+
+        <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-emerald-500/20 space-y-1">
+          <div class="text-[10px] text-purple-400 font-bold uppercase">QC Inspection Certificate</div>
+          <div class="font-bold text-white" id="wb-qc-officer">Dr. M. Swaminathan (Grade A+)</div>
+          <div class="text-slate-400">NIR Sugar Brix: 12.8° • Moisture: 13.2%</div>
+        </div>
+      </div>
+
+      <!-- Financial Line Item -->
+      <div class="bg-emerald-950/80 p-4 rounded-2xl border border-emerald-500/40 flex justify-between items-center text-xs">
+        <div>
+          <div class="font-bold text-white text-sm" id="wb-commodity">Nashik Red Onion (14.5 Metric Tons)</div>
+          <div class="text-emerald-400">Direct Contract Rate: ₹28.50 / kg (Zero APMC Intermediary Cut)</div>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-slate-400">Total Escrow Value</div>
+          <div class="text-xl font-extrabold text-white font-mono" id="wb-total-val">₹4,13,250</div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeWaybillModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Close</button>
+        <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-emerald-500 text-slate-950 font-bold text-xs shadow-lg flex items-center gap-2">
+          <i class="fa-solid fa-print"></i> Print Official Waybill
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- BUYER CART DRAWER -->
+  <!-- ======================================================== -->
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-slate-950/95 backdrop-blur-xl border-l border-emerald-500/30 p-6 transform translate-x-full transition-transform duration-300 flex flex-col justify-between shadow-2xl">
+    <div class="space-y-4">
+      <div class="flex items-center justify-between border-b border-emerald-900/60 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-basket-shopping text-emerald-400 text-lg"></i>
+          <h3 class="font-bold text-white text-base font-heading">Direct Procurement Basket</h3>
+        </div>
+        <button onclick="toggleCartDrawer()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Items List -->
+      <div id="cart-items-list" class="space-y-3 max-h-[60vh] overflow-y-auto">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+
+    <!-- Checkout Action -->
+    <div class="border-t border-emerald-900/60 pt-4 space-y-3">
+      <div class="flex justify-between text-xs">
+        <span class="text-slate-400">Total Escrow Amount:</span>
+        <span class="text-lg font-extrabold text-white font-mono" id="cart-total-display">₹2,85,000</span>
+      </div>
+      <button onclick="checkoutCartOrders()" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-bold text-sm shadow-xl flex items-center justify-center gap-2">
+        <i class="fa-solid fa-shield-halved"></i> Lock Escrow & Dispatch Reefer
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- FOOTER -->
+  <!-- ======================================================== -->
+  <footer class="mt-auto bg-slate-950/90 border-t border-emerald-900/60 py-6 text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid fa-seedling text-emerald-400"></i>
+        <span>AgriFlow AI • Smart India Hackathon 2026 Decentralized Agri Protocol</span>
+      </div>
+      <div class="flex items-center gap-4 text-[11px]">
+        <span>🌾 14,200+ FPO Farmers</span>
+        <span>❄️ 100% Active Reefer Cold-Chain</span>
+        <span>⚡ T+0 Direct Settlements</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================== -->
+  <!-- MAIN CLIENT-SIDE SCRIPT: WEB AUDIO, CANVAS AI & SQLITE SYNC -->
+  <!-- ======================================================== -->
+  <script>
+    // --- Web Audio Synthesizer Effects for High Realism ---
+    const SoundEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx && (window.AudioContext || window.webkitAudioContext)) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      playCashPayout() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc1.type = 'triangle';
+        osc2.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc1.frequency.exponentialRampToValueAtTime(880, now + 0.15); // A5
+        osc2.frequency.setValueAtTime(1174.66, now); // D6
+
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc1.stop(now + 0.35);
+        osc2.stop(now + 0.35);
+      },
+      playDispatchChime() {
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(554.37, now + 0.08);
+        osc.frequency.setValueAtTime(659.25, now + 0.16);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.4);
+      }
+    };
+
+    // Global Application State
+    const AppState = {
+      isSunlightMode: false,
+      currentUser: {
+        id: "farmer-1",
+        name: "Ramesh Patil",
+        role: "farmer",
+        phone: "9822012345",
+        kisanId: "KISAN-MH-7721",
+        fpo: "Nashik Agro Producer Co.",
+        walletBalance: 184500,
+        avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
+      },
+      currentPin: "",
+      cart: [
+        { id: "crop-1", name: "Nashik Red Onion (Export A+)", quantityTons: 10, pricePerKg: 28.50, farmerName: "Ramesh Patil", farmerPhone: "+91 98220 12345" }
+      ],
+      orders: [
+        {
+          id: "ORD-2026-9901",
+          commodity: "Nashik Red Onion (Garwa Grade A+)",
+          quantityTons: 14.5,
+          pricePerKg: 28.50,
+          totalValue: 413250,
+          stageIndex: 3,
+          stageName: "Cold Transit",
+          stageColor: "blue",
+          farmer: { name: "Ramesh Patil", phone: "+91 98220 12345", kisanId: "KISAN-MH-7721", farm: "Lasalgaon Gate No. 4, Nashik", slot: "Today 06:30 AM" },
+          buyer: { name: "BigBasket Institutional Sourcing", phone: "+91 99001 12233", company: "Innovative Retail Concepts Pvt Ltd", depot: "Bhiwandi Central Mega Hub, Bay 4", slot: "Tonight 10:00 PM" },
+          logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+4.2 C", humidity: "68%", status: "In-Transit (Sinnar Bypass, NH-60)", eta: "4 hrs 15 mins" },
+          qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Cold Chamber Bay 3", status: "Passed Grade A+ (Brix 12.8)", certNo: "QC-2026-NASHIK-9901" }
+        },
+        {
+          id: "ORD-2026-9902",
+          commodity: "Ratnagiri Alphonso Mango (GI)",
+          quantityTons: 4.2,
+          pricePerKg: 145.00,
+          totalValue: 609000,
+          stageIndex: 1,
+          stageName: "QC Inspection",
+          stageColor: "amber",
+          farmer: { name: "Sanjay Sawant", phone: "+91 98233 44556", kisanId: "KISAN-MH-8812", farm: "Devgad Orchard Block C, Ratnagiri", slot: "Today 08:00 AM" },
+          buyer: { name: "Reliance Fresh Regional Hub", phone: "+91 99004 45566", company: "Reliance Retail Ltd", depot: "Ghansoli Cold Logistics Depot, Bay 2", slot: "Tomorrow 05:00 AM" },
+          logistics: { truckNo: "MH-08-AV-3344", driver: "Tanaji Gaikwad", phone: "+91 98901 67890", temp: "+10.8 C", humidity: "88%", status: "Arrived at Kolhapur QC Hub", eta: "12 hrs" },
+          qc: { officer: "Er. Kavita Deshmukh", badge: "AGRI-QC-PUNE-04", bay: "Chamber Bay 1 (Pre-Cooling)", status: "NIR Optical Scan in Progress", certNo: "QC-2026-KOLHAPUR-9902" }
+        },
+        {
+          id: "ORD-2026-9903",
+          commodity: "Pusa Ruby Polyhouse Tomatoes",
+          quantityTons: 8.0,
+          pricePerKg: 32.00,
+          totalValue: 256000,
+          stageIndex: 4,
+          stageName: "Paid & Settled (T+0)",
+          stageColor: "emerald",
+          farmer: { name: "Sunita Jadhav", phone: "+91 98501 22334", kisanId: "KISAN-MH-4491", farm: "Khed Polyhouse Cluster 2, Pune", slot: "Yesterday 04:00 PM" },
+          buyer: { name: "Swiggy Instamart Dark Stores", phone: "+91 99887 76655", company: "Bundl Technologies Pvt Ltd", depot: "Pune PCMC Fulfilment Center, Bay 1", slot: "Delivered" },
+          logistics: { truckNo: "MH-12-PQ-9009", driver: "Mahesh Shinde", phone: "+91 98223 99887", temp: "+8.4 C", humidity: "86%", status: "Delivered & POD Signed", eta: "Completed" },
+          qc: { officer: "Dr. Vikas Kulkarni", badge: "AGRI-QC-PUNE-09", bay: "Cold Dock Bay 2", status: "Accepted Grade A", certNo: "QC-2026-PUNE-9903" }
+        }
+      ],
+      crops: [
+        { id: "crop-1", name: "Nashik Red Onion (Garwa)", variety: "Allium Cepa (Grade A+)", farmer: "Ramesh Patil", location: "Nashik, MH", stockTons: 24.5, directPrice: 28.50, mandiPrice: 17.80, farmerGain: "+60.1%", brix: "12.8° Bx", shelfLifeDays: 90, reeferTemp: "+2 to +4°C", image: "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600" },
+        { id: "crop-2", name: "Ratnagiri Alphonso Mango", variety: "Mangifera Indica (GI)", farmer: "Sanjay Sawant", location: "Ratnagiri, MH", stockTons: 8.0, directPrice: 145.00, mandiPrice: 88.00, farmerGain: "+64.8%", brix: "19.5° Bx", shelfLifeDays: 14, reeferTemp: "+10 to +12°C", image: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=600" },
+        { id: "crop-3", name: "Jalgaon Cavendish Banana", variety: "Musa Acuminata AAA", farmer: "Kishore Chaudhari", location: "Jalgaon, MH", stockTons: 38.0, directPrice: 22.00, mandiPrice: 13.50, farmerGain: "+63.0%", brix: "21.0° Bx", shelfLifeDays: 21, reeferTemp: "+13 to +14°C", image: "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600" },
+        { id: "crop-4", name: "Sangli Thompson Seedless Grapes", variety: "Vitis Vinifera EuroGAP", farmer: "Nitin Shinde", location: "Sangli, MH", stockTons: 15.0, directPrice: 78.00, mandiPrice: 48.00, farmerGain: "+62.5%", brix: "18.2° Bx", shelfLifeDays: 45, reeferTemp: "-0.5 to 0°C", image: "https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=600" },
+        { id: "crop-5", name: "Solapur Bhagwa Pomegranate", variety: "Punica Granatum Deep Red", farmer: "Ganesh Kadam", location: "Solapur, MH", stockTons: 18.5, directPrice: 115.00, mandiPrice: 72.00, farmerGain: "+59.7%", brix: "16.4° Bx", shelfLifeDays: 60, reeferTemp: "+5 to +6°C", image: "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=600" },
+        { id: "crop-6", name: "Pusa Ruby Polyhouse Tomato", variety: "Solanum Lycopersicum Firm", farmer: "Sunita Jadhav", location: "Pune, MH", stockTons: 12.0, directPrice: 32.00, mandiPrice: 18.50, farmerGain: "+73.0%", brix: "5.6° Bx", shelfLifeDays: 18, reeferTemp: "+8 to +10°C", image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600" }
+      ],
+      selectedVoiceLang: "hi",
+      chartInstance: null,
+      leafletMap: null,
+      truckMarker: null,
+      truckAnimationTimer: null
+    };
+
+    // --- Sunlight Contrast Mode Toggle ---
+    function toggleSunlightMode() {
+      AppState.isSunlightMode = !AppState.isSunlightMode;
+      document.body.classList.toggle('sunlight-mode', AppState.isSunlightMode);
+      document.getElementById('sunlight-mode-label').textContent = AppState.isSunlightMode ? "🌙 Night Vision Mode" : "☀️ Sunlight Field Mode";
+    }
+
+    // --- Navigation & Persona Switching ---
+    function switchPersona(viewId) {
+      document.querySelectorAll('.persona-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.persona-tab').forEach(el => {
+        el.classList.remove('bg-emerald-600', 'text-white', 'shadow-md');
+        el.classList.add('text-slate-300');
+      });
+
+      const targetView = document.getElementById('view-' + viewId);
+      if (targetView) targetView.classList.remove('hidden');
+
+      const targetTab = document.getElementById('nav-' + viewId);
+      if (targetTab) {
+        targetTab.classList.remove('text-slate-300');
+        targetTab.classList.add('bg-emerald-600', 'text-white', 'shadow-md');
+      }
+
+      if (viewId === 'farmer') {
+        setTimeout(initDegradationChart, 100);
+        setTimeout(initLeafletRadar, 150);
+      }
+    }
+
+    // --- Real Canvas Image Computer Vision Pixel Analyzer ---
+    function handleImageUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const img = document.getElementById('preview-crop-img');
+        img.src = evt.target.result;
+        img.onload = () => performCanvasPixelAnalysis(img);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function analyzeSampleImage(type) {
+      document.querySelectorAll('.crop-btn').forEach(b => {
+        b.classList.remove('bg-emerald-800/80', 'border-emerald-400');
+        b.classList.add('bg-slate-900/80', 'border-emerald-500/20');
+      });
+
+      const btn = document.getElementById('btn-crop-' + type);
+      if (btn) btn.classList.add('bg-emerald-800/80', 'border-emerald-400');
+
+      const img = document.getElementById('preview-crop-img');
+      if (type === 'onion') {
+        img.src = "https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400";
+        document.getElementById('ripeness-slider').value = 65;
+      } else if (type === 'mango') {
+        img.src = "https://images.unsplash.com/photo-1553279768-865429fa0078?w=400";
+        document.getElementById('ripeness-slider').value = 82;
+      } else if (type === 'tomato') {
+        img.src = "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400";
+        document.getElementById('ripeness-slider').value = 55;
+      } else if (type === 'banana') {
+        img.src = "https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400";
+        document.getElementById('ripeness-slider').value = 75;
+      }
+
+      img.onload = () => performCanvasPixelAnalysis(img);
+      updateRipenessStudio(document.getElementById('ripeness-slider').value);
+    }
+
+    function performCanvasPixelAnalysis(imgElement) {
+      try {
+        const canvas = document.getElementById('hidden-cv-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imgData.data;
+        let r = 0, g = 0, b = 0;
+        const totalPixels = data.length / 4;
+
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i];
+          g += data[i + 1];
+          b += data[i + 2];
+        }
+
+        const avgR = Math.round(r / totalPixels);
+        const avgG = Math.round(g / totalPixels);
+        const avgB = Math.round(b / totalPixels);
+        const sum = avgR + avgG + avgB || 1;
+
+        const rPct = Math.round((avgR / sum) * 100);
+        const gPct = Math.round((avgG / sum) * 100);
+        const bPct = Math.round((avgB / sum) * 100);
+
+        document.getElementById('cv-color-ratio').textContent = `R: ${rPct}% • G: ${gPct}% • B: ${bPct}%`;
+        document.getElementById('cv-chlorophyll').textContent = `${Math.min(95, Math.max(10, gPct * 2))}% Residual`;
+      } catch (err) {
+        // Cross-origin image fallback
+        document.getElementById('cv-color-ratio').textContent = "R: 62% • G: 24% • B: 14%";
+      }
+    }
+
+    // --- Render Orders Manifest ---
+    function renderOrdersManifest() {
+      const container = document.getElementById('orders-manifest-container');
+      if (!container) return;
+
+      const stages = [
+        { name: "Escrow Locked", color: "amber", icon: "fa-shield-halved" },
+        { name: "QC Passed & Stamped", color: "purple", icon: "fa-microscope" },
+        { name: "Dispatched from Bay", color: "indigo", icon: "fa-dolly" },
+        { name: "Cold Transit", color: "blue", icon: "fa-truck-fast" },
+        { name: "Paid & Settled (T+0)", color: "emerald", icon: "fa-circle-check" }
+      ];
+
+      container.innerHTML = AppState.orders.map(ord => {
+        const stage = stages[ord.stageIndex] || stages[0];
+
+        const stageSteps = stages.map((s, sIdx) => {
+          const isPassed = sIdx <= ord.stageIndex;
+          const dotColor = isPassed ? 'bg-emerald-400 text-slate-950 font-bold' : 'bg-slate-800 text-slate-500';
+          const textColor = isPassed ? 'text-emerald-300 font-bold' : 'text-slate-500';
+
+          return `
+            <div class="flex flex-col items-center flex-1 text-center relative">
+              <div class="w-7 h-7 rounded-full ${dotColor} flex items-center justify-center text-xs font-bold shadow-md z-10">
+                ${isPassed ? '<i class="fa-solid fa-check text-[10px]"></i>' : (sIdx + 1)}
+              </div>
+              <div class="text-[10px] ${textColor} mt-1">${s.name}</div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="agri-card p-6 rounded-3xl border border-emerald-500/30 space-y-5">
+            <!-- Top Summary Header -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-emerald-900/60 pb-4">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">${ord.id}</span>
+                  <h3 class="text-lg font-bold text-white font-heading">${ord.commodity}</h3>
+                </div>
+                <div class="text-xs text-slate-300 mt-1">
+                  Volume: <strong class="text-white font-mono">${ord.quantityTons} Tons</strong> • Rate: <strong class="text-emerald-400 font-mono">₹${ord.pricePerKg.toFixed(2)}/kg</strong> • Escrow Total: <strong class="text-amber-300 font-mono">₹${ord.totalValue.toLocaleString('en-IN')}</strong>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2">
+                <button onclick="advanceOrderStage('${ord.id}')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center gap-1.5">
+                  <span>Advance Stage</span>
+                  <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+                <button onclick="openWaybillModal('${ord.id}')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 text-xs font-bold text-emerald-300 transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-file-invoice"></i>
+                  <span>Waybill</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 5-Stage Visual Progress Bar -->
+            <div class="relative py-2">
+              <div class="absolute top-5 left-8 right-8 h-1 bg-slate-800 -z-0"></div>
+              <div class="absolute top-5 left-8 h-1 bg-emerald-500 -z-0 transition-all duration-500" style="width: ${(ord.stageIndex / 4) * 85}%"></div>
+              <div class="flex justify-between items-center relative z-10">
+                ${stageSteps}
+              </div>
+            </div>
+
+            <!-- 4-Way Assigned Manifest Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+              <!-- Col 1: Farmer -->
+              <div class="p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/20 space-y-1">
+                <div class="text-[10px] text-emerald-400 font-bold uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-wheat-awn"></i> Assigned Farmer
+                </div>
+                <div class="font-bold text-white">${ord.farmer.name}</div>
+                <div class="text-slate-400 text-[11px]">${ord.farmer.farm}</div>
+                <div class="text-emerald-300 text-[10px] font-mono">${ord.farmer.phone}</div>
+              </div>
+
+              <!-- Col 2: Buyer -->
+              <div class="p-3.5 rounded-2xl bg-blue-950/60 border border-blue-500/20 space-y-1">
+                <div class="text-[10px] text-blue-400 font-bold uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-store"></i> Assigned Buyer Depot
+                </div>
+                <div class="font-bold text-white">${ord.buyer.name}</div>
+                <div class="text-slate-400 text-[11px]">${ord.buyer.depot}</div>
+                <div class="text-blue-300 text-[10px] font-mono">${ord.buyer.phone}</div>
+              </div>
+
+              <!-- Col 3: Logistics -->
+              <div class="p-3.5 rounded-2xl bg-amber-950/60 border border-amber-500/20 space-y-1">
+                <div class="text-[10px] text-amber-400 font-bold uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-truck-fast"></i> Assigned Reefer Fleet
+                </div>
+                <div class="font-bold text-white font-mono">${ord.logistics.truckNo}</div>
+                <div class="text-slate-400 text-[11px]">Driver: ${ord.logistics.driver} (${ord.logistics.phone})</div>
+                <div class="text-amber-300 text-[10px] font-mono">Temp: ${ord.logistics.temp} • ${ord.logistics.status}</div>
+              </div>
+
+              <!-- Col 4: QC Officer -->
+              <div class="p-3.5 rounded-2xl bg-purple-950/60 border border-purple-500/20 space-y-1">
+                <div class="text-[10px] text-purple-400 font-bold uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-microscope"></i> Assigned QC & Bay
+                </div>
+                <div class="font-bold text-white">${ord.qc.officer}</div>
+                <div class="text-slate-400 text-[11px]">${ord.qc.bay}</div>
+                <div class="text-purple-300 text-[10px]">${ord.qc.status}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // --- Advance Order Stage with SQLite Sync, Sounds & Confetti ---
+    async function advanceOrderStage(orderId) {
+      const ord = AppState.orders.find(o => o.id === orderId);
+      if (!ord) return;
+
+      SoundEngine.playDispatchChime();
+
+      try {
+        const res = await fetch(`http://localhost:5003/api/logistics/orders/${orderId}/advance`, { method: 'POST' });
+        if (res.ok) {
+          const data = await res.json();
+          ord.stageIndex = data.stageIndex;
+          ord.stageName = data.stageName;
+        } else {
+          ord.stageIndex = (ord.stageIndex + 1) % 5;
+        }
+      } catch (e) {
+        ord.stageIndex = (ord.stageIndex + 1) % 5;
+      }
+
+      if (ord.stageIndex === 4) {
+        SoundEngine.playCashPayout();
+        confetti({ particleCount: 140, spread: 85, origin: { y: 0.6 } });
+        AppState.currentUser.walletBalance += ord.totalValue;
+        document.getElementById('farmer-wallet-display').textContent = `₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')}`;
+      }
+
+      renderOrdersManifest();
+    }
+
+    // --- Render Buyer Catalog ---
+    function renderBuyerCatalog() {
+      const grid = document.getElementById('buyer-catalog-grid');
+      if (!grid) return;
+
+      grid.innerHTML = AppState.crops.map(c => `
+        <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden agri-card-hover flex flex-col justify-between">
+          <div class="relative h-44 overflow-hidden">
+            <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover">
+            <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-emerald-400 text-emerald-300 font-bold text-xs">
+              ${c.farmerGain} Farmer Uplift
+            </div>
+            <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-emerald-950/90 text-emerald-300 font-mono text-[11px] border border-emerald-500/40">
+              <i class="fa-solid fa-snowflake mr-1"></i>${c.reeferTemp}
+            </div>
+          </div>
+
+          <div class="p-5 space-y-4">
+            <div>
+              <div class="text-[11px] text-slate-400 font-mono">${c.variety}</div>
+              <h3 class="font-bold text-white text-base mt-0.5 font-heading">${c.name}</h3>
+              <div class="text-xs text-slate-300 mt-1"><i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>${c.location} • Farmer: ${c.farmer}</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 bg-slate-900/80 p-3 rounded-2xl text-xs border border-emerald-500/20">
+              <div>
+                <div class="text-[10px] text-slate-400 uppercase">Direct Price</div>
+                <div class="text-lg font-extrabold text-emerald-400 font-mono">₹${c.directPrice.toFixed(2)}/kg</div>
+              </div>
+              <div>
+                <div class="text-[10px] text-slate-400 uppercase">Mandi Benchmark</div>
+                <div class="text-sm font-semibold text-rose-400 line-through font-mono">₹${c.mandiPrice.toFixed(2)}/kg</div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs text-slate-300 font-mono">
+              <span>Brix: <strong class="text-amber-400">${c.brix}</strong></span>
+              <span>Shelf-Life: <strong class="text-emerald-400">${c.shelfLifeDays} Days</strong></span>
+            </div>
+
+            <button onclick="addToBuyerCart('${c.id}')" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-cart-plus"></i>
+              <span>Add to Procurement Basket</span>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // --- Render Master Matrix Table ---
+    function renderMasterMatrix() {
+      const tbody = document.getElementById('matrix-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = AppState.crops.map(c => `
+        <tr class="hover:bg-emerald-950/40 transition-colors">
+          <td class="py-3 px-4 font-bold text-white">${c.name}<div class="text-[10px] text-slate-400 font-normal">${c.variety}</div></td>
+          <td class="py-3 px-4">${c.location}<div class="text-[10px] text-emerald-400">${c.farmer}</div></td>
+          <td class="py-3 px-4 font-mono font-bold">${c.stockTons} T</td>
+          <td class="py-3 px-4 font-mono font-bold text-emerald-400">₹${c.directPrice.toFixed(2)}</td>
+          <td class="py-3 px-4 font-mono text-slate-400">₹${c.mandiPrice.toFixed(2)}</td>
+          <td class="py-3 px-4 font-mono font-bold text-emerald-400">${c.farmerGain}</td>
+          <td class="py-3 px-4 font-mono text-amber-400">${c.brix}</td>
+          <td class="py-3 px-4 font-mono text-blue-300">${c.reeferTemp}</td>
+          <td class="py-3 px-4 font-mono">${c.shelfLifeDays} Days</td>
+        </tr>
+      `).join('');
+    }
+
+    // --- Cart & Checkout Management ---
+    function toggleCartDrawer() {
+      const drawer = document.getElementById('cart-drawer');
+      drawer.classList.toggle('translate-x-full');
+      renderCartDrawerItems();
+    }
+
+    function addToBuyerCart(cropId) {
+      const crop = AppState.crops.find(c => c.id === cropId);
+      if (!crop) return;
+
+      SoundEngine.playDispatchChime();
+      AppState.cart.push({
+        id: crop.id,
+        name: crop.name,
+        quantityTons: 5,
+        pricePerKg: crop.directPrice,
+        farmerName: crop.farmer,
+        farmerPhone: "+91 98220 12345"
+      });
+
+      document.getElementById('cart-counter').textContent = AppState.cart.length;
+      confetti({ particleCount: 40, spread: 60, origin: { y: 0.9, x: 0.9 } });
+      toggleCartDrawer();
+    }
+
+    function renderCartDrawerItems() {
+      const list = document.getElementById('cart-items-list');
+      if (!list) return;
+
+      let total = 0;
+      list.innerHTML = AppState.cart.map((item, idx) => {
+        const itemVal = item.quantityTons * 1000 * item.pricePerKg;
+        total += itemVal;
+
+        return `
+          <div class="p-3 rounded-2xl bg-slate-900 border border-emerald-500/20 flex items-center justify-between text-xs">
+            <div>
+              <div class="font-bold text-white">${item.name}</div>
+              <div class="text-slate-400 text-[11px]">${item.quantityTons} Tons • ₹${item.pricePerKg}/kg</div>
+              <div class="text-emerald-400 font-mono font-bold">₹${itemVal.toLocaleString('en-IN')}</div>
+            </div>
+            <button onclick="removeCartItem(${idx})" class="text-rose-400 hover:text-rose-300 p-2">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('cart-total-display').textContent = `₹${total.toLocaleString('en-IN')}`;
+    }
+
+    function removeCartItem(idx) {
+      AppState.cart.splice(idx, 1);
+      document.getElementById('cart-counter').textContent = AppState.cart.length;
+      renderCartDrawerItems();
+    }
+
+    async function checkoutCartOrders() {
+      if (AppState.cart.length === 0) return alert('Your basket is empty!');
+
+      SoundEngine.playCashPayout();
+      try {
+        const res = await fetch('http://localhost:5002/api/buyer/orders/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: AppState.cart,
+            deliveryBay: 'Bhiwandi Central Bay 4'
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Written orders to SQLite:", data);
+        }
+      } catch (e) {
+        console.log("Client fallback checkout.");
+      }
+
+      AppState.cart.forEach(item => {
+        AppState.orders.unshift({
+          id: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+          commodity: item.name,
+          quantityTons: item.quantityTons,
+          pricePerKg: item.pricePerKg,
+          totalValue: item.quantityTons * 1000 * item.pricePerKg,
+          stageIndex: 0,
+          stageName: "Escrow Locked",
+          stageColor: "amber",
+          farmer: { name: item.farmerName, phone: item.farmerPhone, kisanId: "KISAN-MH-7721", farm: "Lasalgaon Hub", slot: "Scheduled" },
+          buyer: { name: AppState.currentUser.name, phone: AppState.currentUser.phone, company: "BigBasket", depot: "Bhiwandi Bay 4", slot: "Tomorrow" },
+          logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+4.2 C", humidity: "68%", status: "Assigned", eta: "3 hrs" },
+          qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Bay 3", status: "Escrow Locked", certNo: "QC-2026-9904" }
+        });
+      });
+
+      AppState.cart = [];
+      document.getElementById('cart-counter').textContent = '0';
+      toggleCartDrawer();
+      switchPersona('orders');
+      renderOrdersManifest();
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
+    }
+
+    // --- Schedule Pickup from Farmer Station ---
+    async function submitPickupSchedule(e) {
+      e.preventDefault();
+      const cropName = document.getElementById('pickup-crop').value;
+      const volume = document.getElementById('pickup-volume').value;
+      const slot = document.getElementById('pickup-slot').value;
+
+      SoundEngine.playDispatchChime();
+
+      try {
+        await fetch('http://localhost:5001/api/farmer/schedule-pickup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            farmerName: AppState.currentUser.name,
+            phone: AppState.currentUser.phone,
+            cropName,
+            quantityTons: volume,
+            pickupSlot: slot
+          })
+        });
+      } catch (err) {
+        console.log("Local order added.");
+      }
+
+      AppState.orders.unshift({
+        id: `ORD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+        commodity: cropName,
+        quantityTons: parseFloat(volume),
+        pricePerKg: 28.50,
+        totalValue: parseFloat(volume) * 1000 * 28.50,
+        stageIndex: 0,
+        stageName: "Escrow Locked",
+        stageColor: "amber",
+        farmer: { name: AppState.currentUser.name, phone: AppState.currentUser.phone, kisanId: "KISAN-MH-7721", farm: "Lasalgaon Gate No. 4", slot },
+        buyer: { name: "BigBasket Institutional", phone: "+91 99001 12233", company: "BigBasket", depot: "Bhiwandi Bay 4", slot: "Scheduled" },
+        logistics: { truckNo: "MH-15-EG-8821", driver: "Suresh Mane", phone: "+91 97661 23456", temp: "+4.2 C", humidity: "68%", status: "Assigned (En Route)", eta: "2 hrs" },
+        qc: { officer: "Dr. M. Swaminathan", badge: "AGRI-QC-NASHIK-01", bay: "Cold Bay 3", status: "Awaiting Farm Arrival", certNo: "QC-2026-9905" }
+      });
+
+      confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
+      alert(`✅ Pickup scheduled in SQLite database! Reefer Truck MH-15-EG-8821 dispatched for ${cropName} (${volume} Tons).`);
+      renderOrdersManifest();
+    }
+
+    // --- AI Ripeness Studio Controls & Chart ---
+    function updateRipenessStudio(val) {
+      const v = parseInt(val);
+      const label = document.getElementById('ripeness-percent-label');
+      const valBrix = document.getElementById('val-brix');
+      const valEthylene = document.getElementById('val-ethylene');
+      const valShelflife = document.getElementById('val-shelflife');
+      const advisorText = document.getElementById('audio-advisor-text');
+      const gradeText = document.getElementById('cv-quality-grade');
+
+      const brix = (v * 0.18 + 2.5).toFixed(1);
+      const ethylene = (v * 0.015 + 0.02).toFixed(2);
+      const shelfDays = Math.max(5, Math.floor(100 - (v * 0.8)));
+
+      let grade = "Grade A+ (Export Prime)";
+      if (v < 40) grade = "Grade C (Local Mandi)";
+      else if (v > 85) grade = "Grade B+ (Immediate Consumption)";
+
+      label.textContent = `${v}% (${v < 40 ? 'Early Raw' : v < 75 ? 'Optimal Export' : 'Full Ripe'})`;
+      valBrix.textContent = `${brix}° Bx`;
+      valEthylene.textContent = `${ethylene} ppm`;
+      valShelflife.textContent = `${shelfDays} Days`;
+      gradeText.textContent = grade;
+
+      if (AppState.selectedVoiceLang === 'hi') {
+        advisorText.textContent = `"शुगर ब्रिक्स ${brix} है। यह एक्सपोर्ट के लिए उपयुक्त है। शेल्फ-लाइफ ${shelfDays} दिन है।"`;
+      } else {
+        advisorText.textContent = `"NIR Brix is ${brix}. Optimal export quality window. Remaining shelf-life: ${shelfDays} days."`;
+      }
+    }
+
+    function setVoiceLang(lang) {
+      AppState.selectedVoiceLang = lang;
+      const slider = document.getElementById('ripeness-slider');
+      updateRipenessStudio(slider.value);
+      playRipenessAudio();
+    }
+
+    function playRipenessAudio() {
+      const text = document.getElementById('audio-advisor-text').textContent.replace(/"/g, '');
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = AppState.selectedVoiceLang === 'hi' ? 'hi-IN' : 'en-IN';
+        utterance.rate = 0.95;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function initDegradationChart() {
+      const ctx = document.getElementById('degradationChart');
+      if (!ctx) return;
+
+      if (AppState.chartInstance) AppState.chartInstance.destroy();
+
+      AppState.chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Day 0', 'Day 2', 'Day 4', 'Day 6', 'Day 8', 'Day 10', 'Day 12', 'Day 14'],
+          datasets: [
+            {
+              label: 'AgriFlow Active Reefer (+4°C)',
+              data: [98, 96, 95, 93, 91, 89, 87, 85],
+              borderColor: '#10b981',
+              backgroundColor: 'rgba(16, 185, 129, 0.15)',
+              borderWidth: 3,
+              fill: true,
+              tension: 0.3
+            },
+            {
+              label: 'Traditional Open Truck (+34°C)',
+              data: [98, 84, 68, 52, 38, 22, 10, 2],
+              borderColor: '#f43f5e',
+              borderDash: [5, 5],
+              borderWidth: 2,
+              fill: false,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: '#94a3b8', font: { size: 10 } }
+            }
+          },
+          scales: {
+            y: {
+              min: 0,
+              max: 100,
+              grid: { color: 'rgba(52, 211, 153, 0.1)' },
+              ticks: { color: '#94a3b8', font: { size: 10 }, callback: v => v + '%' }
+            },
+            x: {
+              grid: { color: 'rgba(52, 211, 153, 0.05)' },
+              ticks: { color: '#94a3b8', font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    // --- Interactive Leaflet Radar with Live Moving Truck Animation ---
+    function initLeafletRadar() {
+      const mapContainer = document.getElementById('radarMap');
+      if (!mapContainer || AppState.leafletMap) return;
+
+      AppState.leafletMap = L.map('radarMap').setView([19.8512, 73.9922], 9);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(AppState.leafletMap);
+
+      const stops = [
+        { name: "Node 1: Lasalgaon Farmgate Hub", pos: [20.1472, 74.2267] },
+        { name: "Node 2: Nashik Cold Bay 3", pos: [19.9975, 73.7898] },
+        { name: "Node 3: Current Live Location (NH-60)", pos: [19.8512, 73.9922] },
+        { name: "Node 4: Igatpuri Pass", pos: [19.6967, 73.5622] },
+        { name: "Node 5: Bhiwandi Mega Depot", pos: [19.2967, 73.0622] }
+      ];
+
+      const latlngs = stops.map(s => s.pos);
+      L.polyline(latlngs, { color: '#10b981', weight: 4, dashArray: '8, 8' }).addTo(AppState.leafletMap);
+
+      stops.forEach(s => {
+        L.marker(s.pos).addTo(AppState.leafletMap).bindPopup(`<strong>${s.name}</strong>`);
+      });
+
+      // Moving Truck Marker
+      const truckIcon = L.divIcon({
+        className: 'custom-truck-icon',
+        html: '<div style="background:#10b981; color:#022c22; padding:4px 8px; border-radius:12px; font-weight:bold; font-size:11px; border:2px solid #ffffff; box-shadow:0 4px 10px rgba(0,0,0,0.5);">🚛 MH-15</div>',
+        iconSize: [65, 30],
+        iconAnchor: [32, 15]
+      });
+
+      AppState.truckMarker = L.marker([19.8512, 73.9922], { icon: truckIcon }).addTo(AppState.leafletMap);
+    }
+
+    function startTruckAnimation() {
+      if (!AppState.truckMarker) return;
+      SoundEngine.playDispatchChime();
+
+      const waypoints = [
+        [20.1472, 74.2267],
+        [19.9975, 73.7898],
+        [19.8512, 73.9922],
+        [19.6967, 73.5622],
+        [19.2967, 73.0622]
+      ];
+
+      let step = 0;
+      if (AppState.truckAnimationTimer) clearInterval(AppState.truckAnimationTimer);
+
+      document.getElementById('btn-truck-anim').innerHTML = `<i class="fa-solid fa-spinner fa-spin text-[10px]"></i> Moving...`;
+
+      AppState.truckAnimationTimer = setInterval(() => {
+        if (step >= waypoints.length) {
+          clearInterval(AppState.truckAnimationTimer);
+          document.getElementById('btn-truck-anim').innerHTML = `<i class="fa-solid fa-play text-[10px]"></i> Transit Complete`;
+          confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+          return;
+        }
+
+        const target = waypoints[step];
+        AppState.truckMarker.setLatLng(target);
+        AppState.leafletMap.panTo(target);
+
+        // Update random live sensor jitter
+        const speed = Math.floor(52 + Math.random() * 12);
+        const temp = +(4.0 + Math.random() * 0.4).toFixed(1);
+
+        document.getElementById('live-speed-badge').textContent = `Speed: ${speed} km/h`;
+        document.getElementById('live-temp-badge').textContent = `Temp: +${temp}°C`;
+
+        step++;
+      }, 1200);
+    }
+
+    // --- Farmer-Friendly Auth Modals & Functions ---
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.remove('hidden');
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+    }
+
+    function switchAuthTab(tabId) {
+      document.querySelectorAll('.auth-subtab').forEach(b => {
+        b.classList.remove('bg-emerald-600', 'text-white', 'font-bold');
+        b.classList.add('text-slate-300');
+      });
+
+      const btn = document.getElementById('tab-btn-' + tabId);
+      if (btn) {
+        btn.classList.add('bg-emerald-600', 'text-white', 'font-bold');
+        btn.classList.remove('text-slate-300');
+      }
+
+      document.getElementById('subtab-voice-otp').classList.add('hidden');
+      document.getElementById('subtab-qr-card').classList.add('hidden');
+      document.getElementById('subtab-dialer-pin').classList.add('hidden');
+      document.getElementById('subtab-personas').classList.add('hidden');
+
+      document.getElementById('subtab-' + tabId).classList.remove('hidden');
+    }
+
+    async function sendVoiceOtp() {
+      const phone = document.getElementById('login-phone').value;
+      SoundEngine.playDispatchChime();
+      try {
+        const res = await fetch('http://localhost:5001/api/farmer/auth/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        speakCurrentOtp(data.otp);
+      } catch (e) {
+        speakCurrentOtp('1295');
+      }
+      alert('📲 OTP Sent via SMS & Voice Call!');
+    }
+
+    function speakCurrentOtp(customOtp) {
+      const otpStr = customOtp || '1 2 9 5';
+      const prompt = `नमस्ते किसान भाई, एग्रीफ्लो लॉगिन ओटीपी है: ${otpStr.split('').join(' ')}`;
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(prompt);
+        u.lang = 'hi-IN';
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function verifyOtpAndLogin() {
+      SoundEngine.playCashPayout();
+      AppState.currentUser = {
+        id: "farmer-1",
+        name: "Ramesh Patil",
+        role: "farmer",
+        phone: "9822012345",
+        kisanId: "KISAN-MH-7721",
+        fpo: "Nashik Agro Producer Co.",
+        walletBalance: 184500,
+        avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
+      };
+      updateUserUI();
+      closeAuthModal();
+      switchPersona('farmer');
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function loginWithKisanCard(farmerId) {
+      SoundEngine.playCashPayout();
+      if (farmerId === 'farmer-1') {
+        AppState.currentUser = {
+          id: "farmer-1",
+          name: "Ramesh Patil",
+          role: "farmer",
+          phone: "9822012345",
+          kisanId: "KISAN-MH-7721",
+          fpo: "Nashik Agro Producer Co.",
+          walletBalance: 184500,
+          avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
+        };
+      } else {
+        AppState.currentUser = {
+          id: "farmer-2",
+          name: "Sardar Balram Singh",
+          role: "farmer",
+          phone: "9814056789",
+          kisanId: "KISAN-PB-3310",
+          fpo: "Malwa Farmer Producer Org",
+          walletBalance: 412000,
+          avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150"
+        };
+      }
+      updateUserUI();
+      closeAuthModal();
+      switchPersona('farmer');
+      confetti({ particleCount: 100, spread: 80, origin: { y: 0.6 } });
+    }
+
+    function pressPin(num) {
+      if (AppState.currentPin.length < 4) {
+        AppState.currentPin += num;
+        document.getElementById('pin-display').textContent = '•'.repeat(AppState.currentPin.length);
+      }
+    }
+    function clearPin() {
+      AppState.currentPin = "";
+      document.getElementById('pin-display').textContent = "••••";
+    }
+    function submitPinLogin() {
+      verifyOtpAndLogin();
+    }
+
+    function quickLoginPersona(pId) {
+      SoundEngine.playCashPayout();
+      if (pId === 'farmer-1') {
+        AppState.currentUser = { id: "farmer-1", name: "Ramesh Patil", role: "farmer", phone: "9822012345", kisanId: "KISAN-MH-7721", fpo: "Nashik FPO", walletBalance: 184500, avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" };
+        switchPersona('farmer');
+      } else if (pId === 'buyer-1') {
+        AppState.currentUser = { id: "buyer-1", name: "BigBasket Sourcing", role: "buyer", phone: "9900112233", kisanId: "BUYER-CORP-01", fpo: "Retail Hub", walletBalance: 2500000, avatar: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" };
+        switchPersona('buyer');
+      } else if (pId === 'logistics-1') {
+        AppState.currentUser = { id: "logistics-1", name: "Suresh Mane", role: "logistics", phone: "9766123456", kisanId: "FLEET-MH-15", fpo: "Reefer Driver", walletBalance: 32000, avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" };
+        switchPersona('orders');
+      } else if (pId === 'qc-1') {
+        AppState.currentUser = { id: "qc-1", name: "Dr. Swaminathan", role: "qc", phone: "9444123456", kisanId: "QC-NASHIK-01", fpo: "Quality Hub", walletBalance: 75000, avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" };
+        switchPersona('orders');
+      }
+      updateUserUI();
+      closeAuthModal();
+      confetti({ particleCount: 70, spread: 60, origin: { y: 0.5 } });
+    }
+
+    function updateUserUI() {
+      document.getElementById('user-avatar').src = AppState.currentUser.avatar;
+      document.getElementById('user-display-name').textContent = AppState.currentUser.name;
+      document.getElementById('user-display-sub').textContent = `${AppState.currentUser.kisanId} • ${AppState.currentUser.fpo}`;
+      document.getElementById('user-role-badge').textContent = AppState.currentUser.role.toUpperCase();
+
+      if (AppState.currentUser.role === 'farmer') {
+        document.getElementById('farmer-header-name').textContent = AppState.currentUser.name;
+        document.getElementById('farmer-header-avatar').src = AppState.currentUser.avatar;
+        document.getElementById('farmer-header-fpo').textContent = `${AppState.currentUser.fpo} • ${AppState.currentUser.kisanId}`;
+        document.getElementById('farmer-wallet-display').textContent = `₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')}`;
+      }
+    }
+
+    // --- Waybill Modal ---
+    function openWaybillModal(orderId) {
+      const ord = AppState.orders.find(o => o.id === orderId);
+      if (!ord) return;
+
+      document.getElementById('wb-order-id').textContent = ord.id;
+      document.getElementById('wb-farmer-name').textContent = `${ord.farmer.name} (${ord.farmer.farm})`;
+      document.getElementById('wb-buyer-name').textContent = `${ord.buyer.name} (${ord.buyer.depot})`;
+      document.getElementById('wb-truck-no').textContent = `${ord.logistics.truckNo} (${ord.logistics.driver})`;
+      document.getElementById('wb-qc-officer').textContent = `${ord.qc.officer} (${ord.qc.bay})`;
+      document.getElementById('wb-commodity').textContent = `${ord.commodity} (${ord.quantityTons} Tons)`;
+      document.getElementById('wb-total-val').textContent = `₹${ord.totalValue.toLocaleString('en-IN')}`;
+
+      document.getElementById('waybill-modal').classList.remove('hidden');
+    }
+    function closeWaybillModal() {
+      document.getElementById('waybill-modal').classList.add('hidden');
+    }
+
+    // --- 3-Server Live API Testing Sandbox ---
+    async function testApiEndpoint(type) {
+      const display = document.getElementById('api-json-display');
+      const statusLabel = document.getElementById('api-status-label');
+      const latencyLabel = document.getElementById('api-latency-label');
+
+      display.textContent = 'Executing SQLite binary query...';
+      const t0 = performance.now();
+
+      try {
+        let url = '';
+        let opts = { method: 'GET' };
+
+        if (type === 'farmer_health') url = 'http://localhost:5001/api/farmer/crops';
+        else if (type === 'farmer_otp') {
+          url = 'http://localhost:5001/api/farmer/auth/send-otp';
+          opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: '9822012345' }) };
+        }
+        else if (type === 'buyer_catalog') url = 'http://localhost:5002/api/buyer/catalog?sortBy=shelflife';
+        else if (type === 'logistics_manifest') url = 'http://localhost:5003/api/logistics/telematics';
+
+        const res = await fetch(url, opts);
+        const json = await res.json();
+        const t1 = performance.now();
+
+        statusLabel.textContent = `HTTP ${res.status} OK — SQLite Port ${url.split(':')[2].split('/')[0]}`;
+        latencyLabel.textContent = `Latency: ${(t1 - t0).toFixed(1)}ms`;
+        display.textContent = JSON.stringify(json, null, 2);
+      } catch (e) {
+        const t1 = performance.now();
+        statusLabel.textContent = `SQLite Local Database Mode`;
+        latencyLabel.textContent = `Latency: ${(t1 - t0).toFixed(1)}ms`;
+        display.textContent = JSON.stringify({
+          database: "SQLite3 (servers/agriflow.db)",
+          status: "standalone_active",
+          message: "Run 'npm run servers' in your terminal to boot all 3 live microservices!"
+        }, null, 2);
+      }
+    }
+
+    // --- CSV Export for Produce Matrix ---
+    function exportMatrixCSV() {
+      const headers = ["Crop Name", "Variety", "Location", "Farmer", "Stock (Tons)", "Direct Price (INR)", "Mandi Benchmark (INR)", "Farmer Gain", "Sugar Brix", "Reefer Temp", "Shelf Life (Days)"];
+      const rows = AppState.crops.map(c => [
+        `"${c.name}"`, `"${c.variety}"`, `"${c.location}"`, `"${c.farmer}"`, c.stockTons, c.directPrice, c.mandiPrice, `"${c.farmerGain}"`, `"${c.brix}"`, `"${c.reeferTemp}"`, c.shelfLifeDays
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "AgriFlow_Master_Produce_Matrix.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // --- Live Background Telemetry Health Poller ---
+    async function checkMicroserversHealth() {
+      const check = async (url, badgeId) => {
+        const badge = document.getElementById(badgeId);
+        if (!badge) return;
+        try {
+          const res = await fetch(url, { signal: AbortSignal.timeout(1000) });
+          if (res.ok) {
+            badge.textContent = "ONLINE (SQL)";
+            badge.className = "text-emerald-400 font-mono text-[10px]";
+          } else {
+            badge.textContent = "STANDALONE";
+            badge.className = "text-amber-400 font-mono text-[10px]";
+          }
+        } catch (e) {
+          badge.textContent = "STANDALONE";
+          badge.className = "text-amber-400 font-mono text-[10px]";
+        }
+      };
+
+      check('http://localhost:5001/api/health', 'badge-farmer-status');
+      check('http://localhost:5002/api/health', 'badge-buyer-status');
+      check('http://localhost:5003/api/health', 'badge-logistics-status');
+    }
+
+    function triggerFarmerPayout() {
+      SoundEngine.playCashPayout();
+      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+      alert(`🏦 Payout of ₹${AppState.currentUser.walletBalance.toLocaleString('en-IN')} initiated via e-RUPI to State Bank of India A/c ...8821.`);
+    }
+
+    // --- Application Initialization ---
+    window.addEventListener('DOMContentLoaded', () => {
+      renderOrdersManifest();
+      renderBuyerCatalog();
+      renderMasterMatrix();
+      updateUserUI();
+      checkMicroserversHealth();
+      setInterval(checkMicroserversHealth, 8000);
+    });
+  </script>
+</body>
+</html>

@@ -545,20 +545,21 @@
   <!-- ======================================================== -->
   <div id="main-app-container" class="hidden flex-col min-h-screen relative z-10">
 
-    <!-- LIVE APMC MANDI BENCHMARK & MULTI-SERVER TICKER -->
+    <!-- LIVE APMC MANDI BENCHMARK & GOVT MSP PROTECTION TICKER -->
     <div class="bg-slate-950/95 border-b border-emerald-500/20 py-1.5 px-4 text-[11px] overflow-hidden flex items-center z-20">
       <div class="flex items-center gap-2 font-bold text-amber-400 shrink-0 pr-4 border-r border-emerald-900/60 z-10 bg-slate-950">
-        <i class="fa-solid fa-satellite-dish animate-pulse text-emerald-400"></i>
-        <span><span data-i18n="live_apmc_benchmark">LIVE APMC BENCHMARK:</span></span>
+        <i class="fa-solid fa-scale-balanced text-amber-400 animate-pulse"></i>
+        <span><span data-i18n="live_apmc_benchmark">GOVT MSP & APMC BENCHMARK:</span></span>
       </div>
       <div class="overflow-hidden relative w-full">
         <div class="animate-marquee whitespace-nowrap text-slate-300 font-mono flex gap-8">
-          <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
-          <span>🥭 Ratnagiri APMC: <strong class="text-rose-400">₹88.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹145.00/kg (+64.8%)</strong></span>
-          <span>🍅 Pune Vashi APMC: <strong class="text-rose-400">₹18.50/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹32.00/kg (+73.0%)</strong></span>
-          <span>🍇 Sangli EuroGAP: <strong class="text-rose-400">₹48.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹78.00/kg (+62.5%)</strong></span>
-          <span>🥔 Khanna Mandi: <strong class="text-rose-400">₹13.00/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹21.00/kg (+61.5%)</strong></span>
-          <span>🧅 Lasalgaon Mandi: <strong class="text-rose-400">₹17.80/kg</strong> ➔ AgriFlow Locked: <strong class="text-emerald-400">₹28.50/kg (+60.1%)</strong></span>
+          <span>🏛️ <strong class="text-amber-300">CACP MSP Floor: ACTIVE</strong> (Zero produce sold below Govt MSP)</span>
+          <span>🧅 Onion: Mandi <strong class="text-rose-400">₹17.80</strong> • Govt MSP <strong class="text-amber-300">₹21.00</strong> ➔ AgriFlow Direct: <strong class="text-emerald-400">₹28.50/kg (+35.7% over MSP)</strong></span>
+          <span>🍅 Tomato: Mandi <strong class="text-rose-400">₹18.50</strong> • Govt MSP <strong class="text-amber-300">₹21.80</strong> ➔ AgriFlow Direct: <strong class="text-emerald-400">₹32.00/kg (+46.8% over MSP)</strong></span>
+          <span>🥔 Potato: Mandi <strong class="text-rose-400">₹14.50</strong> • Govt MSP <strong class="text-amber-300">₹17.10</strong> ➔ AgriFlow Direct: <strong class="text-emerald-400">₹24.00/kg (+40.4% over MSP)</strong></span>
+          <span>🥕 Carrot: Mandi <strong class="text-rose-400">₹25.00</strong> • Govt MSP <strong class="text-amber-300">₹29.50</strong> ➔ AgriFlow Direct: <strong class="text-emerald-400">₹42.00/kg (+42.4% over MSP)</strong></span>
+          <span>🥦 Cauliflower: Mandi <strong class="text-rose-400">₹21.00</strong> • Govt MSP <strong class="text-amber-300">₹24.80</strong> ➔ AgriFlow Direct: <strong class="text-emerald-400">₹36.00/kg (+45.2% over MSP)</strong></span>
+          <span>🧄 Garlic: Mandi <strong class="text-rose-400">₹80.00</strong> • Govt MSP <strong class="text-amber-300">₹94.40</strong> ➔ AgriFlow Direct: <strong class="text-emerald-400">₹130.00/kg (+37.7% over MSP)</strong></span>
         </div>
       </div>
     </div>
@@ -1252,6 +1253,11 @@
           </div>
 
           <div class="flex items-center gap-2 flex-wrap">
+            <!-- 🔒 Confidential Privacy Mask Toggle -->
+            <button onclick="togglePrivacyMask()" id="privacy-mask-btn" class="px-3.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-amber-500/40 text-xs font-bold text-amber-300 transition-all flex items-center gap-2 shadow-lg">
+              <i class="fa-solid fa-user-shield text-amber-400" id="privacy-mask-icon"></i>
+              <span id="privacy-mask-label">Mask Bank Data (Confidential)</span>
+            </button>
             <button onclick="exportFarmerEarningsCSV()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-purple-500/40 text-xs font-bold text-purple-300 hover:text-white transition-all flex items-center gap-2 shadow-lg">
               <i class="fa-solid fa-file-csv text-emerald-400"></i> Export Audit CSV
             </button>
@@ -2417,6 +2423,20 @@
       }
     }
 
+    
+    let isBankDataMasked = true;
+
+    function togglePrivacyMask() {
+      isBankDataMasked = !isBankDataMasked;
+      const label = document.getElementById('privacy-mask-label');
+      const icon = document.getElementById('privacy-mask-icon');
+      if (label) label.textContent = isBankDataMasked ? "Mask Bank Data (Confidential)" : "Data Unmasked (Auditor View)";
+      if (icon) icon.className = isBankDataMasked ? "fa-solid fa-user-shield text-amber-400" : "fa-solid fa-eye text-emerald-400";
+
+      SoundEngine.playNatureClick();
+      filterStaffEarningsTable();
+    }
+
     function renderStaffEarningsTable(list) {
       const tbody = document.getElementById('staff-earnings-tbody');
       if (!tbody) return;
@@ -2437,7 +2457,7 @@
           <td class="py-3.5 px-4 font-bold text-amber-300 bg-amber-950/20">+₹${f.extra_profit.toLocaleString('en-IN')}</td>
           <td class="py-3.5 px-4 font-sans text-[11px]">
             <div class="font-bold text-white">${f.bank_name}</div>
-            <div class="text-slate-400">${f.account_no} • IFSC: ${f.ifsc}</div>
+            <div class="text-slate-400">${isBankDataMasked ? "•••• •••• " + f.account_no.slice(-4) : f.account_no} • IFSC: ${isBankDataMasked ? "••••" + f.ifsc.slice(-4) : f.ifsc}</div>
           </td>
           <td class="py-3.5 px-4 text-[10px] text-purple-300 font-bold">${f.utr_ref}</td>
           <td class="py-3.5 px-4">
@@ -3768,8 +3788,8 @@
         <div class="agri-card rounded-3xl border border-emerald-500/30 overflow-hidden agri-card-hover flex flex-col justify-between shadow-xl">
           <div class="relative h-44 overflow-hidden group">
             <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-            <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-emerald-400 text-emerald-300 font-bold text-xs shadow-lg">
-              ${c.farmerGain} Uplift
+            <div class="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-slate-950/85 backdrop-blur-md border border-emerald-400 text-emerald-300 font-bold text-xs shadow-lg flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved text-amber-400 text-[10px]"></i> ${c.farmerGain} Uplift
             </div>
             <div class="absolute top-3 left-3 px-2 py-0.5 rounded-lg bg-slate-950/80 text-amber-300 font-bold text-[10px] border border-amber-500/40">
               ${c.category}
@@ -3787,14 +3807,26 @@
               <div class="text-xs text-slate-300 mt-1"><i class="fa-solid fa-location-dot text-emerald-400 mr-1"></i>${c.location} • <span class="text-slate-400">Farmer: ${c.farmer}</span></div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 bg-slate-900/80 p-3 rounded-2xl text-xs border border-emerald-500/20">
-              <div>
-                <div class="text-[10px] text-slate-400 uppercase font-semibold">AgriFlow Direct</div>
-                <div class="text-lg font-black text-emerald-400 font-mono">₹${c.directPrice.toFixed(2)}/kg</div>
+            <!-- 3-Tier Price Comparison: AgriFlow Direct vs Mandi vs Govt MSP -->
+            <div class="bg-slate-900/80 p-3 rounded-2xl border border-emerald-500/20 space-y-2 text-xs">
+              <div class="flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+                <div>
+                  <div class="text-[9px] text-emerald-400 font-bold uppercase tracking-wider">AgriFlow Direct Price</div>
+                  <div class="text-base font-black text-emerald-300 font-mono">₹${c.directPrice.toFixed(2)}/kg</div>
+                </div>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold border border-emerald-500/30">
+                  ${c.gainVsMsp || '+35%'} over MSP
+                </span>
               </div>
-              <div>
-                <div class="text-[10px] text-slate-400 uppercase font-semibold">Mandi Rate</div>
-                <div class="text-sm font-semibold text-rose-400 line-through font-mono">₹${c.mandiPrice.toFixed(2)}/kg</div>
+              <div class="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                <div>
+                  <span class="text-slate-400 text-[10px]">Govt MSP:</span>
+                  <div class="text-amber-300 font-bold">₹${(c.mspPrice || c.mandiPrice * 1.18).toFixed(2)}/kg</div>
+                </div>
+                <div>
+                  <span class="text-slate-400 text-[10px]">Mandi Distress:</span>
+                  <div class="text-rose-400 line-through">₹${c.mandiPrice.toFixed(2)}/kg</div>
+                </div>
               </div>
             </div>
 

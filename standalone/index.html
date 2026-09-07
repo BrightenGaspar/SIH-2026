@@ -98,7 +98,7 @@
       right: -20px;
       width: 700px;
       height: 720px;
-      opacity: 0.88;
+      opacity: 0.90;
       background: url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1000&auto=format&fit=crop&q=85') center/contain no-repeat;
       filter: drop-shadow(0 0 35px rgba(16, 185, 129, 0.65)) brightness(1.2) contrast(1.15);
       animation: treeSwayWind 7s ease-in-out infinite alternate;
@@ -112,7 +112,7 @@
       left: -20px;
       width: 580px;
       height: 580px;
-      opacity: 0.78;
+      opacity: 0.80;
       background: url('https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=900&auto=format&fit=crop&q=85') center/contain no-repeat;
       filter: drop-shadow(0 0 30px rgba(52, 211, 153, 0.45)) brightness(1.15);
       animation: branchSwayWind 9s ease-in-out infinite alternate;
@@ -126,7 +126,7 @@
       right: 2%;
       width: 480px;
       height: 600px;
-      opacity: 0.75;
+      opacity: 0.78;
       animation: treeSwayWind 7s ease-in-out infinite alternate;
       transform-origin: bottom center;
       filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.6));
@@ -275,14 +275,12 @@
     <!-- 3. Crisp SVG Lush Green Tree Structure (Guarantees Crystal-Clear Visibility) -->
     <div class="svg-tree-canopy hidden sm:block">
       <svg viewBox="0 0 400 500" class="w-full h-full drop-shadow-2xl" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <!-- Tree Trunk & Roots -->
         <path d="M190 500 C190 420 175 360 160 300 C150 250 165 200 185 140 C195 200 220 250 225 300 C235 360 215 420 215 500 Z" fill="#3e2723" opacity="0.95"/>
         <path d="M175 360 C140 330 110 320 80 310 C105 325 135 345 165 375 Z" fill="#2d1d19"/>
         <path d="M210 330 C245 300 280 290 320 275 C285 295 250 315 215 345 Z" fill="#2d1d19"/>
         <path d="M185 230 C150 190 120 180 85 160 C120 180 150 205 180 240 Z" fill="#3e2723"/>
         <path d="M195 200 C225 160 260 145 305 125 C265 150 230 175 195 210 Z" fill="#3e2723"/>
 
-        <!-- Lush Green Foliage Clusters with Gradients -->
         <circle cx="185" cy="110" r="75" fill="#059669" opacity="0.85"/>
         <circle cx="130" cy="160" r="65" fill="#10b981" opacity="0.9"/>
         <circle cx="250" cy="150" r="70" fill="#047857" opacity="0.9"/>
@@ -308,13 +306,13 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- 🔐 1. SUPER EASY & INTUITIVE LOGIN GATE -->
+  <!-- 🔐 1. ULTRA-EASY & DEAD-SIMPLE 1-TAP LOGIN LAUNCHPAD -->
   <!-- (Website only opens into full app once logged in) -->
   <!-- ======================================================== -->
   <div id="auth-gate-container" class="min-h-screen flex items-center justify-center p-4 sm:p-6 relative z-20 transition-all duration-500">
-    <div class="agri-card max-w-xl w-full rounded-3xl border border-emerald-500/40 p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+    <div class="agri-card max-w-lg w-full rounded-3xl border-2 border-emerald-500/50 p-6 sm:p-8 space-y-5 shadow-2xl relative overflow-hidden">
       
-      <!-- SIH-2026 Header Banner -->
+      <!-- Brand Header -->
       <div class="flex items-center justify-between border-b border-emerald-800/60 pb-4">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-amber-400 p-0.5 shadow-lg shadow-emerald-500/20">
@@ -326,7 +324,7 @@
             <div class="flex items-center gap-2">
               <span class="font-heading font-extrabold text-2xl tracking-tight text-white">Agri<span class="text-emerald-400">Flow</span> <span class="text-amber-400 text-xs px-1.5 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">AI</span></span>
             </div>
-            <p class="text-[11px] text-emerald-300/90 font-medium">Smart India Hackathon 2026 • Problem Statement 33</p>
+            <p class="text-[11px] text-emerald-300 font-medium">Smart India Hackathon 2026 • PS-33</p>
           </div>
         </div>
 
@@ -336,130 +334,103 @@
         </button>
       </div>
 
-      <!-- 🌟 SUPER EASY: 1-CLICK INSTANT ENTRY HERO BUTTON -->
-      <div class="space-y-3">
-        <button onclick="quickLoginPersona('farmer-1')" class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-extrabold text-base shadow-2xl hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-between group">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-950/20 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-              🌾
-            </div>
-            <div class="text-left">
-              <div class="text-sm font-black leading-tight">1-CLICK INSTANT ENTRY (Kisan Portal)</div>
-              <div class="text-[11px] font-semibold text-slate-900/80">Log in immediately as Ramesh Patil (Nashik FPO)</div>
-            </div>
+      <!-- Welcome Title -->
+      <div class="text-center space-y-1">
+        <h2 class="text-xl sm:text-2xl font-black text-white font-heading">
+          Select Your Role to Enter
+        </h2>
+        <p class="text-xs text-emerald-300/90 font-medium">
+          ⚡ 1-Click Direct Access • No Password Required
+        </p>
+      </div>
+
+      <!-- 🌟 1. GIANT 1-CLICK FAST LAUNCH HERO BUTTON -->
+      <button onclick="quickLoginPersona('farmer-1')" class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm shadow-xl hover:shadow-emerald-500/40 transition-all transform hover:-translate-y-0.5 flex items-center justify-between group">
+        <div class="flex items-center gap-2.5">
+          <span class="text-xl">🌾</span>
+          <div class="text-left">
+            <div class="font-extrabold leading-tight text-slate-950">1-CLICK INSTANT ENTRY (Kisan Farmer)</div>
+            <div class="text-[10px] font-semibold text-slate-900/80">Ramesh Patil • Nashik FPO • ₹1,84,500 Balance</div>
           </div>
-          <div class="w-9 h-9 rounded-xl bg-slate-950/20 flex items-center justify-center text-slate-950 font-bold text-sm">
-            <i class="fa-solid fa-arrow-right group-hover:translate-x-0.5 transition-transform"></i>
+        </div>
+        <div class="w-8 h-8 rounded-xl bg-slate-950/20 flex items-center justify-center text-slate-950 font-bold text-sm">
+          <i class="fa-solid fa-arrow-right group-hover:translate-x-0.5 transition-transform"></i>
+        </div>
+      </button>
+
+      <!-- 🌟 2. 4 SIMPLE 1-TAP ROLE BUTTONS -->
+      <div class="space-y-2 pt-1">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+          
+          <!-- Role 1: Kisan Farmer -->
+          <button onclick="quickLoginPersona('farmer-1')" class="p-3.5 rounded-2xl bg-emerald-950/80 hover:bg-emerald-900 border-2 border-emerald-500/50 hover:border-emerald-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-10 h-10 rounded-xl object-cover border border-emerald-400">
+              <div>
+                <div class="font-bold text-white group-hover:text-emerald-300">Ramesh Patil</div>
+                <div class="text-[10px] text-emerald-400 font-semibold">🌾 Kisan Farmer</div>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+          </button>
+
+          <!-- Role 2: Institutional Buyer -->
+          <button onclick="quickLoginPersona('buyer-1')" class="p-3.5 rounded-2xl bg-blue-950/80 hover:bg-blue-900 border-2 border-blue-500/50 hover:border-blue-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-10 h-10 rounded-xl object-cover border border-blue-400">
+              <div>
+                <div class="font-bold text-white group-hover:text-blue-300">BigBasket</div>
+                <div class="text-[10px] text-blue-400 font-semibold">🛒 Sourcing Buyer</div>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-500/30 group-hover:bg-blue-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+          </button>
+
+          <!-- Role 3: Reefer Logistics Driver -->
+          <button onclick="quickLoginPersona('logistics-1')" class="p-3.5 rounded-2xl bg-amber-950/80 hover:bg-amber-900 border-2 border-amber-500/50 hover:border-amber-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-10 h-10 rounded-xl object-cover border border-amber-400">
+              <div>
+                <div class="font-bold text-white group-hover:text-amber-300">Suresh Mane</div>
+                <div class="text-[10px] text-amber-400 font-semibold">🚚 Reefer Driver</div>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+          </button>
+
+          <!-- Role 4: Quality Control Officer -->
+          <button onclick="quickLoginPersona('qc-1')" class="p-3.5 rounded-2xl bg-purple-950/80 hover:bg-purple-900 border-2 border-purple-500/50 hover:border-purple-400 text-left flex items-center justify-between transition-all hover:scale-[1.02] shadow-lg group">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-10 h-10 rounded-xl object-cover border border-purple-400">
+              <div>
+                <div class="font-bold text-white group-hover:text-purple-300">Dr. Swaminathan</div>
+                <div class="text-[10px] text-purple-400 font-semibold">🔬 QC Officer</div>
+              </div>
+            </div>
+            <span class="px-2 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30 group-hover:bg-purple-500 group-hover:text-slate-950 transition-colors">Enter ➔</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- 🎙️ 3. OPTIONAL SPOKEN AUDIO OTP DEMO (ACCESSIBILITY) -->
+      <div class="bg-slate-950/80 p-3 rounded-2xl border border-emerald-500/20 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-volume-high text-amber-400 text-base animate-pulse"></i>
+          <div>
+            <div class="text-white font-semibold">Rural Voice Login Demo</div>
+            <div class="text-[10px] text-slate-400">Hear Hindi OTP audio prompt</div>
           </div>
+        </div>
+        <button onclick="speakCurrentOtp('1295')" class="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow transition-all flex items-center gap-1">
+          <i class="fa-solid fa-play text-[10px]"></i> Speak OTP
         </button>
       </div>
 
-      <!-- 🌟 4 EASY 1-TAP ROLE CARDS -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-300 font-semibold flex items-center gap-1.5">
-            <i class="fa-solid fa-bolt text-amber-400"></i> Or Tap Any Stakeholder to Enter Instantly:
-          </span>
-          <span class="text-[10px] text-emerald-400 font-mono">Zero Typing Needed</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2.5 text-xs">
-          <!-- Role 1: Farmer -->
-          <button onclick="quickLoginPersona('farmer-1')" class="p-3 rounded-2xl bg-emerald-950/70 hover:bg-emerald-900/90 border border-emerald-500/40 hover:border-emerald-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
-            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150" alt="Farmer" class="w-11 h-11 rounded-xl object-cover border border-emerald-400">
-            <div>
-              <div class="font-bold text-white group-hover:text-emerald-300 transition-colors">Ramesh Patil</div>
-              <div class="text-[10px] text-emerald-400 font-medium">🌾 Kisan Farmer</div>
-              <div class="text-[9px] text-slate-400 font-mono">₹1,84,500 Bal</div>
-            </div>
-          </button>
-
-          <!-- Role 2: Buyer -->
-          <button onclick="quickLoginPersona('buyer-1')" class="p-3 rounded-2xl bg-blue-950/70 hover:bg-blue-900/90 border border-blue-500/40 hover:border-blue-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
-            <img src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=150" alt="Buyer" class="w-11 h-11 rounded-xl object-cover border border-blue-400">
-            <div>
-              <div class="font-bold text-white group-hover:text-blue-300 transition-colors">BigBasket Sourcing</div>
-              <div class="text-[10px] text-blue-400 font-medium">🛒 Institutional Buyer</div>
-              <div class="text-[9px] text-slate-400 font-mono">Escrow Active</div>
-            </div>
-          </button>
-
-          <!-- Role 3: Logistics -->
-          <button onclick="quickLoginPersona('logistics-1')" class="p-3 rounded-2xl bg-amber-950/70 hover:bg-amber-900/90 border border-amber-500/40 hover:border-amber-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150" alt="Driver" class="w-11 h-11 rounded-xl object-cover border border-amber-400">
-            <div>
-              <div class="font-bold text-white group-hover:text-amber-300 transition-colors">Suresh Mane</div>
-              <div class="text-[10px] text-amber-400 font-medium">🚚 Reefer Fleet Driver</div>
-              <div class="text-[9px] text-slate-400 font-mono">MH-15-EG-8821</div>
-            </div>
-          </button>
-
-          <!-- Role 4: QC Officer -->
-          <button onclick="quickLoginPersona('qc-1')" class="p-3 rounded-2xl bg-purple-950/70 hover:bg-purple-900/90 border border-purple-500/40 hover:border-purple-400 text-left flex items-center gap-3 transition-all hover:scale-[1.02] shadow group">
-            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="QC" class="w-11 h-11 rounded-xl object-cover border border-purple-400">
-            <div>
-              <div class="font-bold text-white group-hover:text-purple-300 transition-colors">Dr. Swaminathan</div>
-              <div class="text-[10px] text-purple-400 font-medium">🔬 Senior QC Officer</div>
-              <div class="text-[9px] text-slate-400 font-mono">Bay 3 NIR Scan</div>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- 📱 OPTIONAL ACCESSIBLE METHODS (VOICE OTP / KISAN CARD / PIN) -->
-      <div class="border-t border-emerald-900/60 pt-4 space-y-3">
-        <div class="flex items-center justify-between text-xs text-slate-400">
-          <span>More Accessible Login Modes:</span>
-        </div>
-
-        <!-- Auth Method Selector Tabs -->
-        <div class="grid grid-cols-3 gap-1.5 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/20 text-[11px] font-semibold text-center">
-          <button onclick="switchGateAuthTab('voice-otp')" id="gate-tab-btn-voice-otp" class="gate-auth-subtab py-1.5 rounded-xl bg-emerald-600 text-white font-bold transition-all">📱 Spoken OTP</button>
-          <button onclick="switchGateAuthTab('qr-card')" id="gate-tab-btn-qr-card" class="gate-auth-subtab py-1.5 rounded-xl text-slate-300 hover:text-white transition-all">📷 Kisan Card</button>
-          <button onclick="switchGateAuthTab('dialer-pin')" id="gate-tab-btn-dialer-pin" class="gate-auth-subtab py-1.5 rounded-xl text-slate-300 hover:text-white transition-all">🔢 4-Digit PIN</button>
-        </div>
-
-        <!-- Tab 1: Voice & SMS OTP -->
-        <div id="gate-subtab-voice-otp" class="space-y-3">
-          <div class="flex items-center gap-2">
-            <input type="tel" id="gate-login-phone" value="+91 98220 12345 (Ramesh Patil)" readonly class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-2 text-xs text-emerald-300 font-mono">
-            <button onclick="speakCurrentOtp('1295')" title="Audio Readout (आवाज़ सुनें)" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1 text-xs font-bold shadow transition-all">
-              <i class="fa-solid fa-volume-high"></i>
-              <span>Hear OTP</span>
-            </button>
-          </div>
-          <button onclick="verifyOtpAndUnlockApp()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-lock-open"></i>
-            <span>Verify Demo OTP (1 2 9 5) & Enter</span>
-          </button>
-        </div>
-
-        <!-- Tab 2: Kisan Smart Card -->
-        <div id="gate-subtab-qr-card" class="hidden space-y-2">
-          <div onclick="loginWithKisanCard('farmer-1')" class="cursor-pointer p-3 rounded-xl bg-emerald-950/70 border border-emerald-400 text-xs flex items-center justify-between hover:bg-emerald-900 transition-all">
-            <div class="flex items-center gap-2">
-              <i class="fa-solid fa-qrcode text-emerald-400 text-lg"></i>
-              <span><strong>Kisan Smart Card</strong> • Ramesh Patil</span>
-            </div>
-            <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-400 text-slate-950 font-bold">1-Tap</span>
-          </div>
-        </div>
-
-        <!-- Tab 3: Dialer PIN -->
-        <div id="gate-subtab-dialer-pin" class="hidden space-y-3">
-          <div class="text-center">
-            <span class="text-xs text-slate-400">PIN: <strong class="text-emerald-400 font-mono">•••• (1234)</strong></span>
-          </div>
-          <button onclick="submitGatePinLogin()" class="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-500">
-            Submit PIN & Unlock
-          </button>
-        </div>
-      </div>
-
-      <!-- Trust Footer -->
+      <!-- Live Server Footnote -->
       <div class="border-t border-emerald-900/60 pt-3 flex items-center justify-between text-[11px] text-slate-400">
-        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-shield-check"></i> 3 SQLite Microservers Active</span>
-        <span>⚡ T+0 Direct Payouts</span>
+        <span class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-circle-check"></i> 3 Microservers Ready</span>
+        <span class="text-slate-300 font-mono">SQLite3 Protocol</span>
       </div>
 
     </div>
@@ -1421,7 +1392,6 @@
         walletBalance: 184500,
         avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
       },
-      currentGatePin: "",
       cart: [
         { id: "crop-1", name: "Nashik Red Onion (Export A+)", quantityTons: 10, pricePerKg: 28.50, farmerName: "Ramesh Patil", farmerPhone: "+91 98220 12345" }
       ],
@@ -1531,96 +1501,15 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function switchGateAuthTab(tabId) {
-      document.querySelectorAll('.gate-auth-subtab').forEach(b => {
-        b.classList.remove('bg-emerald-600', 'text-white', 'font-bold');
-        b.classList.add('text-slate-300');
-      });
-
-      const btn = document.getElementById('gate-tab-btn-' + tabId);
-      if (btn) {
-        btn.classList.add('bg-emerald-600', 'text-white', 'font-bold');
-        btn.classList.remove('text-slate-300');
-      }
-
-      document.getElementById('gate-subtab-voice-otp').classList.add('hidden');
-      document.getElementById('gate-subtab-qr-card').classList.add('hidden');
-      document.getElementById('gate-subtab-dialer-pin').classList.add('hidden');
-
-      const targetSubtab = document.getElementById('gate-subtab-' + tabId);
-      if (targetSubtab) targetSubtab.classList.remove('hidden');
-    }
-
-    async function sendGateVoiceOtp() {
-      const phone = '9822012345';
-      SoundEngine.playDispatchChime();
-      try {
-        const res = await fetch('http://localhost:5001/api/farmer/auth/send-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone })
-        });
-        const data = await res.json();
-        speakCurrentOtp(data.otp);
-      } catch (e) {
-        speakCurrentOtp('1295');
-      }
-    }
-
     function speakCurrentOtp(customOtp) {
       const otpStr = customOtp || '1 2 9 5';
-      const prompt = `नमस्ते किसान भाई, एग्रीफ्लो लॉगिन ओटीपी है: ${otpStr.split('').join(' ')}`;
+      const prompt = `नमस्ते किसान भाई, एग्रीफ्लो में आपका स्वागत है। लॉगिन ओटीपी है: ${otpStr.split('').join(' ')}`;
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const u = new SpeechSynthesisUtterance(prompt);
         u.lang = 'hi-IN';
         window.speechSynthesis.speak(u);
       }
-    }
-
-    function verifyOtpAndUnlockApp() {
-      AppState.currentUser = {
-        id: "farmer-1",
-        name: "Ramesh Patil",
-        role: "farmer",
-        phone: "9822012345",
-        kisanId: "KISAN-MH-7721",
-        fpo: "Nashik Agro Producer Co.",
-        walletBalance: 184500,
-        avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
-      };
-      unlockApplication('farmer');
-    }
-
-    function loginWithKisanCard(farmerId) {
-      if (farmerId === 'farmer-1') {
-        AppState.currentUser = {
-          id: "farmer-1",
-          name: "Ramesh Patil",
-          role: "farmer",
-          phone: "9822012345",
-          kisanId: "KISAN-MH-7721",
-          fpo: "Nashik Agro Producer Co.",
-          walletBalance: 184500,
-          avatar: "https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150"
-        };
-      } else {
-        AppState.currentUser = {
-          id: "farmer-2",
-          name: "Sardar Balram Singh",
-          role: "farmer",
-          phone: "9814056789",
-          kisanId: "KISAN-PB-3310",
-          fpo: "Malwa Farmer Producer Org",
-          walletBalance: 412000,
-          avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150"
-        };
-      }
-      unlockApplication('farmer');
-    }
-
-    function submitGatePinLogin() {
-      verifyOtpAndUnlockApp();
     }
 
     function quickLoginPersona(pId) {

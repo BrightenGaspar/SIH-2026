@@ -539,20 +539,24 @@
           <div class="flex items-center justify-between">
             <h2 class="text-xl font-black text-white font-heading flex items-center gap-2">
               <i class="fa-solid fa-lock text-emerald-400"></i>
-              <span data-i18n="auth_welcome">Sign In to AgriFlow</span>
+              <span id="auth-card-title-text">AgriFlow Unified Portal</span>
             </h2>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
               🔒 256-Bit SSL
             </span>
           </div>
-          <p class="text-xs text-slate-400" data-i18n="auth_portal_desc">Enter credentials or request an instant SMS OTP to your SIM.</p>
+          <p class="text-xs text-slate-400" id="auth-card-sub-text">Instant SIM OTP login, new farmer registration, or stakeholder access.</p>
         </div>
 
-        <!-- 📑 AUTHENTICATION METHOD TABS -->
-        <div class="grid grid-cols-4 gap-1 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/30 text-[11px] font-bold">
+        <!-- 📑 5 FIRST-CLASS AUTH & REGISTRATION TABS -->
+        <div class="grid grid-cols-5 gap-1 bg-slate-900/90 p-1 rounded-2xl border border-emerald-500/30 text-[10px] sm:text-[11px] font-bold">
           <button id="auth-tab-btn-otp" onclick="switchAuthTab('otp')" class="auth-tab-btn active py-2 px-1 rounded-xl bg-emerald-500 text-slate-950 transition-all flex flex-col items-center justify-center gap-1 shadow">
             <i class="fa-solid fa-mobile-screen-button text-xs"></i>
-            <span>Real OTP</span>
+            <span>SIM OTP</span>
+          </button>
+          <button id="auth-tab-btn-reg" onclick="switchAuthTab('reg')" class="auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1">
+            <i class="fa-solid fa-user-plus text-xs text-emerald-400"></i>
+            <span>Register</span>
           </button>
           <button id="auth-tab-btn-pwd" onclick="switchAuthTab('pwd')" class="auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1">
             <i class="fa-solid fa-key text-xs"></i>
@@ -563,8 +567,8 @@
             <span>Boss MPIN</span>
           </button>
           <button id="auth-tab-btn-easy" onclick="switchAuthTab('easy')" class="auth-tab-btn py-2 px-1 rounded-xl text-slate-300 hover:text-white transition-all flex flex-col items-center justify-center gap-1">
-            <i class="fa-solid fa-bolt text-xs"></i>
-            <span>1-Tap Demo</span>
+            <i class="fa-solid fa-bolt text-xs text-amber-400"></i>
+            <span>1-Tap</span>
           </button>
         </div>
 
@@ -585,11 +589,11 @@
                   <span id="send-otp-btn-label">Send OTP 📲</span>
                 </button>
               </div>
-              <div class="mt-1.5 p-2 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-[11px] text-slate-300 flex items-center justify-between" id="otp-status-container">
+              <div class="mt-1.5 p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-[11px] text-slate-300 flex items-center justify-between" id="otp-status-container">
                 <span id="otp-sent-status-text" class="flex items-center gap-1.5">
-                  <i class="fa-solid fa-mobile-screen text-emerald-400"></i> Click <strong>Send OTP</strong> to receive a 4-digit code on your SIM.
+                  <i class="fa-solid fa-mobile-screen text-emerald-400"></i> Click <strong>Send OTP</strong> to dispatch 4-digit code to SIM. <button type="button" id="otp-inline-retry-btn" onclick="triggerSendRealOtp()" class="ml-2 text-amber-400 font-bold underline hidden">Resend</button>
                 </span>
-                <button type="button" onclick="triggerSendRealOtp()" class="text-amber-400 hover:text-amber-300 font-bold underline decoration-amber-500/40 text-[10px] hidden" id="otp-inline-retry-btn">Resend</button>
+                <button type="button" onclick="autoFillCurrentOtp()" id="btn-quick-autofill-otp" class="text-amber-400 hover:text-amber-300 font-bold underline text-[10px] hidden">Auto-Fill</button>
               </div>
             </div>
 
@@ -598,8 +602,8 @@
               <div class="flex items-center justify-between">
                 <label class="text-slate-300 font-semibold">Enter 4-Digit Received OTP</label>
                 <div class="flex items-center gap-2">
-                  <button type="button" onclick="autoFillCurrentOtp()" id="btn-quick-autofill-otp" class="text-[11px] text-amber-300 hover:text-amber-200 font-bold bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40 flex items-center gap-1 hidden">
-                    <i class="fa-solid fa-bolt text-[9px]"></i> Auto-Fill
+                  <button type="button" onclick="autoFillCurrentOtp()" class="text-[11px] text-amber-300 hover:text-amber-200 font-bold bg-amber-500/20 px-2 py-0.5 rounded border border-amber-500/40 flex items-center gap-1">
+                    <i class="fa-solid fa-bolt text-[9px]"></i> 1-Tap Fill
                   </button>
                   <button type="button" onclick="speakCurrentGeneratedOtp()" class="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold flex items-center gap-1">
                     <i class="fa-solid fa-volume-high"></i> Voice OTP
@@ -609,10 +613,10 @@
 
               <!-- 4 Discrete Square Boxes -->
               <div class="grid grid-cols-4 gap-2.5" id="otp-boxes-container">
-                <input type="text" maxlength="1" id="otp-box-1" oninput="handleOtpBoxInput(1)" onkeydown="handleOtpBoxKeydown(1, event)" onpaste="handleOtpBoxPaste(event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
-                <input type="text" maxlength="1" id="otp-box-2" oninput="handleOtpBoxInput(2)" onkeydown="handleOtpBoxKeydown(2, event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
-                <input type="text" maxlength="1" id="otp-box-3" oninput="handleOtpBoxInput(3)" onkeydown="handleOtpBoxKeydown(3, event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
-                <input type="text" maxlength="1" id="otp-box-4" oninput="handleOtpBoxInput(4)" onkeydown="handleOtpBoxKeydown(4, event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
+                <input type="text" maxlength="1" id="otp-box-1" oninput="handleOtpBoxInput(1)" onkeydown="handleOtpBoxKeydown(1, event)" onpaste="handleOtpBoxPaste(event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-2xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
+                <input type="text" maxlength="1" id="otp-box-2" oninput="handleOtpBoxInput(2)" onkeydown="handleOtpBoxKeydown(2, event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-2xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
+                <input type="text" maxlength="1" id="otp-box-3" oninput="handleOtpBoxInput(3)" onkeydown="handleOtpBoxKeydown(3, event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-2xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
+                <input type="text" maxlength="1" id="otp-box-4" oninput="handleOtpBoxInput(4)" onkeydown="handleOtpBoxKeydown(4, event)" class="otp-box w-full h-12 bg-slate-900 text-white text-center text-2xl font-black rounded-2xl border-2 border-emerald-500/40 focus:outline-none focus:border-emerald-400 focus:bg-slate-800 font-mono shadow-inner" placeholder="-">
               </div>
             </div>
 
@@ -625,11 +629,90 @@
         </div>
 
         <!-- ======================================================== -->
-        <!-- TAB CONTENT 2: 🔑 STANDARD USERNAME & PASSWORD -->
+        <!-- TAB CONTENT 2: 📝 FIRST-CLASS NEW USER REGISTRATION -->
+        <!-- ======================================================== -->
+        <div id="auth-panel-reg" class="auth-panel hidden space-y-3.5">
+          <form id="inline-register-form" onsubmit="submitRegistration(event)" class="space-y-3 text-xs">
+            
+            <!-- Stakeholder Account Type -->
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Select Account Role</label>
+              <div class="grid grid-cols-4 gap-1.5">
+                <label class="cursor-pointer">
+                  <input type="radio" name="inline-reg-role" value="farmer" checked class="peer sr-only">
+                  <div class="p-2 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-emerald-400 peer-checked:bg-emerald-950 text-center font-bold text-slate-300 peer-checked:text-emerald-300 transition-all text-[10px]">
+                    <i class="fa-solid fa-wheat-awn block text-xs mb-0.5 text-emerald-400"></i>
+                    <span>Farmer</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="inline-reg-role" value="buyer" class="peer sr-only">
+                  <div class="p-2 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-blue-400 peer-checked:bg-blue-950 text-center font-bold text-slate-300 peer-checked:text-blue-300 transition-all text-[10px]">
+                    <i class="fa-solid fa-building-columns block text-xs mb-0.5 text-blue-400"></i>
+                    <span>Buyer</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="inline-reg-role" value="logistics" class="peer sr-only">
+                  <div class="p-2 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-amber-400 peer-checked:bg-amber-950 text-center font-bold text-slate-300 peer-checked:text-amber-300 transition-all text-[10px]">
+                    <i class="fa-solid fa-truck-fast block text-xs mb-0.5 text-amber-400"></i>
+                    <span>Driver</span>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="inline-reg-role" value="qc" class="peer sr-only">
+                  <div class="p-2 rounded-xl bg-slate-900 border border-emerald-500/30 peer-checked:border-purple-400 peer-checked:bg-purple-950 text-center font-bold text-slate-300 peer-checked:text-purple-300 transition-all text-[10px]">
+                    <i class="fa-solid fa-microchip block text-xs mb-0.5 text-purple-400"></i>
+                    <span>QC Officer</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Full Name -->
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Full Legal Name</label>
+              <input type="text" id="inline-reg-fullname" placeholder="e.g. Ramesh Deshmukh" value="Balram Patil" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3.5 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-medium">
+            </div>
+
+            <!-- Mobile & District Grid -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">Mobile (Aadhaar)</label>
+                <input type="tel" id="inline-reg-phone" placeholder="10-digit mobile" value="9823055441" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+              </div>
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">District / FPO</label>
+                <input type="text" id="inline-reg-location" placeholder="e.g. Nashik, MH" value="Nashik Agro FPO" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-medium">
+              </div>
+            </div>
+
+            <!-- Password & MPIN -->
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">Set Password</label>
+                <input type="password" id="inline-reg-password" placeholder="Create password" value="farmer123" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono">
+              </div>
+              <div>
+                <label class="block text-slate-300 font-semibold mb-1">Set 4-Digit MPIN</label>
+                <input type="password" id="inline-reg-mpin" placeholder="e.g. 5544" value="5544" maxlength="4" required class="w-full bg-slate-900 text-white text-xs rounded-xl px-3 py-2.5 border border-emerald-500/40 focus:outline-none focus:border-emerald-400 font-mono text-center">
+              </div>
+            </div>
+
+            <!-- Submit Registration -->
+            <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-xl transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-user-check"></i>
+              <span>Create Account & Enter Platform ➔</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- ======================================================== -->
+        <!-- TAB CONTENT 3: 🔑 STANDARD USERNAME & PASSWORD -->
         <!-- ======================================================== -->
         <div id="auth-panel-pwd" class="auth-panel hidden space-y-3.5">
           <form id="standard-login-form" onsubmit="submitStandardPasswordLogin(event)" class="space-y-3 text-xs">
-            <!-- Username Input (Empty by default) -->
+            <!-- Username Input -->
             <div>
               <label class="block text-slate-300 font-semibold mb-1">Username / User ID</label>
               <div class="relative">
@@ -638,7 +721,7 @@
               </div>
             </div>
 
-            <!-- Password Input with Show/Hide Toggle (Empty by default) -->
+            <!-- Password Input with Show/Hide Toggle -->
             <div>
               <div class="flex items-center justify-between mb-1">
                 <label class="text-slate-300 font-semibold">Password</label>
@@ -686,7 +769,7 @@
         </div>
 
         <!-- ======================================================== -->
-        <!-- TAB CONTENT 3: 🛡️ BOSS & STAFF MPIN ACCESS -->
+        <!-- TAB CONTENT 4: 🛡️ BOSS & STAFF MPIN ACCESS -->
         <!-- ======================================================== -->
         <div id="auth-panel-mpin" class="auth-panel hidden space-y-3.5">
           <div class="p-3 rounded-2xl bg-purple-950/60 border border-purple-500/40 space-y-1">
@@ -724,7 +807,7 @@
         </div>
 
         <!-- ======================================================== -->
-        <!-- TAB CONTENT 4: 🌾 RURAL 1-TAP EASY ACCESS (DEMO CARDS) -->
+        <!-- TAB CONTENT 5: 🌾 RURAL 1-TAP EASY ACCESS (DEMO CARDS) -->
         <!-- ======================================================== -->
         <div id="auth-panel-easy" class="auth-panel hidden space-y-3.5">
           
@@ -4550,11 +4633,11 @@
     // 🌐 REALISTIC WEB AUTHENTICATION & INTERACTIVE CONTROLS
     // ========================================================
 
-    // Switch between Auth Tabs
+        // Switch between 5 Auth Tabs
     function switchAuthTab(tabId) {
       if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
       
-      const tabBtns = ['easy', 'pwd', 'mpin', 'otp'];
+      const tabBtns = ['otp', 'reg', 'pwd', 'mpin', 'easy'];
       tabBtns.forEach(t => {
         const btn = document.getElementById('auth-tab-btn-' + t);
         const panel = document.getElementById('auth-panel-' + t);
@@ -4575,100 +4658,97 @@
       });
     }
 
-    // Toggle Password Visibility Eye
-    function togglePasswordVisibility(inputId, iconId) {
-      const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      if (input && icon) {
-        if (input.type === 'password') {
-          input.type = 'text';
-          icon.className = 'fa-solid fa-eye-slash text-xs text-amber-400';
-        } else {
-          input.type = 'password';
-          icon.className = 'fa-solid fa-eye text-xs text-slate-400';
-        }
-      }
-    }
-
-    // Autofill demo login credentials
-    function autofillLogin(user, pwd) {
-      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
-      const userInput = document.getElementById('login-username-input');
-      const pwdInput = document.getElementById('login-password-input');
-      if (userInput) userInput.value = user;
-      if (pwdInput) pwdInput.value = pwd;
-      showNotification('Loaded ' + user + ' credentials!', 'info');
-    }
-
-    // Standard Password Login Form Submit
-    function submitStandardPasswordLogin(e) {
-      if (e) e.preventDefault();
-      const user = (document.getElementById('login-username-input')?.value || '').trim();
-      const pwd = (document.getElementById('login-password-input')?.value || '').trim();
-
-      if (!user || !pwd) {
-        showNotification('Please enter your username and password', 'error');
-        return;
-      }
-
-      const btn = document.getElementById('btn-submit-pwd-login');
-      if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...';
-        btn.disabled = true;
-      }
-
-      setTimeout(() => {
-        if (btn) {
-          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In with Credentials';
-          btn.disabled = false;
-        }
-
-        // Map user to persona
-        let personaKey = 'farmer-1';
-        if (user.includes('buyer') || user.includes('priya')) personaKey = 'buyer-1';
-        else if (user.includes('logistics') || user.includes('driver') || user.includes('suresh')) personaKey = 'logistics-1';
-        else if (user.includes('qc') || user.includes('swami')) personaKey = 'qc-1';
-        else if (user.includes('admin') || user.includes('boss')) {
-          unlockConfidentialStaffAudit();
-          return;
-        }
-
-        quickLoginPersona(personaKey);
-        showNotification('Welcome back, ' + user + '! Session authenticated.', 'success');
-      }, 400);
-    }
-
-    // Registration Modal Open/Close/Submit
-    function openRegisterModal() {
-      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
-      const m = document.getElementById('register-modal');
-      if (m) m.classList.remove('hidden');
-    }
-
-    function closeRegisterModal() {
-      if (typeof SoundEngine !== 'undefined') SoundEngine.playNatureClick();
-      const m = document.getElementById('register-modal');
-      if (m) m.classList.add('hidden');
-    }
-
+    // Submit Registration (From either inline Tab or Modal)
     function submitRegistration(e) {
       if (e) e.preventDefault();
-      const name = document.getElementById('reg-fullname')?.value || 'New Farmer';
-      const role = document.querySelector('input[name="reg-role"]:checked')?.value || 'farmer';
       
+      let name = document.getElementById('inline-reg-fullname')?.value || document.getElementById('reg-fullname')?.value || 'Balram Patil';
+      let phone = document.getElementById('inline-reg-phone')?.value || document.getElementById('reg-phone')?.value || '9823055441';
+      let location = document.getElementById('inline-reg-location')?.value || document.getElementById('reg-location')?.value || 'Nashik Agro FPO';
+      let role = document.querySelector('input[name="inline-reg-role"]:checked')?.value || document.querySelector('input[name="reg-role"]:checked')?.value || 'farmer';
+
       closeRegisterModal();
       if (typeof SoundEngine !== 'undefined') SoundEngine.playCashPayout();
       if (typeof confetti !== 'undefined') {
-        confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
       }
 
-      let personaKey = 'farmer-1';
-      if (role === 'buyer') personaKey = 'buyer-1';
-      else if (role === 'logistics') personaKey = 'logistics-1';
-      else if (role === 'qc') personaKey = 'qc-1';
+      // Create new registered user session
+      const newUser = {
+        id: 'kisan-' + Math.floor(1000 + Math.random() * 9000),
+        name: name,
+        role: role,
+        phone: phone,
+        kisanId: 'KISAN-' + (location.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'IND') + '-77' + Math.floor(10 + Math.random() * 89),
+        fpo: location,
+        walletBalance: role === 'farmer' ? 150000 : (role === 'buyer' ? 2500000 : 85000),
+        avatar: role === 'farmer' ? 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=120' : (role === 'buyer' ? 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120' : 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120')
+      };
 
-      quickLoginPersona(personaKey);
-      showNotification('Registration successful! Welcome to AgriFlow, ' + name, 'success');
+      AppState.currentUser = newUser;
+      localStorage.setItem('agriflow_registered_user', JSON.stringify(newUser));
+
+      unlockApplication(role);
+      showNotification('🎉 Registration successful! Welcome to AgriFlow, ' + name + ' (' + role.toUpperCase() + ')', 'success');
+    }
+
+    // Bulletproof Phone OTP Submit Handler
+    function submitRealPhoneOtpLogin(e) {
+      if (e) e.preventDefault();
+      
+      // Gather digits from the 4 discrete boxes
+      let enteredOtp = '';
+      for (let i = 1; i <= 4; i++) {
+        enteredOtp += (document.getElementById('otp-box-' + i)?.value || '').trim();
+      }
+
+      const card = document.getElementById('auth-main-card');
+
+      // Auto-populate if user has active OTP or fallback
+      if (enteredOtp.length !== 4) {
+        // If activeOtp exists, auto-fill for zero friction
+        if (SmsGateway.activeOtp) {
+          autoFillCurrentOtp();
+          enteredOtp = SmsGateway.activeOtp.code;
+        } else {
+          // Send OTP automatically and guide user
+          triggerSendRealOtp();
+          return;
+        }
+      }
+
+      // Check OTP against SmsGateway or standard test codes
+      const validCodes = ['1295', '8821', '0000', '9999'];
+      if (SmsGateway.activeOtp) validCodes.push(SmsGateway.activeOtp.code);
+
+      const isValid = validCodes.includes(enteredOtp) || (SmsGateway.activeOtp && SmsGateway.activeOtp.code === enteredOtp);
+
+      if (!isValid) {
+        if (card) {
+          card.classList.add('animate-shake');
+          setTimeout(() => card.classList.remove('animate-shake'), 500);
+        }
+        for (let i = 1; i <= 4; i++) {
+          const box = document.getElementById('otp-box-' + i);
+          if (box) {
+            box.classList.add('border-rose-500');
+            setTimeout(() => box.classList.remove('border-rose-500'), 1500);
+          }
+        }
+        showNotification('Invalid OTP! Expected: ' + (SmsGateway.activeOtp?.code || '1295'), 'error');
+        return;
+      }
+
+      // Success! Authenticated via Real OTP
+      hideSmsBanner();
+      if (typeof SoundEngine !== 'undefined') SoundEngine.playCashPayout();
+      if (typeof confetti !== 'undefined') {
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+      }
+
+      const phone = document.getElementById('otp-login-phone')?.value || '9822012345';
+      quickLoginPersona('farmer-1');
+      showNotification('✅ Phone SIM verified (+91 ' + phone + '). Welcome Ramesh Patil!', 'success');
     }
 
     // ========================================================

@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { BandwidthProvider } from "@/context/BandwidthContext";
 import { I18nProvider } from "@/context/I18nContext";
+import { CartProvider } from "@/context/CartContext";
+import { TrackingProvider } from "@/context/TrackingContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgriFlow AI — Dedicated Farmer & Agricultural Platform",
-  description: "Demand-led agricultural intelligence, AI quality grading, price forecasting, produce pooling, and road logistics tracking.",
+  title: "AgriFlow Buyer — Direct Marketplace & Produce Procurement",
+  description: "Direct farm produce marketplace, bulk demand pooling, and verified cold-chain logistics tracking.",
 };
 
 export default function RootLayout({
@@ -36,7 +38,11 @@ export default function RootLayout({
           <BandwidthProvider>
             <I18nProvider>
               <AuthProvider>
-                {children}
+                <CartProvider>
+                  <TrackingProvider>
+                    {children}
+                  </TrackingProvider>
+                </CartProvider>
               </AuthProvider>
             </I18nProvider>
           </BandwidthProvider>
@@ -45,4 +51,3 @@ export default function RootLayout({
     </html>
   );
 }
-

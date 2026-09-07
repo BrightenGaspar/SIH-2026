@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface BandwidthContextType {
   isLowBandwidth: boolean;
   toggleLowBandwidth: () => void;
+  toggleBandwidth: () => void;
   setLowBandwidth: (val: boolean) => void;
 }
 
@@ -32,7 +33,7 @@ export function BandwidthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <BandwidthContext.Provider value={{ isLowBandwidth, toggleLowBandwidth, setLowBandwidth }}>
+    <BandwidthContext.Provider value={{ isLowBandwidth, toggleLowBandwidth, toggleBandwidth: toggleLowBandwidth, setLowBandwidth }}>
       {children}
     </BandwidthContext.Provider>
   );

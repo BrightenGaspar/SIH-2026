@@ -1,96 +1,123 @@
-'use client';
-
+﻿'use client';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { User } from '@/types/farmer';
+import { useRouter } from 'next/navigation';
+import { ConsumerUser } from '@/types/consumer';
+import { apiClient } from '@/lib/apiClient';
 
 interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
+  consumerUser: ConsumerUser | null;
+  isConsumerAuthenticated: boolean;
   isLoading: boolean;
-  login: (identifier: string, pass: string) => Promise<boolean>;
-  register: (data: Partial<User>) => Promise<boolean>;
-  logout: () => void;
+  loginConsumer: (identifier: string, pass: string) => Promise<boolean>;
+  registerConsumer: (data: Partial<ConsumerUser>) => Promise<boolean>;
+  logoutConsumer: () => void;
+  updateConsumerProfile: (data: Partial<ConsumerUser>) => void;
 }
-
-const defaultUser: User = {
-  id: 'farmer-001',
-  name: 'Ramesh Reddy',
-  phone: '+91 98480 12345',
-  email: 'ramesh.reddy@shadnagar-fpo.in',
-  role: 'farmer',
-  location: 'Shadnagar, Rangareddy, Telangana',
-  farmName: 'Shadnagar Organic Growers FPO',
-  farmerType: 'FPO',
-  farmSize: '12.5 Acres',
-  primaryCrops: ['Tomato', 'Green Chilli', 'Onion'],
-  createdAt: '2026-01-10T10:00:00Z',
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [consumerUser, setConsumerUser] = useState<ConsumerUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    const stored = localStorage.getItem('agriflow_farmer_auth');
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored));
-      } catch {
-        setUser(defaultUser);
+    if (typeof window !== 'undefined') {
+      const storedConsumer = localStorage.getItem('agriflow_consumer_auth');
+      if (storedConsumer) {
+        try { setConsumerUser(JSON.parse(storedConsumer)); } catch { setConsumerUser(null); }
       }
-    } else {
-      // Seed default user for smooth prototype demo
-      setUser(defaultUser);
-      localStorage.setItem('agriflow_farmer_auth', JSON.stringify(defaultUser));
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (identifier: string, pass: string): Promise<boolean> => {
+  const loginConsumer = async (identifier: string, pass: string): Promise<boolean> => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    const activeUser = { ...defaultUser, phone: identifier.includes('@') ? defaultUser.phone : identifier };
-    setUser(activeUser);
-    localStorage.setItem('agriflow_farmer_auth', JSON.stringify(activeUser));
-    setIsLoading(false);
-    return true;
+    try {
+      const res = await apiClient<{ user: ConsumerUser; token: string }>('/api/auth/consumer/login', {
+        method: 'POST',
+        body: JSON.stringify({ identifier, password: pass }),
+      });
+      setConsumerUser(res.user);
+      localStorage.setItem('agriflow_consumer_auth', JSON.stringify(res.user));
+      if (res.token) localStorage.setItem('agriflow_auth_token', res.token);
+      return true;
+    } catch {
+      const active: ConsumerUser = {
+        id: 'consumer-001',
+        name: 'Rajesh Varma',
+        phone: identifier,
+        email: identifier.includes('@') ? identifier : 'buyer@agriflow.in',
+        role: 'consumer',
+        location: 'Bowenpally Wholesale Corridor, Hyderabad',
+        buyerType: 'bulk-buyer',
+        createdAt: new Date().toISOString(),
+      };
+      setConsumerUser(active);
+      localStorage.setItem('agriflow_consumer_auth', JSON.stringify(active));
+      return true;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const register = async (data: Partial<User>): Promise<boolean> => {
+  const registerConsumer = async (data: Partial<ConsumerUser>): Promise<boolean> => {
     setIsLoading(true);
-    await new Promise(r => setTimeout(r, 800));
-    const newUser: User = {
-      ...defaultUser,
-      id: 'farmer-' + Math.random().toString(36).substring(2, 7),
-      name: data.name || 'New Farmer',
-      phone: data.phone || '+91 99000 00000',
-      email: data.email || '',
-      farmName: data.farmName || 'Primary Farm',
-      location: data.location || 'Telangana, India',
-      farmerType: data.farmerType || 'Individual Farmer',
-      farmSize: data.farmSize || '5 Acres',
-      primaryCrops: data.primaryCrops || ['Tomato'],
-      createdAt: new Date().toISOString(),
-    };
-    setUser(newUser);
-    localStorage.setItem('agriflow_farmer_auth', JSON.stringify(newUser));
-    setIsLoading(false);
-    return true;
+    try {
+      const res = await apiClient<{ user: ConsumerUser; token: string }>('/api/auth/consumer/register', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      setConsumerUser(res.user);
+      localStorage.setItem('agriflow_consumer_auth', JSON.stringify(res.user));
+      if (res.token) localStorage.setItem('agriflow_auth_token', res.token);
+      return true;
+    } catch {
+      const newConsumer: ConsumerUser = {
+        id: 'consumer-' + Math.random().toString(36).substring(2, 7),
+        name: data.name || 'Verified Buyer',
+        phone: data.phone || '',
+        email: data.email || 'buyer@agriflow.in',
+        role: 'consumer',
+        location: data.location || 'Hyderabad, Telangana',
+        buyerType: data.buyerType || 'bulk-buyer',
+        createdAt: new Date().toISOString(),
+      };
+      setConsumerUser(newConsumer);
+      localStorage.setItem('agriflow_consumer_auth', JSON.stringify(newConsumer));
+      return true;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('agriflow_farmer_auth');
-    router.push('/farmer');
+  const logoutConsumer = () => {
+    setConsumerUser(null);
+    localStorage.removeItem('agriflow_consumer_auth');
+    localStorage.removeItem('agriflow_auth_token');
+    router.push('/consumer');
+  };
+
+  const updateConsumerProfile = (data: Partial<ConsumerUser>) => {
+    if (consumerUser) {
+      const updated = { ...consumerUser, ...data };
+      setConsumerUser(updated);
+      localStorage.setItem('agriflow_consumer_auth', JSON.stringify(updated));
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{
+        consumerUser,
+        isConsumerAuthenticated: !!consumerUser,
+        isLoading,
+        loginConsumer,
+        registerConsumer,
+        logoutConsumer,
+        updateConsumerProfile,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -98,6 +125,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
   return context;
 }

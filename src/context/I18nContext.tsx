@@ -1,7 +1,5 @@
 'use client';
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
 type Language = 'en' | 'hi';
 
 interface I18nContextType {
@@ -13,6 +11,15 @@ interface I18nContextType {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     dashboard: 'Dashboard',
+    marketplace: 'Marketplace',
+    cart: 'Cart',
+    orders: 'Orders',
+    tracking: 'Tracking',
+    profile: 'Profile',
+    settings: 'Settings',
+    logout: 'Logout',
+    login: 'Login',
+    register: 'Register',
     myProduce: 'My Produce',
     mandiPrices: 'Mandi Prices',
     demandMap: 'Demand Map',
@@ -25,11 +32,23 @@ const translations: Record<Language, Record<string, string>> = {
     groupSelling: 'Group Selling / Produce Pooling',
     roadLogistics: 'Road Logistics',
     viewTracking: 'View Tracking',
-    joinGroup: 'Join Group Pool',
-    createPool: 'Create Pool',
-    profile: 'Profile',
-    settings: 'Settings',
-    logout: 'Logout',
+    browseMarketplace: 'Browse Marketplace',
+    knowYourFarmer: 'Know Your Farmer',
+    priceTransparency: 'Price Transparency',
+    impactReceipt: 'Impact Receipt',
+    coldChainTelemetry: 'Cold-Chain Telemetry',
+    freshness: 'Harvest Freshness',
+    farmerReceives: 'Farmer Receives',
+    consumerPrice: 'Consumer Price',
+    roadLogisticsFee: 'Road Logistics',
+    platformFee: 'Platform Fee',
+    bulkDemand: 'Create Bulk Demand',
+    multiFarmerFulfillment: 'Multi-Farmer Fulfillment',
+    viewDetails: 'View Details',
+    addToCart: 'Add to Cart',
+    checkout: 'Proceed to Checkout',
+    activeDeliveries: 'Active Deliveries',
+    recommendedForYou: 'AI Recommended Produce',
     lowBandwidth: 'Low Bandwidth',
     perishableRisk: 'Perishable Risk',
     returnLoad: 'Return Load Matching',
@@ -38,30 +57,51 @@ const translations: Record<Language, Record<string, string>> = {
     agriflowRealization: 'AgriFlow Direct Realization',
   },
   hi: {
-    dashboard: 'डैशबोर्ड (Dashboard)',
+    dashboard: 'Ð䥎�ॎ₻Ð��ₜ⤥ₜ⤥₵ (Dashboard)',
+    marketplace: 'ैंडै बाजार (Marketplace)',
+    cart: 'टोकरी (Cart)',
+    orders: 'ऑर्डर (Orders)',
+    tracking: 'लाइव ट्रैकिंग (Tracking)',
+    profile: '४्लोૃाईल (Profile)',
+    settings: 'सेटिंगस (Settings)',
+    logout: 'लॉग आउट (Logout)',
+    login: 'लॉग इन (Login)',
+    register: 'पंजीकरण (Register)',
     myProduce: 'मेरी उपज (My Produce)',
     mandiPrices: 'मंडी भाव (Mandi Prices)',
-    demandMap: 'मांग नक्शा (Demand Map)',
-    aiRecommendations: 'एआई सिफारिशें (AI Recommendations)',
-    ordersAndDelivery: 'ऑर्डर और डिलीवरी (Orders & Delivery)',
-    addProduce: '+ उपज जोड़ें',
+    demandMap: 'म社ं नक्शा (Demand Map)',
+    aiRecommendations: 'एआई सि૧ारिशे (AI Recommendations)',
+    ordersAndDelivery: 'ऑरऍ炨र और डिलीवरी',
+    addProduce: '+ उपज जोड़ेट',
     todaysOpportunities: 'आज के अवसर',
-    marketSnapshot: 'बाजार भाव विवरण',
-    bestTimeToSell: 'बेचने का सही समय',
+    marketSnapshot: 'बाजार भाऱ विवरण’',
+    bestTimeToSell: 'बेचने का सही समॏ',
     groupSelling: 'समूह बिक्री / उपज पूलिंग',
-    roadLogistics: 'सड़क परिवहन लॉजिस्टिक्स',
-    viewTracking: 'ट्रैकिंग देखें',
-    joinGroup: 'ग्रुप में शामिल हों',
-    createPool: 'पूल बनाएं',
-    profile: 'प्रोफ़ाइल',
-    settings: 'सेटिंग्स',
-    logout: 'लॉग आउट',
+    roadLogistics: 'सडऽ परिवहन लॉजिस्टिक्स',
+    viewTracking: 'ट्रैचोळ देखेश',
+    browseMarketplace: 'उत्पादक देखेल (Marketplace',
+    knowYourFarmer: 'किसान को जानेन (Know Your Farmer)',
+    priceTransparency: 'बूल्ळ पारदर्शिता (Price Breakdown(',
+    impactReceipt: 'खरीद प्रभाव रसी (Impact Receipt)',
+    coldChainTelemetry: 'कोल्ड-dचेन तापमान (Cold-Chain)',
+    freshness: 'कटाई की ताजगी (Freshness)',
+    farmerReceives: 'किसान को मिला',
+    consumerPrice: 'उपभोक्ता मूल्य',
+    roadLogisticsFee: 'सडि परिवहन भाडाऱ',
+    platformFee: '्लेट्फॉर्म शूल्क',
+    bulkDemand: 'थोक मांग दर्ज करें (Bulk Demand)',
+    multiFarmerFulfillment: 'बहु-कि�.ान समेकन',
+    viewDetails: 'विवरण देखेश',
+    addToCart: 'कार्ट में जोडेऺ (Add to Cart)',
+    checkout: 'भु�_तान करें (Checkout)',
+    activeDeliveries: 'सक्रिय डीलीवरी',
+    recommendedForYou: 'एआ	 अनुशंसित उपज',
     lowBandwidth: 'कम बैंडविड्थ मोड',
     perishableRisk: 'खराब होने का जोखिम',
     returnLoad: 'वापसी भाड़ा मैचिंग',
-    farmerBenefit: 'किसान लाभ व आमदनी',
+    farmerBenefit: 'कि�.ान लाभर वी आमदनी',
     conventional: 'पारंपरिक मंडी भाव',
-    agriflowRealization: 'एग्रीफ्लो सीधी प्राप्ति',
+    agriflowRealization: 'एग्री फ्लो सोताी वास्ति',
   },
 };
 
@@ -81,7 +121,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string): string => {
-    return translations[language][key] || translations['en'][key] || key;
+    const currentMap = translations[language] || translations['en'];
+    return (currentMap as Record<string, string>)[key] || (translations['en'] as Record<string, string>)[key] || key;
   };
 
   return (

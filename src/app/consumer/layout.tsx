@@ -42,7 +42,7 @@ export default function ConsumerLayout({
     { href: '/consumer/marketplace', label: t('marketplace'), icon: Store, authRequired: false },
     { href: '/consumer/cart', label: 'Cart', icon: ShoppingBag, authRequired: false },
     { href: '/consumer/orders', label: t('orders'), icon: Package, authRequired: true },
-    { href: '/consumer/tracking/TRK-CONS-ROAD-9021', label: 'Tracking', icon: Truck, authRequired: true },
+    { href: '/consumer/tracking', label: 'GPS Tracking', icon: Truck, authRequired: false },
   ];
 
   const handleLogout = () => {

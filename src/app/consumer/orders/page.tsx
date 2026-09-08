@@ -126,7 +126,7 @@ export default function ConsumerOrdersPage() {
               >
                 {/* Order Header Summary Card */}
                 <div className="p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-zinc-100 dark:border-zinc-800/80">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <span className="text-sm font-black font-mono text-zinc-900 dark:text-white">
                         {order.id}
@@ -134,6 +134,12 @@ export default function ConsumerOrdersPage() {
                       <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getStatusBadge(order.status)}`}>
                         {order.status}
                       </span>
+                      {order.status === 'In Transit' && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 animate-pulse">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          Live GPS Active
+                        </span>
+                      )}
                       {order.isBulkOrder && (
                         <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                           Bulk Multi-Farmer ({order.totalQuantityKg.toLocaleString('en-IN')} kg)
@@ -145,13 +151,21 @@ export default function ConsumerOrdersPage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4">
-                    <div className="text-left sm:text-right">
+                  <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-3">
+                    <div className="text-left sm:text-right mr-1">
                       <span className="text-xs text-zinc-400 block">Total Settlement</span>
                       <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">
                         ₹{order.totalAmount.toLocaleString('en-IN')}
                       </span>
                     </div>
+
+                    <Link
+                      href={`/consumer/tracking/${order.logisticsId || 'TRK-CONS-ROAD-9021'}`}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
+                      title="Open Live GPS Tracking Map"
+                    >
+                      <Truck className="w-3.5 h-3.5" /> Track GPS
+                    </Link>
 
                     <button
                       type="button"

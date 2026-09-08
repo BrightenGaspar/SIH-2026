@@ -70,7 +70,7 @@ export default function CombinedMainHub() {
                   Unified Gateway
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 hidden sm:block">Farm-gate AI grading, direct bulk procurement & cold chain tracking</p>
+              <p className="text-[11px] text-slate-400 hidden sm:block">Direct farm procurement, group selling & cold chain tracking</p>
             </div>
           </div>
 
@@ -104,7 +104,7 @@ export default function CombinedMainHub() {
       <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-12">
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-900/40 border border-emerald-700/60 text-emerald-300 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" /> Direct Sourcing • AI Quality Grading • Smart Cold Chain
+            <Sparkles className="w-3.5 h-3.5" /> Direct Farm Sourcing • Group Selling • Smart Cold Chain
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
             One Unified Platform for{' '}
@@ -113,7 +113,7 @@ export default function CombinedMainHub() {
             </span>
           </h1>
           <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
-            Eliminating middleman leakages with computer-vision produce grading, direct collective marketplace sourcing, and IoT reefer telemetry with return-haul optimization.
+            Eliminating middleman leakages with direct collective marketplace sourcing, group selling, and IoT reefer telemetry with return-haul optimization.
           </p>
         </div>
 
@@ -178,13 +178,13 @@ export default function CombinedMainHub() {
                   🌾 Farmer & Collective Portal
                 </h3>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                  List harvest lots, scan with AI computer-vision grading, explore regional mandi forecasts, and consolidate loads with nearby farmers.
+                  List harvest lots, declare quantities, explore regional mandi forecasts, and consolidate loads with nearby farmers.
                 </p>
               </div>
               <div className="space-y-1.5 pt-2 border-t border-slate-800 text-xs text-slate-300">
                 <div className="flex items-center gap-2">
                   <span className="text-emerald-400">✓</span>
-                  <span>AI Computer-Vision Quality Grading</span>
+                  <span>Direct Farm-Gate Produce Listing</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-emerald-400">✓</span>
@@ -213,7 +213,7 @@ export default function CombinedMainHub() {
                   href="/farmer/produce"
                   className="py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-[11px] font-medium text-center border border-slate-700 transition"
                 >
-                  AI Grade Produce
+                  Produce Inventory
                 </Link>
                 <Link
                   href="/farmer/demand-map"
@@ -371,7 +371,7 @@ export default function CombinedMainHub() {
                 }`}
               >
                 <Sprout className="w-3.5 h-3.5" />
-                <span>AI Grading (Farmer)</span>
+                <span>Farmer Sourcing</span>
               </button>
               <button
                 onClick={() => setActiveTab('buyer')}
@@ -403,18 +403,18 @@ export default function CombinedMainHub() {
             </div>
           </div>
 
-          {/* TAB 1: FARMER AI GRADING PREVIEW */}
+          {/* TAB 1: FARMER HARVEST LISTING PREVIEW */}
           {activeTab === 'farmer' && (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               <div className="lg:col-span-5 space-y-4">
                 <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                  Computer-Vision Produce Quality Engine
+                  Direct Harvest Listing & Sourcing
                 </span>
                 <h3 className="text-xl font-black text-white">
-                  Simulate Live Crop Quality Assessment
+                  Farm Harvest Declarations & Realization
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Select a sample harvest to evaluate symmetry, skin defects, color ripeness, and determine fair price realization.
+                  Select a crop to explore listed harvest lots, view regional market prices, and calculate guaranteed net bank realizations.
                 </p>
 
                 <div className="flex gap-2 pt-2">
@@ -438,7 +438,7 @@ export default function CombinedMainHub() {
                     href="/farmer/produce"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-lg shadow-emerald-950"
                   >
-                    <span>Launch Full Farmer AI Grading</span>
+                    <span>Explore Produce Inventory</span>
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -451,7 +451,7 @@ export default function CombinedMainHub() {
                     <div className="text-xs text-slate-400">{cropStats[sampleCrop].desc}</div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-slate-400 block">Assigned Grade</span>
+                    <span className="text-xs text-slate-400 block">Grade Classification</span>
                     <span className="text-lg font-black text-emerald-400 px-2.5 py-0.5 rounded bg-emerald-950 border border-emerald-800">
                       Grade {cropStats[sampleCrop].grade}
                     </span>
@@ -460,15 +460,15 @@ export default function CombinedMainHub() {
 
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-[11px] text-slate-400 block">Visual Score</span>
-                    <strong className="text-emerald-400 text-lg">{cropStats[sampleCrop].score}/100</strong>
+                    <span className="text-[11px] text-slate-400 block">Batch Volume</span>
+                    <strong className="text-emerald-400 text-lg">2,400 kg</strong>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-[11px] text-slate-400 block">Defect Rate</span>
-                    <strong className="text-cyan-400 text-lg">{cropStats[sampleCrop].defect}</strong>
+                    <span className="text-[11px] text-slate-400 block">Listing Status</span>
+                    <strong className="text-cyan-400 text-sm font-bold block mt-1">Active Listing</strong>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-900 border border-slate-800">
-                    <span className="text-[11px] text-slate-400 block">Fair Realization</span>
+                    <span className="text-[11px] text-slate-400 block">Direct Realization</span>
                     <strong className="text-teal-400 text-sm font-bold block mt-1">{cropStats[sampleCrop].realization}</strong>
                   </div>
                 </div>
@@ -620,8 +620,8 @@ export default function CombinedMainHub() {
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center space-y-2">
                   <div className="w-8 h-8 rounded-lg bg-emerald-950 text-emerald-400 font-black text-sm flex items-center justify-center mx-auto">1</div>
-                  <h4 className="text-xs font-bold text-white">Harvest & AI Grade</h4>
-                  <p className="text-[11px] text-slate-400">Farmer uploads harvest photo. Computer vision grades lot & estimates realization.</p>
+                  <h4 className="text-xs font-bold text-white">Harvest & Listing</h4>
+                  <p className="text-[11px] text-slate-400">Farmer declares crop quantity, location hub, and target price realization.</p>
                 </div>
 
                 <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-center space-y-2">
@@ -675,7 +675,7 @@ export default function CombinedMainHub() {
                 </li>
                 <li>
                   <Link href="/farmer/produce" className="text-slate-300 hover:text-emerald-400 transition flex items-center justify-between">
-                    <span>📸 AI Quality Grading & Produce</span>
+                    <span>🌾 Produce Inventory & Listing</span>
                     <ArrowUpRight className="w-3.5 h-3.5 text-slate-500" />
                   </Link>
                 </li>
@@ -792,7 +792,7 @@ export default function CombinedMainHub() {
       {/* Footer */}
       <footer className="border-t border-slate-800/80 bg-slate-950 py-8 text-center text-xs text-slate-500 space-y-2">
         <p className="font-medium text-slate-400">AgriFlow AI • SIH Smart India Hackathon End-to-End Agri Platform</p>
-        <p>Direct Farmer Sourcing • Computer-Vision Quality Grading • Reefer Cold-Chain Optimization</p>
+        <p>Direct Farmer Sourcing • Group Selling • Reefer Cold-Chain Optimization</p>
       </footer>
     </div>
   );

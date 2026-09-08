@@ -121,9 +121,9 @@ export default function FarmerPublicLandingPage() {
             <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mb-4">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-lg font-bold text-white mb-2">2. AI Produce Quality Grading</h3>
+            <h3 className="text-lg font-bold text-white mb-2">2. Direct Produce Listing</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Upload crop photos to simulate visual quality evaluation (Grade A, A-, B, etc.) and calculate fair baseline realizations.
+              Declare harvest quantities, target realization rates, and location hubs to instantly connect with verified wholesale buyers.
             </p>
           </div>
 

@@ -254,7 +254,7 @@ export default function ConsumerCheckoutPage() {
               <div className="p-3 bg-zinc-50 dark:bg-zinc-800/60 rounded-xl border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 dark:text-zinc-400 flex items-start gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                 <p className="leading-snug text-[11px]">
-                  <strong>Escrow Protection:</strong> Payment remains locked in AgriFlow Smart Escrow until the truck arrives and the IoT temperature sensor data & visual produce grading are verified at your gate.
+                  <strong>Escrow Protection:</strong> Payment remains locked in AgriFlow Smart Escrow until the truck arrives and produce delivery is verified at your gate.
                 </p>
               </div>
             </div>
@@ -290,7 +290,7 @@ export default function ConsumerCheckoutPage() {
                   <span className="font-bold text-zinc-900 dark:text-white">₹{roadLogisticsFee.toLocaleString('en-IN')}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Quality AI & Smart Escrow Fee:</span>
+                  <span>Platform & Smart Escrow Fee:</span>
                   <span className="font-bold text-zinc-900 dark:text-white">₹{platformFee.toLocaleString('en-IN')}</span>
                 </div>
 

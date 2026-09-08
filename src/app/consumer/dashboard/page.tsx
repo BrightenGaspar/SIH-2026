@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -165,8 +165,8 @@ export default function ConsumerDashboard() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-semibold">Active Orders</span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">{activeOrders.length}</span>
+              <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-semibold">Active In-Transit Orders</span>
+              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block">{activeOrders.length}</span>
             </div>
             <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
               <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-semibold">Completed Orders</span>
@@ -177,6 +177,138 @@ export default function ConsumerDashboard() {
               <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">{bulkDemands.length}</span>
             </div>
           </div>
+
+          {/* Live Highway GPS Tracking Featured Widget */}
+          <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-emerald-950 p-6 md:p-8 rounded-3xl border border-emerald-500/30 text-white shadow-xl space-y-6 relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                  <Truck className="w-6 h-6 animate-pulse" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
+                      Live Delivery Tracking by GPS
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      Satellite Connected
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mt-0.5">
+                    Consolidated Farm Dispatch • TRK-CONS-ROAD-9021
+                  </h3>
+                </div>
+              </div>
+
+              <Link
+                href="/consumer/tracking?id=TRK-CONS-ROAD-9021"
+                className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/50 shrink-0"
+              >
+                <MapPin className="w-4 h-4" /> Open Full GPS Tracking Map <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+
+            {/* GPS Telemetry Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
+                <span className="text-zinc-400 text-[11px] block">Current Highway Position</span>
+                <strong className="text-white text-sm block">Shamshabad ORR Tollway</strong>
+                <span className="text-emerald-400 font-mono text-[11px] block">17.2403° N, 78.4294° E</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
+                <span className="text-zinc-400 text-[11px] block">Carrier & Driver</span>
+                <strong className="text-white text-sm block">Tata 407 Reefer</strong>
+                <span className="text-zinc-300 text-[11px] block">Mohammed Ismail (TS 08 UB 4192)</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
+                <span className="text-zinc-400 text-[11px] block">IoT Reefer Cold Chain</span>
+                <strong className="text-emerald-400 text-sm block">5.8°C (Optimal Range)</strong>
+                <span className="text-zinc-300 text-[11px] block">Humidity: 86% • Low Spoilage Risk</span>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
+                <span className="text-zinc-400 text-[11px] block">Target Arrival (ETA)</span>
+                <strong className="text-white text-sm block">Today, 05:45 PM</strong>
+                <span className="text-emerald-400 font-bold text-[11px] block">28 km Remaining (45 mins)</span>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <span>Shadnagar FPO Hub (Origin)</span>
+                <span className="font-bold text-white">68% Journey Completed</span>
+                <span>Bowenpally Terminal (Destination)</span>
+              </div>
+              <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
+                <div className="bg-emerald-500 h-full rounded-full w-[68%] transition-all duration-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'orders' && (
+        <div className="space-y-4">
+          {activeOrders.map((order) => (
+            <div
+              key={order.id}
+              className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-black font-mono text-zinc-900 dark:text-white">{order.id}</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                    {order.status}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    Live GPS Active
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {order.totalQuantityKg.toLocaleString('en-IN')} kg • ₹{order.totalAmount.toLocaleString('en-IN')} • Expected {order.estimatedDeliveryDate}
+                </p>
+              </div>
+
+              <Link
+                href={`/consumer/tracking/${order.logisticsId || 'TRK-CONS-ROAD-9021'}`}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+              >
+                <Truck className="w-3.5 h-3.5" /> Track Live GPS Map <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {activeTab === 'demands' && (
+        <div className="space-y-4">
+          {bulkDemands.map((demand) => (
+            <div
+              key={demand.id}
+              className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div>
+                <span className="text-xs font-mono font-bold text-zinc-400">{demand.id}</span>
+                <h4 className="text-sm font-bold text-zinc-900 dark:text-white mt-0.5">
+                  {demand.produceName} ({demand.requiredQuantityKg} kg)
+                </h4>
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
+                  Delivery to: {demand.deliveryLocation} • Status: <span className="text-emerald-600 font-bold">{demand.status}</span>
+                </p>
+              </div>
+
+              <div className="text-right">
+                <span className="text-xs text-zinc-400 block">Matched Volume</span>
+                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
+                  {demand.matchedQuantityKg} / {demand.requiredQuantityKg} kg ({Math.round((demand.matchedQuantityKg / demand.requiredQuantityKg) * 100)}%)
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       )}
 

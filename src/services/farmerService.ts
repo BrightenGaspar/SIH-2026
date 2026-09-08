@@ -1,4 +1,4 @@
-﻿import { Produce, ProduceGrade, QualityGradeResult } from "@/types/farmer";
+import { Produce, ProduceGrade, QualityGradeResult } from "@/types/farmer";
 import { apiClient } from "@/lib/apiClient";
 import { initialProduceList } from "./mockData/mockProduce";
 
@@ -77,8 +77,8 @@ export const farmerService = {
         freshnessScore: 95,
         estimatedFairRealizationMin: 38,
         estimatedFairRealizationMax: 44,
-        explanation: "High visual symmetry, 92% uniform red hue index, <2% surface blemishes detected. Suitable for institutional retail & Grade-A export contracts.",
-        disclaimer: "AI Quality Grading validated against AGMARK standard criteria.",
+        explanation: "High visual symmetry, 92% uniform red hue index, <2% surface blemishes detected. Suitable for institutional retail contracts.",
+        disclaimer: "Produce quality benchmarked against standard procurement criteria.",
       };
     }
   }

@@ -52,8 +52,8 @@ export default function ConsumerLandingPage() {
   const valuePillars = [
     {
       icon: ShieldCheck,
-      title: 'AI Computer-Vision Grading',
-      desc: 'Automated 6-point visual quality assessment for size uniformity, color saturation, and surface blemish rate.',
+      title: 'Direct Farm Quality Assurance',
+      desc: 'Quality-tested harvest batches with verified farm provenance, harvest date timestamps, and cold-chain compliance.',
       color: 'text-emerald-500 bg-emerald-500/10'
     },
     {
@@ -92,7 +92,7 @@ export default function ConsumerLandingPage() {
           </h1>
 
           <p className="text-sm sm:text-lg text-zinc-300 font-normal leading-relaxed">
-            Eliminate commission agents. Buy directly from FPOs and progressive farmers with AI-certified quality grading, cold-chain road transport, and transparent escrow pricing.
+            Eliminate commission agents. Buy directly from FPOs and progressive farmers with verified farm quality, cold-chain road transport, and transparent escrow pricing.
           </p>
 
           {/* Action CTAs */}
@@ -128,7 +128,7 @@ export default function ConsumerLandingPage() {
           </div>
           <div>
             <span className="text-2xl sm:text-3xl font-black text-white">100%</span>
-            <p className="text-xs text-zinc-400 mt-0.5">AI Quality Certified</p>
+            <p className="text-xs text-zinc-400 mt-0.5">Direct Farm Traceability</p>
           </div>
           <div>
             <span className="text-2xl sm:text-3xl font-black text-cyan-400">4-8°C</span>

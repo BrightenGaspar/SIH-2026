@@ -1,4 +1,4 @@
-﻿import { ProductDetails, ConsumerOrder, BulkDemand, Recommendation } from "@/types/consumer";
+import { ProductDetails, ConsumerOrder, BulkDemand, Recommendation } from "@/types/consumer";
 
 export const mockConsumerProducts: ProductDetails[] = [
   {
@@ -241,33 +241,168 @@ export const mockConsumerProducts: ProductDetails[] = [
 
 export const mockConsumerOrders: ConsumerOrder[] = [
   {
-    id: "ORD-CONS-801",
+    id: "ORD-HYD-5000",
     items: [
       {
         product: mockConsumerProducts[0],
-        quantityKg: 500,
-        selectedTierPricePerKg: 34,
+        quantityKg: 5000,
+        selectedTierPricePerKg: 31,
       }
     ],
-    totalQuantityKg: 500,
-    subtotal: 17000,
-    roadLogisticsFee: 850,
-    platformFee: 420,
-    totalAmount: 18270,
+    totalQuantityKg: 5000,
+    subtotal: 155000,
+    roadLogisticsFee: 4200,
+    platformFee: 1800,
+    totalAmount: 161000,
     deliveryAddress: {
-      name: "Rajesh Varma",
-      phone: "+91 98480 11223",
-      address: "Bowenpally Central Wholesale Yard",
+      name: "Hyderabad Wholesale Sourcing Hub",
+      phone: "+91 98480 99887",
+      address: "Bowenpally Central Terminal, Gate 4",
       city: "Hyderabad",
       district: "Hyderabad",
       state: "Telangana",
       pincode: "500011",
     },
     paymentMethod: "UPI",
-    orderDate: "2026-09-06 11:20 AM",
+    orderDate: "2026-09-08 08:30 AM",
     status: "In Transit",
     logisticsId: "TRK-CONS-ROAD-9021",
-    estimatedDeliveryDate: "Today, 05:45 PM",
+    estimatedDeliveryDate: "Today, 05:45 PM (Live GPS)",
+    isBulkOrder: true,
+    multiFarmerSources: [
+      {
+        farmerOrFpoId: "fpo-shad-01",
+        name: "Ramesh Reddy (Cluster 1)",
+        location: "Shadnagar South, Rangareddy",
+        quantityKg: 2400,
+        grade: "A",
+        contributionPercent: 48,
+      },
+      {
+        farmerOrFpoId: "fpo-shad-02",
+        name: "Laxmi Bai Organic Farm",
+        location: "Shadnagar East, Rangareddy",
+        quantityKg: 1600,
+        grade: "A",
+        contributionPercent: 32,
+      },
+      {
+        farmerOrFpoId: "fpo-shad-03",
+        name: "K. Narsimha & Co-op",
+        location: "Kothur Belt, Rangareddy",
+        quantityKg: 1000,
+        grade: "A",
+        contributionPercent: 20,
+      }
+    ],
+    impactReceipt: {
+      orderId: "ORD-HYD-5000",
+      produceName: "Tomato (Grade A Bulk)",
+      totalQuantityKg: 5000,
+      totalPaid: 161000,
+      farmerShareTotal: 128800,
+      roadLogisticsTotal: 4200,
+      platformFeeTotal: 1800,
+      farmerRealizationGainTotal: 34200,
+      farmerRealizationGainPercent: 36.2,
+      co2ReductionKgEstimate: 42.5,
+      emptyKmSaved: 142,
+      directFarmersEmpoweredCount: 3,
+      statement: "By consolidating 3 smallholder clusters into a single Tata 407 Reefer dispatch, farmers gained +36.2% net margin and 142 empty road km were eliminated.",
+      timestamp: "2026-09-08 08:30 AM",
+    }
+  },
+  {
+    id: "ORD-CONS-801",
+    items: [
+      {
+        product: mockConsumerProducts[1],
+        quantityKg: 500,
+        selectedTierPricePerKg: 49,
+      }
+    ],
+    totalQuantityKg: 500,
+    subtotal: 24500,
+    roadLogisticsFee: 1100,
+    platformFee: 550,
+    totalAmount: 26150,
+    deliveryAddress: {
+      name: "Rajesh Varma (Spice Market)",
+      phone: "+91 98480 11223",
+      address: "Mir Alam Mandi Spice Enclave",
+      city: "Hyderabad",
+      district: "Hyderabad",
+      state: "Telangana",
+      pincode: "500002",
+    },
+    paymentMethod: "UPI",
+    orderDate: "2026-09-08 09:15 AM",
+    status: "In Transit",
+    logisticsId: "TRK-RD-9021",
+    estimatedDeliveryDate: "Today, 04:30 PM (Live GPS)",
+    isBulkOrder: false,
+    impactReceipt: {
+      orderId: "ORD-CONS-801",
+      produceName: "Guntur Hot Green Chillies (Grade A)",
+      totalQuantityKg: 500,
+      totalPaid: 26150,
+      farmerShareTotal: 21500,
+      roadLogisticsTotal: 1100,
+      platformFeeTotal: 550,
+      farmerRealizationGainTotal: 5800,
+      farmerRealizationGainPercent: 31.0,
+      co2ReductionKgEstimate: 14.8,
+      emptyKmSaved: 56,
+      directFarmersEmpoweredCount: 1,
+      statement: "Direct farm-gate cold chain procurement with zero APMC middleman deductions.",
+      timestamp: "2026-09-08 09:15 AM",
+    }
+  },
+  {
+    id: "ORD-MED-102",
+    items: [
+      {
+        product: mockConsumerProducts[2],
+        quantityKg: 3000,
+        selectedTierPricePerKg: 20,
+      }
+    ],
+    totalQuantityKg: 3000,
+    subtotal: 60000,
+    roadLogisticsFee: 2400,
+    platformFee: 900,
+    totalAmount: 63300,
+    deliveryAddress: {
+      name: "Kishore Grand Catering Hub",
+      phone: "+91 94401 55672",
+      address: "Hitec City Catering Complex, Madhapur",
+      city: "Hyderabad",
+      district: "Hyderabad",
+      state: "Telangana",
+      pincode: "500081",
+    },
+    paymentMethod: "UPI",
+    orderDate: "2026-09-07 07:00 AM",
+    status: "Delivered",
+    logisticsId: "TRK-RD-8812",
+    estimatedDeliveryDate: "Delivered on Sep 07, 03:30 PM",
+    isBulkOrder: true,
+    impactReceipt: {
+      orderId: "ORD-MED-102",
+      produceName: "Nashik Premium Red Onions (Grade B)",
+      totalQuantityKg: 3000,
+      totalPaid: 63300,
+      farmerShareTotal: 51000,
+      roadLogisticsTotal: 2400,
+      platformFeeTotal: 900,
+      farmerRealizationGainTotal: 12400,
+      farmerRealizationGainPercent: 24.3,
+      co2ReductionKgEstimate: 28.2,
+      emptyKmSaved: 94,
+      directFarmersEmpoweredCount: 2,
+      statement: "Consolidated Medak FPO storage batch delivered with zero transit damage.",
+      timestamp: "2026-09-07 03:30 PM",
+    }
   }
 ];
 

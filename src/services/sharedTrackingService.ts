@@ -36,7 +36,7 @@ export const mockDeliveryTrips: Record<string, DeliveryTracking> = {
       explanation: "Reefer active at optimal 5.8°C. Relative humidity calibrated at 86% to preserve tomato firmness and prevent transpiration."
     },
     returnLoad: {
-      route: "Hyderabad Terminal → Warangal Produce Hub",
+      route: "Hyderabad Terminal -> Warangal Produce Hub",
       commodity: "Organic Bio-Fertilizer Sacks & Seedlings",
       additionalEarnings: 2800,
       emptyDistanceAvoidedKm: 142
@@ -45,7 +45,7 @@ export const mockDeliveryTrips: Record<string, DeliveryTracking> = {
       { id: "wp-1", title: "Harvest Loaded & Crated (3 Farmer Clusters)", location: "Shadnagar FPO Hub", coordinates: [17.0684, 78.2078], timestamp: "08:30 AM", completed: true },
       { id: "wp-2", title: "IoT Cold Seal & QR Verified", location: "Reefer Pre-Cool Gate", coordinates: [17.0800, 78.2200], timestamp: "09:15 AM", completed: true },
       { id: "wp-3", title: "Departed on NH 44 Expressway", location: "Kothur Toll Plaza", coordinates: [17.1500, 78.3000], timestamp: "10:00 AM", completed: true },
-      { id: "wp-4", title: "In Transit — ORR Highway Corridor", location: "Shamshabad (Speed: 54 km/h • GPS Active)", coordinates: [17.2403, 78.4294], timestamp: "03:15 PM", completed: true, current: true },
+      { id: "wp-4", title: "In Transit - ORR Highway Corridor", location: "Shamshabad (Speed: 54 km/h | GPS Active)", coordinates: [17.2403, 78.4294], timestamp: "03:15 PM", completed: true, current: true },
       { id: "wp-5", title: "Entry into City Wholesale Hub", location: "Bowenpally Terminal Gate 4", coordinates: [17.4729, 78.4842], timestamp: "05:45 PM (ETA)", completed: false },
     ],
     routeCoordinates: [

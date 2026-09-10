@@ -30,7 +30,7 @@ export default function FarmerProfilePage() {
                 Verified Farmer
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">{user?.farmName} • {user?.farmerType}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{user?.farmName} &bull; {user?.farmerType}</p>
           </div>
         </div>
 

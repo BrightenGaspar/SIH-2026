@@ -102,7 +102,7 @@ export default function ConsumerRegisterPage() {
           {t('createAccount')}
         </h1>
         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-          Step {step} of 3 • {step === 1 ? 'Select Buyer Type' : step === 2 ? 'Contact & Location' : 'Sourcing Preferences'}
+          Step {step} of 3 &bull; {step === 1 ? 'Select Buyer Type' : step === 2 ? 'Contact & Location' : 'Sourcing Preferences'}
         </p>
       </div>
 
@@ -296,7 +296,7 @@ export default function ConsumerRegisterPage() {
                 >
                   {SUPPORTED_LANGUAGES.map((l) => (
                     <option key={l.code} value={l.code}>
-                      {l.nativeLabel} — {l.label}
+                      {l.nativeLabel} - {l.label}
                     </option>
                   ))}
                 </select>

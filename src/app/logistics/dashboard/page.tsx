@@ -18,7 +18,8 @@ import {
   CheckCircle2,
   TrendingUp,
   Activity,
-  Layers
+  Layers,
+  AlertTriangle
 } from 'lucide-react';
 
 export default function LogisticsDashboard() {
@@ -36,9 +37,12 @@ export default function LogisticsDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm">
         <div>
           <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Road Freight Command Center</span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Welcome, Deccan Reefer Fleet 🚚</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <span>Welcome, Deccan Reefer Fleet</span>
+            <Truck className="w-6 h-6 text-amber-500 shrink-0" />
+          </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Hyderabad Regional Depot • Dedicated Perishable Farm Corridors
+            Hyderabad Regional Depot &bull; Dedicated Perishable Farm Corridors
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -60,13 +64,13 @@ export default function LogisticsDashboard() {
       {/* TODAY'S TOP LOGISTICS RETURN LOAD ALERT - Mirroring Farmer Top Alert */}
       <div className="bg-gradient-to-r from-amber-950/80 to-slate-900 border-2 border-amber-500/60 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg shadow-amber-950/20">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center font-bold text-2xl flex-shrink-0">
-            🚨
+          <div className="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-6 h-6 text-amber-400" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-amber-400 text-slate-950 text-[10px] font-black uppercase tracking-wider">High Optimization</span>
-              <span className="text-xs font-bold text-amber-300">Bowenpally → Shadnagar Corridor</span>
+              <span className="text-xs font-bold text-amber-300">Bowenpally &rarr; Shadnagar Corridor</span>
             </div>
             <h2 className="text-lg font-bold text-white mt-1">Empty Return Haul Matched (1,200 kg Organic Compost & Seedlings)</h2>
             <p className="text-xs text-slate-300">Driver Mohammed Ismail can earn <strong>+₹2,800 added revenue</strong> and avoid 68 km of empty deadhead miles.</p>

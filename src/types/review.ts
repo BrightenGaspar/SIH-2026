@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AgriFlow Trust & Safety Models
  * Reciprocal Verified Ratings, Reviews, and User/Resource Reporting System
  */
@@ -84,7 +84,7 @@ export interface ParticipantRatingSummary {
 }
 
 // ============================================================================
-// 🚩 USER & RESOURCE REPORTING MODELS
+// [REPORT] USER & RESOURCE REPORTING MODELS
 // ============================================================================
 
 export type ReportType = 'USER' | 'PRODUCT' | 'ORDER' | 'REVIEW' | 'LOGISTICS_SERVICE';

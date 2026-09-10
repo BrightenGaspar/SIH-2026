@@ -56,9 +56,9 @@ export default function FarmerTrackingClient() {
             </span>
             <StatusBadge status={tracking.status} />
           </div>
-          <h1 className="text-2xl font-black text-white">{tracking.pickupLocation} → {tracking.destinationLocation}</h1>
+          <h1 className="text-2xl font-black text-white">{tracking.pickupLocation} &rarr; {tracking.destinationLocation}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Carrier: <strong className="text-white">{tracking.vehicleType} ({tracking.vehicleNumber})</strong> • Driver: {tracking.driverName}
+            Carrier: <strong className="text-white">{tracking.vehicleType} ({tracking.vehicleNumber})</strong> &bull; Driver: {tracking.driverName}
           </p>
         </div>
         <div className="text-right">
@@ -80,7 +80,7 @@ export default function FarmerTrackingClient() {
           </div>
           <div className="text-2xl font-black text-emerald-400">{tracking.spoilageTelemetry.temperatureCelsius}°C</div>
           <p className="text-xs text-slate-400 mt-1">
-            Target: {tracking.spoilageTelemetry.targetTempCelsius}°C • Humidity: {tracking.spoilageTelemetry.humidityPercent}%
+            Target: {tracking.spoilageTelemetry.targetTempCelsius}&deg;C &bull; Humidity: {tracking.spoilageTelemetry.humidityPercent}%
           </p>
         </Card>
 
@@ -153,10 +153,10 @@ export default function FarmerTrackingClient() {
                   <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Demo Simulation</span>
                 </div>
                 <h4 className="text-base font-bold text-white mt-0.5">
-                  {tracking.returnLoad.origin} → {tracking.returnLoad.destination}
+                  {tracking.returnLoad.origin} &rarr; {tracking.returnLoad.destination}
                 </h4>
                 <p className="text-xs text-slate-300">
-                  Cargo: {tracking.returnLoad.commodity} • Avoids {tracking.returnLoad.emptyDistanceAvoidedKm} km empty return run.
+                  Cargo: {tracking.returnLoad.commodity} &bull; Avoids {tracking.returnLoad.emptyDistanceAvoidedKm} km empty return run.
                 </p>
               </div>
             </div>

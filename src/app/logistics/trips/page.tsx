@@ -51,10 +51,10 @@ export default function LogisticsTripsPage() {
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30 text-xs font-bold">
                   {trip.status}
                 </span>
-                <span className="text-xs text-slate-400">• Carrier: {trip.vehicle.vehicleNumber}</span>
+                <span className="text-xs text-slate-400">&bull; Carrier: {trip.vehicle.vehicleNumber}</span>
               </div>
 
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">{trip.sourceHub} → {trip.destinationHub}</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">{trip.sourceHub} &rarr; {trip.destinationHub}</h3>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs text-slate-500 dark:text-slate-400">
                 <div>
@@ -110,7 +110,7 @@ export default function LogisticsTripsPage() {
                     setSelectedReportData({
                       reportType: 'LOGISTICS_SERVICE',
                       transactionId: trip.id,
-                      reportedName: `Trip #${trip.tripCode} (${trip.sourceHub} → ${trip.destinationHub})`,
+                      reportedName: `Trip #${trip.tripCode} (${trip.sourceHub} -> ${trip.destinationHub})`,
                     });
                   }}
                   title="Report incident or payment dispute"

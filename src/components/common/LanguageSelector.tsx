@@ -115,7 +115,7 @@ export function LanguageSelector({ variant = 'select', className = '', onSelectL
       >
         {supportedLanguages.map((l) => (
           <option key={l.code} value={l.code} className="bg-slate-900 text-white">
-            {l.nativeLabel} — {l.label}
+            {l.nativeLabel} - {l.label}
           </option>
         ))}
       </select>

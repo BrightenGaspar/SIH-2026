@@ -10,7 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { completeProfileSchema, CompleteProfileFormData } from '@/lib/validators';
 import { Button } from '@/components/common/Button';
 import { Card } from '@/components/common/Card';
-import { User, MapPin, Globe, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { User, MapPin, Globe, CheckCircle2, AlertCircle, ArrowRight, ArrowLeft, Sprout } from 'lucide-react';
 
 export default function FarmerCompleteProfilePage() {
   const router = useRouter();
@@ -78,11 +78,11 @@ export default function FarmerCompleteProfilePage() {
           
           {/* Header - Instagram/Social App Style Cleanliness */}
           <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-3xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto text-2xl font-black shadow-lg">
+            <div className="w-16 h-16 rounded-3xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto shadow-lg">
               {user?.photoURL ? (
                 <img src={user.photoURL} alt={user.name} className="w-full h-full rounded-3xl object-cover" />
               ) : (
-                '🌾'
+                <Sprout className="w-8 h-8 text-emerald-400" />
               )}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Complete Your Profile</h1>
@@ -221,7 +221,7 @@ export default function FarmerCompleteProfilePage() {
       </div>
 
       <div className="text-center text-xs text-slate-500">
-        AgriFlow AI • Mobile-First Farmer Onboarding
+        AgriFlow AI &bull; Mobile-First Farmer Onboarding
       </div>
     </div>
   );

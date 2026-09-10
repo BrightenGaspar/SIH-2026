@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/common/Card';
 import { PhoneAuthForm } from '@/components/auth/PhoneAuthForm';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Truck } from 'lucide-react';
 
 export default function LogisticsLoginPage() {
   return (
@@ -20,8 +20,8 @@ export default function LogisticsLoginPage() {
         <Card className="bg-slate-900 border-slate-800 p-8 shadow-2xl">
           
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mx-auto mb-3 font-black text-2xl">
-              🚚
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center justify-center mx-auto mb-3">
+              <Truck className="w-7 h-7 text-amber-400" />
             </div>
           </div>
 
@@ -44,7 +44,7 @@ export default function LogisticsLoginPage() {
       </div>
 
       <div className="text-center text-xs text-slate-500">
-        AgriFlow AI • Road Freight Logistics Portal
+        AgriFlow AI &bull; Road Freight Logistics Portal
       </div>
 
     </div>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * AgriFlow Production API Client
  * Clean typed HTTP, WebSocket and SSE interfaces for connecting with real backend services.
  */

@@ -113,5 +113,8 @@ export const mr = {
   "additionalDetails": "अतिरिक्त तपशील",
   "submitReport": "तक्रार सबमिट करा",
   "reportSubmitted": "तुमची तक्रार सबमिट केली गेली आहे आणि तिचे पुनरावलोकन केले जाईल."
+  "aiDecisionCenter": "एआय निर्णय केंद्र",
+  "weatherShock": "हवामान धक्का सिम्युलेटर",
+  "minimumSustainablePrice": "किमान शाश्वत किंमत",
 };
 

@@ -1,4 +1,4 @@
-﻿import { AIRecommendation, DemandZone, ProducePool, SIHScenarioData } from "@/types/farmer";
+import { AIRecommendation, DemandZone, ProducePool, SIHScenarioData } from "@/types/farmer";
 import { apiClient } from "@/lib/apiClient";
 import { mockAIRecommendations, mockDemandZones, mockProducePools } from "./mockData/mockForecasts";
 import { mockSIHScenario } from "./mockData/sihScenarioData";

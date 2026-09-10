@@ -57,12 +57,12 @@ export default function FarmerOrdersPage() {
               <div className="flex flex-wrap items-center gap-2.5">
                 <span className="font-mono text-xs font-bold text-slate-400">{order.id}</span>
                 <StatusBadge status={order.status} />
-                <span className="text-xs text-slate-400">• Ordered: {order.orderDate}</span>
+                <span className="text-xs text-slate-400">&bull; Ordered: {order.orderDate}</span>
               </div>
 
               <div>
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">{order.buyerName}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">{order.buyerType} • Destination: <strong className="text-slate-700 dark:text-slate-200">{order.destinationCity}</strong></p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{order.buyerType} &bull; Destination: <strong className="text-slate-700 dark:text-slate-200">{order.destinationCity}</strong></p>
               </div>
 
               <div className="flex flex-wrap items-center gap-4 text-xs">

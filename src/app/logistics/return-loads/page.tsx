@@ -12,7 +12,7 @@ export default function ReturnLoadsPage() {
   const opportunities = [
     {
       id: 'RET-HYD-WGL-01',
-      route: 'Bowenpally Terminal (Hyderabad) → Warangal Hub',
+      route: 'Bowenpally Terminal (Hyderabad) -> Warangal Hub',
       commodity: 'Organic Fertilizer Sacks & Seedlings',
       weightKg: 2200,
       additionalEarnings: 2800,
@@ -21,7 +21,7 @@ export default function ReturnLoadsPage() {
     },
     {
       id: 'RET-WGL-GNT-02',
-      route: 'Warangal Commercial Mandi → Guntur Agriculture Park',
+      route: 'Warangal Commercial Mandi -> Guntur Agriculture Park',
       commodity: 'Clean HDPE Harvest Packaging Crates',
       weightKg: 1000,
       additionalEarnings: 1900,
@@ -56,7 +56,7 @@ export default function ReturnLoadsPage() {
 
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">{opp.route}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Return Cargo: <strong className="text-slate-700 dark:text-slate-200">{opp.commodity}</strong> ({opp.weightKg.toLocaleString()} kg) • Avoids <strong className="text-emerald-500">{opp.emptyDistanceAvoidedKm} km empty return haul</strong>
+                Return Cargo: <strong className="text-slate-700 dark:text-slate-200">{opp.commodity}</strong> ({opp.weightKg.toLocaleString()} kg) &bull; Avoids <strong className="text-emerald-500">{opp.emptyDistanceAvoidedKm} km empty return haul</strong>
               </p>
             </div>
 

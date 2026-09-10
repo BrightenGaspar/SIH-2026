@@ -32,7 +32,7 @@ export default function ReturnLoadCard({ returnLoad }: ReturnLoadCardProps) {
               {returnLoad.route}
             </h4>
             <p className="text-xs text-slate-300">
-              Return Cargo: <strong>{returnLoad.commodity}</strong> • Avoids{' '}
+              Return Cargo: <strong>{returnLoad.commodity}</strong> &bull; Avoids{' '}
               <strong className="text-emerald-300">{returnLoad.emptyDistanceAvoidedKm} km</strong> empty return haul.
             </p>
           </div>

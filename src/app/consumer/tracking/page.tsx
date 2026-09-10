@@ -252,7 +252,7 @@ function ConsumerTrackingContent() {
                   : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 border-zinc-200 dark:border-zinc-700 hover:border-zinc-400'
               }`}
             >
-              {t.id} • {t.produceName.split('(')[0].trim()} ({t.status})
+              {t.id} &bull; {t.produceName.split('(')[0].trim()} ({t.status})
             </button>
           ))}
         </div>
@@ -279,7 +279,7 @@ function ConsumerTrackingContent() {
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <span className="text-[10px] font-extrabold uppercase font-mono tracking-wider text-zinc-400 block">
-                        {trip.id} • {trip.vehicleNumber}
+                        {trip.id} &bull; {trip.vehicleNumber}
                       </span>
                       <h4 className="text-sm font-bold text-zinc-900 dark:text-white mt-0.5 line-clamp-1">
                         {trip.produceName}
@@ -348,7 +348,7 @@ function ConsumerTrackingContent() {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-300 font-mono mt-0.5">
-                  Coords: {activeTrip.currentCoordinates[0].toFixed(4)}° N, {activeTrip.currentCoordinates[1].toFixed(4)}° E • Speed: {isSimulating ? '58 km/h' : '52 km/h'}
+                  Coords: {activeTrip.currentCoordinates[0].toFixed(4)}&deg; N, {activeTrip.currentCoordinates[1].toFixed(4)}&deg; E &bull; Speed: {isSimulating ? '58 km/h' : '52 km/h'}
                 </p>
               </div>
             </div>

@@ -196,7 +196,7 @@ export default function ConsumerDashboard() {
                     </span>
                   </div>
                   <h3 className="text-lg font-bold text-white mt-0.5">
-                    Consolidated Farm Dispatch • TRK-CONS-ROAD-9021
+                    Consolidated Farm Dispatch &bull; TRK-CONS-ROAD-9021
                   </h3>
                 </div>
               </div>
@@ -214,7 +214,7 @@ export default function ConsumerDashboard() {
               <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
                 <span className="text-zinc-400 text-[11px] block">Current Highway Position</span>
                 <strong className="text-white text-sm block">Shamshabad ORR Tollway</strong>
-                <span className="text-emerald-400 font-mono text-[11px] block">17.2403° N, 78.4294° E</span>
+                <span className="text-emerald-400 font-mono text-[11px] block">17.2403&deg; N, 78.4294&deg; E</span>
               </div>
 
               <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
@@ -225,8 +225,8 @@ export default function ConsumerDashboard() {
 
               <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
                 <span className="text-zinc-400 text-[11px] block">IoT Reefer Cold Chain</span>
-                <strong className="text-emerald-400 text-sm block">5.8°C (Optimal Range)</strong>
-                <span className="text-zinc-300 text-[11px] block">Humidity: 86% • Low Spoilage Risk</span>
+                <strong className="text-emerald-400 text-sm block">5.8&deg;C (Optimal Range)</strong>
+                <span className="text-zinc-300 text-[11px] block">Humidity: 86% &bull; Low Spoilage Risk</span>
               </div>
 
               <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
@@ -269,7 +269,7 @@ export default function ConsumerDashboard() {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {order.totalQuantityKg.toLocaleString('en-IN')} kg • ₹{order.totalAmount.toLocaleString('en-IN')} • Expected {order.estimatedDeliveryDate}
+                  {order.totalQuantityKg.toLocaleString('en-IN')} kg &bull; ₹{order.totalAmount.toLocaleString('en-IN')} &bull; Expected {order.estimatedDeliveryDate}
                 </p>
               </div>
 
@@ -297,7 +297,7 @@ export default function ConsumerDashboard() {
                   {demand.produceName} ({demand.requiredQuantityKg} kg)
                 </h4>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  Delivery to: {demand.deliveryLocation} • Status: <span className="text-emerald-600 font-bold">{demand.status}</span>
+                  Delivery to: {demand.deliveryLocation} &bull; Status: <span className="text-emerald-600 font-bold">{demand.status}</span>
                 </p>
               </div>
 

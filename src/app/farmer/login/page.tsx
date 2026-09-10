@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/common/Card';
 import { PhoneAuthForm } from '@/components/auth/PhoneAuthForm';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sprout } from 'lucide-react';
 
 export default function FarmerLoginPage() {
   return (
@@ -21,8 +21,8 @@ export default function FarmerLoginPage() {
         <Card className="bg-slate-900 border-slate-800 p-8 shadow-2xl">
           
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto mb-3 font-black text-2xl">
-              🌾
+            <div className="w-14 h-14 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto mb-3">
+              <Sprout className="w-7 h-7 text-emerald-400" />
             </div>
           </div>
 
@@ -38,7 +38,7 @@ export default function FarmerLoginPage() {
       </div>
 
       <div className="text-center text-xs text-slate-500">
-        AgriFlow AI • Smart India Hackathon Verified Direct Trade System
+        AgriFlow AI &bull; Smart India Hackathon Verified Direct Trade System
       </div>
 
     </div>

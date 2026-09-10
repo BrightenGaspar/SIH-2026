@@ -113,5 +113,8 @@ export const hi = {
   "additionalDetails": "अतिरिक्त विवरण",
   "submitReport": "रिपोर्ट जमा करें",
   "reportSubmitted": "आपकी रिपोर्ट जमा कर दी गई है और इसकी समीक्षा की जाएगी।"
+  "aiDecisionCenter": "एआई निर्णय केंद्र",
+  "weatherShock": "मौसम आघात सिम्युलेटर",
+  "minimumSustainablePrice": "न्यूनतम टिकाऊ मूल्य",
 };
 

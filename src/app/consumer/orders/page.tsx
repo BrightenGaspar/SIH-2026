@@ -167,7 +167,7 @@ export default function ConsumerOrdersPage() {
                       )}
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      Ordered on {order.orderDate} • Payment via {order.paymentMethod} Escrow
+                      Ordered on {order.orderDate} &bull; Payment via {order.paymentMethod} Escrow
                     </p>
                   </div>
 
@@ -222,7 +222,7 @@ export default function ConsumerOrdersPage() {
                                   {item.product.name}
                                 </span>
                                 <span className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                                  Grade {item.product.grade} • Direct from {item.product.farmerStory.farmerName}
+                                  Grade {item.product.grade} &bull; Direct from {item.product.farmerStory.farmerName}
                                 </span>
                               </div>
                             </div>

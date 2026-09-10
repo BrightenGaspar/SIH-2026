@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -102,7 +102,7 @@ export default function LogisticsDashboardPage() {
           </div>
           <h1 className="text-2xl font-black text-white">{trip.produceName}</h1>
           <p className="text-sm text-slate-400 mt-0.5">
-            {trip.pickupLocation} → {trip.destinationLocation}
+            {trip.pickupLocation} &rarr; {trip.destinationLocation}
           </p>
         </div>
 

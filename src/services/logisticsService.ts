@@ -1,4 +1,4 @@
-﻿import { LogisticsFleetVehicle, ConsolidatedTrip } from '@/types/logistics';
+import { LogisticsFleetVehicle, ConsolidatedTrip } from '@/types/logistics';
 import { apiClient } from '@/lib/apiClient';
 
 export const logisticsService = {

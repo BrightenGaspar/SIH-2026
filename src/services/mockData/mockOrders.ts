@@ -93,7 +93,7 @@ export const mockTrackingDetails: Record<string, RoadLogisticsTracking> = {
       { title: "Produce Loaded & Graded", location: "Shadnagar FPO Hub", timestamp: "09:30 AM", completed: true },
       { title: "Driver Assigned & Inspected", location: "Tata 407 Reefer (TS 08 UB 4192)", timestamp: "10:00 AM", completed: true },
       { title: "Trip Started (Road Route)", location: "Departed Shadnagar", timestamp: "10:30 AM", completed: true },
-      { title: "In Transit — ORR Corridor", location: "Shamshabad (Speed: 52 km/h)", timestamp: "03:15 PM", completed: true, current: true },
+      { title: "In Transit - ORR Corridor", location: "Shamshabad (Speed: 52 km/h)", timestamp: "03:15 PM", completed: true, current: true },
       { title: "Arrival at Destination", location: "Bowenpally Agri Hub, Hyderabad", timestamp: "05:45 PM (ETA)", completed: false },
       { title: "Unloading & Payment Release", location: "Inspection Gate 3", timestamp: "Pending", completed: false },
     ],

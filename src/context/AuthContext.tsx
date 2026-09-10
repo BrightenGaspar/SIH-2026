@@ -164,7 +164,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             vehicleCapacityKg: 5000,
             reeferEnabled: true,
             operatingRegion: profile.state ? `${profile.state} Corridor` : 'Freight Corridor',
-            preferredRoutes: ['Shadnagar → Hyderabad'],
+            preferredRoutes: ['Shadnagar -> Hyderabad'],
             createdAt: new Date().toISOString(),
           };
           setLogisticsUser(updatedLogistics);
@@ -438,7 +438,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         vehicleCapacityKg: 5000,
         reeferEnabled: true,
         operatingRegion: 'Telangana & Andhra Pradesh Corridor',
-        preferredRoutes: ['Shadnagar → Hyderabad'],
+        preferredRoutes: ['Shadnagar -> Hyderabad'],
         createdAt: new Date().toISOString(),
       };
       setLogisticsUser(active);
@@ -480,7 +480,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         vehicleCapacityKg: data.vehicleCapacityKg || 5000,
         reeferEnabled: data.reeferEnabled ?? true,
         operatingRegion: data.operatingRegion || `${data.state || 'Telangana'} Corridor`,
-        preferredRoutes: data.preferredRoutes || ['Shadnagar → Hyderabad'],
+        preferredRoutes: data.preferredRoutes || ['Shadnagar -> Hyderabad'],
         createdAt: new Date().toISOString(),
       };
       setLogisticsUser(newOp);
@@ -762,7 +762,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         vehicleCapacityKg: 5000,
         reeferEnabled: true,
         operatingRegion: 'Telangana & AP Perishable Corridor',
-        preferredRoutes: ['Shadnagar → Hyderabad'],
+        preferredRoutes: ['Shadnagar -> Hyderabad'],
         createdAt: new Date().toISOString(),
       };
       setLogisticsUser(demoLogistics);

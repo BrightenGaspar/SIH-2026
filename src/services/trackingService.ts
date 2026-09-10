@@ -1,4 +1,4 @@
-﻿import { Order, RoadLogisticsTracking } from "@/types/farmer";
+import { Order, RoadLogisticsTracking } from "@/types/farmer";
 import { apiClient } from "@/lib/apiClient";
 import { mockOrders, mockTrackingDetails } from "./mockData/mockOrders";
 

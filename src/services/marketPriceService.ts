@@ -1,4 +1,4 @@
-﻿import { MarketPrice, PriceTrendPoint } from "@/types/farmer";
+import { MarketPrice, PriceTrendPoint } from "@/types/farmer";
 import { apiClient } from "@/lib/apiClient";
 import { mockMarketPrices, mockPriceTrendData } from "./mockData/mockPrices";
 

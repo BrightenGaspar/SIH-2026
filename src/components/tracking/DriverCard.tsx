@@ -68,8 +68,9 @@ export default function DriverCard({
         </div>
 
         {called && (
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-600 dark:text-emerald-400 text-center font-bold animate-fadeIn">
-            📞 Simulated Call Connected: Dialing {driverPhone} (Driver Mohammed Ismail)
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-600 dark:text-emerald-400 text-center font-bold animate-fadeIn flex items-center justify-center gap-1.5">
+            <Phone className="w-3.5 h-3.5 animate-pulse" />
+            <span>Simulated Call Connected: Dialing {driverPhone} (Driver Mohammed Ismail)</span>
           </div>
         )}
       </div>

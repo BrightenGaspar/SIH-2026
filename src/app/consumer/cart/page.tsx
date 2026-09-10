@@ -99,7 +99,7 @@ export default function ConsumerCartPage() {
                     {item.product.name}
                   </h3>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-1 mt-0.5">
-                    <MapPin className="w-3 h-3 text-emerald-500" /> {item.product.farmerStory.farmerName} • {item.product.farmerStory.district}
+                    <MapPin className="w-3 h-3 text-emerald-500" /> {item.product.farmerStory.farmerName} &bull; {item.product.farmerStory.district}
                   </p>
                   <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 block mt-1">
                     ₹{item.selectedTierPricePerKg} / kg

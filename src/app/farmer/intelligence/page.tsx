@@ -23,7 +23,6 @@ import { runUnifiedIntelligencePipeline } from '@/services/intelligenceCoordinat
 import { detectFoodLossRisk } from '@/services/foodLossService';
 import { DecisionSummaryHero } from '@/components/intelligence/DecisionSummaryHero';
 import { ExplainableAICard } from '@/components/common/ExplainableAICard';
-import { VoiceAssistantButton } from '@/components/common/VoiceAssistantButton';
 import { WhatIfSimulator } from '@/components/intelligence/WhatIfSimulator';
 import { SmartBuyerRankingCard } from '@/components/intelligence/SmartBuyerRankingCard';
 import { DestinationOptimizerCard } from '@/components/intelligence/DestinationOptimizerCard';
@@ -97,7 +96,7 @@ export default function FarmerIntelligencePage() {
             <span className='text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800'>
               AgriFlow Decision Engine
             </span>
-            <span className='text-xs text-slate-400'>• Real-time Dynamic Pipeline</span>
+            <span className='text-xs text-slate-400'>&bull; Real-time Dynamic Pipeline</span>
           </div>
           <h1 className='text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1'>
             Central AI Decision Center
@@ -108,7 +107,6 @@ export default function FarmerIntelligencePage() {
         </div>
 
         <div className='flex items-center gap-2.5 flex-wrap'>
-          <VoiceAssistantButton />
           <Link
             href='/traceability/LOT-2026-7842'
             className='px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-white dark:text-slate-900 font-bold text-xs flex items-center gap-1.5 shadow-sm transition'

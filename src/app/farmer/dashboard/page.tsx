@@ -39,6 +39,8 @@ export default function FarmerDashboard() {
   const topRec = recommendations[0];
   const activeOrder = orders.find(o => o.status === 'In Transit') || orders[0];
 
+  const displayName = (user?.name || 'Farmer').replace(/[\uD800-\uDFFF]|[\u2600-\u27BF]|\u00f0[^\s]*|\u00e2[^\s]*/g, '').trim() || 'Farmer';
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       
@@ -47,11 +49,17 @@ export default function FarmerDashboard() {
         <div>
           <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">{t('farmerCommandCenter') || 'Farmer Command Center'}</span>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-2">
-            <span>{t('namaste') || 'Namaste'}, {user?.name || 'Farmer'}</span>
+            <span>{t('namaste') || 'Namaste'}, {displayName}</span>
             <Sprout className="w-6 h-6 text-emerald-500 shrink-0" />
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            {user?.farmName ? `${user.farmName} • ` : ''}{user?.location || 'Direct Farm'}
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center flex-wrap gap-1">
+            {user?.farmName && (
+              <>
+                <span>{user.farmName}</span>
+                <span className="text-slate-400">&bull;</span>
+              </>
+            )}
+            <span>{user?.location || 'Direct Farm'}</span>
           </p>
         </div>
         <div>
@@ -127,7 +135,7 @@ export default function FarmerDashboard() {
             </div>
             <div>
               <h3 className="font-bold text-white text-base">Active Road Logistics Dispatch</h3>
-              <p className="text-xs text-slate-400">Tata 407 Reefer (TS 08 UB 4192) • Driver: Mohammed Ismail</p>
+              <p className="text-xs text-slate-400">Tata 407 Reefer (TS 08 UB 4192) &bull; Driver: Mohammed Ismail</p>
             </div>
           </div>
           <Link href="/farmer/tracking/TRK-9821">
@@ -152,18 +160,15 @@ export default function FarmerDashboard() {
           </div>
           <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700">
             <span className="text-slate-400 block">Remaining Safe Window</span>
-            <span className="text-sm font-bold text-white block mt-0.5">04h 32m</span>
-            <span className="text-[10px] text-emerald-400 font-semibold">Low Spoilage Risk</span>
           </div>
-          <div className="bg-slate-800/60 p-3.5 rounded-xl border border-slate-700">
-            <span className="text-slate-400 block">Estimated Arrival (ETA)</span>
-            <span className="text-sm font-bold text-white block mt-0.5">Today, 05:45 PM</span>
-            <span className="text-[10px] text-slate-400">Bowenpally Hub Gate 3</span>
+          <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/60">
+            <span className="text-[10px] text-slate-400 block uppercase">Distance Remaining</span>
+            <span className="font-bold text-white text-xs mt-0.5 block">38 km</span>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* My Produce Snapshot Table */}
+      {/* 4. MY PRODUCE PREVIEW */}
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2.5">
@@ -175,8 +180,9 @@ export default function FarmerDashboard() {
               <span className="text-xs text-slate-400">{produceList.length} Active Listings</span>
             </div>
           </div>
-          <Link href="/farmer/produce" className="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline">
-            View All ({produceList.length}) →
+          <Link href="/farmer/produce" className="text-xs text-emerald-600 dark:text-emerald-400 font-bold hover:underline flex items-center gap-1">
+            <span>View All ({produceList.length})</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
@@ -197,8 +203,8 @@ export default function FarmerDashboard() {
                 className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-lg">
-                    🌾
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <Sprout className="w-5 h-5 text-emerald-500" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -208,7 +214,7 @@ export default function FarmerDashboard() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Available: <strong className="text-slate-700 dark:text-slate-300">{item.quantity?.toLocaleString()} {item.unit}</strong> • {item.location}
+                      Available: <strong className="text-slate-700 dark:text-slate-300">{item.quantity?.toLocaleString()} {item.unit}</strong> &bull; {item.location}
                     </p>
                   </div>
                 </div>
@@ -269,7 +275,7 @@ export default function FarmerDashboard() {
               <div className="flex items-center gap-2 text-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-slate-300">Status: <strong className="text-white">{activeOrder.status}</strong></span>
-                <span className="text-slate-500">• {activeOrder.destinationCity}</span>
+                <span className="text-slate-500">&bull; {activeOrder.destinationCity}</span>
               </div>
               <Link href={`/farmer/tracking/${activeOrder.logisticsId}`} className="w-full sm:w-auto">
                 <Button size="sm" className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white">
@@ -326,9 +332,10 @@ export default function FarmerDashboard() {
           Detailed price graphs, 7-day demand forecasts, and full realization calculations are kept in the Analytics hub.
         </p>
         <Link href="/farmer/analytics" className="inline-block">
-          <Button variant="outline" size="sm" className="font-bold">
-            <BarChart3 className="w-4 h-4 mr-1.5 text-emerald-500" />
-            <span>Open Farmer Analytics & Graphs →</span>
+          <Button variant="outline" size="sm" className="font-bold flex items-center gap-1.5">
+            <BarChart3 className="w-4 h-4 mr-1 text-emerald-500" />
+            <span>Open Farmer Analytics & Graphs</span>
+            <ArrowRight className="w-3.5 h-3.5 ml-1" />
           </Button>
         </Link>
       </div>

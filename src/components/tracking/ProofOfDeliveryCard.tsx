@@ -60,8 +60,9 @@ export default function ProofOfDeliveryCard({
       </div>
 
       {pod.notes && (
-        <p className="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-emerald-500/20">
-          📝 Notes: {pod.notes}
+        <p className="text-xs text-slate-300 bg-slate-900/60 p-3 rounded-xl border border-emerald-500/20 flex items-center gap-1.5">
+          <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+          <span>Notes: {pod.notes}</span>
         </p>
       )}
     </div>

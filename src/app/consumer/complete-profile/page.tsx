@@ -78,11 +78,11 @@ export default function ConsumerCompleteProfilePage() {
           
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-3xl bg-teal-600/20 text-teal-400 border border-teal-500/30 flex items-center justify-center mx-auto text-2xl font-black shadow-lg">
+            <div className="w-16 h-16 rounded-3xl bg-teal-600/20 text-teal-400 border border-teal-500/30 flex items-center justify-center mx-auto shadow-lg">
               {consumerUser?.photoURL ? (
                 <img src={consumerUser.photoURL} alt={consumerUser.name} className="w-full h-full rounded-3xl object-cover" />
               ) : (
-                '🛒'
+                <Store className="w-8 h-8 text-teal-400" />
               )}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Complete Your Buyer Profile</h1>
@@ -221,7 +221,7 @@ export default function ConsumerCompleteProfilePage() {
       </div>
 
       <div className="text-center text-xs text-zinc-500">
-        AgriFlow AI • Mobile-First Buyer Procurement Onboarding
+        AgriFlow AI &bull; Mobile-First Buyer Procurement Onboarding
       </div>
     </div>
   );

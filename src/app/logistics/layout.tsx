@@ -67,7 +67,7 @@ export default function LogisticsLayout({ children }: { children: React.ReactNod
           <span className="flex items-center gap-1.5 font-bold text-cyan-400">
             <Truck className="w-3.5 h-3.5" /> AgriFlow Fleet & Cold-Chain Network
           </span>
-          <span className="hidden md:inline text-slate-500">• Telemetry & Return-Haul Optimization</span>
+          <span className="hidden md:inline text-slate-500">&bull; Telemetry & Return-Haul Optimization</span>
         </div>
         <div className="flex items-center gap-3">
           <ConnectionIndicator />
@@ -93,7 +93,7 @@ export default function LogisticsLayout({ children }: { children: React.ReactNod
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-white font-black shrink-0 shadow-lg shadow-cyan-600/30">
-              🚚
+              <Truck className="w-5 h-5 text-white" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
@@ -190,7 +190,7 @@ export default function LogisticsLayout({ children }: { children: React.ReactNod
       </main>
 
       <footer className="border-t border-slate-800/60 bg-slate-950 py-6 text-center text-xs text-slate-500">
-        <p>AgriFlow AI • SIH Smart Cold-Chain Transport & Logistics Platform</p>
+        <p>AgriFlow AI &bull; SIH Smart Cold-Chain Transport & Logistics Platform</p>
       </footer>
     </div>
   );

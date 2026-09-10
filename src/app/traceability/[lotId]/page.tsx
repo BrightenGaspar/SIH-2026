@@ -38,7 +38,7 @@ export default function TraceabilityDetailPage({ params }: { params: Promise<{ l
             Audit Another Batch
           </Link>
           <Link href='/farmer/intelligence' className='hover:text-white font-bold text-emerald-300'>
-            Farmer Portal →
+            Farmer Portal &rarr;
           </Link>
         </div>
       </div>
@@ -67,7 +67,7 @@ export default function TraceabilityDetailPage({ params }: { params: Promise<{ l
                 {lot.commodity} <span className='text-emerald-600 dark:text-emerald-400 font-normal'>({lot.variety})</span>
               </h1>
               <p className='text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5'>
-                <MapPin className='w-3.5 h-3.5 text-emerald-500' /> {lot.farmLocation} • Harvested: {lot.harvestDate}
+                <MapPin className='w-3.5 h-3.5 text-emerald-500' /> {lot.farmLocation} &bull; Harvested: {lot.harvestDate}
               </p>
             </div>
 
@@ -151,7 +151,7 @@ export default function TraceabilityDetailPage({ params }: { params: Promise<{ l
 
                   <div className='flex flex-wrap items-center gap-4 text-xs text-slate-500 dark:text-slate-400'>
                     <span><strong>Actor:</strong> {step.actor}</span>
-                    <span>•</span>
+                    <span>&bull;</span>
                     <span><strong>Location:</strong> {step.location}</span>
                   </div>
 

@@ -64,7 +64,7 @@ export default function LogisticsRegisterPage() {
       vehicleCapacityKg: data.vehicleCapacityKg,
       reeferEnabled: data.reeferEnabled,
       operatingRegion: `${data.district}, ${data.state} Corridor`,
-      preferredRoutes: [`${data.place} → Hyderabad`],
+      preferredRoutes: [`${data.place} -> Hyderabad`],
     });
     router.push('/logistics/dashboard');
   };
@@ -158,14 +158,14 @@ export default function LogisticsRegisterPage() {
                   >
                     {SUPPORTED_LANGUAGES.map((l) => (
                       <option key={l.code} value={l.code} className="bg-slate-900 text-white font-medium">
-                        {l.nativeLabel} — {l.label}
+                        {l.nativeLabel} - {l.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
                 <Button type="button" onClick={nextStep} className="w-full py-3 mt-4 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold">
-                  {t('next')}: Fleet & Location Details →
+                  {t('next')}: Fleet & Location Details &rarr;
                 </Button>
               </div>
             )}
@@ -257,7 +257,7 @@ export default function LogisticsRegisterPage() {
                     {t('back')}
                   </Button>
                   <Button type="button" onClick={nextStep} className="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold">
-                    {t('next')} →
+                    {t('next')} &rarr;
                   </Button>
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function LogisticsRegisterPage() {
       </div>
 
       <div className="text-center text-xs text-slate-500">
-        AgriFlow AI • Road Freight Logistics & Reefer Fleet Ops
+        AgriFlow AI &bull; Road Freight Logistics & Reefer Fleet Ops
       </div>
 
     </div>

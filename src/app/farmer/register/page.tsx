@@ -168,7 +168,7 @@ export default function FarmerRegisterPage() {
                   >
                     {SUPPORTED_LANGUAGES.map((l) => (
                       <option key={l.code} value={l.code} className="bg-slate-900 text-white font-medium">
-                        {l.nativeLabel} — {l.label}
+                        {l.nativeLabel} - {l.label}
                       </option>
                     ))}
                   </select>
@@ -176,7 +176,7 @@ export default function FarmerRegisterPage() {
                 </div>
 
                 <Button type="button" onClick={nextStep} className="w-full py-3 mt-4">
-                  {t('next')}: Location Details →
+                  {t('next')}: Location Details &rarr;
                 </Button>
               </div>
             )}
@@ -245,7 +245,7 @@ export default function FarmerRegisterPage() {
                     {t('back')}
                   </Button>
                   <Button type="button" onClick={nextStep} className="flex-1">
-                    {t('next')}: Crops →
+                    {t('next')}: Crops &rarr;
                   </Button>
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function FarmerRegisterPage() {
       </div>
 
       <div className="text-center text-xs text-slate-500">
-        AgriFlow AI • Multilingual Road Freight & Direct Agriculture Platform
+        AgriFlow AI &bull; Multilingual Road Freight & Direct Agriculture Platform
       </div>
 
     </div>

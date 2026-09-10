@@ -21,7 +21,7 @@ export default function ColdChainTelemetryPage() {
             <span className="text-xs font-mono font-bold text-amber-500">TS 08 UB 4192</span>
           </div>
           <div className="text-3xl font-black text-emerald-500">6.2°C</div>
-          <p className="text-xs text-slate-400">Cargo: Tomato (Hybrid Desi) • Target: 6.0°C • Humidity: 88%</p>
+          <p className="text-xs text-slate-400">Cargo: Tomato (Hybrid Desi) &bull; Target: 6.0&deg;C &bull; Humidity: 88%</p>
           <div className="p-3 rounded-xl bg-emerald-950/30 border border-emerald-500/30 text-xs text-emerald-400 font-bold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4" /> Spoilage Safe Window: 4h 32m (Low Risk)
           </div>
@@ -33,7 +33,7 @@ export default function ColdChainTelemetryPage() {
             <span className="text-xs font-mono font-bold text-amber-500">TS 07 EA 8831</span>
           </div>
           <div className="text-3xl font-black text-blue-400">8.5°C</div>
-          <p className="text-xs text-slate-400">Cargo: Green Chilli (G4) • Target: 8.0°C • Humidity: 75%</p>
+          <p className="text-xs text-slate-400">Cargo: Green Chilli (G4) &bull; Target: 8.0&deg;C &bull; Humidity: 75%</p>
           <div className="p-3 rounded-xl bg-blue-950/30 border border-blue-500/30 text-xs text-blue-400 font-bold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4" /> Insulated Vent Active: Safe Window 96h+
           </div>
@@ -45,7 +45,7 @@ export default function ColdChainTelemetryPage() {
             <span className="text-xs font-mono font-bold text-slate-400">TS 09 XY 1029</span>
           </div>
           <div className="text-3xl font-black text-slate-400">24.0°C</div>
-          <p className="text-xs text-slate-400">Cargo: Empty (In Depot Park) • Ambient ventilated</p>
+          <p className="text-xs text-slate-400">Cargo: Empty (In Depot Park) &bull; Ambient ventilated</p>
           <div className="p-3 rounded-xl bg-slate-800 border border-slate-700 text-xs text-slate-400">
             Available for immediate farm gate dispatch
           </div>

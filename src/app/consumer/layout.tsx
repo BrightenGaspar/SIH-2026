@@ -70,7 +70,7 @@ export default function ConsumerLayout({
           <span className="font-bold flex items-center gap-1">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" /> AgriFlow AI
           </span>
-          <span className="hidden sm:inline text-emerald-300">• Direct Farmer-to-Consumer Wholesale & Retail Portal</span>
+          <span className="hidden sm:inline text-emerald-300">&bull; Direct Farmer-to-Consumer Wholesale & Retail Portal</span>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
@@ -289,7 +289,7 @@ export default function ConsumerLayout({
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-zinc-500 dark:text-zinc-400">
           <div className="flex items-center gap-2">
             <span className="font-bold text-zinc-900 dark:text-white">AgriFlow AI Buyer Portal</span>
-            <span>• Direct Farm-Gate Procurement & Verified Cold-Chain Road Sourcing</span>
+            <span>&bull; Direct Farm-Gate Procurement & Verified Cold-Chain Road Sourcing</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/consumer/marketplace" className="hover:text-emerald-600 transition-colors">

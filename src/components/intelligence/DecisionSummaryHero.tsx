@@ -57,7 +57,7 @@ export function DecisionSummaryHero({ data, onOpenQualityModal, className }: Dec
                 Unified Agricultural Decision Engine
               </span>
               <h1 className='text-xl sm:text-2xl font-black tracking-tight text-white'>
-                {commodity} — Strategic Market Intelligence
+                {commodity} - Strategic Market Intelligence
               </h1>
             </div>
           </div>
@@ -109,7 +109,7 @@ export function DecisionSummaryHero({ data, onOpenQualityModal, className }: Dec
               <div>
                 <span className='text-slate-400 block text-[11px]'>Recommended Selling Range:</span>
                 <span className='font-extrabold text-emerald-400 text-sm'>
-                  ₹{weatherShock.recommendedSellingRange.min.toFixed(2)} – ₹{weatherShock.recommendedSellingRange.max.toFixed(2)}
+                  ₹{weatherShock.recommendedSellingRange.min.toFixed(2)} - ₹{weatherShock.recommendedSellingRange.max.toFixed(2)}
                 </span>
               </div>
             </div>

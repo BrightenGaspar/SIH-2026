@@ -14,7 +14,8 @@ import {
   ArrowRight,
   CheckCircle2,
   Lock,
-  ArrowLeft
+  ArrowLeft,
+  Sprout
 } from 'lucide-react';
 
 export default function FarmerPublicLandingPage() {
@@ -36,7 +37,7 @@ export default function FarmerPublicLandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black shadow-lg shadow-emerald-600/30">
-              🌾
+              <Sprout className="w-6 h-6 text-white" />
             </div>
             <div>
               <span className="font-extrabold text-xl tracking-tight text-white">AgriFlow<span className="text-emerald-400"> Farmer</span></span>
@@ -48,7 +49,7 @@ export default function FarmerPublicLandingPage() {
             {isAuthenticated ? (
               <Link href="/farmer/dashboard">
                 <Button variant="primary" size="sm">
-                  Go to Dashboard →
+                  Go to Dashboard &rarr;
                 </Button>
               </Link>
             ) : (
@@ -177,7 +178,7 @@ export default function FarmerPublicLandingPage() {
           <p className="text-sm text-slate-300 max-w-xl mx-auto mb-6">Create your farmer account in 2 minutes and start listing your crops.</p>
           <Link href="/farmer/register">
             <Button size="lg" className="px-8 py-3.5 shadow-lg shadow-emerald-900/50">
-              Get Started Now →
+              Get Started Now &rarr;
             </Button>
           </Link>
         </div>

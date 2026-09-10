@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/common/Card';
@@ -38,7 +38,7 @@ export function BestTimeToSellCard() {
             </div>
             <div>
               <h3 className="font-bold text-slate-900 dark:text-white text-base">Best Time to Sell (AI Forecast)</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Tomato • Live Price Trends</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Tomato &bull; Live Price Trends</p>
             </div>
           </div>
           <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold">

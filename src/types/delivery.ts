@@ -1,4 +1,4 @@
-﻿export type DeliveryStatus =
+export type DeliveryStatus =
   | 'ORDER CONFIRMED'
   | 'PICKUP SCHEDULED'
   | 'DRIVER ASSIGNED'

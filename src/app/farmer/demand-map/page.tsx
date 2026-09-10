@@ -8,7 +8,7 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { useBandwidth } from '@/context/BandwidthContext';
-import { MapPin, Sparkles, TrendingUp, AlertCircle, Users, ArrowRight } from 'lucide-react';
+import { MapPin, Sparkles, TrendingUp, AlertCircle, Users, ArrowRight, Lightbulb } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 
 export default function DemandMapPage() {
@@ -134,7 +134,7 @@ export default function DemandMapPage() {
 
               <div>
                 <h3 className="text-xl font-black text-white">{selectedZone.region}</h3>
-                <span className="text-xs text-slate-400">{selectedZone.state} • Commodity: <strong className="text-white">{selectedZone.commodity}</strong></span>
+                <span className="text-xs text-slate-400">{selectedZone.state} &bull; Commodity: <strong className="text-white">{selectedZone.commodity}</strong></span>
               </div>
 
               <div className="space-y-2 text-xs pt-2 border-t border-slate-800">
@@ -157,7 +157,10 @@ export default function DemandMapPage() {
               </div>
 
               <div className="bg-slate-900/90 rounded-xl p-3 border border-slate-800 text-xs text-slate-300 space-y-1">
-                <span className="font-bold text-white block mb-1">💡 Smart Recommendation:</span>
+                <span className="font-bold text-white flex items-center gap-1 mb-1">
+                  <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Smart Recommendation:</span>
+                </span>
                 <p>Consolidate Shadnagar Tomato harvest. Dispatch via Tata 407 Reefer to capture +₹4.00/kg premium over local mandi.</p>
               </div>
 

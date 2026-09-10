@@ -127,7 +127,7 @@ export function CropQualityModal({
                   Verified Pre-filled Listing
                 </span>
                 <span className='text-xs font-extrabold text-slate-900 dark:text-white block'>
-                  {inspectionResult.prefilledListing.title} — {quantityKg} kg
+                  {inspectionResult.prefilledListing.title} - {quantityKg} kg
                 </span>
                 <span className='text-[11px] text-slate-600 dark:text-slate-300'>
                   Suggested price: ₹{inspectionResult.prefilledListing.suggestedListingPrice}/kg

@@ -39,9 +39,9 @@ export default function TrackingClient() {
             </span>
             <StatusBadge status={tracking.status} />
           </div>
-          <h1 className="text-2xl font-black">{tracking.pickupLocation} → {tracking.destinationLocation}</h1>
+          <h1 className="text-2xl font-black">{tracking.pickupLocation} &rarr; {tracking.destinationLocation}</h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Vehicle: <strong className="text-white">{tracking.vehicleType} ({tracking.vehicleNumber})</strong> • Driver: {tracking.driverName}
+            Vehicle: <strong className="text-white">{tracking.vehicleType} ({tracking.vehicleNumber})</strong> &bull; Driver: {tracking.driverName}
           </p>
         </div>
         <div className="text-right">
@@ -57,7 +57,7 @@ export default function TrackingClient() {
             <Thermometer className="w-4 h-4 text-blue-400" /> Cold-Chain Climate
           </span>
           <div className="text-2xl font-black text-blue-400 mt-2">{tracking.spoilageTelemetry.temperatureCelsius}°C</div>
-          <span className="text-[10px] text-slate-400">Target: {tracking.spoilageTelemetry.targetTempCelsius}°C • Low Spoilage Risk</span>
+          <span className="text-[10px] text-slate-400">Target: {tracking.spoilageTelemetry.targetTempCelsius}&deg;C &bull; Low Spoilage Risk</span>
         </Card>
 
         <Card className="p-5 bg-slate-900 border-slate-800 text-white">

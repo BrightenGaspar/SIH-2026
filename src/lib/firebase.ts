@@ -50,7 +50,7 @@ export const functions = getFunctions(app, "us-central1");
 export const storage = getStorage(app);
 
 // ============================================================================
-// 📱 AUTHENTICATION & CELLULAR OTP HELPERS
+// [AUTH] AUTHENTICATION & CELLULAR OTP HELPERS
 // ============================================================================
 
 /**
@@ -89,7 +89,7 @@ export const verifyFast2SmsOtpAndLogin = async (phone: string, enteredOtp: strin
 };
 
 // ============================================================================
-// 🔒 ESCROW & PROCUREMENT HELPERS
+// [ESCROW] ESCROW & PROCUREMENT HELPERS
 // ============================================================================
 
 export const lockEscrowForOrder = async (orderData: {
@@ -112,7 +112,7 @@ export const releaseEscrowForOrder = async (orderId: string) => {
 };
 
 // ============================================================================
-// 🤖 ROCKY AI ASSISTANT HELPER
+// [AI] ROCKY AI ASSISTANT HELPER
 // ============================================================================
 
 export const askRockyAiBackend = async (queryText: string, language: string = "en") => {
@@ -122,7 +122,7 @@ export const askRockyAiBackend = async (queryText: string, language: string = "e
 };
 
 // ============================================================================
-// 📊 REALTIME FIRESTORE SUBSCRIPTIONS
+// [FIRESTORE] REALTIME FIRESTORE SUBSCRIPTIONS
 // ============================================================================
 
 export const subscribeToMarketplaceCrops = (callback: (crops: any[]) => void) => {

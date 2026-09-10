@@ -207,7 +207,7 @@ export default function AdminCommandCenterPage() {
               <div className='flex items-center justify-between text-[11px] pt-1 border-t border-slate-700 text-slate-400'>
                 <span>Affected Crops: Tomato, Green Chilli</span>
                 <Link href='/farmer/weather-shock' className='text-emerald-400 hover:underline font-bold'>
-                  Inspect Model →
+                  Inspect Model &rarr;
                 </Link>
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function AdminCommandCenterPage() {
               <div className='flex items-center justify-between text-[11px] pt-1 border-t border-slate-700 text-slate-400'>
                 <span>Affected Crops: Onion (Nashik Red)</span>
                 <Link href='/farmer/intelligence' className='text-emerald-400 hover:underline font-bold'>
-                  Inspect Model →
+                  Inspect Model &rarr;
                 </Link>
               </div>
             </div>

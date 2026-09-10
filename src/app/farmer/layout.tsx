@@ -16,6 +16,8 @@ import {
   MapPin,
   Sparkles,
   Truck,
+  Store,
+  ShieldCheck,
   Menu,
   X,
   Sun,
@@ -85,14 +87,14 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
           <Link href="/" className="hover:text-white font-bold text-xs">
             Gateway
           </Link>
-          <Link href="/consumer" className="hover:text-white text-blue-300 font-bold text-xs">
-            🛒 Buyer
+          <Link href="/consumer" className="hover:text-white text-blue-300 font-bold text-xs flex items-center gap-1">
+            <Store className="w-3.5 h-3.5" /> <span>Buyer</span>
           </Link>
-          <Link href="/logistics" className="hover:text-white text-amber-300 font-bold text-xs">
-            🚚 Fleet
+          <Link href="/logistics" className="hover:text-white text-amber-300 font-bold text-xs flex items-center gap-1">
+            <Truck className="w-3.5 h-3.5" /> <span>Fleet</span>
           </Link>
-          <Link href="/admin" className="hover:text-white text-purple-300 font-bold text-xs">
-            ⚡ Admin
+          <Link href="/admin" className="hover:text-white text-purple-300 font-bold text-xs flex items-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5" /> <span>Admin</span>
           </Link>
           <LowBandwidthToggle />
           <LanguageSelector variant="compact" />
@@ -278,7 +280,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 
       {/* Footer */}
       <footer className="border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-slate-900 py-6 text-center text-xs text-slate-500 dark:text-slate-400">
-        <p>© 2026 AgriFlow AI — Dedicated Farmer & FPO Experience • Road Logistics Only • Verified Cold-Chain Telemetry</p>
+        <p>&copy; 2026 AgriFlow AI &bull; Dedicated Farmer & FPO Experience &bull; Road Logistics Only &bull; Verified Cold-Chain Telemetry</p>
       </footer>
     </div>
   );

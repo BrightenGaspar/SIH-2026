@@ -29,7 +29,7 @@ export function PriceBreakdownCard({
               <TrendingUp className="w-4 h-4 text-emerald-500" />
               Transparent Price Waterfall
             </h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Zero hidden brokerage • Real-time cost audit</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Zero hidden brokerage &bull; Real-time cost audit</p>
           </div>
           <span className="text-xs font-black text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
             {breakdown.farmerRealizationBoostPercent}% Direct

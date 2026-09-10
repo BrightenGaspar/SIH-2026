@@ -384,7 +384,7 @@ export function WhatIfSimulator() {
               <div className='bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/20 text-right'>
                 <span className='text-[10px] text-emerald-100 uppercase block font-semibold'>Dynamic Selling Range</span>
                 <span className='text-sm font-extrabold text-white'>
-                  ₹{shock.recommendedSellingRange.min.toFixed(2)} – ₹{shock.recommendedSellingRange.max.toFixed(2)}
+                  ₹{shock.recommendedSellingRange.min.toFixed(2)} - ₹{shock.recommendedSellingRange.max.toFixed(2)}
                 </span>
               </div>
             </div>

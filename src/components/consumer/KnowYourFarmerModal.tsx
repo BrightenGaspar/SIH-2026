@@ -22,7 +22,7 @@ export function KnowYourFarmerModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Know Your Farmer & FPO Transparency"
-      subtitle="Verified direct farm provenance • Zero middleman exploitation"
+      subtitle="Verified direct farm provenance | Zero middleman exploitation"
       maxWidth="xl"
     >
       <div className="space-y-6">

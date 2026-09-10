@@ -78,11 +78,11 @@ export default function LogisticsCompleteProfilePage() {
           
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-3xl bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center mx-auto text-2xl font-black shadow-lg">
+            <div className="w-16 h-16 rounded-3xl bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center mx-auto shadow-lg">
               {logisticsUser?.photoURL ? (
                 <img src={logisticsUser.photoURL} alt={logisticsUser.name} className="w-full h-full rounded-3xl object-cover" />
               ) : (
-                '🚚'
+                <Truck className="w-8 h-8 text-cyan-400" />
               )}
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Complete Fleet Operator Profile</h1>
@@ -221,7 +221,7 @@ export default function LogisticsCompleteProfilePage() {
       </div>
 
       <div className="text-center text-xs text-slate-500">
-        AgriFlow AI • Mobile-First Cold-Chain Logistics Onboarding
+        AgriFlow AI &bull; Mobile-First Cold-Chain Logistics Onboarding
       </div>
     </div>
   );

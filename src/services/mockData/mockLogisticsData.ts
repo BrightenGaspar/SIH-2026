@@ -71,7 +71,7 @@ export const mockConsolidatedTrips: ConsolidatedTrip[] = [
     spoilageRisk: 'LOW',
     returnLoad: {
       id: 'RET-HYD-WGL-01',
-      route: 'Hyderabad Agri Terminal → Warangal Produce Hub',
+      route: 'Hyderabad Agri Terminal -> Warangal Produce Hub',
       commodity: 'Organic Fertilizer Sacks & Nursery Seedlings',
       weightKg: 2200,
       additionalEarnings: 2800,

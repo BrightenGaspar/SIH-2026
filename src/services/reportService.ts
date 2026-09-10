@@ -1,4 +1,4 @@
-﻿import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClient';
 import { CreateReportPayload, ReportEntity } from '@/types/review';
 
 export const reportService = {

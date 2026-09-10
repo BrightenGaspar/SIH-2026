@@ -61,9 +61,9 @@ export function SmartBuyerRankingCard({ buyers, onSelectBuyer, className }: Smar
 
                   <div className='flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400'>
                     <span>{buyer.destinationHub}</span>
-                    <span>•</span>
+                    <span>&bull;</span>
                     <span>{buyer.distanceKm} km away</span>
-                    <span>•</span>
+                    <span>&bull;</span>
                     <span className='flex items-center gap-1 text-amber-500 font-bold'>
                       <Star className='w-3 h-3 fill-amber-400' /> {buyer.reliabilityRating.toFixed(1)}
                     </span>

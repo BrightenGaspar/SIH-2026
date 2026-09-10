@@ -90,7 +90,7 @@ export default function WeatherShockDeepDivePage() {
             </h4>
           </div>
           <p className='text-xs text-slate-600 dark:text-slate-400 leading-relaxed'>
-            Shock multiplier is calculated as <em>1 + ((1 - Supply/Demand) × Elasticity)</em>. At 0.60 ratio and 0.65 elasticity, multiplier is <strong>1.26x</strong> (₹42 → <strong>₹52.92/kg</strong>).
+            Shock multiplier is calculated as <em>1 + ((1 - Supply/Demand) * Elasticity)</em>. At 0.60 ratio and 0.65 elasticity, multiplier is <strong>1.26x</strong> (₹42 &rarr; <strong>₹52.92/kg</strong>).
           </p>
         </div>
       </div>

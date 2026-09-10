@@ -26,7 +26,7 @@ export default function TraceabilityLookupPage() {
           AgriFlow Universal Provenance & Cold-Chain Ledger
         </span>
         <Link href='/' className='hover:text-white font-bold text-xs'>
-          Back to Gateway →
+          Back to Gateway &rarr;
         </Link>
       </div>
 
@@ -74,13 +74,13 @@ export default function TraceabilityLookupPage() {
           </div>
           <div className='flex items-center justify-between text-slate-500'>
             <span>Batch: <strong className='text-slate-800 dark:text-slate-200'>LOT-2026-7842</strong></span>
-            <span>Tomato (Hybrid Desi) • 600 kg</span>
+            <span>Tomato (Hybrid Desi) &bull; 600 kg</span>
           </div>
           <Link
             href='/traceability/LOT-2026-7842'
             className='block text-center py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 font-bold transition'
           >
-            View Full Lifecycle Audit Report →
+            View Full Lifecycle Audit Report &rarr;
           </Link>
         </div>
 

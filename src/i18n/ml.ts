@@ -113,5 +113,8 @@ export const ml = {
   "additionalDetails": "കൂടുതൽ വിവരങ്ങൾ",
   "submitReport": "റിപ്പോർട്ട് സമർപ്പിക്കുക",
   "reportSubmitted": "നിങ്ങളുടെ റിപ്പോർട്ട് സമർപ്പിച്ചു, അത് പരിശോധിക്കപ്പെടും."
+  "aiDecisionCenter": "AI തീരുമാന കേന്ദ്രം",
+  "weatherShock": "കാലാവസ്ഥാ ഷോക്ക് സിമുലേറ്റർ",
+  "minimumSustainablePrice": "കുറഞ്ഞ സുസ്ഥിര വില",
 };
 

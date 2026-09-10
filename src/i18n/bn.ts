@@ -113,5 +113,8 @@ export const bn = {
   "additionalDetails": "অতিরিক্ত বিবরণ",
   "submitReport": "রিপোর্ট জমা দিন",
   "reportSubmitted": "আপনার রিপোর্ট জমা দেওয়া হয়েছে এবং পর্যালোচনা করা হবে।"
+  "aiDecisionCenter": "এআই সিদ্ধান্ত কেন্দ্র",
+  "weatherShock": "আবহাওয়া শক সিমুলেটর",
+  "minimumSustainablePrice": "ন্যূনতম টেকসই মূল্য",
 };
 

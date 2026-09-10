@@ -143,6 +143,31 @@ export default function PublicGateway() {
 
         </div>
 
+        {/* Unified Ecosystem Quick Bar */}
+        <div className="mt-8 p-4 bg-slate-900/60 border border-slate-800 rounded-2xl max-w-4xl w-full flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-bold text-white">Central Intelligence:</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-3 font-semibold text-slate-300">
+            <Link href="/farmer/intelligence" className="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1">
+              ✨ AI Decision Center
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/farmer/weather-shock" className="text-blue-400 hover:text-blue-300 transition flex items-center gap-1">
+              🌧 Weather Shock Simulator
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/traceability/LOT-2026-7842" className="text-purple-400 hover:text-purple-300 transition flex items-center gap-1">
+              🔍 Universal Traceability
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/admin" className="text-amber-400 hover:text-amber-300 transition flex items-center gap-1">
+              ⚡ Admin Center
+            </Link>
+          </div>
+        </div>
+
       </main>
 
       {/* Footer */}

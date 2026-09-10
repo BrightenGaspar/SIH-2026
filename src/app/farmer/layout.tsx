@@ -39,10 +39,10 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
 
-  // Exact required authenticated navigation labels:
-  // Dashboard | My Produce | Mandi Prices | Demand Map | AI Recommendations | Orders & Delivery
+  // Authenticated navigation items
   const navItems = [
     { label: t('dashboard'), href: '/farmer/dashboard', icon: LayoutDashboard },
+    { label: t('aiDecisionCenter') || 'AI Decision Center', href: '/farmer/intelligence', icon: Sparkles },
     { label: t('myProduce'), href: '/farmer/produce', icon: Sprout },
     { label: t('mandiPrices'), href: '/farmer/market-prices', icon: TrendingUp },
     { label: t('demandMap'), href: '/farmer/demand-map', icon: MapPin },
@@ -90,6 +90,9 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
           </Link>
           <Link href="/logistics" className="hover:text-white text-amber-300 font-bold text-xs">
             🚚 Fleet
+          </Link>
+          <Link href="/admin" className="hover:text-white text-purple-300 font-bold text-xs">
+            ⚡ Admin
           </Link>
           <LowBandwidthToggle />
           <LanguageSelector variant="compact" />

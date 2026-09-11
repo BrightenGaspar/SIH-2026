@@ -112,7 +112,7 @@ export const ta = {
   "reason": "காரணம்",
   "additionalDetails": "கூடுதல் விவரங்கள்",
   "submitReport": "புகாரைச் சமர்ப்பிக்கவும்",
-  "reportSubmitted": "உங்கள் புகார் சமர்ப்பிக்கப்பட்டது மற்றும் மதிப்பாய்வு செய்யப்படும்."
+  "reportSubmitted": "உங்கள் புகார் சமர்ப்பிக்கப்பட்டது மற்றும் மதிப்பாய்வு செய்யப்படும்.",
   "aiDecisionCenter": "AI முடிவு மையம்",
   "weatherShock": "வானிலை அதிர்ச்சி உருவகப்படுத்துதல்",
   "minimumSustainablePrice": "குறைந்தபட்ச நிலையான விலை",

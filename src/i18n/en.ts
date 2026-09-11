@@ -114,7 +114,7 @@ export const en = {
   "submitReport": "Submit Report",
   "reportSubmitted": "Your report has been submitted and will be reviewed.",
   "underReview": "Under Review",
-  "resolved": "Resolved"
+  "resolved": "Resolved",
   "aiDecisionCenter": "AI Decision Center",
   "weatherShock": "Weather Shock Simulator",
   "minimumSustainablePrice": "Minimum Sustainable Price",

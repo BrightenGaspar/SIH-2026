@@ -6,11 +6,7 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint",
-    "servers": "node servers/start-all.js",
-    "server:farmer": "node servers/farmer-server.js",
-    "server:buyer": "node servers/buyer-server.js",
-    "server:logistics": "node servers/logistics-server.js"
+    "lint": "eslint"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

@@ -2,24 +2,52 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     
+    // ==========================================
+    // HELPER FUNCTIONS
+    // ==========================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isImageFile() {
+      return request.resource.contentType.matches('image/(jpeg|png|gif|webp)');
+    }
+    
     // Crop harvest photos & produce verification
     match /crop_images/{cropId}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && request.resource.size < 10 * 1024 * 1024
-                   && request.resource.contentType.matches('image/.*');
+      // Only authenticated users can read
+      allow read: if isAuthenticated();
+      // Only farmers can upload crop images (10MB limit, image only)
+      allow write: if isAuthenticated() 
+                   && request.resource.size < 10 * 1024 * 1024
+                   && isImageFile()
+                   && request.auth.token.role == 'farmer';
     }
 
-    // Quality inspection lab certificates & GI verification
+    // Quality inspection lab certificates & GI verification (SECURED)
     match /quality_certificates/{certId}/{fileName} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.resource.size < 15 * 1024 * 1024;
+      // Only authenticated QC officers can read
+      allow read: if isAuthenticated() && (request.auth.token.role == 'qc' || request.auth.token.role == 'admin');
+      // Only QC officers can upload certificates (15MB limit)
+      allow write: if isAuthenticated() 
+                   && request.resource.size < 15 * 1024 * 1024
+                   && (request.auth.token.role == 'qc' || request.auth.token.role == 'admin');
     }
 
-    // User avatars
+    // User avatars (SECURED)
     match /avatars/{userId}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId
-                   && request.resource.size < 5 * 1024 * 1024;
+      // Only authenticated users can read avatars
+      allow read: if isAuthenticated();
+      // Only the user can upload their own avatar (5MB limit, image only)
+      allow write: if isAuthenticated() 
+                   && request.auth.uid == userId
+                   && request.resource.size < 5 * 1024 * 1024
+                   && isImageFile();
+    }
+    
+    // DENY all other uploads
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

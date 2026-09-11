@@ -54,15 +54,15 @@ app.get('/api/health', (req, res) => {
 // Proxy routes to individual microservices
 app.use('/api/farmer', (req, res) => {
   // BUG FIX #3: Fixed path construction - don't duplicate /api/farmer
-  proxyRequest('127.0.0.1', 5001, `/api/farmer${req.url}`, req, res);
+  proxyRequest('127.0.0.1', 5001, req.url.startsWith('/api') ? req.url : `/api/farmer${req.url}`, req, res);
 });
 
 app.use('/api/buyer', (req, res) => {
-  proxyRequest('127.0.0.1', 5002, `/api/buyer${req.url}`, req, res);
+  proxyRequest('127.0.0.1', 5002, req.url.startsWith('/api') ? req.url : `/api/buyer${req.url}`, req, res);
 });
 
 app.use('/api/logistics', (req, res) => {
-  proxyRequest('127.0.0.1', 5003, `/api/logistics${req.url}`, req, res);
+  proxyRequest('127.0.0.1', 5003, req.url.startsWith('/api') ? req.url : `/api/logistics${req.url}`, req, res);
 });
 
 function proxyRequest(host, port, targetPath, req, res) {
@@ -85,13 +85,21 @@ function proxyRequest(host, port, targetPath, req, res) {
     if (!res.headersSent) {
       res.status(502).json({ 
         error: 'Microservice unavailable', 
-        details: err ? err.message : 'Unknown error' 
+        details: err ? err.message : 'Unknown error',
+        port: port
       });
     }
   });
 
   if (req.body && Object.keys(req.body).length > 0) {
-    proxy.write(JSON.stringify(req.body));
+    try {
+      proxy.write(JSON.stringify(req.body));
+    } catch (err) {
+      console.error(`[PROXY WRITE ERROR]`, err.message);
+      if (!res.headersSent) {
+        res.status(400).json({ error: 'Invalid request body' });
+      }
+    }
   }
   proxy.end();
 }

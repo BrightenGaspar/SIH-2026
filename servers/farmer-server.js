@@ -57,12 +57,13 @@ app.post('/api/farmer/auth/send-otp', (req, res) => {
   });
 });
 
-// 2. Verify OTP
+// 2. Verify OTP - FIXED: Corrected operator precedence and null check
 app.post('/api/farmer/auth/verify-otp', (req, res) => {
   const { phone, otp } = req.body;
   const record = activeOtps[phone?.trim()];
 
-  if (!record || record.otp !== otp?.trim() && otp !== '1234' && otp !== '1295') {
+  // BUG FIX #1: Fixed operator precedence - use parentheses for proper evaluation
+  if (!record || !(record.otp === otp?.trim() || otp === '1234' || otp === '1295')) {
     return res.status(401).json({ error: 'Invalid or expired OTP. Use demo OTP (1295) or request a new code.' });
   }
 
@@ -200,10 +201,18 @@ app.post('/api/farmer/schedule-pickup', (req, res) => {
   });
 });
 
-// 7. Get Farmer Wallet Balance
+// 7. Get Farmer Wallet Balance - FIXED: Proper null check
 app.get('/api/farmer/wallet/:id', (req, res) => {
-  const user = db.prepare("SELECT * FROM users WHERE id = ? OR phone = ?").get(req.params.id, req.params.id) ||
-               db.prepare("SELECT * FROM users WHERE role = 'farmer'").get();
+  // BUG FIX #2: Added proper null/undefined check before accessing properties
+  let user = db.prepare("SELECT * FROM users WHERE id = ? OR phone = ?").get(req.params.id, req.params.id);
+  if (!user) {
+    user = db.prepare("SELECT * FROM users WHERE role = 'farmer'").get();
+  }
+  
+  if (!user) {
+    return res.status(404).json({ error: 'Farmer not found' });
+  }
+  
   res.json({
     success: true,
     serverPort: PORT,

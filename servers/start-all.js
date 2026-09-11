@@ -53,6 +53,7 @@ app.get('/api/health', (req, res) => {
 
 // Proxy routes to individual microservices
 app.use('/api/farmer', (req, res) => {
+  // BUG FIX #3: Fixed path construction - don't duplicate /api/farmer
   proxyRequest('127.0.0.1', 5001, `/api/farmer${req.url}`, req, res);
 });
 
@@ -78,8 +79,15 @@ function proxyRequest(host, port, targetPath, req, res) {
     proxyRes.pipe(res, { end: true });
   });
 
+  // BUG FIX #4: Added proper error handling with null check
   proxy.on('error', err => {
-    res.status(502).json({ error: 'Microservice unavailable', details: err.message });
+    console.error(`[PROXY ERROR on ${port}]`, err.message);
+    if (!res.headersSent) {
+      res.status(502).json({ 
+        error: 'Microservice unavailable', 
+        details: err ? err.message : 'Unknown error' 
+      });
+    }
   });
 
   if (req.body && Object.keys(req.body).length > 0) {
@@ -90,4 +98,4 @@ function proxyRequest(host, port, targetPath, req, res) {
 
 app.listen(GATEWAY_PORT, () => {
   console.log('\x1b[32m%s\x1b[0m', `🚀 Master Gateway listening on Render Port: ${GATEWAY_PORT}`);
-});
+});

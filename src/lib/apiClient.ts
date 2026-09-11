@@ -99,6 +99,7 @@ export async function apiClient<T>(endpoint: string, options: RequestOptions = {
 
 /**
  * Realtime WebSocket connection helper for live GPS tracking & telemetry
+ * BUG FIX #5: Properly cleanup socket reference after closure
  */
 export function createLiveTrackingSocket<T>(tripId: string, onMessage: (data: T) => void, onError?: (err: Event) => void): () => void {
   if (typeof window === 'undefined') return () => {};
@@ -127,6 +128,8 @@ export function createLiveTrackingSocket<T>(tripId: string, onMessage: (data: T)
   return () => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.close();
+      // BUG FIX: Properly nullify socket reference after closure
+      socket = null;
     }
   };
 }

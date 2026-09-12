@@ -22,6 +22,7 @@ export const farmerService = {
           quality_grade,
           location,
           status,
+          image_url,
           created_at,
           profiles:farmer_id (
             full_name,
@@ -51,6 +52,8 @@ export const farmerService = {
         location: row.location || (row.profiles as any)?.location || 'Farm Location',
         status: (row.status as ProduceStatus) || 'Active',
         notes: row.variety ? `${row.variety} • ${row.category || ''}` : undefined,
+        imageUrl: row.image_url,
+        image_url: row.image_url,
         createdAt: row.created_at || new Date().toISOString(),
       }));
     } catch (err: any) {
@@ -75,6 +78,7 @@ export const farmerService = {
           asking_price: item.expectedPrice,
           location: item.location,
           status: 'Active',
+          image_url: item.imageUrl || item.image_url || null,
         })
         .select()
         .single();
@@ -99,6 +103,8 @@ export const farmerService = {
         expectedPrice: Number(data.asking_price),
         location: data.location,
         status: (data.status as ProduceStatus) || 'Active',
+        imageUrl: data.image_url || item.imageUrl,
+        image_url: data.image_url || item.image_url,
         createdAt: data.created_at || new Date().toISOString(),
       };
     } catch (err: any) {

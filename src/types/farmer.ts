@@ -37,6 +37,8 @@ export interface Produce {
   location: string;
   status: ProduceStatus;
   notes?: string;
+  imageUrl?: string;
+  image_url?: string;
   createdAt: string;
 }
 

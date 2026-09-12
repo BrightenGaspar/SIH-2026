@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { farmerService } from '@/services/farmerService';
+import { uploadCropImage } from '@/services/storageService';
+import { useAuth } from '@/context/AuthContext';
 import { Produce, ProduceGrade } from '@/types/farmer';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
@@ -10,13 +12,17 @@ import { Modal } from '@/components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { produceSchema, ProduceFormData } from '@/lib/validators';
-import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 
 export default function FarmerProducePage() {
+  const { user } = useAuth();
   const [produceList, setProduceList] = useState<Produce[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<ProduceFormData>({
     resolver: zodResolver(produceSchema),
@@ -32,22 +38,48 @@ export default function FarmerProducePage() {
     },
   });
 
-  useEffect(() => { let isMounted = true; farmerService.getProduceList().then(data => { if (isMounted) setProduceList(data || []); }).catch(() => { if (isMounted) setProduceList([]); }); return () => { isMounted = false; }; }, []);
+  useEffect(() => {
+    let isMounted = true;
+    farmerService.getProduceList()
+      .then(data => { if (isMounted) setProduceList(data || []); })
+      .catch(() => { if (isMounted) setProduceList([]); });
+    return () => { isMounted = false; };
+  }, []);
 
-  const onAddProduceSubmit = (data: ProduceFormData) => {
-    farmerService.addProduce({
-      crop: data.crop,
-      quantity: Number(data.quantity),
-      unit: data.unit,
-      grade: data.grade as ProduceGrade,
-      harvestDate: data.harvestDate,
-      expectedPrice: Number(data.expectedPrice),
-      location: data.location,
-      notes: data.notes,
-    });
-    farmerService.getProduceList().then(data => setProduceList(data || []));
-    setIsAddModalOpen(false);
-    reset();
+  const onAddProduceSubmit = async (data: ProduceFormData) => {
+    try {
+      setIsUploading(true);
+      let uploadedImageUrl: string | undefined = undefined;
+
+      if (imageFile) {
+        const farmerId = user?.id || 'farmer-001';
+        uploadedImageUrl = await uploadCropImage(farmerId, imageFile);
+      }
+
+      await farmerService.addProduce({
+        crop: data.crop,
+        quantity: Number(data.quantity),
+        unit: data.unit,
+        grade: data.grade as ProduceGrade,
+        harvestDate: data.harvestDate,
+        expectedPrice: Number(data.expectedPrice),
+        location: data.location,
+        notes: data.notes,
+        imageUrl: uploadedImageUrl,
+        image_url: uploadedImageUrl,
+      });
+
+      const refreshed = await farmerService.getProduceList();
+      setProduceList(refreshed || []);
+      setIsAddModalOpen(false);
+      setImageFile(null);
+      setImagePreview(null);
+      reset();
+    } catch (err: any) {
+      console.error('Failed to add produce listing:', err?.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const filtered = filterStatus === 'All'
@@ -101,8 +133,17 @@ export default function FarmerProducePage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((item) => (
-            <Card key={item.id} className="flex flex-col justify-between hover:border-emerald-500/50 transition">
+            <Card key={item.id} className="flex flex-col justify-between hover:border-emerald-500/50 transition overflow-hidden">
               <div>
+                {(item.imageUrl || item.image_url) && (
+                  <div className="mb-3 -mx-6 -mt-6 h-40 w-[calc(100%+3rem)] overflow-hidden relative bg-slate-900 border-b border-slate-800">
+                    <img
+                      src={item.imageUrl || item.image_url}
+                      alt={item.crop}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="flex items-start justify-between gap-2 mb-3">
                   <div>
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white">{item.crop}</h3>
@@ -234,6 +275,43 @@ export default function FarmerProducePage() {
             />
           </div>
 
+          {/* Crop Image Upload to Supabase Storage */}
+          <div>
+            <label className="text-xs font-bold text-slate-300 block mb-1">Crop Image</label>
+            <div className="p-3 bg-slate-950 border border-slate-700 rounded-xl space-y-2">
+              <div className="flex items-center gap-3">
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Crop preview"
+                    className="w-14 h-14 object-cover rounded-lg border border-slate-700 shrink-0"
+                  />
+                ) : (
+                  <div className="w-14 h-14 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-500 shrink-0">
+                    <ImageIcon className="w-6 h-6" />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0 space-y-1">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setImageFile(file);
+                        setImagePreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="text-xs text-slate-300 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer w-full"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Uploads directly to produce-images storage bucket
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="text-xs font-bold text-slate-300 block mb-1">Storage / Crate Notes</label>
             <textarea
@@ -244,11 +322,17 @@ export default function FarmerProducePage() {
           </div>
 
           <div className="flex gap-3 pt-3">
-            <Button type="button" variant="secondary" onClick={() => setIsAddModalOpen(false)} className="flex-1">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setIsAddModalOpen(false)}
+              className="flex-1"
+              disabled={isUploading}
+            >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
-              Publish Listing
+            <Button type="submit" className="flex-1" disabled={isUploading}>
+              {isUploading ? 'Uploading Image & Saving...' : 'Publish Listing'}
             </Button>
           </div>
         </form>

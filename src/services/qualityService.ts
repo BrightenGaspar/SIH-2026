@@ -5,7 +5,7 @@ export function evaluateProduceQuality(
   quantityKg: number = 600,
   lotId?: string
 ): QualityInspectionResult {
-  const currentLotId = lotId || LOT-2026-;
+  const currentLotId = lotId || 'LOT-2026-7842';
   
   // Deterministic simulation based on lotId
   const seed = currentLotId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -51,7 +51,7 @@ export function evaluateProduceQuality(
     recommendedBasePricePerKg: recommendedPrice,
     marketReadiness: readiness,
     prefilledListing: {
-      title: ${crop} ( - Farm Fresh),
+      title: `${crop} (${grade} - Farm Fresh)`,
       quantityKg,
       grade,
       suggestedListingPrice: recommendedPrice,

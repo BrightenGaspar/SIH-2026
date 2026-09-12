@@ -38,13 +38,13 @@ export function evaluateStorageVsSell(input: StorageOptimizationInput): StorageO
 
   if (advPerKg > 1.50 && days <= cropProfile.maxSafeTransitHours / 24) {
     action = 'STORE';
-    reasoning = Storing for  days yields +₹/kg higher net farmer realization after factoring ₹ cold-storage fees and ₹ (%) spoilage risk. Future price upside (₹/kg vs ₹/kg) comfortably overcomes holding costs.;
+    reasoning = `Storing for ${days} days yields +₹${advPerKg}/kg higher net farmer realization after factoring ₹${totalStorageCost} cold-storage fees and ₹${spoilageLossVal} (${totalSpoilagePercent}%) spoilage risk. Future price upside (₹${futurePrice}/kg vs ₹${currentPrice}/kg) comfortably overcomes holding costs.`;
   } else if (advPerKg < -0.50) {
     action = 'SELL_NOW';
-    reasoning = Immediate spot sale recommended. Holding for  days would erode net realization by ₹/kg due to cumulative spoilage ( kg lost) and ₹ in storage fees that the projected market price cannot offset.;
+    reasoning = `Immediate spot sale recommended. Holding for ${days} days would erode net realization by ₹${Math.abs(advPerKg)}/kg due to cumulative spoilage (${spoilageLossKg} kg lost) and ₹${totalStorageCost} in storage fees that the projected market price cannot offset.`;
   } else {
     action = 'WAIT';
-    reasoning = Marginal financial delta (+₹/kg). Storing carries operational risks without significant premium. Recommended to sell immediately unless premium buyer contract is confirmed.;
+    reasoning = `Marginal financial delta (+₹${advPerKg}/kg). Storing carries operational risks without significant premium. Recommended to sell immediately unless premium buyer contract is confirmed.`;
   }
 
   return {

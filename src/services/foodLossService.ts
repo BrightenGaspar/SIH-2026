@@ -73,7 +73,7 @@ export function detectFoodLossRisk(
     financialExposureInr: exposureInr,
     recommendedRescueChannels: rescueChannels,
     urgentActionHeadline: riskLevel === 'HIGH' || riskLevel === 'CRITICAL'
-      ? URGENT:  kg  has  hours safe life remaining. ₹ at risk.
-      : Inventory Freshness Optimal:  hours safe shelf life remaining.,
+      ? `URGENT: ${quantityKg} kg ${commodity} has ${remainingHours} hours safe life remaining. ₹${exposureInr} at risk.`
+      : `Inventory Freshness Optimal: ${remainingHours} hours safe shelf life remaining.`,
   };
 }

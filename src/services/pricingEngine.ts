@@ -80,7 +80,7 @@ export function calculatePricing(input: PricingInput): PricingResult {
 
   const isLossRisk = predictedSellingPrice < minimumSustainablePrice;
 
-  const explanation = Fair Reference Price computed dynamically via 40% cost-plus (₹/kg) + 60% market benchmark (₹/kg), adjusted by  quality factor (x) and demand index (x). Minimum Sustainable Price floor is ₹/kg.;
+  const explanation = `Fair Reference Price computed dynamically via 40% cost-plus (₹${costBasedPrice}/kg) + 60% market benchmark (₹${marketPrice}/kg), adjusted by ${qualityGrade} quality factor (${qualityFactor}x) and demand index (${demandFactor}x). Minimum Sustainable Price floor is ₹${minimumSustainablePrice}/kg.`;
 
   return {
     commodity,

@@ -36,7 +36,7 @@ export function getMarketForecast(commodity: string, currentPrice: number): Mark
     peakPriceDay: peakPoint.day,
     peakPrice: peakPoint.predictedPrice,
     recommendation: trend === 'BULLISH' 
-      ? Forward market is BULLISH: prices expected to climb up to ₹/kg by . Consider staggered selling or 3-4 day cold-storage holding if costs allow.
-      : Market is STABLE. Spot selling at current ₹/kg secures immediate cash flow without storage risk.,
+      ? `Forward market is BULLISH: prices expected to climb up to ₹${peakPoint.predictedPrice}/kg by ${peakPoint.day}. Consider staggered selling or 3-4 day cold-storage holding if costs allow.`
+      : `Market is STABLE. Spot selling at current ₹${basePrice}/kg secures immediate cash flow without storage risk.`,
   };
 }

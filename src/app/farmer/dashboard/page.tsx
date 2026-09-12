@@ -166,7 +166,7 @@ export default function FarmerDashboard() {
             <span className="font-bold text-white text-xs mt-0.5 block">38 km</span>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* 4. MY PRODUCE PREVIEW */}
       <Card className="p-6">

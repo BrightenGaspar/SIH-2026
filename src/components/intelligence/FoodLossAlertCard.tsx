@@ -72,7 +72,7 @@ export function FoodLossAlertCard({ lossRisk, onSelectChannel, className }: Food
                   {channel.partnerName}
                 </span>
                 <span className='text-[11px] text-slate-500 block mt-1'>
-                  Salvage: ₹{channel.potentialSalvageValue.toLocaleString()} ({channel.offeredPricePerKg > 0 ? ₹/kg : 'Zero Waste Donation'})
+                  Salvage: ₹{channel.potentialSalvageValue.toLocaleString()} ({channel.offeredPricePerKg > 0 ? `₹${channel.offeredPricePerKg}/kg` : 'Zero Waste Donation'})
                 </span>
               </div>
 

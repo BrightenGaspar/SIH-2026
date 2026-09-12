@@ -58,7 +58,7 @@ export function calculateWeatherShock(input: WeatherShockInput): WeatherShockRes
   const normalNetIncome = (expectedHarvestKg * baseMarketPrice) - totalProdCost;
   const netBalanceVersusNormal = Number((netProfitOnMarketableCrop - normalNetIncome).toFixed(2));
 
-  const narrative = Regional  reduced harvest by %, resulting in a % regional supply shortage. Dynamic shock elasticity () lifts predicted market price from ₹/kg to ₹/kg (Shock Multiplier: x). To cover incurred recovery costs, Minimum Sustainable Price is ₹/kg.;
+  const narrative = `Regional ${weatherEventType} reduced harvest by ${damageRatePercent}%, resulting in a ${marketShortagePercent}% regional supply shortage. Dynamic shock elasticity (${priceElasticity}) lifts predicted market price from ₹${baseMarketPrice}/kg to ₹${safetyClampedPredictedPrice}/kg (Shock Multiplier: ${shockMultiplier}x). To cover incurred recovery costs, Minimum Sustainable Price is ₹${minimumSustainablePrice}/kg.`;
 
   return {
     commodity,

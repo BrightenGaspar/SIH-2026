@@ -127,7 +127,10 @@ export function matchBuyers(
     const matchHighlights: string[] = [];
     if (buyer.pickupOffered) matchHighlights.push('Farm-gate pickup (₹0 freight)');
     if (buyer.paymentTermsDays === 0) matchHighlights.push('Instant digital payout upon delivery');
-    if (buyer.offeredPricePerKg >= expectedPricePerKg) matchHighlights.push(+₹/kg premium over expected);
+    if (buyer.offeredPricePerKg >= expectedPricePerKg) {
+      const diff = (buyer.offeredPricePerKg - expectedPricePerKg).toFixed(2);
+      matchHighlights.push(`+₹${diff}/kg premium over expected`);
+    }
     if (buyer.verifiedBuyer) matchHighlights.push('Verified Corporate Buyer');
 
     return {

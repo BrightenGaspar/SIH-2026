@@ -173,7 +173,6 @@ export default function PublicGateway() {
               <span>Admin Center</span>
             </Link>
           </div>
-        </div>
 
       </main>
 

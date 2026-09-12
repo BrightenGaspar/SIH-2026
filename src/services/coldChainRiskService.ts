@@ -48,7 +48,7 @@ export function assessColdChainRisk(
       severity: 'CRITICAL',
       sensor: 'TEMPERATURE',
       title: 'Severe Reefer Thermal Excursion',
-      message: Cargo temp at °C exceeds max safe limit (°C) by °C.,
+      message: `Cargo temp at ${currentTemp}°C exceeds max safe limit (${profile.maxTempCelsius}°C) by ${tempDeviation}°C.`,
       timeDetected: '12 mins ago',
       suggestedAction: 'Immediate compressor diagnostic & redirect to emergency cold hub.',
     });
@@ -61,7 +61,7 @@ export function assessColdChainRisk(
       severity: 'HIGH',
       sensor: 'TEMPERATURE',
       title: 'Elevated Cargo Temperature',
-      message: Reefer temperature (°C) is above optimal threshold (°C).,
+      message: `Reefer temperature (${currentTemp}°C) is above optimal threshold (${profile.maxTempCelsius}°C).`,
       timeDetected: '24 mins ago',
       suggestedAction: 'Increase reefer cooling throttle to preset setpoint 12.0°C.',
     });

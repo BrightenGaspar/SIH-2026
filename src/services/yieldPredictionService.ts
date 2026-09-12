@@ -37,7 +37,7 @@ export function predictYield(input: YieldPredictionInput): YieldPredictionResult
       {
         factor: 'Soil Organic Carbon & Moisture',
         impact: soilHealth >= 75 ? 'POSITIVE' : 'NEUTRAL',
-        description: Soil health index measured at /100 supports active fruit sizing.,
+        description: `Soil health index measured at ${soilHealth}/100 supports active fruit sizing.`,
       },
       {
         factor: 'Micro-climate Rainfall Index',
@@ -47,7 +47,7 @@ export function predictYield(input: YieldPredictionInput): YieldPredictionResult
       {
         factor: 'Historical Regional Productivity',
         impact: 'POSITIVE',
-        description: Average 3-year baseline in regional cluster:  kg/acre.,
+        description: `Average 3-year baseline in regional cluster: ${baseYieldPerAcre} kg/acre.`,
       },
     ],
     isSimulatedDemo: true,

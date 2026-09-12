@@ -122,7 +122,7 @@ export function getTraceabilityLot(lotId: string = 'LOT-2026-7842'): Traceabilit
     soilHealthScore: 84,
     weatherShockHistory: 'Excessive Rainfall (40% damage, dynamic shortage compensated)',
     coldChainTelemetryVerified: true,
-    qrCodeDataUrl: https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://agriflow.ai/traceability/,
+    qrCodeDataUrl: `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://agriflow.ai/traceability/${lotId}`,
     currentStatus: 'Settled & Delivered',
     buyerName: 'Reliance Fresh Distribution Center',
     finalPayoutPerKg: 54.00,

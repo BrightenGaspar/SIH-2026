@@ -59,15 +59,15 @@ export default function FarmerIntelligencePage() {
     {
       name: 'Cost-Based Recovery Baseline',
       weight: '40% Weight',
-      value: ₹/kg,
-      impact: Floor: ₹/kg,
+      value: `₹${pipelineData.pricing.minimumSustainablePrice}/kg`,
+      impact: `Floor: ₹${pipelineData.pricing.minimumSustainablePrice}/kg`,
       direction: 'neutral' as const,
     },
     {
       name: 'Weather Shock Shortage Index',
       weight: 'Regional',
-      value: +% Shortage,
-      impact: +% Shock Multiplier,
+      value: `+${pipelineData.weatherShock.marketShortagePercent}% Shortage`,
+      impact: `+${((pipelineData.weatherShock.shockMultiplier - 1) * 100).toFixed(0)}% Shock Multiplier`,
       direction: 'up' as const,
     },
     {
@@ -81,7 +81,7 @@ export default function FarmerIntelligencePage() {
       name: 'Forward Mandi Elasticity',
       weight: 'Elasticity 0.65',
       value: 'High Buyer Inelasticity',
-      impact: ₹/kg Dynamic Price,
+      impact: `₹${pipelineData.pricing.predictedSellingPrice}/kg Dynamic Price`,
       direction: 'up' as const,
     },
   ];

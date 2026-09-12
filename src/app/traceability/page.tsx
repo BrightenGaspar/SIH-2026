@@ -12,7 +12,7 @@ export default function TraceabilityLookupPage() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (lotInput.trim()) {
-      router.push(/traceability/);
+      router.push(`/traceability/${encodeURIComponent(lotInput.trim())}`);
     }
   };
 

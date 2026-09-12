@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { consumerService } from '@/services/consumerService';
+import { supabase } from '@/lib/supabase';
 import { ProductItem } from '@/types/consumer';
 import ProductCard from '@/components/consumer/ProductCard';
 import GradeFilterTabs from '@/components/consumer/GradeFilterTabs';
@@ -15,7 +16,8 @@ import {
   List, 
   ArrowUpDown,
   CheckCircle2,
-  Snowflake
+  Snowflake,
+  Radio
 } from 'lucide-react';
 
 export default function ConsumerMarketplacePage() {
@@ -32,13 +34,41 @@ export default function ConsumerMarketplacePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   useEffect(() => {
+    let isMounted = true;
+
     async function load() {
       setLoading(true);
       const data = await consumerService.getProducts();
-      setProducts(data);
-      setLoading(false);
+      if (isMounted) {
+        setProducts(data);
+        setLoading(false);
+      }
     }
     load();
+
+    // Active Supabase realtime stream subscription listening for live INSERT and UPDATE on public.produce
+    const channel = supabase
+      .channel('realtime-marketplace-produce')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'produce',
+        },
+        async () => {
+          const freshData = await consumerService.getProducts();
+          if (isMounted) {
+            setProducts(freshData);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Spices'];

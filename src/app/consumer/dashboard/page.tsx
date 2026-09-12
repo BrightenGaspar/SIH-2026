@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import { consumerService } from '@/services/consumerService';
+import { supabase } from '@/lib/supabase';
 import { ProductDetails, ConsumerOrder, Recommendation, BulkDemand } from '@/types/consumer';
 import { 
   Store, 
@@ -55,6 +56,39 @@ export default function ConsumerDashboard() {
       setBulkDemands(demandList);
     }
     loadData();
+
+    // Active Supabase realtime stream subscription for dashboard updates
+    const channel = supabase
+      .channel('realtime-consumer-dashboard')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'produce',
+        },
+        async () => {
+          const prodList = await consumerService.getProducts();
+          setProducts(prodList);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+        },
+        async () => {
+          const orderList = await consumerService.getOrders();
+          setOrders(orderList);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [consumerUser]);
 
   const activeOrders = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');

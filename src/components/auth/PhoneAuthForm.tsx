@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { ConfirmationResult } from 'firebase/auth';
 import { Button } from '@/components/common/Button';
 import { Phone, Mail, ShieldCheck, ArrowRight, RotateCcw, Sparkles, CheckCircle2, AlertCircle, Lock } from 'lucide-react';
 
@@ -28,9 +27,9 @@ export function PhoneAuthForm({
   const [authMethod, setAuthMethod] = useState<'PHONE' | 'GOOGLE'>('PHONE');
   const [step, setStep] = useState<'PHONE' | 'OTP'>('PHONE');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [sentPhone, setSentPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [userName, setUserName] = useState('');
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -77,22 +76,14 @@ export function PhoneAuthForm({
     setSubmitting(true);
     try {
       const fullNumber = cleanPhone.startsWith('91') && cleanPhone.length > 10 ? `+${cleanPhone}` : `+91${cleanPhone.slice(-10)}`;
-      const result = await sendPhoneOtp(fullNumber, 'recaptcha-container');
-      setConfirmationResult(result);
+      const result = await sendPhoneOtp(fullNumber, { name: userName, role });
+      setSentPhone(fullNumber);
       setStep('OTP');
-      setStatusMsg(`6-digit SMS OTP sent to ${fullNumber}`);
+      setStatusMsg(result.message || `6-digit SMS OTP sent to ${fullNumber}`);
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
       console.error('Phone OTP Send Error:', error);
-      if (error?.code === 'auth/invalid-phone-number') {
-        setErrorMsg('Invalid phone number format.');
-      } else if (error?.code === 'auth/too-many-requests') {
-        setErrorMsg('Too many OTP attempts. Please wait a few minutes.');
-      } else if (error?.code === 'auth/billing-not-enabled' || error?.code === 'auth/quota-exceeded') {
-        setErrorMsg('SMS verification quota exceeded or test number required.');
-      } else {
-        setErrorMsg(error?.message || 'Failed to send OTP. You can use Quick Pitch Demo Login below.');
-      }
+      setErrorMsg(error?.message || 'Failed to send OTP. You can use Quick Pitch Demo Login below.');
     } finally {
       setSubmitting(false);
     }
@@ -102,11 +93,6 @@ export function PhoneAuthForm({
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
-    if (!confirmationResult) {
-      setErrorMsg('Session expired. Please request a new OTP.');
-      setStep('PHONE');
-      return;
-    }
 
     if (otp.trim().length !== 6) {
       setErrorMsg('Please enter the full 6-digit OTP code.');
@@ -115,21 +101,15 @@ export function PhoneAuthForm({
 
     setSubmitting(true);
     try {
-      await verifyPhoneOtp(confirmationResult, otp.trim(), role, {
+      await verifyPhoneOtp(sentPhone || phoneNumber, otp.trim(), role, {
         name: userName || (role === 'farmer' ? 'Kisan Farmer' : role === 'consumer' ? 'Buyer User' : 'Logistics Carrier'),
-        phone: phoneNumber,
+        phone: sentPhone || phoneNumber,
       });
       router.push(redirectUrl);
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
       console.error('OTP Verify Error:', error);
-      if (error?.code === 'auth/invalid-verification-code') {
-        setErrorMsg('Invalid OTP code. Please check and re-enter.');
-      } else if (error?.code === 'auth/code-expired') {
-        setErrorMsg('OTP code has expired. Please request a new code.');
-      } else {
-        setErrorMsg(error?.message || 'Verification failed. Please try again.');
-      }
+      setErrorMsg(error?.message || 'Verification failed. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -183,12 +163,9 @@ export function PhoneAuthForm({
 
   return (
     <div className="space-y-5">
-      {/* Invisible reCAPTCHA container required by Firebase Phone Auth */}
-      <div id="recaptcha-container"></div>
-
       <div className="text-center">
         <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border mb-3 ${colors.badgeBg}`}>
-          <ShieldCheck className="w-3.5 h-3.5" /> Firebase Secure Authentication
+          <ShieldCheck className="w-3.5 h-3.5" /> Supabase Cloud Authentication
         </div>
         <h2 className="text-2xl font-black text-white">{roleTitle}</h2>
         {roleSubtitle && <p className="text-xs text-slate-400 mt-1">{roleSubtitle}</p>}
@@ -274,7 +251,7 @@ export function PhoneAuthForm({
                     />
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">Direct Firebase SMS code will be sent to this number.</p>
+                <p className="text-[11px] text-slate-500 mt-1">Direct Supabase SMS OTP will be sent to this number.</p>
               </div>
 
               <Button

@@ -1,7 +1,7 @@
 export type BuyerType = 'household' | 'retailer' | 'restaurant' | 'bulk-buyer' | 'institution';
 export type ProduceGrade = 'A' | 'B' | 'Organic Certified';
 export type FreshnessLevel = 'Harvested Today' | 'Harvested 1 Day Ago' | 'Harvested 2 Days Ago' | 'Harvested 3 Days Ago' | 'Harvested 4 Days Ago';
-export type ConsumerOrderStatus = 'Order Placed' | 'Confirmed' | 'Preparing' | 'Pickup' | 'In Transit' | 'Delivered' | 'Cancelled';
+export type ConsumerOrderStatus = 'Escrow Locked' | 'Order Placed' | 'Confirmed' | 'Preparing' | 'Pickup' | 'In Transit' | 'Delivered' | 'Cancelled';
 export type RiskLevel = 'Low' | 'Medium' | 'High';
 export type RoadVehicleType = 'Tata Ace' | 'Tata 407 Reefer' | 'Mahindra Bolero Maxi Truck';
 

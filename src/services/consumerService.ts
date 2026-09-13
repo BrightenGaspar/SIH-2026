@@ -1,14 +1,97 @@
-import { BulkDemand, ConsumerOrder, ConsumerTracking, ProductDetails, Recommendation } from '@/types/consumer';
+import {
+  BulkDemand,
+  ConsumerOrder,
+  ConsumerTracking,
+  ProductDetails,
+  ProduceGrade,
+  FreshnessLevel,
+  Recommendation
+} from '@/types/consumer';
 import { supabase } from '@/lib/supabase';
-import { 
-  mockConsumerProducts, 
-  mockConsumerOrders, 
-  mockBulkDemands, 
-  mockRecommendations 
-} from './mockData/mockConsumerData';
+
+function mapRowToProductDetails(row: any): ProductDetails {
+  const price = Number(row.asking_price) || 30;
+  const profile = row.profiles as any;
+
+  const farmerName = profile?.full_name || 'Verified Kisan Partner';
+  const farmOrFpoName = profile?.fpo_name || 'Regional Agro Producer Co.';
+  const district = profile?.district || (row.location ? row.location.split(',')[0].trim() : 'Local District');
+  const state = profile?.state || 'Telangana';
+  const generalLocation = row.location || (profile?.place ? `${profile.place}, ${district}` : `${district}, ${state}`);
+
+  const validCategories = ['Vegetables', 'Fruits', 'Grains', 'Spices'] as const;
+  const category = validCategories.includes(row.category) ? row.category : 'Vegetables';
+
+  const validGrades: ProduceGrade[] = ['A', 'B', 'Organic Certified'];
+  const grade: ProduceGrade = validGrades.includes(row.quality_grade) ? row.quality_grade : 'A';
+
+  return {
+    id: String(row.id),
+    name: row.crop_name || 'Farm Harvest',
+    category,
+    image: row.image_url || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
+    grade,
+    gradeDescription: `Grade ${grade} Certified Farm Harvest`,
+    availableQuantityKg: Number(row.quantity) || 0,
+    minOrderQuantityKg: Math.min(10, Math.max(1, Number(row.quantity) || 1)),
+    harvestDate: row.harvest_date || new Date().toISOString().split('T')[0],
+    freshness: 'Harvested Today' as FreshnessLevel,
+    freshnessScore: 'Excellent',
+    farmerStory: {
+      id: profile?.id || row.farmer_id || String(row.id),
+      farmerName,
+      farmOrFpoName,
+      farmerPhoto: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150',
+      generalLocation,
+      district,
+      state,
+      mainCrops: [row.crop_name || 'Fresh Produce'],
+      harvestDate: row.harvest_date || 'Recent',
+      soilPractices: 'Natural compost & drip irrigation',
+      organicPractices: 'Pesticide residue tested & verified',
+      story: `Direct farmgate listing cultivated with sustainable agricultural practices by ${farmerName}.`,
+      totalAcresGrown: '4.5 Acres',
+      fairPriceCommitment: '100% Direct to Farmer (Zero Middlemen Deductions)',
+    },
+    location: generalLocation,
+    pricePerKg: price,
+    bulkAvailable: (Number(row.quantity) || 0) >= 100,
+    bulkTiers: [
+      { minKg: 10, maxKg: 99, pricePerKg: price, savingsPercent: 0 },
+      { minKg: 100, maxKg: 499, pricePerKg: Math.max(1, Math.round(price * 0.95)), savingsPercent: 5 },
+      { minKg: 500, maxKg: null, pricePerKg: Math.max(1, Math.round(price * 0.90)), savingsPercent: 10 },
+    ],
+    priceBreakdown: {
+      consumerPricePerKg: price,
+      farmerReceivesPerKg: Math.round(price * 0.85),
+      roadLogisticsPerKg: Math.round(price * 0.10),
+      platformFeePerKg: Math.round(price * 0.05),
+      conventionalMarketPricePerKg: Math.round(price * 1.30),
+      farmerRealizationBoostPercent: 28,
+    },
+    description: row.variety
+      ? `${row.variety} • ${row.crop_name} direct from farmgate. Verified sweetness and optimal cold-chain handling.`
+      : `${row.crop_name || 'Produce'} direct from farmgate. Verified sweetness and optimal cold-chain handling.`,
+    isColdChainEligible: true,
+    tags: ['Direct Farmgate', 'Verified Traceability', `Grade ${grade}`],
+    shelfLifeDays: Number(row.shelf_life_days) || 14,
+    optimalStorageTempCelsius: 4.0,
+    nutritionHighlights: ['Farmgate Fresh', 'Naturally Grown', 'Pesticide Monitored'],
+    harvestBatchNumber: `BATCH-${String(row.id).substring(0, 8).toUpperCase()}`,
+    qualityInspectionReport: {
+      colorScore: 95,
+      firmnessScore: 92,
+      defectPercentage: 1.0,
+      inspectionDate: row.harvest_date || new Date().toISOString().split('T')[0],
+      inspectorName: 'AgriFlow Digital QA',
+    },
+  };
+}
 
 export const consumerService = {
-  // Products — Directly queries Supabase 'produce' and joins 'profiles'
+  /**
+   * Fetch all open produce listings dynamically from Supabase public.produce joined with public.profiles
+   */
   async getProducts(): Promise<ProductDetails[]> {
     try {
       const { data, error } = await supabase
@@ -29,100 +112,88 @@ export const consumerService = {
           shelf_life_days,
           image_url,
           created_at,
+          farmer_id,
           profiles:farmer_id (
             id,
             full_name,
             fpo_name,
-            location,
             state,
             district,
-            place
+            place,
+            phone
           )
         `)
         .eq('status', 'Active')
         .order('created_at', { ascending: false });
 
-      if (error || !data || data.length === 0) {
-        if (error) console.warn('Supabase getProducts warning:', error.message);
-        return mockConsumerProducts;
+      if (error) {
+        console.error('Supabase getProducts error:', error.message);
+        return [];
       }
 
-      return data.map((row: any) => {
-        const price = Number(row.asking_price) || 30;
-        const profile = row.profiles as any;
+      if (!data || data.length === 0) {
+        return [];
+      }
 
-        return {
-          id: row.id,
-          name: row.crop_name || 'Farm Harvest',
-          category: (row.category || 'Vegetables') as any,
-          image: row.image_url || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
-          grade: (row.quality_grade || 'A') as any,
-          gradeDescription: `Grade ${row.quality_grade || 'A'} Certified Farm Harvest`,
-          availableQuantityKg: Number(row.quantity) || 500,
-          minOrderQuantityKg: 10,
-          harvestDate: row.harvest_date || 'Harvested Recently',
-          freshness: 'Harvested Today',
-          freshnessScore: 'Excellent',
-          farmerStory: {
-            id: profile?.id || row.id,
-            farmerName: profile?.full_name || 'Verified Kisan Partner',
-            farmOrFpoName: profile?.fpo_name || 'Regional Agro Producer Co.',
-            farmerPhoto: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150',
-            generalLocation: row.location || profile?.location || 'Direct Farm',
-            district: profile?.district || 'Nashik',
-            state: profile?.state || 'Maharashtra',
-            mainCrops: [row.crop_name || 'Fresh Produce'],
-            harvestDate: row.harvest_date || 'Recent',
-            soilPractices: 'Natural compost & drip irrigation',
-            organicPractices: 'Pesticide residue tested',
-            story: 'Direct harvest cultivated with sustainable agricultural practices and transparent traceability.',
-            totalAcresGrown: '4.5 Acres',
-            fairPriceCommitment: '100% Direct to Farmer (Zero Middlemen Deductions)',
-          },
-          location: row.location || profile?.location || 'Regional Agricultural Cluster',
-          pricePerKg: price,
-          bulkAvailable: (Number(row.quantity) || 0) >= 500,
-          priceBreakdown: {
-            consumerPricePerKg: price,
-            farmerReceivesPerKg: Math.round(price * 0.85),
-            roadLogisticsPerKg: Math.round(price * 0.10),
-            platformFeePerKg: Math.round(price * 0.05),
-            conventionalMarketPricePerKg: Math.round(price * 1.30),
-            farmerRealizationBoostPercent: 28,
-          },
-          description: `${row.crop_name || 'Produce'} direct from farmgate. Verified sweetness and optimal cold-chain handling.`,
-          isColdChainEligible: true,
-          tags: ['Direct Farmgate', 'Verified Traceability', row.quality_grade || 'Grade A'],
-          shelfLifeDays: row.shelf_life_days || 14,
-          optimalStorageTempCelsius: 4.0,
-          nutritionHighlights: ['Farmgate Fresh', 'Naturally Grown', 'Pesticide Monitored'],
-          harvestBatchNumber: `BATCH-${row.id.substring(0, 8).toUpperCase()}`,
-          qualityInspectionReport: {
-            colorScore: 95,
-            firmnessScore: 92,
-            defectPercentage: 1.0,
-            inspectionDate: new Date().toISOString().split('T')[0],
-            inspectorName: 'AgriFlow Digital QA',
-          },
-        };
-      });
+      return data.map(mapRowToProductDetails);
     } catch (err: any) {
-      console.warn('Fallback getting products:', err?.message);
-      return mockConsumerProducts;
+      console.error('Error in consumerService.getProducts:', err?.message);
+      return [];
     }
   },
 
+  /**
+   * Fetch single product details dynamically from public.produce joined with public.profiles
+   */
   async getProductById(id: string): Promise<ProductDetails | null> {
     try {
-      const products = await this.getProducts();
-      const found = products.find(p => p.id === id);
-      return found || mockConsumerProducts.find(p => p.id === id) || mockConsumerProducts[0];
-    } catch {
-      return mockConsumerProducts.find(p => p.id === id) || mockConsumerProducts[0];
+      const { data, error } = await supabase
+        .from('produce')
+        .select(`
+          id,
+          crop_name,
+          variety,
+          category,
+          quantity,
+          unit,
+          asking_price,
+          harvest_date,
+          quality_grade,
+          location,
+          status,
+          brix,
+          shelf_life_days,
+          image_url,
+          created_at,
+          farmer_id,
+          profiles:farmer_id (
+            id,
+            full_name,
+            fpo_name,
+            state,
+            district,
+            place,
+            phone
+          )
+        `)
+        .eq('id', id)
+        .maybeSingle();
+
+      if (error || !data) {
+        if (error) console.error('Supabase getProductById error:', error.message);
+        return null;
+      }
+
+      return mapRowToProductDetails(data);
+    } catch (err: any) {
+      console.error('Failed to get product by id:', err?.message);
+      return null;
     }
   },
 
-  // Orders — Directly queries Supabase 'orders' table
+  /**
+   * Fetch real orders from Supabase public.orders table
+   */
   async getOrders(): Promise<ConsumerOrder[]> {
     try {
       const { data, error } = await supabase
@@ -131,16 +202,65 @@ export const consumerService = {
         .order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        return mockConsumerOrders;
+        if (error) console.error('Supabase getOrders error:', error.message);
+        return [];
       }
 
-      return data.map((o: any) => ({
+      return data.map((o: any): ConsumerOrder => ({
         id: o.id,
         orderDate: o.created_at ? o.created_at.substring(0, 16).replace('T', ' ') : new Date().toISOString().substring(0, 16),
-        status: o.status || 'Confirmed',
-        items: [],
-        totalQuantityKg: Number(o.quantity_kg) || 10,
-        subtotal: Number(o.total_amount) || 0,
+        status: (o.status as any) || 'Confirmed',
+        items: [
+          {
+            product: {
+              id: o.id,
+              name: o.commodity || 'Assorted Farm Harvest',
+              category: 'Vegetables',
+              image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
+              grade: 'A',
+              gradeDescription: 'Grade A Certified Farm Harvest',
+              availableQuantityKg: Number(o.quantity_kg) || 10,
+              minOrderQuantityKg: 1,
+              harvestDate: o.created_at ? o.created_at.split('T')[0] : 'Recent',
+              freshness: 'Harvested Today',
+              freshnessScore: 'Excellent',
+              farmerStory: {
+                id: 'farmer-partner',
+                farmerName: 'Verified Kisan Partner',
+                farmOrFpoName: 'Direct Regional Producer Co.',
+                farmerPhoto: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150',
+                generalLocation: o.delivery_city || 'Farmgate',
+                district: o.delivery_city || 'Regional Hub',
+                state: 'Telangana',
+                mainCrops: [o.commodity || 'Farm Harvest'],
+                harvestDate: 'Recent',
+                soilPractices: 'Sustainable compost & drip irrigation',
+                organicPractices: 'Pesticide residue tested',
+                story: 'Direct harvest order delivered via integrated cold chain corridor.',
+                totalAcresGrown: '4.5 Acres',
+                fairPriceCommitment: 'Direct Farmer Settlement',
+              },
+              location: o.delivery_city || 'Regional Depot',
+              pricePerKg: Number(o.total_amount) && Number(o.quantity_kg) ? Math.round(Number(o.total_amount) / Number(o.quantity_kg)) : 30,
+              bulkAvailable: true,
+              priceBreakdown: {
+                consumerPricePerKg: 30,
+                farmerReceivesPerKg: 25,
+                roadLogisticsPerKg: 3,
+                platformFeePerKg: 2,
+                conventionalMarketPricePerKg: 40,
+                farmerRealizationBoostPercent: 25,
+              },
+              description: `${o.commodity || 'Farm Harvest'} ordered direct from verified farm clusters.`,
+              isColdChainEligible: true,
+              tags: ['Direct Farmgate', 'Cold Chain Transport'],
+            },
+            quantityKg: Number(o.quantity_kg) || 1,
+            selectedTierPricePerKg: Number(o.total_amount) && Number(o.quantity_kg) ? Math.round(Number(o.total_amount) / Number(o.quantity_kg)) : 30,
+          }
+        ],
+        totalQuantityKg: Number(o.quantity_kg) || 0,
+        subtotal: Number(o.farmer_realization) || Number(o.total_amount) || 0,
         roadLogisticsFee: Number(o.logistics_fee) || 0,
         platformFee: Number(o.platform_fee) || 0,
         totalAmount: Number(o.total_amount) || 0,
@@ -158,131 +278,147 @@ export const consumerService = {
         logisticsId: 'TRK-CONS-ROAD-9021',
         estimatedDeliveryDate: 'Within 6 Hours',
       }));
-    } catch {
-      return mockConsumerOrders;
+    } catch (err: any) {
+      console.error('Supabase getOrders error:', err?.message);
+      return [];
     }
   },
 
+  /**
+   * Fetch single order by ID
+   */
   async getOrderById(id: string): Promise<ConsumerOrder | null> {
     try {
       const orders = await this.getOrders();
-      return orders.find(o => o.id === id) || mockConsumerOrders[0];
+      return orders.find(o => o.id === id) || null;
     } catch {
-      return mockConsumerOrders[0];
+      return null;
     }
   },
 
+  /**
+   * Create an order directly in Supabase public.orders
+   */
   async createOrder(orderData: Omit<ConsumerOrder, 'id' | 'orderDate' | 'status'>): Promise<ConsumerOrder> {
-    const newOrderId = `ORD-CONS-${Math.floor(1000 + Math.random() * 9000)}`;
+    const newOrderId = `ORD-${Date.now()}`;
+    const commodity = orderData.items?.[0]?.product?.name || 'Assorted Farm Produce';
+
+    let buyerId: string | null = null;
     try {
-      const { error } = await supabase
-        .from('orders')
-        .insert({
-          id: newOrderId,
-          commodity: orderData.items?.[0]?.product?.name || 'Assorted Farm Produce',
-          quantity_kg: orderData.totalQuantityKg,
-          total_amount: orderData.totalAmount,
-          farmer_realization: orderData.subtotal,
-          logistics_fee: orderData.roadLogisticsFee,
-          platform_fee: orderData.platformFee,
-          status: 'Escrow Locked',
-          delivery_address: orderData.deliveryAddress?.address,
-          delivery_city: orderData.deliveryAddress?.city,
-        });
-
-      if (error) {
-        console.warn('Supabase createOrder error, returning local state:', error.message);
-      }
-
-      return {
-        id: newOrderId,
-        orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
-        status: 'Confirmed',
-        ...orderData,
-        logisticsId: 'TRK-CONS-ROAD-9021',
-        estimatedDeliveryDate: 'Within 6 Hours',
-      };
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) buyerId = user.id;
     } catch {
-      return {
-        id: newOrderId,
-        orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
-        status: 'Confirmed',
-        ...orderData,
-        logisticsId: 'TRK-CONS-ROAD-9021',
-        estimatedDeliveryDate: 'Within 6 Hours',
-      };
+      // ignore
     }
+
+    const { error } = await supabase
+      .from('orders')
+      .insert({
+        id: newOrderId,
+        buyer_id: buyerId,
+        commodity,
+        quantity_kg: orderData.totalQuantityKg,
+        total_amount: orderData.totalAmount,
+        farmer_realization: orderData.subtotal,
+        logistics_fee: orderData.roadLogisticsFee,
+        platform_fee: orderData.platformFee,
+        status: 'Escrow Locked',
+        delivery_address: orderData.deliveryAddress?.address,
+        delivery_city: orderData.deliveryAddress?.city,
+      });
+
+    if (error) {
+      console.error('Supabase createOrder error:', error.message);
+      throw new Error(error.message);
+    }
+
+    return {
+      id: newOrderId,
+      orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
+      status: 'Escrow Locked',
+      ...orderData,
+      logisticsId: 'TRK-CONS-ROAD-9021',
+      estimatedDeliveryDate: 'Within 6 Hours',
+    };
   },
 
-  // Tracking
+  /**
+   * Fetch real-time cold-chain tracking details from public.logistics_trips
+   */
   async getTracking(logisticsId: string): Promise<ConsumerTracking | null> {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('logistics_trips')
         .select('*')
-        .eq('id', logisticsId)
-        .single();
+        .or(`id.eq.${logisticsId},order_id.eq.${logisticsId}`)
+        .maybeSingle();
 
-      if (data) {
-        return {
-          id: data.id,
-          orderId: data.order_id || 'ORD-001',
-          vehicleType: 'Tata 407 Reefer',
-          vehicleNumber: data.vehicle_number || 'MH-15-EG-8821',
-          driverName: data.driver_name || 'Suresh Mane',
-          driverPhone: '+91 97661 23456',
-          pickupLocation: 'Farm Harvest Gate',
-          destinationLocation: 'Wholesale Depot Bay 4',
-          currentLocationName: 'Sinnar Bypass Corridor',
-          currentCoordinates: [19.85, 73.5],
-          pickupCoordinates: [19.9975, 73.7898],
-          destinationCoordinates: [19.2183, 72.9781],
-          estimatedArrival: 'Today 04:30 PM',
-          status: 'In Transit',
-          progressPercent: 65,
-          distanceRemainingKm: 38,
-          totalDistanceKm: 120,
-          coldChainTelemetry: {
-            temperatureCelsius: Number(data.current_temp) || 4.2,
-            targetTempCelsius: Number(data.target_temp) || 4.0,
-            humidityPercent: Number(data.humidity) || 88,
-            safeWindowHours: 48,
-            safeWindowMinutes: 30,
-            riskLevel: 'Low',
-            reeferActive: true,
-            isSimulated: false,
-            explanation: 'Reefer cooling active within optimal safe preservation limits.',
-          },
-          timeline: [],
-          isSimulatedGPS: false,
-        };
+      if (error || !data) {
+        return null;
       }
-      return null;
+
+      return {
+        id: data.id,
+        orderId: data.order_id || 'ORD-001',
+        vehicleType: 'Tata 407 Reefer',
+        vehicleNumber: data.vehicle_number || 'MH-15-EG-8821',
+        driverName: data.driver_name || 'Suresh Mane',
+        driverPhone: '+91 97661 23456',
+        pickupLocation: 'Farm Harvest Gate',
+        destinationLocation: 'Wholesale Depot Bay 4',
+        currentLocationName: 'Sinnar Bypass Corridor',
+        currentCoordinates: [Number(data.current_lat) || 19.85, Number(data.current_lng) || 73.5],
+        pickupCoordinates: [19.9975, 73.7898],
+        destinationCoordinates: [19.2183, 72.9781],
+        estimatedArrival: 'Today 04:30 PM',
+        status: (data.status as any) || 'In Transit',
+        progressPercent: 65,
+        distanceRemainingKm: 38,
+        totalDistanceKm: 120,
+        coldChainTelemetry: {
+          temperatureCelsius: Number(data.current_temp) || 4.2,
+          targetTempCelsius: Number(data.target_temp) || 4.0,
+          humidityPercent: Number(data.humidity) || 88,
+          safeWindowHours: 48,
+          safeWindowMinutes: 30,
+          riskLevel: 'Low',
+          reeferActive: true,
+          isSimulated: false,
+          explanation: 'Reefer cooling active within optimal safe preservation limits.',
+        },
+        timeline: [],
+        isSimulatedGPS: false,
+      };
     } catch {
       return null;
     }
   },
 
-  // Bulk Demand
+  /**
+   * Fetch live bulk demands
+   */
   async getBulkDemands(): Promise<BulkDemand[]> {
-    return mockBulkDemands;
+    return [];
   },
 
+  /**
+   * Create bulk demand post
+   */
   async createBulkDemand(demand: Partial<BulkDemand>): Promise<BulkDemand> {
     const qty = demand.requiredQuantityKg || 1000;
     return {
-      id: `BD-${Math.floor(100 + Math.random() * 900)}`,
+      id: `BD-${Date.now()}`,
       buyerId: demand.buyerId || 'consumer-001',
-      produceName: demand.produceName || 'Tomato (Grade A)',
+      produceName: demand.produceName || 'Produce Lot',
       requiredQuantityKg: qty,
       requiredGrade: demand.requiredGrade || 'A',
-      deliveryLocation: demand.deliveryLocation || 'Bowenpally Hub, Hyderabad',
+      deliveryLocation: demand.deliveryLocation || 'Regional Distribution Hub',
       deliveryCity: demand.deliveryCity || 'Hyderabad',
       preferredDeliveryDate: demand.preferredDeliveryDate || 'Tomorrow',
-      deliveryWindow: demand.deliveryWindow || 'Morning',
+      deliveryWindow: demand.deliveryWindow || 'Morning Slot',
       maxBudgetPerKg: demand.maxBudgetPerKg || 30,
-      matchedQuantityKg: demand.matchedQuantityKg ?? Math.round(qty * 0.6),
-      remainingQuantityKg: demand.remainingQuantityKg ?? Math.round(qty * 0.4),
+      matchedQuantityKg: demand.matchedQuantityKg ?? 0,
+      remainingQuantityKg: demand.remainingQuantityKg ?? qty,
       matchedSuppliers: demand.matchedSuppliers || [],
       status: demand.status || 'Matching',
       roadRouteDetails: demand.roadRouteDetails || {
@@ -300,13 +436,40 @@ export const consumerService = {
     };
   },
 
-  // Cart
+  /**
+   * Cart operation
+   */
   async addToCart(productId: string, quantityKg: number): Promise<{ success: boolean }> {
     return { success: true };
   },
 
-  // Recommendations
+  /**
+   * Recommendations dynamically generated from open live items in public.produce
+   */
   async getRecommendations(buyerType?: string): Promise<Recommendation[]> {
-    return mockRecommendations;
+    try {
+      const products = await this.getProducts();
+      if (!products || products.length === 0) {
+        return [];
+      }
+
+      return products.slice(0, 4).map((prod): Recommendation => ({
+        id: `rec-${prod.id}`,
+        produceName: prod.name,
+        productId: prod.id,
+        headline: `Direct ${prod.grade} harvest from ${prod.farmerStory.farmerName}`,
+        explanation: `Sourced direct from ${prod.location}. Reefer cold-chain transit enabled.`,
+        grade: prod.grade,
+        freshness: prod.freshness,
+        pricePerKg: prod.pricePerKg,
+        farmerName: prod.farmerStory.farmerName,
+        distanceKm: 35,
+        matchingScorePercent: 96,
+        image: prod.image,
+        suitableBuyerTypes: ['household', 'retailer', 'restaurant', 'bulk-buyer', 'institution'],
+      }));
+    } catch {
+      return [];
+    }
   },
 };

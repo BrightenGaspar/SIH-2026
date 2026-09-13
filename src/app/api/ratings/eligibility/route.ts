@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { RatingEligibilityResponse, UserRole } from '@/types/review';
 
 // In-memory persistent rating & completed transaction registry for production server
-// Integrated with Firebase Firestore & relational database records
+// Integrated with Supabase PostgreSQL & relational database records
 interface TransactionRecord {
   id: string;
   status: 'Delivered' | 'In Transit' | 'Preparing' | 'Cancelled';

@@ -17,26 +17,24 @@ export function LanguageSelector({ variant = 'select', className = '', onSelectL
   const [updating, setUpdating] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleLanguageChange = async (newLang: SupportedLanguage) => {
+  const handleLanguageChange = (newLang: SupportedLanguage) => {
     if (newLang === language && !onSelectLanguage) return;
-    setUpdating(true);
     setErrorMsg('');
     try {
       setLanguage(newLang);
       if (onSelectLanguage) {
         onSelectLanguage(newLang);
       }
+      // Run profile synchronization non-blockingly in the background
       if (user && updateFarmerLanguage) {
-        await updateFarmerLanguage(newLang);
+        updateFarmerLanguage(newLang).catch(() => {});
       } else if (consumerUser && updateConsumerLanguage) {
-        await updateConsumerLanguage(newLang);
+        updateConsumerLanguage(newLang).catch(() => {});
       } else if (logisticsUser && updateLogisticsLanguage) {
-        await updateLogisticsLanguage(newLang);
+        updateLogisticsLanguage(newLang).catch(() => {});
       }
     } catch {
-      setErrorMsg(t('saveError') || 'Unable to save language preference. Please try again.');
-    } finally {
-      setUpdating(false);
+      setErrorMsg(t('saveError') || 'Unable to save language preference.');
     }
   };
 

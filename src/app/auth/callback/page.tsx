@@ -3,51 +3,65 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { getProfileByUserId, isProfileComplete } from '@/services/profileService';
+import { getProfileByUserId, isProfileComplete, fromDbRole, validateRole } from '@/services/profileService';
 import { Loader2 } from 'lucide-react';
 
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const roleParam = searchParams.get('role');
+  const codeParam = searchParams.get('code');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
+    let isCancelled = false;
+
     async function handleAuthCallback() {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-
-        if (error) {
-          setErrorMsg(error.message);
-          return;
-        }
-
-        if (!session?.user) {
-          const { data: retryData } = await supabase.auth.getSession();
-          if (!retryData.session?.user) {
-            router.replace('/farmer/login');
-            return;
+        // 1. If PKCE authorization code is present in URL, exchange it for a session
+        if (codeParam) {
+          const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(codeParam);
+          if (exchangeErr) {
+            console.error('PKCE exchange error:', exchangeErr);
           }
         }
 
-        const user = session?.user;
-        if (!user) {
-          router.replace('/farmer/login');
+        // 2. Poll/wait for session to be available (handles hash fragment token parsing)
+        let session = (await supabase.auth.getSession()).data.session;
+        let attempts = 0;
+        while (!session?.user && attempts < 10) {
+          attempts++;
+          await new Promise((res) => setTimeout(res, 400));
+          if (isCancelled) return;
+          const retry = await supabase.auth.getSession();
+          if (retry.data.session?.user) {
+            session = retry.data.session;
+            break;
+          }
+        }
+
+        const fallbackRole = validateRole(roleParam) || 'farmer';
+
+        if (!session?.user) {
+          router.replace(`/${fallbackRole}/login`);
           return;
         }
 
-        // Fetch persistent profile from public.profiles
+        const user = session.user;
+
+        // 3. Fetch persistent profile from public.profiles
         const profile = await getProfileByUserId(user.id);
+        const resolvedRole = fromDbRole(profile?.role || roleParam || 'consumer');
 
         if (profile && isProfileComplete(profile)) {
-          // Returning user: redirect directly to saved role dashboard
-          router.replace(`/${profile.role}/dashboard`);
+          // Returning user with completed profile: direct to role dashboard
+          router.replace(`/${resolvedRole}/dashboard`);
         } else {
-          // New user: redirect to Complete Profile screen with role context
-          const queryRole = roleParam || profile?.role || 'consumer';
-          router.replace(`/auth/complete-profile?role=${queryRole}`);
+          // New user or incomplete profile: direct to Complete Profile screen with role context
+          router.replace(`/auth/complete-profile?role=${resolvedRole}`);
         }
       } catch (err: unknown) {
+        if (isCancelled) return;
         const error = err as Error;
         console.error('OAuth Callback handling error:', error);
         setErrorMsg(error.message || 'Failed to complete OAuth sign-in');
@@ -55,7 +69,11 @@ function AuthCallbackContent() {
     }
 
     handleAuthCallback();
-  }, [router, roleParam]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [router, roleParam, codeParam]);
 
   if (errorMsg) {
     return (

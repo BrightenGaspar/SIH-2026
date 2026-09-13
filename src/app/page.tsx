@@ -21,8 +21,16 @@ export default function PublicGateway() {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.hash) {
-      if (window.location.hash.includes('access_token') || window.location.hash.includes('error')) {
+    if (typeof window !== 'undefined') {
+      const hasHash = window.location.hash && (
+        window.location.hash.includes('access_token') || 
+        window.location.hash.includes('error')
+      );
+      const hasCode = window.location.search && (
+        window.location.search.includes('code=') ||
+        window.location.search.includes('error=')
+      );
+      if (hasHash || hasCode) {
         router.replace(`/auth/callback${window.location.search}${window.location.hash}`);
       }
     }

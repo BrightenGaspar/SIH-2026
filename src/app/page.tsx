@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -10,28 +10,15 @@ import {
   Truck, 
   ArrowRight, 
   ShieldCheck, 
-  Sparkles, 
-  Play, 
   Users, 
   Globe, 
-  Leaf, 
-  Package, 
-  Radio, 
-  CheckCircle2, 
-  X,
-  Languages,
-  Activity,
-  ChevronRight
+  Leaf 
 } from 'lucide-react';
 import { useBandwidth } from '@/context/BandwidthContext';
-import { LanguageSelector } from '@/components/common/LanguageSelector';
-import { ConnectionIndicator } from '@/components/common/ConnectionIndicator';
 
 export default function PublicGateway() {
   const router = useRouter();
-  const { isLowBandwidth, setLowBandwidth } = useBandwidth();
-  const [videoModalOpen, setVideoModalOpen] = useState(false);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const { isLowBandwidth } = useBandwidth();
 
   // Preserve OAuth callback token forwarding
   useEffect(() => {
@@ -121,96 +108,8 @@ export default function PublicGateway() {
         </div>
       )}
 
-      {/* 2. TOP NAVIGATION */}
-      <header className="sticky top-0 z-40 bg-[#F8FAF3]/90 backdrop-blur-md border-b border-[#E7EFE0]/80 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          
-          {/* Logo & Tagline */}
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-full bg-[#185E32] text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                <Sprout className="w-5 h-5" />
-              </div>
-              <span className="text-2xl font-black text-[#153820] tracking-tight">
-                AgriFlow
-              </span>
-            </Link>
-
-            <span className="hidden lg:inline-flex items-center text-xs text-[#526D57] font-medium pl-3 border-l border-[#D6E2CE]">
-              Better Farming &bull; Better Food &bull; Brighter Future
-            </span>
-          </div>
-
-          {/* Center Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold">
-            <Link href="/" className="text-[#153820] font-bold relative pb-1">
-              <span>Home</span>
-              <span className="block absolute bottom-0 left-0 right-0 h-0.5 bg-[#185E32] rounded-full" />
-            </Link>
-            <a href="#about" onClick={scrollToRoles} className="text-[#526D57] hover:text-[#153820] transition">
-              About
-            </a>
-            <a href="#features" onClick={scrollToRoles} className="text-[#526D57] hover:text-[#153820] transition">
-              Features
-            </a>
-            <a href="#contact" onClick={scrollToRoles} className="text-[#526D57] hover:text-[#153820] transition">
-              Contact
-            </a>
-          </nav>
-
-          {/* Right Action Controls */}
-          <div className="flex items-center gap-3">
-            <ConnectionIndicator />
-            <LanguageSelector variant="compact" />
-
-            {/* Low Bandwidth Mode Toggle */}
-            <div className="hidden sm:flex items-center bg-white border border-[#DCE7D6] rounded-full p-1 shadow-2xs">
-              <button
-                type="button"
-                onClick={() => setLowBandwidth(false)}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
-                  !isLowBandwidth ? 'bg-[#185E32] text-white shadow-xs' : 'text-[#526D57] hover:text-slate-900'
-                }`}
-                title="Normal Visual Mode"
-              >
-                Normal
-              </button>
-              <button
-                type="button"
-                onClick={() => setLowBandwidth(true)}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
-                  isLowBandwidth ? 'bg-[#185E32] text-white shadow-xs' : 'text-[#526D57] hover:text-slate-900'
-                }`}
-                title="Low Bandwidth Mode"
-              >
-                <Radio className={`w-3 h-3 ${isLowBandwidth ? 'animate-pulse' : ''}`} />
-                <span>2G/3G</span>
-              </button>
-            </div>
-
-            {/* Login Pill Button */}
-            <button
-              type="button"
-              onClick={() => setLoginModalOpen(true)}
-              className="px-5 py-2 rounded-full border border-[#185E32] text-[#185E32] hover:bg-[#EDF5EB] font-bold text-xs transition shadow-2xs cursor-pointer"
-            >
-              Login
-            </button>
-
-            {/* Get Started Pill Button */}
-            <button
-              type="button"
-              onClick={scrollToRoles}
-              className="px-5 py-2 rounded-full bg-[#185E32] hover:bg-[#134D28] text-white font-bold text-xs shadow-xs hover:shadow-sm transition cursor-pointer"
-            >
-              Get Started
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* 3. HERO SECTION */}
-      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 sm:pt-12 sm:pb-16">
+      {/* 2. HERO SECTION */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12 sm:pt-14 sm:pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column: Heading, Subtitle, Buttons, Benefits */}
@@ -250,17 +149,6 @@ export default function PublicGateway() {
               >
                 <span>Get Started</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setVideoModalOpen(true)}
-                className="px-6 py-2.5 rounded-full bg-white border-2 border-[#288E4B] text-[#1D5E34] hover:bg-[#F2F8F3] font-bold text-sm shadow-xs transition flex items-center gap-2 cursor-pointer"
-              >
-                <div className="w-5 h-5 rounded-full bg-[#185E32] text-white flex items-center justify-center">
-                  <Play className="w-2.5 h-2.5 fill-white translate-x-0.5" />
-                </div>
-                <span>Watch Video</span>
               </button>
             </div>
 
@@ -320,18 +208,6 @@ export default function PublicGateway() {
           {/* Right Column: Organic Curved Visual with Indian Farmer & Fresh Harvest */}
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             
-            {/* Top-Right Floating Handwritten / Script Callout */}
-            <div className="absolute -top-6 right-2 sm:right-6 z-20 text-right">
-              <p className="font-serif italic font-bold text-base sm:text-lg lg:text-xl text-[#1E522B] leading-tight drop-shadow-2xs">
-                Healthy Food<br />
-                Happy People<br />
-                A Greener Tomorrow
-              </p>
-              <svg className="w-28 sm:w-36 h-3 ml-auto mt-1" viewBox="0 0 160 12" fill="none">
-                <path d="M5 8 C50 2, 110 2, 155 9" stroke="#2B7F43" strokeWidth="2.5" strokeLinecap="round" />
-              </svg>
-            </div>
-
             {/* Organic Curved Container Framing the Farmer Photo */}
             <div className="relative rounded-[36px] sm:rounded-[48px] overflow-hidden shadow-xl border-4 border-white/90 bg-[#EBF2E5]">
               {!isLowBandwidth ? (
@@ -581,142 +457,6 @@ export default function PublicGateway() {
           &copy; {new Date().getFullYear()} AgriFlow AI &bull; Ministry of Agriculture &amp; Farmers Welfare Hackathon Edition
         </p>
       </footer>
-
-      {/* MODAL: INTERACTIVE WATCH VIDEO */}
-      {videoModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
-        >
-          <div className="bg-white rounded-3xl border border-[#DCE7D6] shadow-2xl max-w-xl w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#185E32] text-white flex items-center justify-center">
-                  <Play className="w-3.5 h-3.5 fill-white translate-x-0.5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900">AgriFlow Farm-to-Table Cold Chain</h3>
-                  <p className="text-[11px] text-slate-500">Live IoT Telemetry &amp; Mandi Aggregation</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setVideoModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="relative rounded-2xl bg-slate-900 text-white p-6 space-y-4 overflow-hidden aspect-video flex flex-col justify-center items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-emerald-600/30 border border-emerald-400/50 flex items-center justify-center text-emerald-400 animate-pulse">
-                <Activity className="w-7 h-7" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-emerald-300">Live IoT Cold Chain Simulation Active</p>
-                <p className="text-xs text-slate-300 mt-1 max-w-md">
-                  Corridor: Shadnagar Farmgate &rarr; Bowenpally APMC wholesale terminal. Reefer temp target: 4&deg;C - 8&deg;C.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-2 text-xs text-slate-500">
-              <span>Verified Direct Kisan Sourcing Platform</span>
-              <button
-                type="button"
-                onClick={() => setVideoModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-[#185E32] text-white font-bold hover:bg-[#134D28] transition cursor-pointer"
-              >
-                Done Watching
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL: LOGIN PORTAL SELECTOR */}
-      {loginModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150"
-        >
-          <div className="bg-white rounded-3xl border border-[#DCE7D6] shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#185E32] text-white flex items-center justify-center">
-                  <Sprout className="w-4 h-4" />
-                </div>
-                <h3 className="text-sm font-bold text-slate-900">Select Login Portal</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setLoginModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
-                aria-label="Close modal"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-2.5">
-              <Link
-                href="/farmer/login"
-                onClick={() => setLoginModalOpen(false)}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F4F9F4] border border-[#D5EAD7] hover:border-[#185E32] transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#185E32] text-white flex items-center justify-center">
-                    <Sprout className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-[#185E32]">Farmer Login</h4>
-                    <p className="text-[11px] text-slate-500">Produce sales &amp; group pooling</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#185E32] group-hover:translate-x-0.5 transition" />
-              </Link>
-
-              <Link
-                href="/consumer/login"
-                onClick={() => setLoginModalOpen(false)}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#F2F7FD] border border-[#CCE0F9] hover:border-[#1D63D8] transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#1D63D8] text-white flex items-center justify-center">
-                    <Store className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-[#1D63D8]">Consumer / Buyer Login</h4>
-                    <p className="text-[11px] text-slate-500">Fresh produce marketplace</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#1D63D8] group-hover:translate-x-0.5 transition" />
-              </Link>
-
-              <Link
-                href="/logistics/login"
-                onClick={() => setLoginModalOpen(false)}
-                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FCF9F0] border border-[#F5E8C4] hover:border-[#B8710B] transition group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#B8710B] text-white flex items-center justify-center">
-                    <Truck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-[#B8710B]">Logistics Fleet Login</h4>
-                    <p className="text-[11px] text-slate-500">Trip dispatch &amp; telemetry</p>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-[#B8710B] group-hover:translate-x-0.5 transition" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }

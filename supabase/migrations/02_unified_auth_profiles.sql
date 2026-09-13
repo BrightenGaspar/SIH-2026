@@ -29,10 +29,10 @@ CREATE POLICY "Users can view own profile"
   ON public.profiles FOR SELECT
   USING (auth.uid() = id);
 
--- Strict: Authenticated users can only insert their own profile linked to their auth user ID
+-- Strict: Authenticated users can insert their profile, and the signup trigger can initialize it
 CREATE POLICY "Users can insert own profile"
   ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid() = id);
+  WITH CHECK (auth.uid() = id OR auth.uid() IS NULL);
 
 -- Strict: Authenticated users can only update their own profile
 CREATE POLICY "Users can update own profile"
@@ -82,7 +82,10 @@ GRANT EXECUTE ON FUNCTION public.resolve_username_to_email(TEXT) TO anon, authen
 
 -- 6. Safe Profile Trigger on auth.users: Auto-link auth.users.id -> public.profiles.id
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER 
+SECURITY DEFINER
+SET search_path = public
+LANGUAGE plpgsql AS $$
 BEGIN
   INSERT INTO public.profiles (id, full_name, role, phone, email, place, area, username)
   VALUES (
@@ -95,15 +98,10 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'area', ''),
     NULLIF(trim(COALESCE(NEW.raw_user_meta_data->>'username', '')), '')
   )
-  ON CONFLICT (id) DO UPDATE
-  SET
-    full_name = CASE WHEN EXCLUDED.full_name <> '' AND (public.profiles.full_name IS NULL OR public.profiles.full_name = '') THEN EXCLUDED.full_name ELSE public.profiles.full_name END,
-    phone = CASE WHEN EXCLUDED.phone <> '' AND (public.profiles.phone IS NULL OR public.profiles.phone = '') THEN EXCLUDED.phone ELSE public.profiles.phone END,
-    email = CASE WHEN EXCLUDED.email <> '' AND (public.profiles.email IS NULL OR public.profiles.email = '') THEN EXCLUDED.email ELSE public.profiles.email END,
-    updated_at = now();
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created

@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Sprout, 
   Store, 
@@ -17,6 +18,15 @@ import { LanguageSelector } from '@/components/common/LanguageSelector';
 import { ConnectionIndicator } from '@/components/common/ConnectionIndicator';
 
 export default function PublicGateway() {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash) {
+      if (window.location.hash.includes('access_token') || window.location.hash.includes('error')) {
+        router.replace(`/auth/callback${window.location.search}${window.location.hash}`);
+      }
+    }
+  }, [router]);
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between selection:bg-emerald-500 selection:text-white font-sans">
       

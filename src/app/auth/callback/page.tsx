@@ -59,13 +59,13 @@ function AuthCallbackContent() {
 
   if (errorMsg) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4">
-        <div className="bg-rose-950/40 border border-rose-500/50 text-rose-300 p-6 rounded-2xl max-w-md text-center space-y-3">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col items-center justify-center p-4">
+        <div className="bg-white border border-rose-200 shadow-sm text-rose-700 p-6 rounded-2xl max-w-md text-center space-y-3">
           <p className="font-bold text-sm">Authentication Error</p>
-          <p className="text-xs text-rose-400">{errorMsg}</p>
+          <p className="text-xs text-rose-600">{errorMsg}</p>
           <button
             onClick={() => router.replace('/farmer/login')}
-            className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl transition"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition"
           >
             Return to Login
           </button>
@@ -75,9 +75,9 @@ function AuthCallbackContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
-      <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-3" />
-      <p className="text-xs text-slate-400">Completing secure authentication...</p>
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-900">
+      <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mb-3" />
+      <p className="text-xs text-slate-600 font-medium">Completing secure authentication...</p>
     </div>
   );
 }
@@ -86,9 +86,9 @@ export default function AuthCallbackPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-3" />
-          <p className="text-xs text-slate-400">Loading authentication...</p>
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-900">
+          <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mb-3" />
+          <p className="text-xs text-slate-600 font-medium">Loading authentication...</p>
         </div>
       }
     >

@@ -1,12 +1,12 @@
 -- Migration: 03_fast2sms_auth_hook.sql
--- Description: Native Supabase Auth Send SMS Hook using Fast2SMS Gateway via pg_net.
+-- Description: Native Supabase Auth Send SMS Hook with jsonb argument and jsonb return type.
 
--- 1. Enable pg_net extension if not already active
+-- 1. Enable pg_net extension
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
--- 2. Define the Send SMS hook function
+-- 2. Define the Send SMS hook function returning jsonb
 CREATE OR REPLACE FUNCTION public.send_sms(event jsonb)
-RETURNS void AS $$
+RETURNS jsonb AS $$
 DECLARE
   raw_phone text;
   clean_phone text;
@@ -15,7 +15,7 @@ BEGIN
   raw_phone := event->'user'->>'phone';
   otp_code := event->'sms'->>'otp';
 
-  -- Normalize to 10-digit Indian mobile number
+  -- Normalize to 10-digit Indian phone number
   clean_phone := regexp_replace(raw_phone, '\D', '', 'g');
   IF length(clean_phone) = 12 AND clean_phone LIKE '91%' THEN
     clean_phone := substr(clean_phone, 3);
@@ -36,6 +36,8 @@ BEGIN
       'numbers', clean_phone
     )
   );
+
+  RETURN '{}'::jsonb;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

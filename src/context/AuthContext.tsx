@@ -12,6 +12,8 @@ import {
   upsertProfile,
   resolveUsernameToEmail,
   generateUniqueUsername,
+  toDbRole,
+  fromDbRole,
 } from '@/services/profileService';
 
 interface AuthContextType {
@@ -228,7 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         options: {
           data: {
             full_name: extraData?.name || '',
-            role: extraData?.role || 'consumer',
+            role: toDbRole(extraData?.role || 'consumer'),
           },
         },
       });
@@ -473,8 +475,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         // 2. Register user via real Supabase Auth
         const cleanPhone = (profileData.phone || '').replace(/\D/g, '');
-        const authEmail = profileData.email?.trim() || (cleanPhone ? `${cleanPhone}@agriflow.local` : `${role}_${Date.now()}@agriflow.local`);
+        const authEmail = profileData.email?.trim() || (cleanPhone ? `${cleanPhone}@agriflow.in` : `${role}_${Date.now()}@agriflow.in`);
         const authPass = profileData.password?.trim() || 'AgriFlow@2026';
+        const dbRole = toDbRole(role);
 
         let { data: authData, error: authError } = await supabase.auth.signUp({
           email: authEmail,
@@ -482,7 +485,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           options: {
             data: {
               full_name: profileData.fullName,
-              role: role,
+              role: dbRole,
               phone: profileData.phone || '',
             },
           },

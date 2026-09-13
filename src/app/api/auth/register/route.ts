@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { generateUniqueUsername, upsertProfile, validateRole } from '@/services/profileService';
+import { generateUniqueUsername, upsertProfile, validateRole, toDbRole } from '@/services/profileService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
 
     const resolvedFullName = (full_name || fullName || email.split('@')[0]).trim();
     const validatedRole = validateRole(role) || 'farmer';
+    const dbRole = toDbRole(validatedRole);
 
     // 1. Sign up user via Supabase Auth SDK
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
       options: {
         data: {
           full_name: resolvedFullName,
-          role: validatedRole,
+          role: dbRole,
           phone: phone || '',
         },
       },

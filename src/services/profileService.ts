@@ -19,6 +19,28 @@ export interface UserProfile {
 }
 
 /**
+ * Maps frontend role ('consumer') to database allowed role ('buyer')
+ * to guarantee compliance with PostgreSQL check constraint 'profiles_role_check'.
+ */
+export function toDbRole(role: string | null | undefined): string {
+  if (!role) return 'buyer';
+  const clean = role.trim().toLowerCase();
+  if (clean === 'consumer') return 'buyer';
+  return clean;
+}
+
+/**
+ * Maps database role ('buyer') back to frontend role ('consumer').
+ */
+export function fromDbRole(role: string | null | undefined): UserRole {
+  if (!role) return 'consumer';
+  const clean = role.trim().toLowerCase();
+  if (clean === 'buyer') return 'consumer';
+  if (clean === 'farmer' || clean === 'logistics') return clean as UserRole;
+  return 'consumer';
+}
+
+/**
  * Checks whether a user profile has all mandatory fields populated.
  * Section 7: A profile is complete when ALL of these are present and non-empty:
  * - full_name
@@ -29,13 +51,13 @@ export interface UserProfile {
  */
 export function isProfileComplete(profile: Partial<UserProfile> | null | undefined): boolean {
   if (!profile) return false;
+  const normalizedRole = fromDbRole(profile.role);
   return Boolean(
     profile.full_name &&
     profile.full_name.trim().length > 0 &&
     profile.username &&
     profile.username.trim().length > 0 &&
-    profile.role &&
-    ['farmer', 'consumer', 'logistics'].includes(profile.role) &&
+    ['farmer', 'consumer', 'logistics'].includes(normalizedRole) &&
     profile.place &&
     profile.place.trim().length > 0 &&
     profile.area &&
@@ -60,7 +82,12 @@ export async function getProfileByUserId(userId: string): Promise<UserProfile | 
       console.warn('Error fetching profile for user ID:', userId, error.message);
       return null;
     }
-    return data as UserProfile | null;
+    if (data) {
+      const p = data as any;
+      p.role = fromDbRole(p.role);
+      return p as UserProfile;
+    }
+    return null;
   } catch (err) {
     console.warn('getProfileByUserId exception:', err);
     return null;
@@ -150,12 +177,14 @@ export async function upsertProfile(
       }
     }
 
+    const targetDbRole = toDbRole(profileData.role || 'consumer');
+
     const payload: Record<string, unknown> = {
       id: profileData.id,
       full_name: profileData.full_name?.trim() || '',
       place: profileData.place?.trim() || '',
       area: profileData.area?.trim() || '',
-      role: profileData.role || 'consumer',
+      role: targetDbRole,
       updated_at: new Date().toISOString(),
     };
 
@@ -189,27 +218,40 @@ export async function upsertProfile(
         if (fbError) {
           return { profile: null, error: fbError.message };
         }
-        return { profile: fallbackData as UserProfile, error: null };
+        if (fallbackData) {
+          const p = fallbackData as any;
+          p.role = fromDbRole(p.role);
+          return { profile: p as UserProfile, error: null };
+        }
       }
       return { profile: null, error: error.message };
     }
 
-    return { profile: data as UserProfile, error: null };
+    if (data) {
+      const p = data as any;
+      p.role = fromDbRole(p.role);
+      return { profile: p as UserProfile, error: null };
+    }
+    return { profile: null, error: null };
   } catch (err: unknown) {
     const error = err as Error;
     return { profile: null, error: error.message || 'Failed to save profile' };
   }
 }
 
-export const VALID_ROLES: UserRole[] = ['farmer', 'consumer', 'logistics'];
+export const VALID_ROLES: (UserRole | 'buyer')[] = ['farmer', 'consumer', 'buyer', 'logistics'];
 
 /**
  * Validate that a role is strictly one of the allowed roles.
+ * Automatically normalizes 'buyer' to 'consumer' for frontend routing.
  */
 export function validateRole(roleInput: string | null | undefined): UserRole | null {
   if (!roleInput) return null;
   const normalized = roleInput.trim().toLowerCase();
-  if (VALID_ROLES.includes(normalized as UserRole)) {
+  if (normalized === 'buyer' || normalized === 'consumer') {
+    return 'consumer';
+  }
+  if (normalized === 'farmer' || normalized === 'logistics') {
     return normalized as UserRole;
   }
   return null;

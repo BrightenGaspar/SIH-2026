@@ -91,7 +91,7 @@ BEGIN
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', ''),
-    COALESCE(NEW.raw_user_meta_data->>'role', 'consumer'),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'buyer'),
     COALESCE(NEW.phone, NEW.raw_user_meta_data->>'phone', ''),
     COALESCE(NEW.email, NEW.raw_user_meta_data->>'email', ''),
     COALESCE(NEW.raw_user_meta_data->>'place', ''),
@@ -107,3 +107,8 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 7. Ensure check constraint accepts all roles (farmer, consumer, buyer, logistics, admin)
+ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
+ALTER TABLE public.profiles ADD CONSTRAINT profiles_role_check CHECK (role IN ('farmer', 'consumer', 'buyer', 'logistics', 'admin'));
+

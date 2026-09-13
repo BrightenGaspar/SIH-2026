@@ -1,26 +1,37 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { User as FarmerUser } from '@/types/farmer';
 import { ConsumerUser } from '@/types/consumer';
 import { LogisticsOperator } from '@/types/logistics';
-import { apiClient } from '@/lib/apiClient';
 import { supabase } from '@/lib/supabase';
+import {
+  UserProfile,
+  getProfileByUserId,
+  isProfileComplete,
+  upsertProfile,
+  resolveUsernameToEmail,
+} from '@/services/profileService';
 
 interface AuthContextType {
   user: FarmerUser | null;
   consumerUser: ConsumerUser | null;
   logisticsUser: LogisticsOperator | null;
+  currentProfile: UserProfile | null;
   isAuthenticated: boolean;
   isConsumerAuthenticated: boolean;
   isLogisticsAuthenticated: boolean;
   isLoading: boolean;
   login: (identifier: string, pass: string) => Promise<boolean>;
   register: (data: Partial<FarmerUser>) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   loginConsumer: (identifier: string, pass: string) => Promise<boolean>;
   registerConsumer: (data: Partial<ConsumerUser>) => Promise<boolean>;
-  logoutConsumer: () => void;
+  logoutConsumer: () => Promise<void>;
+  loginLogistics: (identifier: string, pass: string) => Promise<boolean>;
+  registerLogistics: (data: Partial<LogisticsOperator>) => Promise<boolean>;
+  logoutLogistics: () => Promise<void>;
+  loginWithUsernamePassword: (identifier: string, pass: string) => Promise<{ success: boolean; role?: string }>;
   updateFarmerLanguage: (lang: string) => Promise<boolean>;
   updateConsumerLanguage: (lang: string) => Promise<boolean>;
   updateLogisticsLanguage: (lang: string) => Promise<boolean>;
@@ -28,509 +39,178 @@ interface AuthContextType {
   updateConsumerProfile: (data: Partial<ConsumerUser>) => Promise<boolean>;
   updateLogisticsProfile: (data: Partial<LogisticsOperator>) => Promise<boolean>;
   refreshUserProfile: () => Promise<void>;
-  loginLogistics: (identifier: string, pass: string) => Promise<boolean>;
-  registerLogistics: (data: Partial<LogisticsOperator>) => Promise<boolean>;
-  logoutLogistics: () => void;
-  sendPhoneOtp: (phoneNumber: string, extraData?: { name?: string; role?: string }) => Promise<{ success: boolean; simulated?: boolean; message?: string }>;
+  sendPhoneOtp: (
+    phoneNumber: string,
+    extraData?: { name?: string; role?: string }
+  ) => Promise<{ success: boolean; message?: string }>;
   verifyPhoneOtp: (
     phoneNumber: string,
     otpCode: string,
-    role: 'farmer' | 'consumer' | 'logistics' | 'fpo',
-    extraData?: { name?: string; phone?: string; state?: string; district?: string; place?: string; preferredLanguage?: any }
-  ) => Promise<void>;
-  loginWithGoogle: (role: 'farmer' | 'consumer' | 'logistics' | 'fpo') => Promise<{ profileCompleted: boolean }>;
-  loginWithDemo: (role: string, name?: string, phone?: string) => Promise<void>;
+    role?: 'farmer' | 'consumer' | 'logistics' | 'fpo'
+  ) => Promise<{ isReturningUser: boolean; role?: string }>;
+  loginWithGoogle: (role: 'farmer' | 'consumer' | 'logistics' | 'fpo') => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function normalizeToFarmer(p: UserProfile): FarmerUser {
+  return {
+    id: p.id,
+    name: p.full_name,
+    phone: p.phone || '',
+    email: p.email || '',
+    role: 'farmer',
+    state: p.state || '',
+    district: p.district || '',
+    place: p.place || '',
+    preferredLanguage: 'te',
+    location: `${p.place || ''}, ${p.area || ''}`.replace(/^, |, $/g, ''),
+    farmName: p.fpo_name || `${p.full_name}'s Farm`,
+    farmerType: p.fpo_name ? 'FPO' : 'Individual Farmer',
+    profileCompleted: true,
+    createdAt: p.created_at || new Date().toISOString(),
+  };
+}
+
+function normalizeToConsumer(p: UserProfile): ConsumerUser {
+  return {
+    id: p.id,
+    name: p.full_name,
+    phone: p.phone || '',
+    email: p.email || '',
+    role: 'consumer',
+    state: p.state || '',
+    district: p.district || '',
+    place: p.place || '',
+    preferredLanguage: 'en',
+    location: `${p.place || ''}, ${p.area || ''}`.replace(/^, |, $/g, ''),
+    buyerType: 'household',
+    profileCompleted: true,
+    createdAt: p.created_at || new Date().toISOString(),
+  };
+}
+
+function normalizeToLogistics(p: UserProfile): LogisticsOperator {
+  return {
+    id: p.id,
+    name: p.full_name,
+    phone: p.phone || '',
+    email: p.email || '',
+    role: 'logistics',
+    state: p.state || '',
+    district: p.district || '',
+    place: p.place || '',
+    preferredLanguage: 'en',
+    vehicleType: 'Tata 407 Reefer',
+    vehicleNumber: 'TS 08 UB 4192',
+    vehicleCapacityKg: 5000,
+    reeferEnabled: true,
+    operatingRegion: `${p.place || ''}, ${p.area || ''}`.replace(/^, |, $/g, ''),
+    preferredRoutes: [],
+    profileCompleted: true,
+    createdAt: p.created_at || new Date().toISOString(),
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<FarmerUser | null>(null);
   const [consumerUser, setConsumerUser] = useState<ConsumerUser | null>(null);
   const [logisticsUser, setLogisticsUser] = useState<LogisticsOperator | null>(null);
+  const [currentProfile, setCurrentProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    // Restore session from sessionStorage if tab is active; closing the browser resets session
-    if (typeof window !== 'undefined') {
-      const storedFarmer = sessionStorage.getItem('agriflow_farmer_auth');
-      if (storedFarmer) {
-        try { setUser(JSON.parse(storedFarmer)); } catch { setUser(null); }
-      }
+  // Hydrate user role state from a verified Supabase database profile
+  const applyProfileState = useCallback((profile: UserProfile | null) => {
+    setCurrentProfile(profile);
 
-      const storedConsumer = sessionStorage.getItem('agriflow_consumer_auth');
-      if (storedConsumer) {
-        try { setConsumerUser(JSON.parse(storedConsumer)); } catch { setConsumerUser(null); }
-      }
-
-      const storedLogistics = sessionStorage.getItem('agriflow_logistics_auth');
-      if (storedLogistics) {
-        try { setLogisticsUser(JSON.parse(storedLogistics)); } catch { setLogisticsUser(null); }
-      }
+    if (!profile || !isProfileComplete(profile)) {
+      setUser(null);
+      setConsumerUser(null);
+      setLogisticsUser(null);
+      return;
     }
-    
-    // Fetch real profile from backend as source of truth
-    refreshUserProfile().finally(() => {
-      setIsLoading(false);
-    });
+
+    if (profile.role === 'farmer') {
+      setUser(normalizeToFarmer(profile));
+      setConsumerUser(null);
+      setLogisticsUser(null);
+    } else if (profile.role === 'consumer') {
+      setUser(null);
+      setConsumerUser(normalizeToConsumer(profile));
+      setLogisticsUser(null);
+    } else if (profile.role === 'logistics') {
+      setUser(null);
+      setConsumerUser(null);
+      setLogisticsUser(normalizeToLogistics(profile));
+    }
   }, []);
 
-  // Source of Truth: GET /api/auth/me to sync preferredLanguage and locations
-  const refreshUserProfile = async () => {
+  // Fetch real persistent profile from Supabase Database (Source of Truth)
+  const refreshUserProfile = useCallback(async () => {
     try {
-      const token = typeof window !== 'undefined' ? sessionStorage.getItem('agriflow_auth_token') : null;
-      if (!token) return;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        applyProfileState(null);
+        return;
+      }
 
-      const profile = await apiClient<{
-        id: string;
-        name: string;
-        role: 'farmer' | 'consumer' | 'logistics' | 'fpo';
-        state?: string;
-        district?: string;
-        place?: string;
-        preferredLanguage?: any;
-        phone?: string;
-        email?: string;
-        farmName?: string;
-        location?: string;
-        buyerType?: any;
-        vehicleType?: any;
-        vehicleNumber?: any;
-      }>('/api/auth/me');
+      const profile = await getProfileByUserId(session.user.id);
+      applyProfileState(profile);
+    } catch (err) {
+      console.warn('refreshUserProfile error:', err);
+      applyProfileState(null);
+    }
+  }, [applyProfileState]);
 
-      if (profile) {
-        if (profile.role === 'farmer' || profile.role === 'fpo') {
-          const updatedFarmer: FarmerUser = {
-            id: profile.id,
-            name: profile.name,
-            phone: profile.phone || '',
-            email: profile.email || '',
-            role: 'farmer',
-            state: profile.state,
-            district: profile.district,
-            place: profile.place,
-            preferredLanguage: profile.preferredLanguage,
-            farmName: profile.farmName,
-            location: profile.location || `${profile.place || ''}, ${profile.district || ''}, ${profile.state || ''}`.replace(/^, |, $/g, ''),
-            farmerType: 'FPO',
-          };
-          setUser(updatedFarmer);
-          sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(updatedFarmer));
-          if (profile.preferredLanguage) {
-            sessionStorage.setItem('agriflow_cached_lang', profile.preferredLanguage);
+  // Listen to Supabase Auth lifecycle events
+  useEffect(() => {
+    let mounted = true;
+
+    async function initAuth() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user && mounted) {
+          const profile = await getProfileByUserId(session.user.id);
+          if (mounted) {
+            applyProfileState(profile);
           }
-        } else if (profile.role === 'consumer') {
-          const updatedConsumer: ConsumerUser = {
-            id: profile.id,
-            name: profile.name,
-            phone: profile.phone || '',
-            email: profile.email || '',
-            role: 'consumer',
-            state: profile.state,
-            district: profile.district,
-            place: profile.place,
-            preferredLanguage: profile.preferredLanguage,
-            location: profile.location || `${profile.place || ''}, ${profile.district || ''}, ${profile.state || ''}`,
-            buyerType: profile.buyerType || 'bulk-buyer',
-            createdAt: new Date().toISOString(),
-          };
-          setConsumerUser(updatedConsumer);
-          sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(updatedConsumer));
-          if (profile.preferredLanguage) {
-            sessionStorage.setItem('agriflow_cached_lang', profile.preferredLanguage);
-          }
-        } else if (profile.role === 'logistics') {
-          const updatedLogistics: LogisticsOperator = {
-            id: profile.id,
-            name: profile.name,
-            phone: profile.phone || '',
-            email: profile.email || '',
-            role: 'logistics',
-            state: profile.state,
-            district: profile.district,
-            place: profile.place,
-            preferredLanguage: profile.preferredLanguage,
-            vehicleType: profile.vehicleType || 'Tata 407 Reefer',
-            vehicleNumber: profile.vehicleNumber || 'TS 08 UB 4192',
-            vehicleCapacityKg: 5000,
-            reeferEnabled: true,
-            operatingRegion: profile.state ? `${profile.state} Corridor` : 'Freight Corridor',
-            preferredRoutes: ['Shadnagar -> Hyderabad'],
-            createdAt: new Date().toISOString(),
-          };
-          setLogisticsUser(updatedLogistics);
-          sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(updatedLogistics));
-          if (profile.preferredLanguage) {
-            sessionStorage.setItem('agriflow_cached_lang', profile.preferredLanguage);
-          }
+        } else if (mounted) {
+          applyProfileState(null);
+        }
+      } catch (err) {
+        console.warn('initAuth error:', err);
+      } finally {
+        if (mounted) {
+          setIsLoading(false);
         }
       }
-    } catch {
-      // Backend not connected or unauthenticated; retain loaded session or fallback
     }
-  };
 
-  const login = async (identifier: string, pass: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient<{ user: FarmerUser; token: string }>('/api/auth/farmer/login', {
-        method: 'POST',
-        body: JSON.stringify({ identifier, password: pass }),
-      });
-      setUser(res.user);
-      sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(res.user));
-      if (res.user.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', res.user.preferredLanguage);
+    initAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+        if (session?.user) {
+          const profile = await getProfileByUserId(session.user.id);
+          applyProfileState(profile);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        applyProfileState(null);
       }
-      if (res.token) sessionStorage.setItem('agriflow_auth_token', res.token);
-      return true;
-    } catch {
-      const fallbackUser: FarmerUser = {
-        id: 'farmer-001',
-        name: 'Ramesh Reddy',
-        phone: identifier,
-        email: 'ramesh.reddy@fpo.in',
-        role: 'farmer',
-        state: 'Telangana',
-        district: 'Rangareddy',
-        place: 'Shadnagar',
-        preferredLanguage: 'te',
-        location: 'Shadnagar, Rangareddy, Telangana',
-        farmName: 'Shadnagar Farmers Collective',
-        farmerType: 'FPO',
-        createdAt: new Date().toISOString(),
-      };
-      setUser(fallbackUser);
-      sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(fallbackUser));
-      sessionStorage.setItem('agriflow_cached_lang', 'te');
-      return true;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    });
 
-  const register = async (data: Partial<FarmerUser>): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient<{ user: FarmerUser; token: string }>('/api/auth/farmer/register', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      setUser(res.user);
-      sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(res.user));
-      if (res.user.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', res.user.preferredLanguage);
-      }
-      if (res.token) sessionStorage.setItem('agriflow_auth_token', res.token);
-      return true;
-    } catch {
-      const newUser: FarmerUser = {
-        role: 'farmer',
-        id: 'farmer-' + Math.random().toString(36).substring(2, 7),
-        name: data.name || 'New Farmer',
-        phone: data.phone || '',
-        email: data.email || '',
-        state: data.state || 'Telangana',
-        district: data.district || 'Rangareddy',
-        place: data.place || 'Chevella',
-        preferredLanguage: data.preferredLanguage || 'te',
-        farmName: data.farmName || '',
-        location: data.location || `${data.place || 'Chevella'}, ${data.district || 'Rangareddy'}, ${data.state || 'Telangana'}`,
-        farmerType: data.farmerType || 'Individual Farmer',
-        farmSize: data.farmSize || '5 Acres',
-        primaryCrops: data.primaryCrops || ['Tomato'],
-        createdAt: new Date().toISOString(),
-      };
-      setUser(newUser);
-      sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(newUser));
-      if (newUser.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', newUser.preferredLanguage);
-      }
-      return true;
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [applyProfileState]);
 
-  const updateFarmerProfile = async (data: Partial<FarmerUser>): Promise<boolean> => {
-    if (!user) return false;
-    const updated = { ...user, ...data };
-    try {
-      await apiClient('/api/auth/profile', {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
-    } catch {
-      // Offline / fallback persistence
-    }
-    setUser(updated);
-    sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(updated));
-    if (data.preferredLanguage) {
-      sessionStorage.setItem('agriflow_cached_lang', data.preferredLanguage);
-    }
-    return true;
-  };
-
-  const updateFarmerLanguage = async (lang: string): Promise<boolean> => {
-    return updateFarmerProfile({ preferredLanguage: lang as any });
-  };
-
-  // Logout Farmer
-  const logout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch {
-      // ignore
-    }
-    setUser(null);
-    sessionStorage.removeItem('agriflow_farmer_auth');
-    sessionStorage.removeItem('agriflow_auth_token');
-    sessionStorage.removeItem('agriflow_cached_lang');
-    router.push('/farmer');
-  };
-
-  const loginConsumer = async (identifier: string, pass: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient<{ user: ConsumerUser; token: string }>('/api/auth/consumer/login', {
-        method: 'POST',
-        body: JSON.stringify({ identifier, password: pass }),
-      });
-      setConsumerUser(res.user);
-      sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(res.user));
-      if (res.user.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', res.user.preferredLanguage);
-      }
-      if (res.token) sessionStorage.setItem('agriflow_auth_token', res.token);
-      return true;
-    } catch {
-      const active: ConsumerUser = {
-        id: 'consumer-001',
-        name: 'Rajesh Varma',
-        phone: identifier,
-        email: identifier.includes('@') ? identifier : 'buyer@agriflow.in',
-        role: 'consumer',
-        state: 'Telangana',
-        district: 'Hyderabad',
-        place: 'Bowenpally',
-        preferredLanguage: 'ta',
-        location: 'Bowenpally Wholesale Corridor, Hyderabad',
-        buyerType: 'bulk-buyer',
-        createdAt: new Date().toISOString(),
-      };
-      setConsumerUser(active);
-      sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(active));
-      sessionStorage.setItem('agriflow_cached_lang', 'ta');
-      return true;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const registerConsumer = async (data: Partial<ConsumerUser>): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient<{ user: ConsumerUser; token: string }>('/api/auth/consumer/register', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      setConsumerUser(res.user);
-      sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(res.user));
-      if (res.user.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', res.user.preferredLanguage);
-      }
-      if (res.token) sessionStorage.setItem('agriflow_auth_token', res.token);
-      return true;
-    } catch {
-      const newConsumer: ConsumerUser = {
-        id: 'consumer-' + Math.random().toString(36).substring(2, 7),
-        name: data.name || 'Verified Buyer',
-        phone: data.phone || '',
-        email: data.email || 'buyer@agriflow.in',
-        role: 'consumer',
-        state: data.state || 'Telangana',
-        district: data.district || 'Hyderabad',
-        place: data.place || 'Bowenpally',
-        preferredLanguage: data.preferredLanguage || 'ta',
-        location: data.location || `${data.place || 'Bowenpally'}, ${data.district || 'Hyderabad'}, ${data.state || 'Telangana'}`,
-        buyerType: data.buyerType || 'bulk-buyer',
-        typicalOrderSizeKg: data.typicalOrderSizeKg || 1000,
-        createdAt: new Date().toISOString(),
-      };
-      setConsumerUser(newConsumer);
-      sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(newConsumer));
-      if (newConsumer.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', newConsumer.preferredLanguage);
-      }
-      return true;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateConsumerProfile = async (data: Partial<ConsumerUser>): Promise<boolean> => {
-    if (!consumerUser) return false;
-    const updated = { ...consumerUser, ...data };
-    try {
-      await apiClient('/api/auth/profile', {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
-    } catch {
-      // Offline / fallback persistence
-    }
-    setConsumerUser(updated);
-    sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(updated));
-    if (data.preferredLanguage) {
-      sessionStorage.setItem('agriflow_cached_lang', data.preferredLanguage);
-    }
-    return true;
-  };
-
-  const updateConsumerLanguage = async (lang: string): Promise<boolean> => {
-    return updateConsumerProfile({ preferredLanguage: lang as any });
-  };
-
-  const logoutConsumer = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch {
-      // ignore
-    }
-    setConsumerUser(null);
-    sessionStorage.removeItem('agriflow_consumer_auth');
-    sessionStorage.removeItem('agriflow_auth_token');
-    sessionStorage.removeItem('agriflow_cached_lang');
-    router.push('/consumer');
-  };
-
-  const loginLogistics = async (identifier: string, pass: string): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient<{ user: LogisticsOperator; token: string }>('/api/auth/logistics/login', {
-        method: 'POST',
-        body: JSON.stringify({ identifier, password: pass }),
-      });
-      setLogisticsUser(res.user);
-      sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(res.user));
-      if (res.user.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', res.user.preferredLanguage);
-      }
-      if (res.token) sessionStorage.setItem('agriflow_auth_token', res.token);
-      return true;
-    } catch {
-      const active: LogisticsOperator = {
-        id: 'logistics-001',
-        name: 'Mohammed Ismail',
-        phone: identifier,
-        email: 'ismail.logistics@fleet.in',
-        role: 'logistics',
-        state: 'Telangana',
-        district: 'Rangareddy',
-        place: 'Shamshabad Fleet Hub',
-        preferredLanguage: 'hi',
-        vehicleType: 'Tata 407 Reefer',
-        vehicleNumber: 'TS 08 UB 4192',
-        vehicleCapacityKg: 5000,
-        reeferEnabled: true,
-        operatingRegion: 'Telangana & Andhra Pradesh Corridor',
-        preferredRoutes: ['Shadnagar -> Hyderabad'],
-        createdAt: new Date().toISOString(),
-      };
-      setLogisticsUser(active);
-      sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(active));
-      sessionStorage.setItem('agriflow_cached_lang', 'hi');
-      return true;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const registerLogistics = async (data: Partial<LogisticsOperator>): Promise<boolean> => {
-    setIsLoading(true);
-    try {
-      const res = await apiClient<{ user: LogisticsOperator; token: string }>('/api/auth/logistics/register', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      setLogisticsUser(res.user);
-      sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(res.user));
-      if (res.user.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', res.user.preferredLanguage);
-      }
-      if (res.token) sessionStorage.setItem('agriflow_auth_token', res.token);
-      return true;
-    } catch {
-      const newOp: LogisticsOperator = {
-        id: 'logistics-' + Math.random().toString(36).substring(2, 7),
-        name: data.name || 'Carrier Operator',
-        phone: data.phone || '',
-        email: data.email || 'operator@fleet.in',
-        role: 'logistics',
-        state: data.state || 'Telangana',
-        district: data.district || 'Rangareddy',
-        place: data.place || 'Shamshabad Fleet Hub',
-        preferredLanguage: data.preferredLanguage || 'hi',
-        vehicleType: data.vehicleType || 'Tata 407 Reefer',
-        vehicleNumber: data.vehicleNumber || 'TS 08 UB 4192',
-        vehicleCapacityKg: data.vehicleCapacityKg || 5000,
-        reeferEnabled: data.reeferEnabled ?? true,
-        operatingRegion: data.operatingRegion || `${data.state || 'Telangana'} Corridor`,
-        preferredRoutes: data.preferredRoutes || ['Shadnagar -> Hyderabad'],
-        createdAt: new Date().toISOString(),
-      };
-      setLogisticsUser(newOp);
-      sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(newOp));
-      if (newOp.preferredLanguage) {
-        sessionStorage.setItem('agriflow_cached_lang', newOp.preferredLanguage);
-      }
-      return true;
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const updateLogisticsProfile = async (data: Partial<LogisticsOperator>): Promise<boolean> => {
-    if (!logisticsUser) return false;
-    const updated = { ...logisticsUser, ...data };
-    try {
-      await apiClient('/api/auth/profile', {
-        method: 'PATCH',
-        body: JSON.stringify(data),
-      });
-    } catch {
-      // Offline / fallback persistence
-    }
-    setLogisticsUser(updated);
-    sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(updated));
-    if (data.preferredLanguage) {
-      sessionStorage.setItem('agriflow_cached_lang', data.preferredLanguage);
-    }
-    return true;
-  };
-
-  const updateLogisticsLanguage = async (lang: string): Promise<boolean> => {
-    return updateLogisticsProfile({ preferredLanguage: lang as any });
-  };
-
-  const logoutLogistics = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch {
-      // Offline / fallback
-    }
-    setLogisticsUser(null);
-    sessionStorage.removeItem('agriflow_logistics_auth');
-    sessionStorage.removeItem('agriflow_auth_token');
-    sessionStorage.removeItem('agriflow_cached_lang');
-    router.push('/logistics');
-  };
-
+  // 1. Phone OTP: Dispatch real SMS OTP via Supabase Auth
   const sendPhoneOtp = async (
     phoneNumber: string,
     extraData?: { name?: string; role?: string }
-  ): Promise<{ success: boolean; simulated?: boolean; message?: string }> => {
+  ): Promise<{ success: boolean; message?: string }> => {
     setIsLoading(true);
     try {
       const cleanDigits = phoneNumber.replace(/\D/g, '');
@@ -551,37 +231,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (error) {
-        console.warn('Supabase SMS OTP provider unconfigured or errored, enabling simulated OTP:', error.message);
-        return {
-          success: true,
-          simulated: true,
-          message: 'Development simulation mode: SMS gateway not configured. Verification code: 123456',
-        };
+        console.warn('Supabase signInWithOtp error:', error.message);
+        if (error.message.toLowerCase().includes('provider') || error.message.toLowerCase().includes('unsupported')) {
+          return {
+            success: false,
+            message: 'Phone authentication is not configured in Supabase. Please configure the SMS provider in Supabase Dashboard -> Authentication -> Providers -> Phone.',
+          };
+        }
+        return { success: false, message: error.message };
       }
 
       return {
         success: true,
-        simulated: false,
-        message: `SMS OTP successfully dispatched to ${fullPhone}`,
+        message: `6-digit SMS OTP dispatched to ${fullPhone}`,
       };
     } catch (err: unknown) {
-      console.warn('Supabase signInWithOtp exception, fallback to simulated OTP:', err);
-      return {
-        success: true,
-        simulated: true,
-        message: 'Development simulation mode: SMS gateway not configured. Verification code: 123456',
-      };
+      const error = err as Error;
+      return { success: false, message: error.message || 'Failed to send SMS OTP' };
     } finally {
       setIsLoading(false);
     }
   };
 
+  // 2. Phone OTP: Verify real SMS OTP and distinguish returning vs new users
   const verifyPhoneOtp = async (
     phoneNumber: string,
     otpCode: string,
-    role: 'farmer' | 'consumer' | 'logistics' | 'fpo',
-    extraData?: { name?: string; phone?: string; state?: string; district?: string; place?: string; preferredLanguage?: any }
-  ): Promise<void> => {
+    role: 'farmer' | 'consumer' | 'logistics' | 'fpo' = 'consumer'
+  ): Promise<{ isReturningUser: boolean; role?: string }> => {
     setIsLoading(true);
     try {
       const cleanDigits = phoneNumber.replace(/\D/g, '');
@@ -591,230 +268,223 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ? `+91${cleanDigits}`
         : `+${cleanDigits}`;
 
-      let verifiedUserId: string | null = null;
+      // Real Supabase verification (No fake universal OTP)
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: fullPhone,
+        token: otpCode.trim(),
+        type: 'sms',
+      });
 
-      // Support development simulation override '123456'
-      if (otpCode === '123456') {
-        console.info('Using development simulation token 123456 for phone login');
-      } else {
-        const { data, error } = await supabase.auth.verifyOtp({
-          phone: fullPhone,
-          token: otpCode,
-          type: 'sms',
-        });
-        if (error) {
-          throw new Error(error.message || 'Invalid SMS verification code.');
-        }
-        verifiedUserId = data.user?.id || null;
+      if (error || !data.user) {
+        throw new Error(error?.message || 'Invalid or expired SMS OTP code.');
       }
 
-      const assignedId = verifiedUserId || `${role}-${cleanDigits.slice(-6) || Math.random().toString(36).slice(2, 7)}`;
-      const assignedName = extraData?.name || (role === 'farmer' ? 'Kisan Farmer' : role === 'consumer' ? 'Buyer User' : 'Logistics Carrier');
-      const assignedState = extraData?.state || 'Telangana';
-      const assignedDistrict = extraData?.district || (role === 'farmer' ? 'Rangareddy' : role === 'consumer' ? 'Hyderabad' : 'Rangareddy');
-      const assignedPlace = extraData?.place || (role === 'farmer' ? 'Shadnagar' : role === 'consumer' ? 'Bowenpally' : 'Shamshabad Fleet Hub');
-      const assignedLang = extraData?.preferredLanguage || (role === 'farmer' ? 'te' : role === 'consumer' ? 'ta' : 'hi');
-      const assignedLocation = `${assignedPlace}, ${assignedDistrict}, ${assignedState}`;
+      // Check whether profile exists and is complete in public.profiles
+      const profile = await getProfileByUserId(data.user.id);
 
-      if (role === 'farmer' || role === 'fpo') {
-        const farmerUser: FarmerUser = {
-          id: assignedId,
-          name: assignedName,
-          phone: fullPhone,
-          email: `${cleanDigits.slice(-10) || 'farmer'}@agriflow.in`,
-          role: 'farmer',
-          state: assignedState,
-          district: assignedDistrict,
-          place: assignedPlace,
-          preferredLanguage: assignedLang,
-          location: assignedLocation,
-          farmName: `${assignedName}'s Farm`,
-          farmerType: role === 'fpo' ? 'FPO' : 'Individual Farmer',
-          profileCompleted: true,
-          createdAt: new Date().toISOString(),
-        };
-        setUser(farmerUser);
-        sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(farmerUser));
-        sessionStorage.setItem('agriflow_cached_lang', assignedLang);
-      } else if (role === 'consumer') {
-        const consumerUser: ConsumerUser = {
-          id: assignedId,
-          name: assignedName,
-          phone: fullPhone,
-          email: `${cleanDigits.slice(-10) || 'buyer'}@agriflow.in`,
-          role: 'consumer',
-          state: assignedState,
-          district: assignedDistrict,
-          place: assignedPlace,
-          preferredLanguage: assignedLang,
-          location: assignedLocation,
-          buyerType: 'household',
-          profileCompleted: true,
-          createdAt: new Date().toISOString(),
-        };
-        setConsumerUser(consumerUser);
-        sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(consumerUser));
-        sessionStorage.setItem('agriflow_cached_lang', assignedLang);
-      } else if (role === 'logistics') {
-        const logisticsUser: LogisticsOperator = {
-          id: assignedId,
-          name: assignedName,
-          phone: fullPhone,
-          email: `${cleanDigits.slice(-10) || 'fleet'}@agriflow.in`,
-          role: 'logistics',
-          state: assignedState,
-          district: assignedDistrict,
-          place: assignedPlace,
-          preferredLanguage: assignedLang,
-          vehicleType: 'Tata 407 Reefer',
-          vehicleNumber: 'TS 08 UB 4192',
-          vehicleCapacityKg: 5000,
-          reeferEnabled: true,
-          operatingRegion: 'Telangana & AP Perishable Corridor',
-          preferredRoutes: ['Shadnagar -> Hyderabad'],
-          profileCompleted: true,
-          createdAt: new Date().toISOString(),
-        };
-        setLogisticsUser(logisticsUser);
-        sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(logisticsUser));
-        sessionStorage.setItem('agriflow_cached_lang', assignedLang);
+      if (profile && isProfileComplete(profile)) {
+        // Returning User: Load profile, skip Complete Profile, proceed to dashboard
+        applyProfileState(profile);
+        router.push(`/${profile.role}/dashboard`);
+        return { isReturningUser: true, role: profile.role };
+      } else {
+        // New or incomplete user: Redirect to Complete Profile
+        const targetRole = role === 'fpo' ? 'farmer' : role;
+        router.push(`/auth/complete-profile?role=${targetRole}`);
+        return { isReturningUser: false, role: targetRole };
       }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const loginWithGoogle = async (role: 'farmer' | 'consumer' | 'logistics' | 'fpo'): Promise<{ profileCompleted: boolean }> => {
+  // 3. Google OAuth: Real Supabase OAuth flow
+  const loginWithGoogle = async (role: 'farmer' | 'consumer' | 'logistics' | 'fpo'): Promise<void> => {
     setIsLoading(true);
     try {
+      const targetRole = role === 'fpo' ? 'farmer' : role;
+      const redirectTo = typeof window !== 'undefined'
+        ? `${window.location.origin}/auth/callback?role=${targetRole}`
+        : undefined;
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback?role=${role}` : undefined,
+          redirectTo,
         },
       });
 
       if (error) {
-        console.warn('Supabase Google OAuth notice:', error.message);
+        throw new Error(error.message);
       }
-
-      if (role === 'farmer' || role === 'fpo') {
-        const newGoogleFarmer: FarmerUser = {
-          id: 'farmer-google-' + Date.now().toString(36),
-          name: 'Kisan Google Farmer',
-          email: 'farmer@gmail.com',
-          phone: '',
-          role: 'farmer',
-          profileCompleted: false,
-          createdAt: new Date().toISOString(),
-        };
-        setUser(newGoogleFarmer);
-        sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(newGoogleFarmer));
-      } else if (role === 'consumer') {
-        const newGoogleConsumer: ConsumerUser = {
-          id: 'consumer-google-' + Date.now().toString(36),
-          name: 'Consumer Google User',
-          email: 'buyer@gmail.com',
-          phone: '',
-          role: 'consumer',
-          location: '',
-          buyerType: 'household',
-          profileCompleted: false,
-          createdAt: new Date().toISOString(),
-        };
-        setConsumerUser(newGoogleConsumer);
-        sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(newGoogleConsumer));
-      } else if (role === 'logistics') {
-        const newGoogleLogistics: LogisticsOperator = {
-          id: 'logistics-google-' + Date.now().toString(36),
-          name: 'Logistics Google Fleet',
-          email: 'fleet@gmail.com',
-          phone: '',
-          role: 'logistics',
-          vehicleType: 'Tata 407 Reefer',
-          vehicleNumber: '',
-          vehicleCapacityKg: 2500,
-          reeferEnabled: true,
-          operatingRegion: '',
-          preferredRoutes: [],
-          profileCompleted: false,
-          createdAt: new Date().toISOString(),
-        };
-        setLogisticsUser(newGoogleLogistics);
-        sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(newGoogleLogistics));
-      }
-      return { profileCompleted: false };
-    } catch (error) {
-      console.warn('Google login error, fallback simulated:', error);
-      return { profileCompleted: false };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const loginWithDemo = async (role: string, name?: string, phone?: string): Promise<void> => {
+  // 4. Username + Password Login: Secure resolution & Supabase Auth authentication
+  const loginWithUsernamePassword = async (
+    identifier: string,
+    pass: string
+  ): Promise<{ success: boolean; role?: string }> => {
     setIsLoading(true);
-    if (role === 'farmer' || role === 'fpo') {
-      const demoFarmer: FarmerUser = {
-        id: 'farmer-001',
-        name: name || 'Ramesh Reddy (Shadnagar FPO)',
-        phone: phone || '+91 98480 12345',
-        email: 'ramesh.reddy@fpo.in',
-        role: 'farmer',
-        state: 'Telangana',
-        district: 'Rangareddy',
-        place: 'Shadnagar',
-        preferredLanguage: 'te',
-        location: 'Shadnagar, Rangareddy, Telangana',
-        farmName: 'Shadnagar Farmers Collective',
-        farmerType: 'FPO',
-        createdAt: new Date().toISOString(),
-      };
-      setUser(demoFarmer);
-      sessionStorage.setItem('agriflow_farmer_auth', JSON.stringify(demoFarmer));
-      sessionStorage.setItem('agriflow_cached_lang', 'te');
-    } else if (role === 'consumer') {
-      const demoConsumer: ConsumerUser = {
-        id: 'consumer-001',
-        name: name || 'Priya Sharma (Hyderabad Wholesale)',
-        phone: phone || '+91 98480 54321',
-        email: 'priya@wholesale.in',
-        role: 'consumer',
-        state: 'Telangana',
-        district: 'Hyderabad',
-        place: 'Bowenpally',
-        preferredLanguage: 'ta',
-        location: 'Bowenpally Wholesale Corridor, Hyderabad',
-        buyerType: 'bulk-buyer',
-        createdAt: new Date().toISOString(),
-      };
-      setConsumerUser(demoConsumer);
-      sessionStorage.setItem('agriflow_consumer_auth', JSON.stringify(demoConsumer));
-      sessionStorage.setItem('agriflow_cached_lang', 'ta');
-    } else if (role === 'logistics') {
-      const demoLogistics: LogisticsOperator = {
-        id: 'logistics-001',
-        name: name || 'Gurdeep Singh',
-        phone: phone || '+91 98480 99881',
-        email: 'gurdeep@reeferfleet.in',
-        role: 'logistics',
-        state: 'Telangana',
-        district: 'Rangareddy',
-        place: 'Shamshabad Fleet Hub',
-        preferredLanguage: 'hi',
-        vehicleType: 'Tata 407 Reefer',
-        vehicleNumber: 'TS 08 UB 4192',
-        vehicleCapacityKg: 5000,
-        reeferEnabled: true,
-        operatingRegion: 'Telangana & AP Perishable Corridor',
-        preferredRoutes: ['Shadnagar -> Hyderabad'],
-        createdAt: new Date().toISOString(),
-      };
-      setLogisticsUser(demoLogistics);
-      sessionStorage.setItem('agriflow_logistics_auth', JSON.stringify(demoLogistics));
-      sessionStorage.setItem('agriflow_cached_lang', 'hi');
+    try {
+      const cleanIdent = identifier.trim();
+      let targetEmail = cleanIdent;
+
+      // If username was entered, resolve to auth email securely
+      if (!cleanIdent.includes('@')) {
+        const resolved = await resolveUsernameToEmail(cleanIdent);
+        if (!resolved) {
+          throw new Error(`Username "${cleanIdent}" not found. Please check your username or login using Phone OTP.`);
+        }
+        targetEmail = resolved;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: targetEmail,
+        password: pass,
+      });
+
+      if (error || !data.user) {
+        throw new Error(error?.message || 'Invalid credentials.');
+      }
+
+      const profile = await getProfileByUserId(data.user.id);
+      if (profile && isProfileComplete(profile)) {
+        applyProfileState(profile);
+        router.push(`/${profile.role}/dashboard`);
+        return { success: true, role: profile.role };
+      } else {
+        router.push('/auth/complete-profile');
+        return { success: true };
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
+  };
+
+  // Backward-compatible login wrappers
+  const login = async (identifier: string, pass: string): Promise<boolean> => {
+    const res = await loginWithUsernamePassword(identifier, pass);
+    return res.success;
+  };
+
+  const loginConsumer = async (identifier: string, pass: string): Promise<boolean> => {
+    const res = await loginWithUsernamePassword(identifier, pass);
+    return res.success;
+  };
+
+  const loginLogistics = async (identifier: string, pass: string): Promise<boolean> => {
+    const res = await loginWithUsernamePassword(identifier, pass);
+    return res.success;
+  };
+
+  // Profile update wrappers
+  const updateFarmerProfile = async (data: Partial<FarmerUser>): Promise<boolean> => {
+    if (!currentProfile) return false;
+    const { profile, error } = await upsertProfile({
+      id: currentProfile.id,
+      full_name: data.name,
+      place: data.place,
+      district: data.district,
+      state: data.state,
+      fpo_name: data.farmName,
+      phone: data.phone,
+      email: data.email,
+    });
+    if (!error && profile) {
+      applyProfileState(profile);
+      return true;
+    }
+    return false;
+  };
+
+  const updateConsumerProfile = async (data: Partial<ConsumerUser>): Promise<boolean> => {
+    if (!currentProfile) return false;
+    const { profile, error } = await upsertProfile({
+      id: currentProfile.id,
+      full_name: data.name,
+      place: data.place,
+      district: data.district,
+      state: data.state,
+      phone: data.phone,
+      email: data.email,
+    });
+    if (!error && profile) {
+      applyProfileState(profile);
+      return true;
+    }
+    return false;
+  };
+
+  const updateLogisticsProfile = async (data: Partial<LogisticsOperator>): Promise<boolean> => {
+    if (!currentProfile) return false;
+    const { profile, error } = await upsertProfile({
+      id: currentProfile.id,
+      full_name: data.name,
+      place: data.place,
+      district: data.district,
+      state: data.state,
+      phone: data.phone,
+      email: data.email,
+    });
+    if (!error && profile) {
+      applyProfileState(profile);
+      return true;
+    }
+    return false;
+  };
+
+  const updateFarmerLanguage = async (_lang: string): Promise<boolean> => true;
+  const updateConsumerLanguage = async (_lang: string): Promise<boolean> => true;
+  const updateLogisticsLanguage = async (_lang: string): Promise<boolean> => true;
+
+  // Registration helpers
+  const register = async (data: Partial<FarmerUser>): Promise<boolean> => {
+    router.push('/farmer/login');
+    return true;
+  };
+
+  const registerConsumer = async (data: Partial<ConsumerUser>): Promise<boolean> => {
+    router.push('/consumer/login');
+    return true;
+  };
+
+  const registerLogistics = async (data: Partial<LogisticsOperator>): Promise<boolean> => {
+    router.push('/logistics/login');
+    return true;
+  };
+
+  // Sign Out cleanly
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
+    applyProfileState(null);
+    router.push('/farmer/login');
+  };
+
+  const logoutConsumer = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
+    applyProfileState(null);
+    router.push('/consumer/login');
+  };
+
+  const logoutLogistics = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // ignore
+    }
+    applyProfileState(null);
+    router.push('/logistics/login');
   };
 
   return (
@@ -823,6 +493,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         consumerUser,
         logisticsUser,
+        currentProfile,
         isAuthenticated: !!user,
         isConsumerAuthenticated: !!consumerUser,
         isLogisticsAuthenticated: !!logisticsUser,
@@ -843,10 +514,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginLogistics,
         registerLogistics,
         logoutLogistics,
+        loginWithUsernamePassword,
         sendPhoneOtp,
         verifyPhoneOtp,
         loginWithGoogle,
-        loginWithDemo,
       }}
     >
       {children}

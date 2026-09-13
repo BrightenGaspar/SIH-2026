@@ -1,5 +1,5 @@
 -- Migration: 03_fast2sms_auth_hook.sql
--- Description: Native Supabase Auth Send SMS Hook with jsonb argument and jsonb return type.
+-- Description: Native Supabase Auth Send SMS Hook with dedicated Fast2SMS OTP route.
 
 -- 1. Enable pg_net extension
 CREATE EXTENSION IF NOT EXISTS pg_net;
@@ -23,7 +23,7 @@ BEGIN
     clean_phone := right(clean_phone, 10);
   END IF;
 
-  -- Dispatch real SMS via Fast2SMS Quick Route (q) asynchronously using pg_net
+  -- Dispatch real SMS via Fast2SMS dedicated OTP Route (works on DND & Non-DND 24/7) asynchronously using pg_net
   PERFORM net.http_post(
     url := 'https://www.fast2sms.com/dev/bulkV2',
     headers := jsonb_build_object(
@@ -31,8 +31,8 @@ BEGIN
       'Content-Type', 'application/json'
     ),
     body := jsonb_build_object(
-      'route', 'q',
-      'message', 'Your AgriFlow verification code is ' || otp_code || '. Valid for 5 minutes. Do not share with anyone.',
+      'route', 'otp',
+      'variables_values', otp_code,
       'numbers', clean_phone
     )
   );
@@ -44,3 +44,4 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 3. Grant necessary execution permissions to Supabase Auth admin
 GRANT EXECUTE ON FUNCTION public.send_sms(jsonb) TO supabase_auth_admin;
 GRANT EXECUTE ON FUNCTION public.send_sms(jsonb) TO postgres;
+

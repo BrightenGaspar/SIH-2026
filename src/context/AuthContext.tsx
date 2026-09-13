@@ -285,11 +285,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const cleanDigits = phoneNumber.replace(/\D/g, '');
-      const fullPhone = phoneNumber.startsWith('+')
-        ? phoneNumber
-        : cleanDigits.length === 10
-        ? `+91${cleanDigits}`
-        : `+${cleanDigits}`;
+      const raw10 = cleanDigits.slice(-10);
+      if (raw10.length !== 10) {
+        return { success: false, message: 'Please enter a valid 10-digit Indian mobile number.' };
+      }
+      const fullPhone = `+91${raw10}`;
 
       const { error } = await supabase.auth.signInWithOtp({
         phone: fullPhone,
@@ -333,11 +333,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const cleanDigits = phoneNumber.replace(/\D/g, '');
-      const fullPhone = phoneNumber.startsWith('+')
-        ? phoneNumber
-        : cleanDigits.length === 10
-        ? `+91${cleanDigits}`
-        : `+${cleanDigits}`;
+      const raw10 = cleanDigits.slice(-10);
+      if (raw10.length !== 10) {
+        throw new Error('Invalid phone number format. Please enter a valid 10-digit number.');
+      }
+      const fullPhone = `+91${raw10}`;
 
       // Real Supabase verification (No fake universal OTP)
       const { data, error } = await supabase.auth.verifyOtp({
@@ -351,19 +351,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Check whether profile exists and is complete in public.profiles
-      const profile = await getProfileByUserId(data.user.id);
+      let profile = await getProfileByUserId(data.user.id);
+      const targetRole = role === 'fpo' ? 'farmer' : role;
 
-      if (profile && isProfileComplete(profile)) {
-        // Returning User: Load profile, skip Complete Profile, proceed to dashboard
-        applyProfileState(profile);
-        router.push(`/${profile.role}/dashboard`);
-        return { isReturningUser: true, role: profile.role };
-      } else {
-        // New or incomplete user: Redirect to Complete Profile
-        const targetRole = role === 'fpo' ? 'farmer' : role;
-        router.push(`/auth/complete-profile?role=${targetRole}`);
-        return { isReturningUser: false, role: targetRole };
+      if (!profile) {
+        // Auto-provision profile with target role so mobile users can immediately access their dashboard
+        const generatedUsername = await generateUniqueUsername(
+          (data.user.user_metadata?.full_name as string) || `user_${raw10.slice(-4)}`,
+          data.user.id
+        );
+        const { profile: newProfile } = await upsertProfile({
+          id: data.user.id,
+          full_name: (data.user.user_metadata?.full_name as string) || `User ${raw10.slice(-4)}`,
+          username: generatedUsername,
+          role: targetRole,
+          phone: fullPhone,
+          place: 'Local Mandi',
+          area: 'Rural Hub',
+        });
+        if (newProfile) {
+          profile = newProfile;
+        }
+      } else if (!isProfileComplete(profile)) {
+        // Profile exists but is missing mandatory fields - backfill them gracefully
+        const needsUsername = !profile.username || profile.username.trim().length === 0;
+        const generatedUsername = needsUsername
+          ? await generateUniqueUsername(profile.full_name || `user_${raw10.slice(-4)}`, data.user.id)
+          : profile.username;
+
+        const { profile: updatedProfile } = await upsertProfile({
+          id: data.user.id,
+          full_name: profile.full_name?.trim() || `User ${raw10.slice(-4)}`,
+          username: generatedUsername,
+          role: profile.role || targetRole,
+          phone: profile.phone || fullPhone,
+          place: profile.place?.trim() || 'Local Mandi',
+          area: profile.area?.trim() || 'Rural Hub',
+        });
+        if (updatedProfile) {
+          profile = updatedProfile;
+        }
       }
+
+      // Hydrate state
+      applyProfileState(profile, data.user);
+
+      // Navigate directly to the authenticated role dashboard
+      const activeRole = profile?.role || targetRole;
+      router.push(`/${activeRole}/dashboard`);
+      return { isReturningUser: true, role: activeRole };
     } finally {
       setIsLoading(false);
     }

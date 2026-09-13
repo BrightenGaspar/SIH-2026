@@ -100,21 +100,21 @@ export function PhoneAuthForm({
     setStatusMsg('');
 
     const cleanPhone = phoneNumber.replace(/\D/g, '');
-    if (cleanPhone.length < 10) {
+    const raw10 = cleanPhone.slice(-10);
+    if (raw10.length !== 10) {
       setErrorMsg('Please enter a valid 10-digit mobile number.');
       return;
     }
 
     setSubmitting(true);
+    setStatusMsg('Sending SMS verification code...');
     try {
-      const fullNumber =
-        cleanPhone.startsWith('91') && cleanPhone.length > 10
-          ? `+${cleanPhone}`
-          : `+91${cleanPhone.slice(-10)}`;
+      const fullNumber = `+91${raw10}`;
 
       const result = await sendPhoneOtp(fullNumber, { role });
       if (!result.success) {
         setErrorMsg(result.message || 'Failed to send SMS OTP.');
+        setStatusMsg('');
         return;
       }
 
@@ -125,6 +125,7 @@ export function PhoneAuthForm({
     } catch (err: unknown) {
       const error = err as Error;
       setErrorMsg(error.message || 'Failed to send OTP.');
+      setStatusMsg('');
     } finally {
       setSubmitting(false);
     }
@@ -135,21 +136,24 @@ export function PhoneAuthForm({
     e.preventDefault();
     setErrorMsg('');
 
-    if (otp.trim().length !== 6) {
+    const cleanOtp = otp.trim();
+    if (cleanOtp.length !== 6) {
       setErrorMsg('Please enter the full 6-digit OTP code.');
       return;
     }
 
     setSubmitting(true);
+    setStatusMsg('Verifying OTP code...');
     try {
-      const result = await verifyPhoneOtp(sentPhone || phoneNumber, otp.trim(), role);
-      if (result.isReturningUser) {
-        router.push(`/${result.role || role}/dashboard`);
-      }
+      const targetPhone = sentPhone || phoneNumber;
+      const result = await verifyPhoneOtp(targetPhone, cleanOtp, role);
+      setStatusMsg('OTP verified successfully! Entering dashboard...');
+      const targetRole = result.role || role;
+      router.push(`/${targetRole}/dashboard`);
     } catch (err: unknown) {
       const error = err as Error;
       setErrorMsg(error.message || 'Verification failed. Please check the OTP code.');
-    } finally {
+      setStatusMsg('');
       setSubmitting(false);
     }
   };

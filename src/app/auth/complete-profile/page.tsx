@@ -61,9 +61,17 @@ function CompleteProfileContent() {
   useEffect(() => {
     async function loadSession() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        let { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-          router.replace('/farmer/login');
+          // Allow short hydration window for storage retrieval
+          await new Promise((r) => setTimeout(r, 400));
+          const retry = await supabase.auth.getSession();
+          session = retry.data.session;
+        }
+
+        if (!session?.user) {
+          const fallbackLogin = validatedInitialRole ? `/${validatedInitialRole}/login` : '/farmer/login';
+          router.replace(fallbackLogin);
           return;
         }
 

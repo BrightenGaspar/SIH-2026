@@ -79,19 +79,19 @@ export default function ConsumerLandingPage() {
   return (
     <div className="space-y-16 py-4 sm:py-8">
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-zinc-900 to-zinc-950 border border-emerald-500/30 p-8 sm:p-14 text-white shadow-2xl">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 border border-blue-500/30 p-8 sm:p-14 text-white shadow-sm">
+        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="max-w-3xl relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold tracking-wide uppercase">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold tracking-wide uppercase backdrop-blur-xs">
             <Sparkles className="w-3.5 h-3.5" /> Next-Gen Direct Farm Procurement
           </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
-            Fresh Produce Directly From <span className="text-emerald-400">Verified Indian Farms</span>.
+            Fresh Produce Directly From <span className="text-blue-100">Verified Indian Farms</span>.
           </h1>
 
-          <p className="text-sm sm:text-lg text-zinc-300 font-normal leading-relaxed">
+          <p className="text-sm sm:text-lg text-blue-100 font-normal leading-relaxed">
             Eliminate commission agents. Buy directly from FPOs and progressive farmers with verified farm quality, cold-chain road transport, and transparent escrow pricing.
           </p>
 
@@ -99,21 +99,21 @@ export default function ConsumerLandingPage() {
           <div className="flex flex-wrap items-center gap-4 pt-4">
             <Link
               href="/consumer/marketplace"
-              className="px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/25 transition-all duration-200 active:scale-95"
+              className="px-6 py-3.5 rounded-2xl bg-white hover:bg-blue-50 text-blue-700 font-bold text-sm flex items-center gap-2 shadow-xs transition-all duration-200 active:scale-95 cursor-pointer"
             >
-              <Store className="w-4 h-4" /> Explore Marketplace <ArrowRight className="w-4 h-4" />
+              <Store className="w-4 h-4 text-blue-600" /> Explore Marketplace <ArrowRight className="w-4 h-4" />
             </Link>
 
             <Link
               href="/consumer/register"
-              className="px-6 py-3.5 rounded-2xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 font-bold text-sm flex items-center gap-2 transition-all duration-200"
+              className="px-6 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white border border-blue-400 font-bold text-sm flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-xs"
             >
               Create Buyer Account
             </Link>
 
             <Link
               href="/consumer/login"
-              className="px-4 py-3.5 text-xs text-zinc-400 hover:text-white font-semibold transition-colors"
+              className="px-4 py-3.5 text-xs text-blue-100 hover:text-white font-semibold transition-colors"
             >
               Already registered? Sign In
             </Link>
@@ -121,22 +121,22 @@ export default function ConsumerLandingPage() {
         </div>
 
         {/* Live Metrics Row */}
-        <div className="mt-12 pt-8 border-t border-zinc-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
+        <div className="mt-12 pt-8 border-t border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-emerald-400">72.4%</span>
-            <p className="text-xs text-zinc-400 mt-0.5">Direct Farmer Share</p>
+            <span className="text-2xl sm:text-3xl font-black text-white">72.4%</span>
+            <p className="text-xs text-blue-100 mt-0.5">Direct Farmer Share</p>
           </div>
           <div>
             <span className="text-2xl sm:text-3xl font-black text-white">100%</span>
-            <p className="text-xs text-zinc-400 mt-0.5">Direct Farm Traceability</p>
+            <p className="text-xs text-blue-100 mt-0.5">Direct Farm Traceability</p>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-cyan-400">4-8°C</span>
-            <p className="text-xs text-zinc-400 mt-0.5">Monitored Cold-Chain</p>
+            <span className="text-2xl sm:text-3xl font-black text-white">4-8°C</span>
+            <p className="text-xs text-blue-100 mt-0.5">Monitored Cold-Chain</p>
           </div>
           <div>
-            <span className="text-2xl sm:text-3xl font-black text-amber-400">0%</span>
-            <p className="text-xs text-zinc-400 mt-0.5">Middleman Arbitrage</p>
+            <span className="text-2xl sm:text-3xl font-black text-white">0%</span>
+            <p className="text-xs text-blue-100 mt-0.5">Middleman Arbitrage</p>
           </div>
         </div>
       </section>

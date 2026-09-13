@@ -4,84 +4,109 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import { useBandwidth } from '@/context/BandwidthContext';
 import { consumerService } from '@/services/consumerService';
 import { supabase } from '@/lib/supabase';
 import { ProductDetails, ConsumerOrder, Recommendation, BulkDemand } from '@/types/consumer';
+import { LowBandwidthBanner } from '@/components/common/LowBandwidthBanner';
+import { LazyMap } from '@/components/maps/LazyMap';
 import { 
   Store, 
   Package, 
   Truck, 
-  TrendingDown, 
-  Users, 
-  ShieldCheck, 
-  Sparkles, 
-  ArrowRight, 
   Plus, 
-  Clock, 
+  MapPin, 
+  Search, 
+  ShoppingCart, 
   CheckCircle2, 
-  AlertCircle,
-  BarChart3,
-  MapPin,
-  Search,
-  ShoppingCart
+  ArrowRight, 
+  Clock, 
+  Radio, 
+  RefreshCw, 
+  Sparkles, 
+  Check, 
+  ShieldCheck,
+  Wheat,
+  Apple,
+  Carrot,
+  Flame
 } from 'lucide-react';
-import { formatINR } from '@/lib/utils';
+import { cn, formatINR } from '@/lib/utils';
 
 export default function ConsumerDashboard() {
-  const { consumerUser } = useAuth();
+  const { user, consumerUser } = useAuth();
   const { addToCart } = useCart();
+  const { isLowBandwidth } = useBandwidth();
+
   const [products, setProducts] = useState<ProductDetails[]>([]);
   const [orders, setOrders] = useState<ConsumerOrder[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [bulkDemands, setBulkDemands] = useState<BulkDemand[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'orders' | 'demands'>('overview');
 
-  // New Demand Post Form Modal State
+  // Search and Category Filter
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+
+  // Modal State
   const [showDemandModal, setShowDemandModal] = useState(false);
-  const [newProduceName, setNewProduceName] = useState('Tomato');
-  const [newRequiredKg, setNewRequiredKg] = useState(5000);
+  const [newProduceName, setNewProduceName] = useState('Tomato (Hybrid)');
+  const [newRequiredKg, setNewRequiredKg] = useState(2500);
   const [demandCreated, setDemandCreated] = useState(false);
 
-  useEffect(() => {
-    async function loadData() {
+  // Added to cart notification indicator
+  const [addedItem, setAddedItem] = useState<string | null>(null);
+
+  // Manual refresh state for Low Bandwidth
+  const [manualRefreshing, setManualRefreshing] = useState(false);
+
+  // Real user display name (NEVER hardcode reference demo names)
+  const displayName =
+    consumerUser?.name ||
+    user?.name ||
+    (user?.email ? user.email.split('@')[0] : 'Valued Buyer');
+
+  const locationText = consumerUser?.location || user?.location || 'Hyderabad Hub, Telangana';
+
+  const loadData = async () => {
+    try {
       const [prodList, orderList, recList, demandList] = await Promise.all([
         consumerService.getProducts(),
         consumerService.getOrders(),
         consumerService.getRecommendations(consumerUser?.buyerType),
-        consumerService.getBulkDemands()
+        consumerService.getBulkDemands(),
       ]);
-      setProducts(prodList);
-      setOrders(orderList);
-      setRecommendations(recList);
-      setBulkDemands(demandList);
+      setProducts(prodList || []);
+      setOrders(orderList || []);
+      setRecommendations(recList || []);
+      setBulkDemands(demandList || []);
+    } catch (err) {
+      console.error('Failed to load consumer dashboard data:', err);
     }
+  };
+
+  useEffect(() => {
     loadData();
 
-    // Active Supabase realtime stream subscription for dashboard updates
+    // In Low Bandwidth mode, avoid real-time websocket subscription to conserve data
+    if (isLowBandwidth) return;
+
     const channel = supabase
       .channel('realtime-consumer-dashboard')
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'produce',
-        },
+        { event: '*', schema: 'public', table: 'produce' },
         async () => {
           const prodList = await consumerService.getProducts();
-          setProducts(prodList);
+          setProducts(prodList || []);
         }
       )
       .on(
         'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'orders',
-        },
+        { event: '*', schema: 'public', table: 'orders' },
         async () => {
           const orderList = await consumerService.getOrders();
-          setOrders(orderList);
+          setOrders(orderList || []);
         }
       )
       .subscribe();
@@ -89,29 +114,46 @@ export default function ConsumerDashboard() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [consumerUser]);
+  }, [consumerUser, isLowBandwidth]);
 
-  const activeOrders = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-  const completedOrders = orders.filter(o => o.status === 'Delivered');
+  const handleManualRefresh = async () => {
+    setManualRefreshing(true);
+    await loadData();
+    setTimeout(() => setManualRefreshing(false), 500);
+  };
 
-  const sihHighlightOrder = orders.find(o => o.id === 'ORD-HYD-5000') || orders[0];
+  const handleAddToCart = (product: ProductDetails) => {
+    addToCart(product, 50); // Default order step: 50 kg wholesale or base quantity
+    setAddedItem(product.id);
+    setTimeout(() => setAddedItem(null), 2000);
+  };
 
   const handleCreateDemand = async (e: React.FormEvent) => {
     e.preventDefault();
     const created = await consumerService.createBulkDemand({
-      buyerId: consumerUser?.id || 'consumer-001',
+      buyerId: consumerUser?.id || user?.id || 'consumer-001',
       produceName: newProduceName,
       requiredQuantityKg: newRequiredKg,
       matchedQuantityKg: 0,
       remainingQuantityKg: newRequiredKg,
       requiredGrade: 'A',
-      deliveryLocation: consumerUser?.location || 'Bowenpally Hub, Hyderabad',
+      deliveryLocation: locationText,
       deliveryCity: 'Hyderabad',
       preferredDeliveryDate: 'Tomorrow Morning (06:00 - 09:00 AM)',
       deliveryWindow: 'Early Morning Slot',
       maxBudgetPerKg: 28,
       matchedSuppliers: [],
-      roadRouteDetails: { traditionalDistanceKm: 60, traditionalCost: 2400, traditionalHours: 2.5, optimizedDistanceKm: 42, optimizedCost: 1600, optimizedHours: 1.5, distanceSavedKm: 18, costSavedINR: 800, hoursSaved: 1.0 },
+      roadRouteDetails: {
+        traditionalDistanceKm: 60,
+        traditionalCost: 2400,
+        traditionalHours: 2.5,
+        optimizedDistanceKm: 42,
+        optimizedCost: 1600,
+        optimizedHours: 1.5,
+        distanceSavedKm: 18,
+        costSavedINR: 800,
+        hoursSaved: 1.0,
+      },
     });
 
     setBulkDemands([created, ...bulkDemands]);
@@ -122,269 +164,683 @@ export default function ConsumerDashboard() {
     }, 1500);
   };
 
-  return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
-      {/* Welcome Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-950 via-zinc-900 to-zinc-900 border border-emerald-500/20 p-6 md:p-8">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
-              <Sparkles className="w-3.5 h-3.5" /> Buyer Procurement Portal
-            </div>
-            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">
-              Welcome back, {consumerUser?.name || 'Valued Buyer'}
-            </h1>
-            <p className="text-xs md:text-sm text-zinc-300 mt-1 max-w-2xl">
-              Source farm-fresh perishable produce directly from aggregated farmer clusters with guaranteed cold-chain logistics.
-            </p>
-          </div>
+  // Filter products by search and category
+  const filteredProducts = products.filter((item) => {
+    const matchesCategory =
+      selectedCategory === 'All' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesSearch =
+      searchQuery.trim() === '' ||
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.tags?.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesCategory && matchesSearch;
+  });
 
-          <div className="flex items-center gap-3">
+  const activeOrders = orders.filter((o) => o.status !== 'Delivered' && o.status !== 'Cancelled');
+  const completedOrders = orders.filter((o) => o.status === 'Delivered');
+
+  return (
+    <div className="space-y-6 max-w-6xl mx-auto pb-12">
+      {/* 1. LOW BANDWIDTH MODE BANNER */}
+      <LowBandwidthBanner role="consumer" />
+
+      {/* 2. WELCOME HEADER (Matching reference visual replica) */}
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
+              Buyer Procurement Portal
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+            <span className="text-xs text-slate-500">{locationText}</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
+            Welcome, {displayName}!
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Find fresh and quality produce directly from local verified farmers.
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2">
+          {isLowBandwidth && (
             <button
               type="button"
-              onClick={() => setShowDemandModal(true)}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/40"
+              onClick={handleManualRefresh}
+              disabled={manualRefreshing}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer transition"
             >
-              <Plus className="w-4 h-4" /> Post Custom Bulk Demand
+              <RefreshCw className={cn('w-3.5 h-3.5', manualRefreshing && 'animate-spin')} />
+              <span>{manualRefreshing ? 'Refreshing...' : 'Manual Refresh'}</span>
             </button>
-            <Link
-              href="/consumer/marketplace"
-              className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold border border-zinc-700 transition flex items-center gap-2"
+          )}
+
+          <button
+            type="button"
+            onClick={() => setShowDemandModal(true)}
+            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Post Bulk Demand</span>
+          </button>
+
+          <Link href="/consumer/marketplace">
+            <button
+              type="button"
+              className="border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
             >
-              <Store className="w-4 h-4 text-emerald-400" /> Browse Marketplace
-            </Link>
-          </div>
+              <Store className="w-4 h-4 text-blue-600" />
+              <span className="hidden sm:inline">Marketplace</span>
+            </button>
+          </Link>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800 pb-2">
+      {/* 3. SEARCH BAR & CATEGORY PILLS */}
+      <div className="space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search for products, farms, varieties..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition shadow-xs"
+          />
+        </div>
+
+        {/* Category Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {[
+            { name: 'All', icon: Sparkles },
+            { name: 'Vegetables', icon: Carrot },
+            { name: 'Fruits', icon: Apple },
+            { name: 'Grains', icon: Wheat },
+            { name: 'Spices', icon: Flame },
+          ].map((cat) => {
+            const Icon = cat.icon;
+            const isSelected = selectedCategory.toLowerCase() === cat.name.toLowerCase();
+            return (
+              <button
+                key={cat.name}
+                type="button"
+                onClick={() => setSelectedCategory(cat.name)}
+                className={cn(
+                  'px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0',
+                  isSelected
+                    ? 'bg-blue-600 text-white shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                )}
+              >
+                <Icon className={cn('w-3.5 h-3.5', isSelected ? 'text-white' : 'text-slate-500')} />
+                <span>{cat.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. 3 KPI STAT CARDS */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500">Active Deliveries</span>
+            <span className="p-2 rounded-xl bg-blue-50 text-blue-600">
+              <Truck className="w-4 h-4" />
+            </span>
+          </div>
+          <div className="text-2xl font-black text-slate-900 mt-2">{activeOrders.length}</div>
+          <span className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
+            <Radio className="w-3 h-3 animate-pulse" /> Live GPS in transit
+          </span>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500">Completed Orders</span>
+            <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+              <CheckCircle2 className="w-4 h-4" />
+            </span>
+          </div>
+          <div className="text-2xl font-black text-slate-900 mt-2">{completedOrders.length}</div>
+          <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
+            100% Quality inspected
+          </span>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500">Posted Bulk Demands</span>
+            <span className="p-2 rounded-xl bg-purple-50 text-purple-600">
+              <Package className="w-4 h-4" />
+            </span>
+          </div>
+          <div className="text-2xl font-black text-slate-900 mt-2">{bulkDemands.length}</div>
+          <span className="text-[11px] text-purple-600 font-semibold flex items-center gap-1 mt-1">
+            Cluster-aggregated supply
+          </span>
+        </div>
+      </div>
+
+      {/* 5. TABS NAVIGATION */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+          className={cn(
+            'px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer',
             activeTab === 'overview'
-              ? 'bg-emerald-600 text-white'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-          }`}
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 hover:bg-slate-100'
+          )}
         >
           Procurement Overview
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('orders')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+          className={cn(
+            'px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer',
             activeTab === 'orders'
-              ? 'bg-emerald-600 text-white'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-          }`}
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 hover:bg-slate-100'
+          )}
         >
           Active Orders ({activeOrders.length})
         </button>
         <button
           type="button"
           onClick={() => setActiveTab('demands')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition ${
+          className={cn(
+            'px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer',
             activeTab === 'demands'
-              ? 'bg-emerald-600 text-white'
-              : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-          }`}
+              ? 'bg-blue-600 text-white shadow-xs'
+              : 'text-slate-600 hover:bg-slate-100'
+          )}
         >
           Bulk Demands ({bulkDemands.length})
         </button>
       </div>
 
-      {/* Content based on active tab */}
+      {/* 6. TAB CONTENT */}
       {activeTab === 'overview' && (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-semibold">Active In-Transit Orders</span>
-              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1 block">{activeOrders.length}</span>
+          {/* HERO BANNER (Normal Mode only - deferred in Low Bandwidth to save data) */}
+          {!isLowBandwidth && (
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 sm:p-8 shadow-sm">
+              <div className="relative z-10 max-w-xl space-y-2">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-bold backdrop-blur-xs">
+                  <ShieldCheck className="w-3.5 h-3.5" /> 100% Quality Guaranteed &bull; Cold-Chain Assured
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight">
+                  Fresh Produce From Local Farmers
+                </h2>
+                <p className="text-xs text-blue-100 leading-relaxed">
+                  Order directly from verified farm clusters. Transparent farm gate pricing, real-time IoT temperature logging, and guaranteed next-day delivery.
+                </p>
+                <div className="pt-2">
+                  <Link href="/consumer/marketplace">
+                    <button
+                      type="button"
+                      className="bg-white text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+                    >
+                      <Store className="w-4 h-4 text-blue-600" />
+                      <span>Explore Full Marketplace</span>
+                    </button>
+                  </Link>
+                </div>
+              </div>
             </div>
-            <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-semibold">Completed Orders</span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">{completedOrders.length}</span>
+          )}
+
+          {/* POPULAR PRODUCTS SECTION */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-black text-slate-900 tracking-tight">
+                  {isLowBandwidth ? 'Popular Products (Text Only)' : 'Popular Products'}
+                </h3>
+                {isLowBandwidth && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200 flex items-center gap-1">
+                    <Radio className="w-3 h-3 text-blue-600" /> Text Mode Active
+                  </span>
+                )}
+              </div>
+              <Link
+                href="/consumer/marketplace"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1"
+              >
+                <span>View All</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            <div className="p-6 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
-              <span className="text-xs text-zinc-500 dark:text-zinc-400 block font-semibold">Posted Demands</span>
-              <span className="text-2xl font-black text-zinc-900 dark:text-white mt-1 block">{bulkDemands.length}</span>
-            </div>
+
+            {/* DUAL-MODE PRODUCTS PRESENTATION */}
+            {isLowBandwidth ? (
+              /* LOW BANDWIDTH MODE: Clean Text-Only Table (No image requests) */
+              <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider text-[11px]">
+                        <th className="py-3 px-4">Product Name</th>
+                        <th className="py-3 px-4">Category</th>
+                        <th className="py-3 px-4">Origin / Farm</th>
+                        <th className="py-3 px-4">Available Qty</th>
+                        <th className="py-3 px-4">Price / kg</th>
+                        <th className="py-3 px-4 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {filteredProducts.slice(0, 8).map((product) => (
+                        <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3 px-4">
+                            <span className="font-bold text-slate-900 block">{product.name}</span>
+                            <span className="text-[10px] text-emerald-600 font-semibold uppercase">
+                              Grade {product.grade || 'A'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[11px]">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-slate-600">
+                            {product.farmerStory?.farmOrFpoName || product.location}
+                          </td>
+                          <td className="py-3 px-4 font-semibold text-slate-800">
+                            {product.availableQuantityKg?.toLocaleString('en-IN') || 500} kg
+                          </td>
+                          <td className="py-3 px-4">
+                            <span className="font-black text-blue-600">
+                              ₹{product.pricePerKg}/kg
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => handleAddToCart(product)}
+                              className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs inline-flex items-center gap-1 shadow-2xs transition cursor-pointer"
+                            >
+                              {addedItem === product.id ? (
+                                <>
+                                  <Check className="w-3 h-3 text-white" /> Added
+                                </>
+                              ) : (
+                                <>
+                                  <ShoppingCart className="w-3 h-3" /> Add
+                                </>
+                              )}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                      {filteredProducts.length === 0 && (
+                        <tr>
+                          <td colSpan={6} className="py-8 text-center text-slate-400 text-xs">
+                            No produce found matching your search.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              /* NORMAL MODE: Visual Card Grid with Photos */
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {filteredProducts.slice(0, 8).map((product) => (
+                  <div
+                    key={product.id}
+                    className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs hover:shadow-md transition-shadow flex flex-col justify-between group"
+                  >
+                    <div>
+                      {/* Product Image / Visual */}
+                      <div className="w-full h-36 rounded-xl bg-slate-100 overflow-hidden relative mb-3 border border-slate-100">
+                        {product.image ? (
+                          <img
+                            src={product.image}
+                            alt={product.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-slate-400 bg-slate-50">
+                            <Store className="w-8 h-8 text-slate-300" />
+                          </div>
+                        )}
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-white/90 text-blue-700 text-[10px] font-bold backdrop-blur-xs shadow-xs">
+                          Grade {product.grade || 'A'}
+                        </span>
+                      </div>
+
+                      {/* Info */}
+                      <div className="space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          {product.category}
+                        </span>
+                        <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                          {product.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-500 truncate">
+                          {product.farmerStory?.farmOrFpoName || product.location}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom Pricing and Action */}
+                    <div className="pt-4 border-t border-slate-100 mt-3 flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block">Price</span>
+                        <span className="text-base font-black text-blue-600">
+                          ₹{product.pricePerKg}
+                          <span className="text-xs text-slate-500 font-normal">/kg</span>
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddToCart(product)}
+                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 shadow-xs transition cursor-pointer"
+                      >
+                        {addedItem === product.id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-white" /> Added
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-3.5 h-3.5" /> Add
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {filteredProducts.length === 0 && (
+                  <div className="col-span-full py-12 text-center bg-white border border-slate-200 rounded-2xl">
+                    <Store className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                    <p className="text-xs text-slate-500 font-semibold">No products found</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Try adjusting your search keywords or category filters.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Live Highway GPS Tracking Featured Widget */}
-          <div className="bg-gradient-to-br from-zinc-900 via-zinc-900 to-emerald-950 p-6 md:p-8 rounded-3xl border border-emerald-500/30 text-white shadow-xl space-y-6 relative overflow-hidden">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
+          {/* 7. FEATURED IN-TRANSIT DELIVERY TRACKING (Dual-Mode LazyMap) */}
+          <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                  <Truck className="w-6 h-6 animate-pulse" />
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center shrink-0">
+                  <Truck className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-emerald-400">
-                      Live Delivery Tracking by GPS
+                    <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">
+                      Live Delivery Tracking
                     </span>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                      Satellite Connected
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                      Satellite GPS Connected
                     </span>
                   </div>
-                  <h3 className="text-lg font-bold text-white mt-0.5">
+                  <h3 className="text-sm font-bold text-slate-900 mt-0.5">
                     Consolidated Farm Dispatch &bull; TRK-CONS-ROAD-9021
                   </h3>
                 </div>
               </div>
 
               <Link
-                href="/consumer/tracking?id=TRK-CONS-ROAD-9021"
-                className="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-emerald-950/50 shrink-0"
+                href="/consumer/tracking/TRK-CONS-ROAD-9021"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer self-start sm:self-auto"
               >
-                <MapPin className="w-4 h-4" /> Open Full GPS Tracking Map <ArrowRight className="w-3.5 h-3.5" />
+                <MapPin className="w-3.5 h-3.5" /> Full GPS Tracking <ArrowRight className="w-3 h-3" />
               </Link>
             </div>
 
             {/* GPS Telemetry Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
-                <span className="text-zinc-400 text-[11px] block">Current Highway Position</span>
-                <strong className="text-white text-sm block">Shamshabad ORR Tollway</strong>
-                <span className="text-emerald-400 font-mono text-[11px] block">17.2403&deg; N, 78.4294&deg; E</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="text-slate-400 text-[10px] block font-semibold">Current Position</span>
+                <strong className="text-slate-900 text-xs block">Shamshabad ORR Tollway</strong>
+                <span className="text-blue-600 font-mono text-[10px] block">17.2403&deg; N, 78.4294&deg; E</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
-                <span className="text-zinc-400 text-[11px] block">Carrier & Driver</span>
-                <strong className="text-white text-sm block">Tata 407 Reefer</strong>
-                <span className="text-zinc-300 text-[11px] block">Mohammed Ismail (TS 08 UB 4192)</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="text-slate-400 text-[10px] block font-semibold">Carrier & Vehicle</span>
+                <strong className="text-slate-900 text-xs block">Tata 407 Reefer</strong>
+                <span className="text-slate-600 text-[10px] block">Mohammed Ismail (TS 08 UB 4192)</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
-                <span className="text-zinc-400 text-[11px] block">IoT Reefer Cold Chain</span>
-                <strong className="text-emerald-400 text-sm block">5.8&deg;C (Optimal Range)</strong>
-                <span className="text-zinc-300 text-[11px] block">Humidity: 86% &bull; Low Spoilage Risk</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="text-slate-400 text-[10px] block font-semibold">IoT Cold Chain</span>
+                <strong className="text-emerald-600 text-xs block">5.8&deg;C (Optimal Range)</strong>
+                <span className="text-slate-600 text-[10px] block">Humidity: 86% &bull; Low Spoilage</span>
               </div>
 
-              <div className="p-4 rounded-2xl bg-zinc-800/80 border border-zinc-700/80 space-y-1">
-                <span className="text-zinc-400 text-[11px] block">Target Arrival (ETA)</span>
-                <strong className="text-white text-sm block">Today, 05:45 PM</strong>
-                <span className="text-emerald-400 font-bold text-[11px] block">28 km Remaining (45 mins)</span>
+              <div className="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-0.5">
+                <span className="text-slate-400 text-[10px] block font-semibold">Target Arrival (ETA)</span>
+                <strong className="text-slate-900 text-xs block">Today, 05:45 PM</strong>
+                <span className="text-blue-600 font-bold text-[10px] block">28 km Remaining (45 mins)</span>
               </div>
             </div>
 
-            {/* Progress Bar */}
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-xs text-zinc-400">
+            {/* Journey Progress Bar */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
                 <span>Shadnagar FPO Hub (Origin)</span>
-                <span className="font-bold text-white">68% Journey Completed</span>
+                <span className="font-bold text-slate-900">68% Journey Completed</span>
                 <span>Bowenpally Terminal (Destination)</span>
               </div>
-              <div className="w-full bg-zinc-800 rounded-full h-2 overflow-hidden">
-                <div className="bg-emerald-500 h-full rounded-full w-[68%] transition-all duration-500" />
+              <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div className="bg-blue-600 h-full rounded-full w-[68%] transition-all duration-500" />
               </div>
+            </div>
+
+            {/* Dual-Mode Route View */}
+            <div className="pt-2">
+              <LazyMap
+                vehicleId="TRK-CONS-ROAD-9021"
+                origin="Shadnagar Farm Hub"
+                destination="Bowenpally Terminal"
+                distanceKm={46}
+                totalDistanceKm={74}
+                status="In Transit"
+                role="consumer"
+              >
+                <div className="w-full h-48 bg-slate-100 rounded-xl flex items-center justify-center text-slate-400 border border-slate-200 text-xs">
+                  <div className="text-center space-y-1">
+                    <MapPin className="w-6 h-6 text-blue-600 mx-auto" />
+                    <span className="font-semibold text-slate-700 block">Interactive Live GPS Route Map</span>
+                    <span className="text-[11px] text-slate-500 block">Live coordinates updating via satellite beacon</span>
+                  </div>
+                </div>
+              </LazyMap>
             </div>
           </div>
         </div>
       )}
 
+      {/* ACTIVE ORDERS TAB */}
       {activeTab === 'orders' && (
         <div className="space-y-4">
           {activeOrders.map((order) => (
             <div
               key={order.id}
-              className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
             >
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-black font-mono text-zinc-900 dark:text-white">{order.id}</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                  <span className="text-sm font-black font-mono text-slate-900">{order.id}</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
                     {order.status}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    Live GPS Active
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    Satellite Tracked
                   </span>
                 </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {order.totalQuantityKg.toLocaleString('en-IN')} kg &bull; ₹{order.totalAmount.toLocaleString('en-IN')} &bull; Expected {order.estimatedDeliveryDate}
+                <p className="text-xs text-slate-500">
+                  {order.totalQuantityKg?.toLocaleString('en-IN')} kg &bull; ₹{order.totalAmount?.toLocaleString('en-IN')} &bull; Expected {order.estimatedDeliveryDate}
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Delivery Destination: {order.deliveryAddress?.city || locationText}
                 </p>
               </div>
 
               <Link
                 href={`/consumer/tracking/${order.logisticsId || 'TRK-CONS-ROAD-9021'}`}
-                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition"
+                className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
               >
                 <Truck className="w-3.5 h-3.5" /> Track Live GPS Map <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           ))}
+
+          {activeOrders.length === 0 && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
+              <Truck className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs text-slate-500 font-semibold">No active in-transit orders</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Browse our marketplace to procure fresh farm produce directly from verified growers.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
+      {/* BULK DEMANDS TAB */}
       {activeTab === 'demands' && (
         <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-black text-slate-900">Custom Procurement Demands</h3>
+            <button
+              type="button"
+              onClick={() => setShowDemandModal(true)}
+              className="bg-blue-600 hover:bg-blue-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" /> Post New Demand
+            </button>
+          </div>
+
           {bulkDemands.map((demand) => (
             <div
               key={demand.id}
-              className="p-5 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+              className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
             >
-              <div>
-                <span className="text-xs font-mono font-bold text-zinc-400">{demand.id}</span>
-                <h4 className="text-sm font-bold text-zinc-900 dark:text-white mt-0.5">
-                  {demand.produceName} ({demand.requiredQuantityKg} kg)
+              <div className="space-y-1">
+                <span className="text-xs font-mono font-bold text-slate-400">{demand.id}</span>
+                <h4 className="text-sm font-bold text-slate-900">
+                  {demand.produceName} ({demand.requiredQuantityKg?.toLocaleString('en-IN')} kg)
                 </h4>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-                  Delivery to: {demand.deliveryLocation} &bull; Status: <span className="text-emerald-600 font-bold">{demand.status}</span>
+                <p className="text-xs text-slate-500">
+                  Destination: {demand.deliveryLocation} &bull; Status:{' '}
+                  <span className="text-blue-600 font-bold">{demand.status}</span>
+                </p>
+                <p className="text-[11px] text-slate-400">
+                  Max Budget: ₹{demand.maxBudgetPerKg}/kg &bull; Required Grade: Grade {demand.requiredGrade}
                 </p>
               </div>
 
               <div className="text-right">
-                <span className="text-xs text-zinc-400 block">Matched Volume</span>
-                <span className="text-sm font-black text-emerald-600 dark:text-emerald-400">
-                  {demand.matchedQuantityKg} / {demand.requiredQuantityKg} kg ({Math.round((demand.matchedQuantityKg / demand.requiredQuantityKg) * 100)}%)
+                <span className="text-xs text-slate-400 block font-medium">Matched Volume</span>
+                <span className="text-sm font-black text-blue-600 block">
+                  {demand.matchedQuantityKg} / {demand.requiredQuantityKg} kg (
+                  {Math.round((demand.matchedQuantityKg / (demand.requiredQuantityKg || 1)) * 100)}%)
                 </span>
+                <div className="w-32 bg-slate-100 rounded-full h-1.5 mt-1.5 overflow-hidden ml-auto">
+                  <div
+                    className="bg-blue-600 h-full rounded-full"
+                    style={{
+                      width: `${Math.min(
+                        100,
+                        Math.round((demand.matchedQuantityKg / (demand.requiredQuantityKg || 1)) * 100)
+                      )}%`,
+                    }}
+                  />
+                </div>
               </div>
             </div>
           ))}
+
+          {bulkDemands.length === 0 && (
+            <div className="bg-white border border-slate-200 rounded-2xl p-12 text-center">
+              <Package className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-xs text-slate-500 font-semibold">No custom demands published yet</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Aggregate your commodity volume and match with farmer clusters at competitive farm-gate rates.
+              </p>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Demand Modal */}
+      {/* POST BULK DEMAND MODAL */}
       {showDemandModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-2xl space-y-4">
-            <h3 className="text-lg font-black text-zinc-900 dark:text-white">Post Custom Bulk Demand</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/50 backdrop-blur-xs animate-fadeIn">
+          <div className="w-full max-w-md bg-white rounded-2xl p-6 border border-slate-200 shadow-xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-black text-slate-900">Post Custom Bulk Demand</h3>
+              <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                Cluster Matching
+              </span>
+            </div>
+
             <form onSubmit={handleCreateDemand} className="space-y-4">
               <div>
-                <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Produce Commodity</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Produce Commodity
+                </label>
                 <input
                   type="text"
                   value={newProduceName}
                   onChange={(e) => setNewProduceName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-sm font-semibold"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   required
                 />
               </div>
+
               <div>
-                <label className="text-xs font-bold text-zinc-600 dark:text-zinc-400 block mb-1">Required Quantity (kg)</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Required Quantity (kg)
+                </label>
                 <input
                   type="number"
                   value={newRequiredKg}
                   onChange={(e) => setNewRequiredKg(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 text-sm font-semibold"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                   required
+                  min={50}
+                  step={50}
                 />
               </div>
+
+              <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-900 space-y-1">
+                <span className="font-bold block">Smart Route Optimization</span>
+                <p className="text-[11px] text-blue-700">
+                  AgriFlow will auto-route this demand to certified farmer clusters within 150 km, aggregating cold-chain trucks for maximum freshness.
+                </p>
+              </div>
+
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowDemandModal(false)}
-                  className="flex-1 py-2.5 rounded-xl bg-zinc-200 dark:bg-zinc-800 text-xs font-bold text-zinc-700 dark:text-zinc-300"
+                  className="flex-1 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow-lg"
+                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white shadow-xs cursor-pointer transition"
                 >
-                  {demandCreated ? 'Created!' : 'Publish Demand'}
+                  {demandCreated ? 'Demand Published!' : 'Publish Demand'}
                 </button>
               </div>
             </form>
@@ -393,4 +849,4 @@ export default function ConsumerDashboard() {
       )}
     </div>
   );
-}
+}

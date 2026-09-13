@@ -8,21 +8,21 @@ import { ArrowLeft, Sprout } from 'lucide-react';
 
 export default function FarmerLoginPage() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8 selection:bg-emerald-500 selection:text-white">
       
       {/* Back link */}
       <div className="max-w-md w-full mx-auto">
-        <Link href="/farmer" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-400 transition font-medium">
+        <Link href="/farmer" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-emerald-600 transition font-medium">
           <ArrowLeft className="w-4 h-4" /> Back to Farmer Portal
         </Link>
       </div>
 
       <div className="max-w-md w-full mx-auto my-8">
-        <Card className="bg-slate-900 border-slate-800 p-8 shadow-2xl">
+        <Card className="bg-white border-slate-200 p-6 sm:p-8 shadow-xs rounded-2xl">
           
           <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto mb-3">
-              <Sprout className="w-7 h-7 text-emerald-400" />
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto mb-3">
+              <Sprout className="w-7 h-7 text-emerald-600" />
             </div>
           </div>
 
@@ -37,10 +37,11 @@ export default function FarmerLoginPage() {
         </Card>
       </div>
 
-      <div className="text-center text-xs text-slate-500">
+      <div className="text-center text-xs text-slate-400">
         AgriFlow AI &bull; Smart India Hackathon Verified Direct Trade System
       </div>
 
     </div>
   );
 }
+

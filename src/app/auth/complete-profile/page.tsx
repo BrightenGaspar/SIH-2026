@@ -246,282 +246,282 @@ function CompleteProfileContent() {
 
   if (checkingSession) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-3" />
-        <p className="text-xs text-slate-400">Verifying secure session...</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-900">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mb-3" />
+        <p className="text-xs text-slate-500">Verifying secure session...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-lg w-full mx-auto my-auto space-y-6">
-        
-        {/* Card Container */}
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-lg w-full mx-auto my-auto space-y-6">
           
-          {/* Header */}
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
-              <ShieldCheck className="w-7 h-7" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              Complete Your Profile
-            </h1>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Please finish setting up your account details. This information is saved permanently and links directly to your role dashboard.
-            </p>
-          </div>
-
-          {/* Verified Identity Badge */}
-          <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-3 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2.5">
-              {authEmail ? (
-                <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
-                  <Mail className="w-4 h-4" />
-                </div>
-              ) : (
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                  <Phone className="w-4 h-4" />
-                </div>
-              )}
-              <div>
-                <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
-                  Verified Identity
-                </span>
-                <span className="font-mono text-white font-semibold">
-                  {authEmail || authPhone || 'Authenticated Account'}
-                </span>
-              </div>
-            </div>
-            <span className="text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
-              <CheckCircle2 className="w-3 h-3" /> Linked
-            </span>
-          </div>
-
-          {/* Error Alert */}
-          {formError && (
-            <div className="bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />
-              <div>{formError}</div>
-            </div>
-          )}
-
-          {/* Success Alert */}
-          {successMessage && (
-            <div className="bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-              <div>{successMessage}</div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Card Container */}
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
             
-            {/* Full Name */}
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1.5 uppercase tracking-wider">
-                Full Name <span className="text-rose-400">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="e.g. Ramesh Reddy or Priya Sharma"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:border-emerald-500 transition"
-                />
+            {/* Header */}
+            <div className="text-center space-y-2">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
+                <ShieldCheck className="w-7 h-7" />
               </div>
-            </div>
-
-            {/* Username with Live Debounce Availability Check */}
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Username <span className="text-rose-400">*</span>
-                </label>
-                {usernameStatus === 'checking' && (
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
-                    <Loader2 className="w-3 h-3 animate-spin" /> checking...
-                  </span>
-                )}
-                {usernameStatus === 'available' && (
-                  <span className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3" /> available
-                  </span>
-                )}
-                {usernameStatus === 'taken' && (
-                  <span className="text-[11px] text-rose-400 font-bold flex items-center gap-1">
-                    <XCircle className="w-3 h-3" /> already taken
-                  </span>
-                )}
-              </div>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
-                placeholder="e.g. ramesh123"
-                className={`w-full bg-slate-950 border rounded-xl px-4 py-3 text-sm font-mono text-white focus:outline-none focus:ring-1 transition ${
-                  usernameStatus === 'available'
-                    ? 'border-emerald-500 focus:border-emerald-500'
-                    : usernameStatus === 'taken'
-                    ? 'border-rose-500 focus:border-rose-500'
-                    : 'border-slate-700 focus:border-emerald-500'
-                }`}
-              />
-              {usernameError && (
-                <p className="text-[11px] text-rose-400 mt-1">{usernameError}</p>
-              )}
-            </div>
-
-            {/* Place / City & Area / Locality */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1.5 uppercase tracking-wider">
-                  Place / City <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={place}
-                  onChange={(e) => setPlace(e.target.value)}
-                  placeholder="e.g. Hyderabad"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:border-emerald-500 transition"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1.5 uppercase tracking-wider">
-                  Area / Locality <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={area}
-                  onChange={(e) => setArea(e.target.value)}
-                  placeholder="e.g. Shadnagar"
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:border-emerald-500 transition"
-                />
-              </div>
-            </div>
-
-            {/* Role Selection */}
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1.5 uppercase tracking-wider">
-                Permanent Role <span className="text-rose-400">*</span>
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                
-                {/* Farmer */}
-                <button
-                  type="button"
-                  onClick={() => setRole('farmer')}
-                  className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1.5 ${
-                    role === 'farmer'
-                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold ring-1 ring-emerald-500 shadow-sm'
-                      : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-white'
-                  }`}
-                >
-                  <Sprout className="w-5 h-5 text-emerald-400" />
-                  <span className="text-xs leading-tight">Farmer / FPO</span>
-                </button>
-
-                {/* Consumer */}
-                <button
-                  type="button"
-                  onClick={() => setRole('consumer')}
-                  className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1.5 ${
-                    role === 'consumer'
-                      ? 'border-blue-500 bg-blue-500/10 text-blue-400 font-bold ring-1 ring-blue-500 shadow-sm'
-                      : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-white'
-                  }`}
-                >
-                  <Store className="w-5 h-5 text-blue-400" />
-                  <span className="text-xs leading-tight">Consumer / Buyer</span>
-                </button>
-
-                {/* Logistics */}
-                <button
-                  type="button"
-                  onClick={() => setRole('logistics')}
-                  className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1.5 ${
-                    role === 'logistics'
-                      ? 'border-amber-500 bg-amber-500/10 text-amber-400 font-bold ring-1 ring-amber-500 shadow-sm'
-                      : 'border-slate-800 bg-slate-950 text-slate-400 hover:border-slate-700 hover:text-white'
-                  }`}
-                >
-                  <Truck className="w-5 h-5 text-amber-400" />
-                  <span className="text-xs leading-tight">Logistic Operator</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Optional Password Setup */}
-            <div className="pt-2 border-t border-slate-800/80">
-              <label className="text-xs font-bold text-slate-300 block mb-1 uppercase tracking-wider flex items-center justify-between">
-                <span>Account Password (Optional)</span>
-                <span className="text-[10px] text-slate-500 font-normal lowercase">enables username + password login</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Set password for username login"
-                  minLength={6}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-1 focus:border-emerald-500 transition"
-                />
-              </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                Managed securely by Supabase Auth. Never stored in plain text.
+              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                Complete Your Profile
+              </h1>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                Please finish setting up your account details. This information is saved permanently and links directly to your role dashboard.
               </p>
             </div>
-
-            {/* Submit Button */}
-            <div className="pt-3">
-              <button
-                type="submit"
-                disabled={submitting || usernameStatus === 'taken'}
-                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition disabled:opacity-50"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Saving Profile...</span>
-                  </>
+  
+            {/* Verified Identity Badge */}
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2.5">
+                {authEmail ? (
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center">
+                    <Mail className="w-4 h-4" />
+                  </div>
                 ) : (
-                  <>
-                    <span>Save Profile & Enter Dashboard</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
+                  <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
+                    <Phone className="w-4 h-4" />
+                  </div>
                 )}
-              </button>
+                <div>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">
+                    Verified Identity
+                  </span>
+                  <span className="font-mono text-slate-900 font-semibold">
+                    {authEmail || authPhone || 'Authenticated Account'}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3" /> Linked
+              </span>
             </div>
-          </form>
-
+  
+            {/* Error Alert */}
+            {formError && (
+              <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+                <div>{formError}</div>
+              </div>
+            )}
+  
+            {/* Success Alert */}
+            {successMessage && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <div>{successMessage}</div>
+              </div>
+            )}
+  
+            <form onSubmit={handleSubmit} className="space-y-4">
+              
+              {/* Full Name */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase tracking-wider">
+                  Full Name <span className="text-rose-500">*</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="e.g. Ramesh Reddy or Priya Sharma"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                  />
+                </div>
+              </div>
+  
+              {/* Username with Live Debounce Availability Check */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                    Username <span className="text-rose-500">*</span>
+                  </label>
+                  {usernameStatus === 'checking' && (
+                    <span className="text-[11px] text-slate-500 flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" /> checking...
+                    </span>
+                  )}
+                  {usernameStatus === 'available' && (
+                    <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> available
+                    </span>
+                  )}
+                  {usernameStatus === 'taken' && (
+                    <span className="text-[11px] text-rose-600 font-bold flex items-center gap-1">
+                      <XCircle className="w-3 h-3" /> already taken
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/\s+/g, ''))}
+                  placeholder="e.g. ramesh123"
+                  className={`w-full bg-slate-50 border rounded-xl px-4 py-3 text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 transition ${
+                    usernameStatus === 'available'
+                      ? 'border-emerald-500 focus:ring-emerald-500/20 focus:border-emerald-500'
+                      : usernameStatus === 'taken'
+                      ? 'border-rose-500 focus:ring-rose-500/20 focus:border-rose-500'
+                      : 'border-slate-200 focus:ring-emerald-500/20 focus:border-emerald-500'
+                  }`}
+                />
+                {usernameError && (
+                  <p className="text-[11px] text-rose-600 mt-1">{usernameError}</p>
+                )}
+              </div>
+  
+              {/* Place / City & Area / Locality */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase tracking-wider">
+                    Place / City <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                    placeholder="e.g. Hyderabad"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                  />
+                </div>
+  
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase tracking-wider">
+                    Area / Locality <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={area}
+                    onChange={(e) => setArea(e.target.value)}
+                    placeholder="e.g. Shadnagar"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                  />
+                </div>
+              </div>
+  
+              {/* Role Selection */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5 uppercase tracking-wider">
+                  Permanent Role <span className="text-rose-500">*</span>
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  
+                  {/* Farmer */}
+                  <button
+                    type="button"
+                    onClick={() => setRole('farmer')}
+                    className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
+                      role === 'farmer'
+                        ? 'border-emerald-500 bg-emerald-50 text-emerald-800 font-bold ring-2 ring-emerald-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    <Sprout className="w-5 h-5 text-emerald-600" />
+                    <span className="text-xs leading-tight">Farmer / FPO</span>
+                  </button>
+  
+                  {/* Consumer */}
+                  <button
+                    type="button"
+                    onClick={() => setRole('consumer')}
+                    className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
+                      role === 'consumer'
+                        ? 'border-blue-500 bg-blue-50 text-blue-800 font-bold ring-2 ring-blue-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    <Store className="w-5 h-5 text-blue-600" />
+                    <span className="text-xs leading-tight">Consumer / Buyer</span>
+                  </button>
+  
+                  {/* Logistics */}
+                  <button
+                    type="button"
+                    onClick={() => setRole('logistics')}
+                    className={`p-3 rounded-2xl border text-center transition flex flex-col items-center justify-center gap-1.5 cursor-pointer ${
+                      role === 'logistics'
+                        ? 'border-amber-500 bg-amber-50 text-amber-800 font-bold ring-2 ring-amber-500/20 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                  >
+                    <Truck className="w-5 h-5 text-amber-600" />
+                    <span className="text-xs leading-tight">Logistic Operator</span>
+                  </button>
+                </div>
+              </div>
+  
+              {/* Optional Password Setup */}
+              <div className="pt-2 border-t border-slate-100">
+                <label className="text-xs font-bold text-slate-700 block mb-1 uppercase tracking-wider flex items-center justify-between">
+                  <span>Account Password (Optional)</span>
+                  <span className="text-[10px] text-slate-400 font-normal lowercase">enables username + password login</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Set password for username login"
+                    minLength={6}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"
+                  />
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Managed securely by Supabase Auth. Never stored in plain text.
+                </p>
+              </div>
+  
+              {/* Submit Button */}
+              <div className="pt-3">
+                <button
+                  type="submit"
+                  disabled={submitting || usernameStatus === 'taken'}
+                  className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-xs transition cursor-pointer disabled:opacity-50"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Profile...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Save Profile & Enter Dashboard</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+  
+          </div>
+  
+          <div className="text-center text-xs text-slate-400">
+            AgriFlow AI &bull; Supabase PostgreSQL Persistent User Identity
+          </div>
+  
         </div>
-
-        <div className="text-center text-xs text-slate-500">
-          AgriFlow AI &bull; Supabase PostgreSQL Persistent User Identity
-        </div>
-
       </div>
-    </div>
-  );
-}
-
-export default function CompleteProfilePage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-white">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-500 mb-3" />
-          <p className="text-xs text-slate-400">Loading profile setup...</p>
-        </div>
-      }
-    >
-      <CompleteProfileContent />
-    </Suspense>
-  );
-}
+    );
+  }
+  
+  export default function CompleteProfilePage() {
+    return (
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 text-slate-900">
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-600 mb-3" />
+            <p className="text-xs text-slate-500">Loading profile setup...</p>
+          </div>
+        }
+      >
+        <CompleteProfileContent />
+      </Suspense>
+    );
+  }

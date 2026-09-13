@@ -1,55 +1,52 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  Truck, 
-  MapPin, 
-  ThermometerSnowflake, 
-  RefreshCw, 
-  ShieldCheck, 
-  Sprout, 
-  Store, 
-  ArrowLeft,
-  Package,
-  Layers,
-  Sparkles,
-  PhoneCall,
-  Menu,
-  X
-} from 'lucide-react';
-
-import { LanguageSelector } from '@/components/common/LanguageSelector';
-import { LowBandwidthToggle } from '@/components/common/LowBandwidthToggle';
-import { ConnectionIndicator } from '@/components/common/ConnectionIndicator';
-import { useI18n } from '@/context/I18nContext';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { useI18n } from '@/context/I18nContext';
+import { GlobalHeader } from '@/components/navigation/GlobalHeader';
+import { MobileBottomNav } from '@/components/navigation/MobileBottomNav';
+import {
+  Home,
+  Truck,
+  Navigation,
+  RefreshCw,
+  ThermometerSnowflake,
+  MapPin,
+  User,
+  Settings,
+  ShieldCheck,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export default function LogisticsLayout({ children }: { children: React.ReactNode }) {
+export default function LogisticsLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { t } = useI18n();
+  const router = useRouter();
   const { logisticsUser, logoutLogistics } = useAuth();
+  const { t } = useI18n();
 
-  const navItems = [
-    { href: '/logistics/dashboard', label: t('fleetDashboard') || 'Fleet Dashboard', icon: Layers },
-    { href: '/logistics/trips', label: t('consolidatedTrips') || 'Consolidated Trips', icon: Truck },
-    { href: '/logistics/return-loads', label: t('returnLoadAI') || 'Return Load AI', icon: RefreshCw },
-    { href: '/logistics/telemetry', label: t('reeferTelemetry') || 'Reefer Telemetry', icon: ThermometerSnowflake },
-  ];
+  const isPublic =
+    pathname === '/logistics' ||
+    pathname === '/logistics/login' ||
+    pathname === '/logistics/register' ||
+    pathname === '/logistics/complete-profile';
 
-  const publicRoutes = ['/logistics', '/logistics/login', '/logistics/register', '/logistics/complete-profile'];
-  const isPublic = publicRoutes.includes(pathname);
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isPublic && !logisticsUser) {
-      // If unauthenticated on protected logistics routes, redirect to login
-      window.location.href = '/logistics/login';
-    } else if (logisticsUser && logisticsUser.profileCompleted === false && pathname !== '/logistics/complete-profile') {
-      window.location.href = '/logistics/complete-profile';
+      router.push('/logistics/login');
+    } else if (
+      logisticsUser &&
+      logisticsUser.profileCompleted === false &&
+      pathname !== '/logistics/complete-profile'
+    ) {
+      router.push('/logistics/complete-profile');
     }
-  }, [isPublic, logisticsUser, pathname]);
+  }, [isPublic, logisticsUser, pathname, router]);
 
   if (isPublic) {
     return <>{children}</>;
@@ -59,139 +56,75 @@ export default function LogisticsLayout({ children }: { children: React.ReactNod
     return null;
   }
 
+  const navItems = [
+    { href: '/logistics/dashboard', label: 'Fleet Overview', icon: Home },
+    { href: '/logistics/trips', label: 'Consolidated Trips', icon: Navigation },
+    { href: '/logistics/return-loads', label: 'Return Load AI', icon: RefreshCw },
+    { href: '/logistics/telemetry', label: 'Reefer Telemetry', icon: ThermometerSnowflake },
+    { href: '/logistics/settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-cyan-500 selection:text-white">
-      {/* Universal Top Switcher Banner */}
-      <div className="bg-slate-900/90 border-b border-slate-800 text-xs text-slate-400 px-4 py-1.5 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 font-bold text-cyan-400">
-            <Truck className="w-3.5 h-3.5" /> AgriFlow Fleet & Cold-Chain Network
-          </span>
-          <span className="hidden md:inline text-slate-500">&bull; Telemetry & Return-Haul Optimization</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <ConnectionIndicator />
-          <LowBandwidthToggle />
-          <Link href="/" className="hover:text-slate-200 transition flex items-center gap-1">
-            <ArrowLeft className="w-3 h-3" /> Home Hub
-          </Link>
-          <span className="text-slate-700">|</span>
-          <Link href="/farmer" className="text-emerald-400 hover:text-emerald-300 transition flex items-center gap-1">
-            <Sprout className="w-3 h-3" /> Farmer Portal
-          </Link>
-          <span className="text-slate-700">|</span>
-          <Link href="/consumer" className="text-teal-400 hover:text-teal-300 transition flex items-center gap-1">
-            <Store className="w-3 h-3" /> Buyer Portal
-          </Link>
-          <span className="text-slate-700">|</span>
-          <LanguageSelector variant="compact" />
-        </div>
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+      {/* 1. GLOBAL HEADER (Exact reference match) */}
+      <GlobalHeader />
+
+      {/* 2. BODY: DESKTOP SIDEBAR + MAIN CONTENT */}
+      <div className="flex-1 flex max-w-7xl w-full mx-auto pb-16 md:pb-6">
+        {/* Desktop Sidebar (White + Light Amber, exact reference match) */}
+        <aside className="hidden md:flex flex-col w-60 shrink-0 bg-white border-r border-slate-200 py-6 px-4 justify-between">
+          <div className="space-y-6">
+            <div className="px-2">
+              <div className="flex items-center gap-2 text-amber-700 font-bold text-xs uppercase tracking-wider">
+                <Truck className="w-4 h-4 text-amber-600" />
+                <span>Logistics Fleet</span>
+              </div>
+            </div>
+
+            {/* Navigation links */}
+            <nav className="space-y-1">
+              {navItems.map(item => {
+                const Icon = item.icon;
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== '/logistics/dashboard' && pathname.startsWith(item.href));
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-colors',
+                      isActive
+                        ? 'bg-amber-100 text-amber-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    )}
+                  >
+                    <Icon className={cn('w-4 h-4', isActive ? 'text-amber-700' : 'text-slate-400')} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+
+          {/* Bottom Sidebar Promo Card (from reference image) */}
+          <div className="bg-amber-50 border border-amber-200/60 rounded-2xl p-4 text-center mt-6">
+            <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center mx-auto mb-2 shadow-xs">
+              <Truck className="w-4 h-4" />
+            </div>
+            <p className="text-xs font-bold text-amber-900">Safe Delivery • Fresh Produce</p>
+            <p className="text-[11px] text-amber-700 mt-0.5">
+              Optimized return hauls with verified 6.2°C cold-chain preservation.
+            </p>
+          </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
 
-      {/* Main Navbar */}
-      <header className="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-white font-black shrink-0 shadow-lg shadow-cyan-600/30">
-              <Truck className="w-5 h-5 text-white" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white whitespace-nowrap">
-                  AgriFlow <span className="text-cyan-400">Logistics</span>
-                </span>
-                <span className="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800 whitespace-nowrap">
-                  Active Fleet Ops
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 truncate hidden md:block">Reefer Telemetry, Highway Routes & Return Load Matching</p>
-            </div>
-          </div>
-
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-                    isActive
-                      ? 'bg-cyan-950 text-cyan-400 border border-cyan-700/60 shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/farmer/tracking/TRK-RD-9021"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-950 border border-cyan-700/60 hover:bg-cyan-900/80 text-cyan-300 text-xs font-semibold transition"
-            >
-              <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-              <span className="hidden sm:inline">Active Trip GPS</span>
-              <span className="sm:hidden">GPS</span>
-            </Link>
-
-            {logisticsUser && (
-              <button
-                onClick={logoutLogistics}
-                className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800/60 hover:bg-rose-950/40 hover:border-rose-700/50 text-xs font-semibold text-slate-300 hover:text-rose-400 transition"
-              >
-                {t('logout')}
-              </button>
-            )}
-
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
-              aria-label="Toggle navigation menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Drawer Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-800 bg-slate-900 px-4 py-3 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
-                    isActive
-                      ? 'bg-cyan-950 text-cyan-400 border border-cyan-700/60'
-                      : 'text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 text-cyan-400" />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </header>
-
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full min-w-0">
-        {children}
-      </main>
-
-      <footer className="border-t border-slate-800/60 bg-slate-950 py-6 text-center text-xs text-slate-500">
-        <p>AgriFlow AI &bull; SIH Smart Cold-Chain Transport & Logistics Platform</p>
-      </footer>
+      {/* 3. MOBILE BOTTOM NAVIGATION */}
+      <MobileBottomNav role="logistics" />
     </div>
   );
 }

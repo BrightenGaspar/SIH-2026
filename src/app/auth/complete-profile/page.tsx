@@ -9,6 +9,7 @@ import {
   upsertProfile,
   getProfileByUserId,
   UserRole,
+  validateRole,
 } from '@/services/profileService';
 import {
   ShieldCheck,
@@ -30,7 +31,7 @@ import {
 function CompleteProfileContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialRoleParam = searchParams.get('role') as UserRole | null;
+  const validatedInitialRole = validateRole(searchParams.get('role'));
 
   const { refreshUserProfile } = useAuth();
 
@@ -39,16 +40,12 @@ function CompleteProfileContent() {
   const [authPhone, setAuthPhone] = useState<string>('');
   const [checkingSession, setCheckingSession] = useState(true);
 
-  // Form states
+  // Form states - Priority 1: Explicit validated role parameter from query string, Priority 3: Fallback 'consumer'
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [place, setPlace] = useState('');
   const [area, setArea] = useState('');
-  const [role, setRole] = useState<UserRole>(
-    initialRoleParam && ['farmer', 'consumer', 'logistics'].includes(initialRoleParam)
-      ? initialRoleParam
-      : 'consumer'
-  );
+  const [role, setRole] = useState<UserRole>(validatedInitialRole || 'consumer');
   const [password, setPassword] = useState('');
 
   // Username validation state
@@ -83,8 +80,13 @@ function CompleteProfileContent() {
           if (existingProfile.username) setUsername(existingProfile.username);
           if (existingProfile.place) setPlace(existingProfile.place);
           if (existingProfile.area) setArea(existingProfile.area);
-          if (existingProfile.role && ['farmer', 'consumer', 'logistics'].includes(existingProfile.role)) {
-            setRole(existingProfile.role);
+
+          // Priority 2: Only adopt existing database profile role if NO explicit role parameter was passed in URL
+          if (!validatedInitialRole) {
+            const validDbRole = validateRole(existingProfile.role);
+            if (validDbRole) {
+              setRole(validDbRole);
+            }
           }
         } else if (session.user.user_metadata?.full_name) {
           setFullName(session.user.user_metadata.full_name);
@@ -96,7 +98,7 @@ function CompleteProfileContent() {
       }
     }
     loadSession();
-  }, [router]);
+  }, [router, validatedInitialRole]);
 
   // 2. Debounced username availability check
   const verifyUsername = useCallback(

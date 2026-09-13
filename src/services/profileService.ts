@@ -200,3 +200,46 @@ export async function upsertProfile(
     return { profile: null, error: error.message || 'Failed to save profile' };
   }
 }
+
+export const VALID_ROLES: UserRole[] = ['farmer', 'consumer', 'logistics'];
+
+/**
+ * Validate that a role is strictly one of the allowed roles.
+ */
+export function validateRole(roleInput: string | null | undefined): UserRole | null {
+  if (!roleInput) return null;
+  const normalized = roleInput.trim().toLowerCase();
+  if (VALID_ROLES.includes(normalized as UserRole)) {
+    return normalized as UserRole;
+  }
+  return null;
+}
+
+/**
+ * Deterministically generates a unique username from a display name and checks database availability.
+ */
+export async function generateUniqueUsername(
+  baseName: string,
+  currentUserId?: string
+): Promise<string> {
+  const sanitized = baseName
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '') || 'user';
+
+  let candidate = sanitized.slice(0, 20);
+  if (await checkUsernameAvailable(candidate, currentUserId)) {
+    return candidate;
+  }
+
+  for (let i = 2; i <= 50; i++) {
+    const nextCandidate = `${sanitized.slice(0, 16)}_${i}`;
+    if (await checkUsernameAvailable(nextCandidate, currentUserId)) {
+      return nextCandidate;
+    }
+  }
+
+  return `${sanitized.slice(0, 12)}_${Date.now().toString().slice(-4)}`;
+}
+

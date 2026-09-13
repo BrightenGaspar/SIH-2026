@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { generateUniqueUsername, upsertProfile, validateRole } from '@/services/profileService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,11 @@ export async function POST(request: NextRequest) {
       phone,
       state,
       district,
+      place,
+      area,
+      username,
+      fpo_name,
+      fpoName,
     } = body;
 
     // Validate required fields
@@ -36,7 +42,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const resolvedFullName = full_name || fullName || email.split('@')[0];
+    const resolvedFullName = (full_name || fullName || email.split('@')[0]).trim();
+    const validatedRole = validateRole(role) || 'farmer';
 
     // 1. Sign up user via Supabase Auth SDK
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -45,8 +52,8 @@ export async function POST(request: NextRequest) {
       options: {
         data: {
           full_name: resolvedFullName,
-          role,
-          phone,
+          role: validatedRole,
+          phone: phone || '',
         },
       },
     });
@@ -72,28 +79,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 2. Insert companion profile data directly into public.profiles
-    const profilePayload = {
+    // 2. Resolve username and mandatory profile fields to guarantee isProfileComplete() returns true
+    const resolvedUsername = username?.trim()
+      ? username.trim().toLowerCase().replace(/[^a-z0-9_]/g, '_')
+      : await generateUniqueUsername(resolvedFullName, user.id);
+
+    const resolvedPlace = (place || district || 'Central').trim();
+    const resolvedArea = (area || district || state || 'Hub').trim();
+
+    // 3. Upsert complete companion profile directly into public.profiles
+    const { profile: profileData, error: profileError } = await upsertProfile({
       id: user.id,
       full_name: resolvedFullName,
-      role,
+      username: resolvedUsername,
+      role: validatedRole,
+      place: resolvedPlace,
+      area: resolvedArea,
       phone: phone || null,
+      email: email || null,
       state: state || null,
       district: district || null,
-    };
-
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .upsert(profilePayload)
-      .select()
-      .single();
+      fpo_name: fpo_name || fpoName || null,
+    });
 
     if (profileError) {
-      console.error('Error inserting into public.profiles:', profileError.message);
+      console.error('Error inserting into public.profiles:', profileError);
       return NextResponse.json(
         {
           success: false,
-          error: `User authenticated, but companion profile creation failed: ${profileError.message}`,
+          error: `User authenticated, but companion profile creation failed: ${profileError}`,
           userId: user.id,
         },
         { status: 500 }
@@ -109,7 +123,7 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
         },
-        profile: profileData || profilePayload,
+        profile: profileData,
         session: authData.session,
       },
       { status: 201 }

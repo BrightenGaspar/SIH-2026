@@ -28,7 +28,7 @@ export default function ConsumerLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { consumerUser, isConsumerAuthenticated, logoutConsumer } = useAuth();
+  const { consumerUser, isConsumerAuthenticated, isLoading, logoutConsumer } = useAuth();
   const { totalItems } = useCart();
   const { t } = useI18n();
 
@@ -39,21 +39,35 @@ export default function ConsumerLayout({
     pathname === '/consumer/complete-profile';
 
   useEffect(() => {
-    if (!isPublicPage && !isConsumerAuthenticated) {
-      router.push('/consumer/login');
-    } else if (
-      isConsumerAuthenticated &&
-      consumerUser &&
-      consumerUser.profileCompleted === false &&
-      pathname !== '/consumer/complete-profile'
-    ) {
-      router.push('/consumer/complete-profile');
+    if (!isPublicPage && !isLoading) {
+      if (!isConsumerAuthenticated) {
+        router.push('/consumer/login');
+      } else if (
+        consumerUser &&
+        consumerUser.profileCompleted === false &&
+        pathname !== '/consumer/complete-profile'
+      ) {
+        router.push('/consumer/complete-profile');
+      }
     }
-  }, [isPublicPage, isConsumerAuthenticated, consumerUser, pathname, router]);
+  }, [isPublicPage, isLoading, isConsumerAuthenticated, consumerUser, pathname, router]);
 
   // If on login/register/splash public page, render children directly without dashboard sidebar
   if (isPublicPage) {
     return <>{children}</>;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-3" />
+        <p className="text-xs text-slate-500 font-medium">Loading Consumer Portal...</p>
+      </div>
+    );
+  }
+
+  if (!isConsumerAuthenticated) {
+    return null;
   }
 
   const navLinks = [

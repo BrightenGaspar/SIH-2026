@@ -27,7 +27,7 @@ export default function LogisticsLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logisticsUser, logoutLogistics } = useAuth();
+  const { logisticsUser, isLogisticsAuthenticated, isLoading, logoutLogistics } = useAuth();
   const { t } = useI18n();
 
   const isPublic =
@@ -37,19 +37,30 @@ export default function LogisticsLayout({
     pathname === '/logistics/complete-profile';
 
   useEffect(() => {
-    if (!isPublic && !logisticsUser) {
-      router.push('/logistics/login');
-    } else if (
-      logisticsUser &&
-      logisticsUser.profileCompleted === false &&
-      pathname !== '/logistics/complete-profile'
-    ) {
-      router.push('/logistics/complete-profile');
+    if (!isPublic && !isLoading) {
+      if (!isLogisticsAuthenticated && !logisticsUser) {
+        router.push('/logistics/login');
+      } else if (
+        logisticsUser &&
+        logisticsUser.profileCompleted === false &&
+        pathname !== '/logistics/complete-profile'
+      ) {
+        router.push('/logistics/complete-profile');
+      }
     }
-  }, [isPublic, logisticsUser, pathname, router]);
+  }, [isPublic, isLoading, isLogisticsAuthenticated, logisticsUser, pathname, router]);
 
   if (isPublic) {
     return <>{children}</>;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-600 rounded-full animate-spin mb-3" />
+        <p className="text-xs text-slate-500 font-medium">Loading Logistics Portal...</p>
+      </div>
+    );
   }
 
   if (!logisticsUser) {

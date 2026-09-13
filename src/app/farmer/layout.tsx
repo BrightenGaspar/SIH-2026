@@ -43,17 +43,30 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   const publicFarmerRoutes = ['/farmer', '/farmer/login', '/farmer/register', '/farmer/complete-profile'];
   const isPublicRoute = publicFarmerRoutes.includes(pathname);
 
+  React.useEffect(() => {
+    if (!isPublicRoute && !isLoading) {
+      if (!isAuthenticated) {
+        router.push('/farmer/login');
+      } else if (user && user.profileCompleted === false && pathname !== '/farmer/complete-profile') {
+        router.push('/farmer/complete-profile');
+      }
+    }
+  }, [isPublicRoute, isLoading, isAuthenticated, user, pathname, router]);
+
   if (isPublicRoute) {
     return <>{children}</>;
   }
 
-  if (!isLoading && !isAuthenticated) {
-    router.push('/farmer/login');
-    return null;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="w-10 h-10 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-3" />
+        <p className="text-xs text-slate-500 font-medium">Loading Farmer Portal...</p>
+      </div>
+    );
   }
 
-  if (!isLoading && isAuthenticated && user && user.profileCompleted === false && pathname !== '/farmer/complete-profile') {
-    router.push('/farmer/complete-profile');
+  if (!isAuthenticated) {
     return null;
   }
 

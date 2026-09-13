@@ -11,6 +11,7 @@ import {
   isProfileComplete,
   upsertProfile,
   resolveUsernameToEmail,
+  generateUniqueUsername,
 } from '@/services/profileService';
 
 interface AuthContextType {
@@ -38,7 +39,7 @@ interface AuthContextType {
   updateFarmerProfile: (data: Partial<FarmerUser>) => Promise<boolean>;
   updateConsumerProfile: (data: Partial<ConsumerUser>) => Promise<boolean>;
   updateLogisticsProfile: (data: Partial<LogisticsOperator>) => Promise<boolean>;
-  refreshUserProfile: () => Promise<void>;
+  refreshUserProfile: () => Promise<UserProfile | null>;
   sendPhoneOtp: (
     phoneNumber: string,
     extraData?: { name?: string; role?: string }
@@ -147,19 +148,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Fetch real persistent profile from Supabase Database (Source of Truth)
-  const refreshUserProfile = useCallback(async () => {
+  const refreshUserProfile = useCallback(async (): Promise<UserProfile | null> => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
         applyProfileState(null);
-        return;
+        return null;
       }
 
       const profile = await getProfileByUserId(session.user.id);
       applyProfileState(profile);
+      return profile;
     } catch (err) {
       console.warn('refreshUserProfile error:', err);
       applyProfileState(null);
+      return null;
     }
   }, [applyProfileState]);
 
@@ -440,20 +443,145 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateConsumerLanguage = async (_lang: string): Promise<boolean> => true;
   const updateLogisticsLanguage = async (_lang: string): Promise<boolean> => true;
 
-  // Registration helpers
-  const register = async (data: Partial<FarmerUser>): Promise<boolean> => {
-    router.push('/farmer/login');
-    return true;
+  // Real Supabase registration and profile provisioning
+  const registerWithSupabase = async (
+    role: 'farmer' | 'consumer' | 'logistics',
+    profileData: {
+      fullName: string;
+      phone?: string;
+      email?: string;
+      password?: string;
+      place?: string;
+      area?: string;
+      state?: string;
+      district?: string;
+      fpoName?: string;
+    }
+  ): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      let targetUserId: string | null = null;
+      let targetEmail = profileData.email?.trim() || null;
+      let targetPhone = profileData.phone?.trim() || null;
+
+      // 1. Check if an active authenticated session already exists (e.g. from Google OAuth or Phone OTP)
+      const { data: { session: existingSession } } = await supabase.auth.getSession();
+      if (existingSession?.user) {
+        targetUserId = existingSession.user.id;
+        if (!targetEmail) targetEmail = existingSession.user.email || null;
+        if (!targetPhone) targetPhone = existingSession.user.phone || null;
+      } else {
+        // 2. Register user via real Supabase Auth
+        const cleanPhone = (profileData.phone || '').replace(/\D/g, '');
+        const authEmail = profileData.email?.trim() || (cleanPhone ? `${cleanPhone}@agriflow.local` : `${role}_${Date.now()}@agriflow.local`);
+        const authPass = profileData.password?.trim() || 'AgriFlow@2026';
+
+        let { data: authData, error: authError } = await supabase.auth.signUp({
+          email: authEmail,
+          password: authPass,
+          options: {
+            data: {
+              full_name: profileData.fullName,
+              role: role,
+              phone: profileData.phone || '',
+            },
+          },
+        });
+
+        if (authError) {
+          if (authError.message.toLowerCase().includes('already registered')) {
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+              email: authEmail,
+              password: authPass,
+            });
+            if (signInError) throw new Error(authError.message);
+            authData = signInData;
+          } else {
+            throw new Error(authError.message);
+          }
+        }
+
+        if (!authData.user) {
+          throw new Error('Registration failed: No authenticated user created.');
+        }
+
+        targetUserId = authData.user.id;
+        targetEmail = authEmail;
+        targetPhone = profileData.phone || null;
+      }
+
+      // 3. Generate verified unique username
+      const username = await generateUniqueUsername(profileData.fullName || role, targetUserId);
+
+      // 4. Upsert complete profile satisfying all isProfileComplete requirements
+      const { profile, error: pError } = await upsertProfile({
+        id: targetUserId,
+        full_name: profileData.fullName.trim(),
+        username,
+        role: role,
+        place: profileData.place?.trim() || profileData.district?.trim() || 'Central',
+        area: profileData.area?.trim() || profileData.district?.trim() || profileData.state?.trim() || 'Hub',
+        phone: targetPhone,
+        email: targetEmail,
+        state: profileData.state?.trim() || null,
+        district: profileData.district?.trim() || null,
+        fpo_name: profileData.fpoName?.trim() || null,
+      });
+
+      if (pError || !profile) {
+        throw new Error(pError || 'Failed to save companion profile in database.');
+      }
+
+      // 5. Hydrate AuthContext state with fresh persistent profile
+      const freshProfile = await refreshUserProfile();
+      applyProfileState(freshProfile || profile);
+
+      // 6. Navigate directly to the verified role dashboard
+      router.push(`/${role}/dashboard`);
+      return true;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const registerConsumer = async (data: Partial<ConsumerUser>): Promise<boolean> => {
-    router.push('/consumer/login');
-    return true;
+  const register = async (data: Partial<FarmerUser> & { password?: string }): Promise<boolean> => {
+    return registerWithSupabase('farmer', {
+      fullName: data.name || '',
+      phone: data.phone,
+      email: data.email,
+      place: data.place,
+      area: data.district,
+      state: data.state,
+      district: data.district,
+      fpoName: data.farmName,
+      password: data.password,
+    });
   };
 
-  const registerLogistics = async (data: Partial<LogisticsOperator>): Promise<boolean> => {
-    router.push('/logistics/login');
-    return true;
+  const registerConsumer = async (data: Partial<ConsumerUser> & { password?: string }): Promise<boolean> => {
+    return registerWithSupabase('consumer', {
+      fullName: data.name || '',
+      phone: data.phone,
+      email: data.email,
+      place: data.place,
+      area: data.district,
+      state: data.state,
+      district: data.district,
+      password: data.password,
+    });
+  };
+
+  const registerLogistics = async (data: Partial<LogisticsOperator> & { password?: string }): Promise<boolean> => {
+    return registerWithSupabase('logistics', {
+      fullName: data.name || '',
+      phone: data.phone,
+      email: data.email,
+      place: data.place,
+      area: data.district,
+      state: data.state,
+      district: data.district,
+      password: data.password,
+    });
   };
 
   // Sign Out cleanly

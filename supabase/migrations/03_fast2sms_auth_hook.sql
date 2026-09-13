@@ -23,7 +23,7 @@ BEGIN
     clean_phone := right(clean_phone, 10);
   END IF;
 
-  -- Dispatch real SMS via Fast2SMS dedicated OTP Route (works on DND & Non-DND 24/7) asynchronously using pg_net
+  -- Dispatch real SMS via Fast2SMS Quick Route (q) asynchronously using pg_net
   PERFORM net.http_post(
     url := 'https://www.fast2sms.com/dev/bulkV2',
     headers := jsonb_build_object(
@@ -31,8 +31,8 @@ BEGIN
       'Content-Type', 'application/json'
     ),
     body := jsonb_build_object(
-      'route', 'otp',
-      'variables_values', otp_code,
+      'route', 'q',
+      'message', 'AgriFlow verification code is ' || otp_code || '. Valid for 5 minutes. Do not share with anyone.',
       'numbers', clean_phone
     )
   );

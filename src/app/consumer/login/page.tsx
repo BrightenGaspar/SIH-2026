@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
+import { PhoneAuthForm } from '@/components/auth/PhoneAuthForm';
 import { 
   LogIn, 
   Store, 
@@ -14,7 +15,9 @@ import {
   Building2, 
   Utensils, 
   ShoppingBag, 
-  Home 
+  Home,
+  Phone,
+  KeyRound
 } from 'lucide-react';
 
 export default function ConsumerLoginPage() {
@@ -22,6 +25,7 @@ export default function ConsumerLoginPage() {
   const { loginConsumer } = useAuth();
   const { t } = useI18n();
 
+  const [loginMethod, setLoginMethod] = useState<'PHONE' | 'PASSWORD'>('PHONE');
   const [identifier, setIdentifier] = useState('rajesh.varma@southern-procure.in');
   const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
@@ -74,58 +78,98 @@ export default function ConsumerLoginPage() {
       </div>
 
       <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-xl space-y-6">
-        {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl text-xs text-red-600 dark:text-red-400 font-medium">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
-              Email or Mobile Number
-            </label>
-            <input
-              type="text"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="e.g. buyer@agriflow.in or 9848012345"
-              required
-              className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                Password
-              </label>
-              <span className="text-[11px] text-zinc-400">Demo PIN: 1234</span>
-            </div>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="********"
-              required
-              className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-            />
-          </div>
-
+        {/* Method Switcher */}
+        <div className="grid grid-cols-2 p-1 bg-zinc-100 dark:bg-zinc-800/80 rounded-2xl text-xs font-bold">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all duration-200 disabled:opacity-50"
+            type="button"
+            onClick={() => setLoginMethod('PHONE')}
+            className={`py-2.5 rounded-xl flex items-center justify-center gap-2 transition ${
+              loginMethod === 'PHONE'
+                ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-sm font-black'
+                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+            }`}
           >
-            {loading ? (
-              <span className="inline-block animate-spin">⏳</span>
-            ) : (
-              <>
-                <LogIn className="w-4 h-4" /> Sign In to Buyer Portal
-              </>
-            )}
+            <Phone className="w-3.5 h-3.5" />
+            <span>Phone OTP (Primary)</span>
           </button>
-        </form>
+          <button
+            type="button"
+            onClick={() => setLoginMethod('PASSWORD')}
+            className={`py-2.5 rounded-xl flex items-center justify-center gap-2 transition ${
+              loginMethod === 'PASSWORD'
+                ? 'bg-white dark:bg-zinc-900 text-emerald-600 dark:text-emerald-400 shadow-sm font-black'
+                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white'
+            }`}
+          >
+            <KeyRound className="w-3.5 h-3.5" />
+            <span>Email & Password</span>
+          </button>
+        </div>
+
+        {loginMethod === 'PHONE' ? (
+          <PhoneAuthForm
+            role="consumer"
+            redirectUrl="/consumer/dashboard"
+            roleTitle="Buyer Phone Login"
+            roleSubtitle="Instant SMS OTP verification with escrow security"
+            themeColor="emerald"
+          />
+        ) : (
+          <>
+            {error && (
+              <div className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl text-xs text-red-600 dark:text-red-400 font-medium">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-1.5">
+                  Email or Mobile Number
+                </label>
+                <input
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="e.g. buyer@agriflow.in or 9848012345"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                    Password
+                  </label>
+                  <span className="text-[11px] text-zinc-400">Demo PIN: 1234</span>
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="********"
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/60 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all duration-200 disabled:opacity-50"
+              >
+                {loading ? (
+                  <span className="inline-block animate-spin">⏳</span>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" /> Sign In to Buyer Portal
+                  </>
+                )}
+              </button>
+            </form>
+          </>
+        )}
 
         {/* Quick Demo Logins for SIH Judges */}
         <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 space-y-3">

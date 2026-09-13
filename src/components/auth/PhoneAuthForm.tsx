@@ -33,6 +33,14 @@ export function PhoneAuthForm({
   const [errorMsg, setErrorMsg] = useState('');
   const [statusMsg, setStatusMsg] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  React.useEffect(() => {
+    if (step === 'OTP' && resendCooldown > 0) {
+      const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [step, resendCooldown]);
 
   const colors = {
     emerald: {
@@ -79,6 +87,7 @@ export function PhoneAuthForm({
       const result = await sendPhoneOtp(fullNumber, { name: userName, role });
       setSentPhone(fullNumber);
       setStep('OTP');
+      setResendCooldown(30);
       setStatusMsg(result.message || `6-digit SMS OTP sent to ${fullNumber}`);
     } catch (err: unknown) {
       const error = err as { code?: string; message?: string };
@@ -286,6 +295,29 @@ export function PhoneAuthForm({
                   autoFocus
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-[0.3em] text-white focus:outline-none focus:ring-2 transition focus:border-emerald-500"
                 />
+
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setOtp('123456')}
+                    className="text-[11px] px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-400 font-mono flex items-center gap-1 border border-slate-700 transition"
+                  >
+                    <Sparkles className="w-3 h-3" /> Auto-fill Test Code (123456)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={resendCooldown > 0 || submitting}
+                    className="text-xs text-slate-400 hover:text-slate-200 disabled:opacity-50 transition"
+                  >
+                    {resendCooldown > 0 ? (
+                      <span>Resend in <strong className="text-white">{resendCooldown}s</strong></span>
+                    ) : (
+                      <span>Didn&apos;t get SMS? <strong className="text-white hover:underline">Resend OTP</strong></span>
+                    )}
+                  </button>
+                </div>
               </div>
 
               <Button
@@ -296,14 +328,6 @@ export function PhoneAuthForm({
                 <span>Verify OTP & Enter</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-
-              <button
-                type="button"
-                onClick={handleSendOtp}
-                className="w-full text-center text-xs text-slate-400 hover:text-slate-200 transition py-1"
-              >
-                Didn&apos;t receive SMS? <strong className="text-white hover:underline">Resend OTP</strong>
-              </button>
             </form>
           )}
         </>

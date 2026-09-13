@@ -120,7 +120,7 @@ export function PhoneAuthForm({
 
       setSentPhone(fullNumber);
       setStep('OTP');
-      setResendCooldown(45);
+      setResendCooldown(120);
       setStatusMsg(result.message || `SMS verification code sent to ${fullNumber}`);
     } catch (err: unknown) {
       const error = err as Error;

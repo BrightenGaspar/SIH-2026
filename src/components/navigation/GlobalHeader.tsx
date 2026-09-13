@@ -24,7 +24,16 @@ import { cn } from '@/lib/utils';
 export function GlobalHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const {
+    currentUser,
+    currentProfile,
+    user,
+    consumerUser,
+    logisticsUser,
+    logout,
+    logoutConsumer,
+    logoutLogistics,
+  } = useAuth();
   const { isLowBandwidth, setLowBandwidth } = useBandwidth();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
@@ -51,17 +60,23 @@ export function GlobalHeader() {
     ? 'Logistics Operator'
     : 'AgriFlow Member';
 
-  const displayName =
-    (user?.name || (isFarmer ? 'Ramesh Kumar' : isConsumer ? 'Sneha Patel' : 'Vikram Singh'))
-      .replace(/[\uD800-\uDFFF]|[\u2600-\u27BF]|\u00f0[^\s]*|\u00e2[^\s]*/g, '')
-      .trim() || 'User';
+  // Single Source of Truth: currentUser derived from Supabase Auth + public.profiles
+  const activeName =
+    currentUser?.name ||
+    currentProfile?.full_name ||
+    (isFarmer ? user?.name : isConsumer ? consumerUser?.name : logisticsUser?.name) ||
+    currentProfile?.username ||
+    'User';
 
-  const avatarInitials = displayName
-    .split(' ')
-    .map(n => n[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2) || 'AF';
+  const displayName = activeName
+    .replace(/[\uD800-\uDFFF]|[\u2600-\u27BF]|\u00f0[^\s]*|\u00e2[^\s]*/g, '')
+    .trim() || 'User';
+
+  const avatarInitials =
+    currentUser?.initials ||
+    (displayName.split(/\s+/).filter(Boolean).length === 1
+      ? displayName.trim()[0].toUpperCase()
+      : (displayName.split(/\s+/).filter(Boolean)[0][0] + displayName.split(/\s+/).filter(Boolean).slice(-1)[0][0]).toUpperCase());
 
   return (
     <header className="sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs h-16 px-3 sm:px-6 flex items-center justify-between transition-colors">
@@ -179,12 +194,14 @@ export function GlobalHeader() {
             >
               <div className="px-4 py-2 border-b border-slate-100">
                 <p className="text-xs font-bold text-slate-900">{displayName}</p>
-                <p className="text-[11px] text-slate-500">{user?.phone || user?.email || roleLabel}</p>
+                <p className="text-[11px] text-slate-500 truncate max-w-[200px]">
+                  {currentUser?.phone || currentUser?.email || currentProfile?.phone || currentProfile?.email || roleLabel}
+                </p>
               </div>
 
               <div className="py-1">
                 <Link
-                  href={isFarmer ? '/farmer/profile' : isConsumer ? '/consumer/profile' : '/logistics'}
+                  href={isFarmer ? '/farmer/profile' : isConsumer ? '/consumer/profile' : '/logistics/profile'}
                   onClick={() => setProfileDropdownOpen(false)}
                   className="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 >
@@ -236,9 +253,15 @@ export function GlobalHeader() {
               <div className="border-t border-slate-100 pt-1 mt-1">
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={async () => {
                     setProfileDropdownOpen(false);
-                    logout();
+                    if (isConsumer) {
+                      await logoutConsumer();
+                    } else if (isLogistics) {
+                      await logoutLogistics();
+                    } else {
+                      await logout();
+                    }
                     router.push('/');
                   }}
                   className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 text-left cursor-pointer"

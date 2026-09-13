@@ -16,7 +16,35 @@ import {
   fromDbRole,
 } from '@/services/profileService';
 
+export interface AuthenticatedUser {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  role: 'farmer' | 'consumer' | 'logistics';
+  username: string | null;
+  initials: string;
+  place?: string | null;
+  area?: string | null;
+  state?: string | null;
+  district?: string | null;
+  fpo_name?: string | null;
+}
+
+export function getInitials(name: string): string {
+  const clean = (name || '')
+    .replace(/[\uD800-\uDFFF]|[\u2600-\u27BF]|\u00f0[^\s]*|\u00e2[^\s]*/g, '')
+    .trim();
+  if (!clean) return 'U';
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) {
+    return parts[0][0].toUpperCase();
+  }
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 interface AuthContextType {
+  currentUser: AuthenticatedUser | null;
   user: FarmerUser | null;
   consumerUser: ConsumerUser | null;
   logisticsUser: LogisticsOperator | null;
@@ -28,6 +56,7 @@ interface AuthContextType {
   login: (identifier: string, pass: string) => Promise<boolean>;
   register: (data: Partial<FarmerUser>) => Promise<boolean>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   loginConsumer: (identifier: string, pass: string) => Promise<boolean>;
   registerConsumer: (data: Partial<ConsumerUser>) => Promise<boolean>;
   logoutConsumer: () => Promise<void>;
@@ -116,6 +145,7 @@ function normalizeToLogistics(p: UserProfile): LogisticsOperator {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(null);
   const [user, setUser] = useState<FarmerUser | null>(null);
   const [consumerUser, setConsumerUser] = useState<ConsumerUser | null>(null);
   const [logisticsUser, setLogisticsUser] = useState<LogisticsOperator | null>(null);
@@ -123,9 +153,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // Hydrate user role state from a verified Supabase database profile
-  const applyProfileState = useCallback((profile: UserProfile | null) => {
+  // Hydrate user role state and unified identity from a verified Supabase database profile & session
+  const applyProfileState = useCallback((profile: UserProfile | null, sessionUser?: any | null) => {
     setCurrentProfile(profile);
+
+    const activeId = profile?.id || sessionUser?.id;
+    if (activeId) {
+      const rawName =
+        profile?.full_name?.trim() ||
+        (sessionUser?.user_metadata?.full_name as string)?.trim() ||
+        (sessionUser?.user_metadata?.name as string)?.trim() ||
+        profile?.username?.trim() ||
+        (sessionUser?.email ? sessionUser.email.split('@')[0] : '') ||
+        '';
+
+      const rawRole = fromDbRole(
+        profile?.role ||
+        (sessionUser?.user_metadata?.role as string) ||
+        'consumer'
+      );
+
+      const displayName = rawName || (rawRole === 'farmer' ? 'Farmer' : rawRole === 'logistics' ? 'Transporter' : 'Consumer');
+
+      setCurrentUser({
+        id: activeId,
+        name: displayName,
+        email: profile?.email || sessionUser?.email || null,
+        phone: profile?.phone || sessionUser?.phone || null,
+        role: rawRole,
+        username: profile?.username || null,
+        initials: getInitials(displayName),
+        place: profile?.place || null,
+        area: profile?.area || null,
+        state: profile?.state || null,
+        district: profile?.district || null,
+        fpo_name: profile?.fpo_name || null,
+      });
+    } else {
+      setCurrentUser(null);
+    }
 
     if (!profile || !isProfileComplete(profile)) {
       setUser(null);
@@ -154,16 +220,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) {
-        applyProfileState(null);
+        applyProfileState(null, null);
         return null;
       }
 
       const profile = await getProfileByUserId(session.user.id);
-      applyProfileState(profile);
+      applyProfileState(profile, session.user);
       return profile;
     } catch (err) {
       console.warn('refreshUserProfile error:', err);
-      applyProfileState(null);
+      applyProfileState(null, null);
       return null;
     }
   }, [applyProfileState]);
@@ -178,10 +244,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user && mounted) {
           const profile = await getProfileByUserId(session.user.id);
           if (mounted) {
-            applyProfileState(profile);
+            applyProfileState(profile, session.user);
           }
         } else if (mounted) {
-          applyProfileState(null);
+          applyProfileState(null, null);
         }
       } catch (err) {
         console.warn('initAuth error:', err);
@@ -198,10 +264,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
         if (session?.user) {
           const profile = await getProfileByUserId(session.user.id);
-          applyProfileState(profile);
+          applyProfileState(profile, session.user);
         }
       } else if (event === 'SIGNED_OUT') {
-        applyProfileState(null);
+        applyProfileState(null, null);
       }
     });
 
@@ -390,13 +456,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentProfile) return false;
     const { profile, error } = await upsertProfile({
       id: currentProfile.id,
-      full_name: data.name,
-      place: data.place,
-      district: data.district,
-      state: data.state,
-      fpo_name: data.farmName,
-      phone: data.phone,
-      email: data.email,
+      role: 'farmer',
+      full_name: data.name !== undefined ? data.name : currentProfile.full_name,
+      username: currentProfile.username,
+      place: data.place !== undefined ? data.place : currentProfile.place,
+      area: currentProfile.area || currentProfile.district || 'Hub',
+      district: data.district !== undefined ? data.district : currentProfile.district,
+      state: data.state !== undefined ? data.state : currentProfile.state,
+      fpo_name: data.farmName !== undefined ? data.farmName : currentProfile.fpo_name,
+      phone: data.phone !== undefined ? data.phone : currentProfile.phone,
+      email: data.email !== undefined ? data.email : currentProfile.email,
     });
     if (!error && profile) {
       applyProfileState(profile);
@@ -409,12 +478,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentProfile) return false;
     const { profile, error } = await upsertProfile({
       id: currentProfile.id,
-      full_name: data.name,
-      place: data.place,
-      district: data.district,
-      state: data.state,
-      phone: data.phone,
-      email: data.email,
+      role: 'consumer',
+      full_name: data.name !== undefined ? data.name : currentProfile.full_name,
+      username: currentProfile.username,
+      place: data.place !== undefined ? data.place : currentProfile.place,
+      area: currentProfile.area || currentProfile.district || 'Hub',
+      district: data.district !== undefined ? data.district : currentProfile.district,
+      state: data.state !== undefined ? data.state : currentProfile.state,
+      phone: data.phone !== undefined ? data.phone : currentProfile.phone,
+      email: data.email !== undefined ? data.email : currentProfile.email,
     });
     if (!error && profile) {
       applyProfileState(profile);
@@ -427,12 +499,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentProfile) return false;
     const { profile, error } = await upsertProfile({
       id: currentProfile.id,
-      full_name: data.name,
-      place: data.place,
-      district: data.district,
-      state: data.state,
-      phone: data.phone,
-      email: data.email,
+      role: 'logistics',
+      full_name: data.name !== undefined ? data.name : currentProfile.full_name,
+      username: currentProfile.username,
+      place: data.place !== undefined ? data.place : currentProfile.place,
+      area: currentProfile.area || currentProfile.district || 'Hub',
+      district: data.district !== undefined ? data.district : currentProfile.district,
+      state: data.state !== undefined ? data.state : currentProfile.state,
+      phone: data.phone !== undefined ? data.phone : currentProfile.phone,
+      email: data.email !== undefined ? data.email : currentProfile.email,
     });
     if (!error && profile) {
       applyProfileState(profile);
@@ -594,7 +669,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
-    applyProfileState(null);
+    applyProfileState(null, null);
     router.push('/farmer/login');
   };
 
@@ -604,7 +679,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
-    applyProfileState(null);
+    applyProfileState(null, null);
     router.push('/consumer/login');
   };
 
@@ -614,24 +689,74 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
-    applyProfileState(null);
+    applyProfileState(null, null);
     router.push('/logistics/login');
+  };
+
+  // Secure Server-Side Account & Data Deletion
+  const deleteAccount = async (): Promise<{ success: boolean; error?: string }> => {
+    setIsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('You must be authenticated to delete your account.');
+      }
+
+      const res = await fetch('/api/auth/delete-account', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.error || 'Failed to delete account.');
+      }
+
+      // Evict Supabase session
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
+
+      // Evict all React state
+      applyProfileState(null, null);
+
+      // Evict client storage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('agriflow_cart');
+        localStorage.removeItem('agriflow_consumer_auth');
+        localStorage.removeItem('agriflow_farmer_auth');
+        localStorage.removeItem('agriflow_logistics_auth');
+      }
+
+      // Redirect to public landing gateway
+      router.push('/');
+      return { success: true };
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
+        currentUser,
         user,
         consumerUser,
         logisticsUser,
         currentProfile,
-        isAuthenticated: !!user,
-        isConsumerAuthenticated: !!consumerUser,
-        isLogisticsAuthenticated: !!logisticsUser,
+        isAuthenticated: !!user || (!!currentUser && currentUser.role === 'farmer'),
+        isConsumerAuthenticated: !!consumerUser || (!!currentUser && currentUser.role === 'consumer'),
+        isLogisticsAuthenticated: !!logisticsUser || (!!currentUser && currentUser.role === 'logistics'),
         isLoading,
         login,
         register,
         logout,
+        deleteAccount,
         updateFarmerLanguage,
         updateConsumerLanguage,
         updateLogisticsLanguage,

@@ -42,7 +42,7 @@ export function MobileBottomNav({ role }: MobileBottomNavProps) {
     { label: 'Home', href: '/logistics/dashboard', icon: Home },
     { label: 'Deliveries', href: '/logistics/trips', icon: Navigation },
     { label: 'Map', href: '/logistics/telemetry', icon: MapPin },
-    { label: 'Profile', href: '/logistics', icon: User },
+    { label: 'Profile', href: '/logistics/profile', icon: User },
   ];
 
   const items =

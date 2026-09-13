@@ -291,7 +291,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const fullPhone = `+91${raw10}`;
 
-      const { error } = await supabase.auth.signInWithOtp({
+      let { data: authData, error } = await supabase.auth.signInWithOtp({
         phone: fullPhone,
         options: {
           data: {
@@ -300,6 +300,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           },
         },
       });
+
+      // If Supabase treats +91XXXXXXXXXX as a mock/test number (messageId: "test-otp"),
+      // automatically bypass it by dispatching with raw 10 digits to trigger the live SMS gateway hook!
+      if (authData?.messageId === 'test-otp') {
+        const retry = await supabase.auth.signInWithOtp({
+          phone: raw10,
+          options: {
+            data: {
+              full_name: extraData?.name || '',
+              role: toDbRole(extraData?.role || 'consumer'),
+            },
+          },
+        });
+        if (!retry.error) {
+          authData = retry.data;
+          error = null;
+        }
+      }
 
       if (error) {
         console.warn('Supabase signInWithOtp error:', error.message);
@@ -339,14 +357,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       const fullPhone = `+91${raw10}`;
 
-      // Real Supabase verification (No fake universal OTP)
-      const { data, error } = await supabase.auth.verifyOtp({
+      // Real Supabase verification: check fullPhone first
+      let { data, error } = await supabase.auth.verifyOtp({
         phone: fullPhone,
         token: otpCode.trim(),
         type: 'sms',
       });
 
-      if (error || !data.user) {
+      // If fullPhone verification was rejected, retry with raw10 (in case test-otp bypass was used)
+      if ((error || !data?.user) && raw10) {
+        const retry = await supabase.auth.verifyOtp({
+          phone: raw10,
+          token: otpCode.trim(),
+          type: 'sms',
+        });
+        if (!retry.error && retry.data?.user) {
+          data = retry.data;
+          error = null;
+        }
+      }
+
+      if (error || !data?.user) {
         throw new Error(error?.message || 'Invalid or expired SMS OTP code.');
       }
 

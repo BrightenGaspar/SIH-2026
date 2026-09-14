@@ -1,89 +1,119 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { en } from '@/i18n/en';
-import { te } from '@/i18n/te';
-import { ta } from '@/i18n/ta';
-import { ml } from '@/i18n/ml';
-import { hi } from '@/i18n/hi';
-import { bn } from '@/i18n/bn';
-import { mr } from '@/i18n/mr';
 
-export type SupportedLanguage = 'en' | 'te' | 'ta' | 'ml' | 'hi' | 'bn' | 'mr';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import {
+  SupportedLanguage,
+  SUPPORTED_LANGUAGES,
+  LanguageOption,
+  dictionaries,
+  DEFAULT_LANGUAGE,
+} from '@/i18n';
+import { formatTranslation } from '@/lib/i18nHelpers';
 
-export interface LanguageOption {
-  code: SupportedLanguage;
-  label: string;
-  nativeLabel: string;
-}
-
-export const SUPPORTED_LANGUAGES: LanguageOption[] = [
-  { code: 'en', label: 'English', nativeLabel: 'English' },
-  { code: 'te', label: 'Telugu', nativeLabel: 'తెలుగు' },
-  { code: 'ta', label: 'Tamil', nativeLabel: 'தமிழ்' },
-  { code: 'ml', label: 'Malayalam', nativeLabel: 'മലയാളം' },
-  { code: 'hi', label: 'Hindi', nativeLabel: 'हिन्दी' },
-  { code: 'bn', label: 'Bengali', nativeLabel: 'বাংলা' },
-  { code: 'mr', label: 'Marathi', nativeLabel: 'मराठी' },
-];
-
-const dictionaries: Record<SupportedLanguage, Record<string, string>> = {
-  en,
-  te,
-  ta,
-  ml,
-  hi,
-  bn,
-  mr,
-};
+export { SUPPORTED_LANGUAGES };
+export type { SupportedLanguage, LanguageOption };
 
 interface I18nContextType {
   language: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
   syncWithUserProfile: (lang?: SupportedLanguage) => void;
-  t: (key: string) => string;
+  t: (
+    key: string,
+    paramsOrFallback?: Record<string, string | number> | string,
+    fallback?: string
+  ) => string;
   supportedLanguages: LanguageOption[];
 }
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<SupportedLanguage>('en');
+const STORAGE_KEY = 'app_language';
+const LEGACY_STORAGE_KEY = 'agriflow_cached_lang';
 
-  // Load temporary cache on mount
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<SupportedLanguage>(DEFAULT_LANGUAGE);
+
+  // 1. Hydrate language preference from localStorage on mount and set <html lang="...">
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const cached = localStorage.getItem('agriflow_cached_lang') as SupportedLanguage;
-      if (cached && dictionaries[cached]) {
-        setLanguageState(cached);
+      const stored = (localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)) as SupportedLanguage;
+      if (stored && dictionaries[stored]) {
+        setLanguageState(stored);
+        document.documentElement.lang = stored;
+      } else {
+        document.documentElement.lang = DEFAULT_LANGUAGE;
       }
     }
   }, []);
 
-  // Synchronize language from authenticated backend user profile (Source of Truth)
-  const syncWithUserProfile = (userLang?: SupportedLanguage) => {
-    if (userLang && dictionaries[userLang]) {
-      setLanguageState(userLang);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('agriflow_cached_lang', userLang);
-      }
-    }
-  };
-
-  const setLanguage = (newLang: SupportedLanguage) => {
+  // 2. Set language, update document language, and persist in localStorage
+  const setLanguage = useCallback((newLang: SupportedLanguage) => {
     if (!dictionaries[newLang]) return;
     setLanguageState(newLang);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('agriflow_cached_lang', newLang);
+      localStorage.setItem(STORAGE_KEY, newLang);
+      localStorage.setItem(LEGACY_STORAGE_KEY, newLang);
+      document.documentElement.lang = newLang;
     }
-  };
+  }, []);
 
-  const t = (key: string): string => {
-    const currentDict = dictionaries[language] || dictionaries.en;
-    return currentDict[key] || dictionaries.en[key] || key;
-  };
+  // 3. Synchronize language from authenticated backend user profile (Source of Truth)
+  const syncWithUserProfile = useCallback((userLang?: SupportedLanguage) => {
+    if (userLang && dictionaries[userLang]) {
+      setLanguage(userLang);
+    }
+  }, [setLanguage]);
+
+  // 4. Production-grade translation function with fallback hierarchy & parameter substitution
+  // Fallback hierarchy:
+  // 1. Key in selected language dictionary
+  // 2. Key in English ('en') dictionary
+  // 3. User-provided fallback string
+  // 4. Raw key name
+  const t = useCallback(
+    (
+      key: string,
+      paramsOrFallback?: Record<string, string | number> | string,
+      fallback?: string
+    ): string => {
+      let params: Record<string, string | number> | undefined;
+      let explicitFallback: string | undefined;
+
+      if (typeof paramsOrFallback === 'string') {
+        explicitFallback = paramsOrFallback;
+      } else if (typeof paramsOrFallback === 'object' && paramsOrFallback !== null) {
+        params = paramsOrFallback;
+        explicitFallback = fallback;
+      } else {
+        explicitFallback = fallback;
+      }
+
+      const currentDict = dictionaries[language];
+      const enDict = dictionaries[DEFAULT_LANGUAGE];
+
+      let rawText = currentDict?.[key];
+      if (!rawText && enDict) {
+        rawText = enDict[key];
+      }
+      if (!rawText) {
+        rawText = explicitFallback !== undefined ? explicitFallback : key;
+      }
+
+      return formatTranslation(rawText, params);
+    },
+    [language]
+  );
 
   return (
-    <I18nContext.Provider value={{ language, setLanguage, syncWithUserProfile, t, supportedLanguages: SUPPORTED_LANGUAGES }}>
+    <I18nContext.Provider
+      value={{
+        language,
+        setLanguage,
+        syncWithUserProfile,
+        t,
+        supportedLanguages: SUPPORTED_LANGUAGES,
+      }}
+    >
       {children}
     </I18nContext.Provider>
   );
@@ -91,7 +121,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
 export function useI18n() {
   const context = useContext(I18nContext);
-  if (!context) throw new Error('useI18n must be used within an I18nProvider');
+  if (!context) {
+    throw new Error('useI18n must be used within an I18nProvider');
+  }
   return context;
 }
-

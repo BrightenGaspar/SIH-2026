@@ -20,6 +20,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LanguageSelector } from '@/components/common/LanguageSelector';
 
 export function GlobalHeader() {
   const pathname = usePathname();
@@ -149,6 +150,9 @@ export function GlobalHeader() {
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Online</span>
         </div>
+
+        {/* Language Selector */}
+        <LanguageSelector variant="compact" />
 
         {/* Notifications */}
         <button

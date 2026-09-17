@@ -1,6 +1,20 @@
 export type ProduceGrade = 'A' | 'A-' | 'B' | 'B-' | 'C' | 'C-' | 'D';
 export type ProduceStatus = 'Active' | 'Reserved' | 'Sold' | 'Expired';
-export type OrderStatus = 'New' | 'Confirmed' | 'Pickup' | 'In Transit' | 'Delivered';
+export type OrderStatus = 
+  | 'New' 
+  | 'Confirmed' 
+  | 'Pickup' 
+  | 'In Transit' 
+  | 'Delivered'
+  | 'PREPARING'
+  | 'Preparing'
+  | 'READY_TO_DELIVER'
+  | 'Ready to Deliver'
+  | 'DISPATCH_OFFERED'
+  | 'Escrow Locked'
+  | 'LOGISTICS_ACCEPTED'
+  | 'Rejected'
+  | 'Cancelled';
 export type OpportunityLevel = 'High' | 'Medium' | 'Moderate' | 'Normal';
 
 export type SupportedLanguage = 'en' | 'te' | 'ta' | 'ml' | 'hi' | 'bn' | 'mr';
@@ -16,6 +30,10 @@ export interface User {
   state?: string;
   district?: string;
   place?: string;
+  area?: string;
+  username?: string;
+  latitude?: number;
+  longitude?: number;
   preferredLanguage?: SupportedLanguage;
   profileCompleted?: boolean;
   location?: string;
@@ -30,6 +48,12 @@ export interface Produce {
   id: string;
   crop: string;
   quantity: number;
+  totalQuantity?: number;
+  availableQuantity?: number;
+  reservedQuantity?: number;
+  deliveredQuantity?: number;
+  locationLat?: number;
+  locationLng?: number;
   unit: string;
   grade: ProduceGrade;
   harvestDate: string;
@@ -183,8 +207,10 @@ export interface Order {
   pickupDate: string;
   deliveryDate?: string;
   status: OrderStatus;
+  rawStatus?: string;
   logisticsId: string;
   destinationCity: string;
+  buyerId?: string;
 }
 
 export interface SIHScenarioData {

@@ -1,7 +1,7 @@
 export type BuyerType = 'household' | 'retailer' | 'restaurant' | 'bulk-buyer' | 'institution';
 export type ProduceGrade = 'A' | 'B' | 'Organic Certified';
-export type FreshnessLevel = 'Harvested Today' | 'Harvested 1 Day Ago' | 'Harvested 2 Days Ago' | 'Harvested 3 Days Ago' | 'Harvested 4 Days Ago';
-export type ConsumerOrderStatus = 'Escrow Locked' | 'Order Placed' | 'Confirmed' | 'Preparing' | 'Pickup' | 'In Transit' | 'Delivered' | 'Cancelled';
+export type FreshnessLevel = 'Harvested Today' | 'Harvested 1 Day Ago' | 'Harvested 2 Days Ago' | 'Harvested 3 Days Ago' | 'Harvested 4 Days Ago' | string;
+export type ConsumerOrderStatus = 'Escrow Locked' | 'Order Placed' | 'Confirmed' | 'Preparing' | 'PREPARING' | 'Pickup' | 'In Transit' | 'IN TRANSIT' | 'Dispatched' | 'READY_TO_DELIVER' | 'DISPATCH_OFFERED' | 'Delivered' | 'Cancelled';
 export type RiskLevel = 'Low' | 'Medium' | 'High';
 export type RoadVehicleType = 'Tata Ace' | 'Tata 407 Reefer' | 'Mahindra Bolero Maxi Truck';
 
@@ -92,6 +92,10 @@ export interface ProductItem {
   description: string;
   isColdChainEligible: boolean;
   tags: string[];
+  totalQuantityKg?: number;
+  locationLat?: number;
+  locationLng?: number;
+  distanceKm?: number;
 }
 
 export interface ProductDetails extends ProductItem {
@@ -207,9 +211,12 @@ export interface ConsumerOrder {
     state: string;
     pincode: string;
   };
-  paymentMethod: 'UPI' | 'Card' | 'Demo Cash';
+  paymentMethod: 'UPI' | 'Card' | 'COD' | 'Demo Cash';
   orderDate: string;
   status: ConsumerOrderStatus;
+  rawStatus?: string;
+  farmerId?: string;
+  operatorId?: string;
   logisticsId?: string;
   multiFarmerSources?: MultiFarmerSource[];
   impactReceipt?: ImpactReceipt;

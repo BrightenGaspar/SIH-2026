@@ -1,0 +1,100 @@
+import { LogisticsFleetVehicle, ConsolidatedTrip } from '@/types/logistics';
+
+export const mockFleetVehicles: LogisticsFleetVehicle[] = [
+  {
+    id: 'veh-01',
+    vehicleNumber: 'TS 08 UB 4192',
+    vehicleType: 'Tata 407 Reefer',
+    capacityKg: 3500,
+    currentLoadKg: 2400,
+    driverName: 'Mohammed Ismail',
+    driverPhone: '+91 98480 22341',
+    status: 'In Transit',
+    reeferActive: true,
+    currentTempCelsius: 6.2,
+    currentLocation: 'Shamshabad ORR Corridor, Hyderabad',
+    currentLat: 17.2403,
+    currentLng: 78.4294,
+    assignedTripId: 'TRK-RD-9021',
+  },
+  {
+    id: 'veh-02',
+    vehicleNumber: 'TS 07 EA 8831',
+    vehicleType: 'Mahindra Bolero Maxi Truck',
+    capacityKg: 1500,
+    currentLoadKg: 1200,
+    driverName: 'K. Venkateshwarlu',
+    driverPhone: '+91 98480 55412',
+    status: 'In Transit',
+    reeferActive: false,
+    currentTempCelsius: 8.5,
+    currentLocation: 'Jangaon Highway Mile 42, Telangana',
+    currentLat: 17.7214,
+    currentLng: 79.1554,
+    assignedTripId: 'TRK-RD-8812',
+  },
+  {
+    id: 'veh-03',
+    vehicleNumber: 'TS 09 XY 1029',
+    vehicleType: 'Tata Ace',
+    capacityKg: 1000,
+    currentLoadKg: 0,
+    driverName: 'Ravi Teja',
+    driverPhone: '+91 98480 77319',
+    status: 'Available',
+    reeferActive: false,
+    currentTempCelsius: 24.0,
+    currentLocation: 'Bowenpally Logistics Hub Park, Hyderabad',
+    currentLat: 17.4729,
+    currentLng: 78.4842,
+  }
+];
+
+export const mockConsolidatedTrips: ConsolidatedTrip[] = [
+  {
+    id: 'TRK-RD-9021',
+    tripCode: 'TRIP-HYD-TOMATO-9021',
+    vehicle: mockFleetVehicles[0],
+    sourceHub: 'Shadnagar FPO Cluster Hub',
+    destinationHub: 'Bowenpally Agri Terminal, Hyderabad',
+    totalDistanceKm: 74,
+    distanceCompletedKm: 46,
+    commodity: 'Tomato (Hybrid Desi)',
+    totalKg: 2400,
+    pickups: [
+      { fpoName: 'Shadnagar Organic Growers FPO', location: 'Shadnagar Gate 1', qtyKg: 1400, status: 'Loaded' },
+      { fpoName: 'Chevella Smallholders Unit', location: 'Chevella Road Post', qtyKg: 1000, status: 'Loaded' },
+    ],
+    status: 'IN TRANSIT',
+    estimatedArrival: 'Today, 05:45 PM',
+    coldChainTemp: 6.2,
+    spoilageRisk: 'LOW',
+    returnLoad: {
+      id: 'RET-HYD-WGL-01',
+      route: 'Hyderabad Agri Terminal -> Warangal Produce Hub',
+      commodity: 'Organic Fertilizer Sacks & Nursery Seedlings',
+      weightKg: 2200,
+      additionalEarnings: 2800,
+      emptyDistanceAvoidedKm: 142,
+      isClaimed: false,
+    }
+  },
+  {
+    id: 'TRK-RD-8812',
+    tripCode: 'TRIP-WGL-CHILLI-8812',
+    vehicle: mockFleetVehicles[1],
+    sourceHub: 'Guntur Rural Spice Hub',
+    destinationHub: 'Warangal Commercial Mandi Hub',
+    totalDistanceKm: 185,
+    distanceCompletedKm: 185,
+    commodity: 'Green Chilli (G4)',
+    totalKg: 1200,
+    pickups: [
+      { fpoName: 'Guntur Spice Cluster A', location: 'Guntur South', qtyKg: 1200, status: 'Loaded' }
+    ],
+    status: 'DELIVERED',
+    estimatedArrival: 'Delivered at 02:30 PM',
+    coldChainTemp: 8.5,
+    spoilageRisk: 'LOW',
+  }
+];

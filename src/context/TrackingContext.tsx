@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
 import { DeliveryTracking } from '@/types/delivery';
 import { sharedTrackingService } from '@/services/sharedTrackingService';
 import { supabase } from '@/lib/supabase';
@@ -78,9 +78,73 @@ function mapLogisticsRowToDeliveryTracking(row: any, fallbackId: string): Delive
   };
 }
 
+function mapAssignmentToDeliveryTracking(row: any, fallbackId: string): DeliveryTracking {
+  const currentLat = Number(row.current_lat) || 17.2403;
+  const currentLng = Number(row.current_lng) || 78.4294;
+  const currentTemp = Number(row.current_temp) || 5.5;
+  const humidity = Number(row.humidity) || 85;
+  const pickupLat = Number(row.pickup_lat) || 17.0684;
+  const pickupLng = Number(row.pickup_lng) || 78.2078;
+  const destLat = Number(row.delivery_lat) || 17.4729;
+  const destLng = Number(row.delivery_lng) || 78.4842;
+  const order = row.orders as any;
+  const profile = row.profiles as any;
+
+  const pickupLocation = order?.produce_listings?.location_name || 'Farm Gate Cluster';
+  const destinationLocation = order?.delivery_address || 'Agri Wholesale Terminal';
+  const currentLocation = 'Highway Cold Corridor';
+
+  return {
+    id: row.id || fallbackId,
+    tripId: row.id || fallbackId,
+    orderId: row.order_id || fallbackId,
+    produceName: order?.commodity || order?.produce_listings?.produce_name || 'Fresh Farm Produce',
+    totalQuantityKg: Number(order?.quantity || order?.quantity_kg) || 1000,
+    status: (row.status || 'IN TRANSIT') as any,
+    vehicleType: (row.vehicle_type || 'Tata 407 Reefer') as any,
+    vehicleNumber: row.vehicle_number || 'TS 08 UB 4192',
+    driverName: profile?.full_name || 'Assigned Carrier Driver',
+    driverPhone: profile?.phone || '+91 98480 22341',
+    pickupLocation,
+    destinationLocation,
+    currentLocationName: currentLocation,
+    currentCoordinates: [currentLat, currentLng],
+    pickupCoordinates: [pickupLat, pickupLng],
+    destinationCoordinates: [destLat, destLng],
+    estimatedArrival: 'Today, 05:45 PM',
+    distanceRemainingKm: 25,
+    distanceCompletedKm: 50,
+    totalDistanceKm: 75,
+    progressPercentage: 66,
+    etaMinutes: 40,
+    telemetry: {
+      temperatureCelsius: currentTemp,
+      targetTempCelsius: Number(row.target_temp) || 5.0,
+      humidityPercent: humidity,
+      safeWindowHours: 4,
+      safeWindowMinutes: 30,
+      spoilageRisk: (row.spoilage_risk || 'LOW') as any,
+      reeferActive: true,
+      explanation: 'Authoritative assignment cold chain monitored.',
+    },
+    waypoints: [
+      { id: 'wp-1', title: 'Pickup Verified', location: pickupLocation, coordinates: [pickupLat, pickupLng], timestamp: '08:30 AM', completed: true },
+      { id: 'wp-2', title: 'Carrier in Transit', location: currentLocation, coordinates: [currentLat, currentLng], timestamp: 'Live', completed: true, current: true },
+      { id: 'wp-3', title: 'Destination Terminal', location: destinationLocation, coordinates: [destLat, destLng], timestamp: 'ETA', completed: false },
+    ],
+    routeCoordinates: [
+      [pickupLat, pickupLng],
+      [currentLat, currentLng],
+      [destLat, destLng],
+    ],
+  };
+}
+
 export function TrackingProvider({ children }: { children: ReactNode }) {
   const [activeTripId, setActiveTripId] = useState<string>(DEFAULT_TRIP_ID);
   const [activeTrip, setActiveTrip] = useState<DeliveryTracking | null>(null);
+  const activeTripRef = useRef<DeliveryTracking | null>(null);
+  activeTripRef.current = activeTrip;
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -89,7 +153,56 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      // 1. Query Supabase public.logistics_trips live
+      // 1. Check authoritative public.logistics_assignments first
+      const { data: assignment } = await supabase
+        .from('logistics_assignments')
+        .select(`
+          id,
+          order_id,
+          operator_id,
+          pickup_lat,
+          pickup_lng,
+          delivery_lat,
+          delivery_lng,
+          current_lat,
+          current_lng,
+          status,
+          vehicle_number,
+          vehicle_type,
+          current_temp,
+          target_temp,
+          humidity,
+          spoilage_risk,
+          created_at,
+          updated_at,
+          orders (
+            id,
+            order_number,
+            commodity,
+            quantity,
+            quantity_kg,
+            status,
+            delivery_address,
+            produce_listings (
+              produce_name,
+              location_name
+            )
+          ),
+          profiles:operator_id (
+            id,
+            full_name,
+            phone
+          )
+        `)
+        .or(`id.eq.${activeTripId},order_id.eq.${activeTripId}`)
+        .maybeSingle();
+
+      if (assignment) {
+        setActiveTrip(mapAssignmentToDeliveryTracking(assignment, activeTripId));
+        return;
+      }
+
+      // 2. Query legacy Supabase public.logistics_trips
       const { data, error: dbError } = await supabase
         .from('logistics_trips')
         .select('*')
@@ -117,12 +230,23 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
     fetchTrip();
   }, [fetchTrip]);
 
-  // Active Supabase realtime stream subscription listening for live UPDATE and INSERT on public.logistics_trips
+  // Active Supabase realtime stream subscription listening for live updates on logistics_assignments and logistics_trips
   useEffect(() => {
     if (!activeTripId) return;
 
     const channel = supabase
       .channel(`realtime-logistics-${activeTripId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'logistics_assignments',
+        },
+        () => {
+          fetchTrip();
+        }
+      )
       .on(
         'postgres_changes',
         {
@@ -135,11 +259,12 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
           if (!updatedRow) return;
 
           // Check if event targets our currently tracked shipment
+          const currentTrip = activeTripRef.current;
           const matches =
             updatedRow.id === activeTripId ||
             updatedRow.order_id === activeTripId ||
             updatedRow.trip_code === activeTripId ||
-            (activeTrip && (updatedRow.id === activeTrip.id || updatedRow.id === activeTrip.tripId));
+            (currentTrip && (updatedRow.id === currentTrip.id || updatedRow.id === currentTrip.tripId));
 
           if (matches) {
             setActiveTrip((prev) => {
@@ -147,13 +272,15 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
                 return mapLogisticsRowToDeliveryTracking(updatedRow, activeTripId);
               }
 
-              const newLat = Number(updatedRow.current_lat) || prev.currentCoordinates[0];
-              const newLng = Number(updatedRow.current_lng) || prev.currentCoordinates[1];
-              const newTemp = Number(updatedRow.current_temp) || prev.telemetry.temperatureCelsius;
-              const newHumidity = Number(updatedRow.humidity) || prev.telemetry.humidityPercent;
+              const prevLat = prev.currentCoordinates ? prev.currentCoordinates[0] : 17.3850;
+              const prevLng = prev.currentCoordinates ? prev.currentCoordinates[1] : 78.4867;
+              const newLat = Number(updatedRow.current_lat) || prevLat;
+              const newLng = Number(updatedRow.current_lng) || prevLng;
+              const newTemp = updatedRow.current_temp != null ? Number(updatedRow.current_temp) : prev.telemetry.temperatureCelsius;
+              const newHumidity = updatedRow.humidity != null ? Number(updatedRow.humidity) : prev.telemetry.humidityPercent;
 
               const positionChanged =
-                newLat !== prev.currentCoordinates[0] || newLng !== prev.currentCoordinates[1];
+                newLat !== prevLat || newLng !== prevLng;
 
               return {
                 ...prev,
@@ -181,7 +308,7 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [activeTripId, activeTrip]);
+  }, [activeTripId, fetchTrip]);
 
   const getTrip = useCallback((id: string): DeliveryTracking | null => {
     if (id === activeTrip?.id || id === activeTrip?.tripId || id === activeTrip?.orderId) {

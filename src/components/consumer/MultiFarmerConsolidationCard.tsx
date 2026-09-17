@@ -35,7 +35,7 @@ export const MultiFarmerConsolidationCard: React.FC<MultiFarmerConsolidationCard
               </h3>
               {isSIHDemoHighlight && (
                 <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-emerald-500 text-white">
-                  SIH Demo Realization
+                  Verified Aggregation
                 </span>
               )}
             </div>

@@ -69,7 +69,7 @@ export default function RouteMap({ trip, isLowBandwidth = false }: RouteMapProps
             <span className="text-slate-400 block text-[11px]">Current Highway Position:</span>
             <strong className="text-white block mt-0.5 text-sm">{trip.currentLocationName}</strong>
             <span className="text-emerald-400 font-mono text-[11px] block mt-1">
-              Coords: {trip.currentCoordinates[0]}&deg; N, {trip.currentCoordinates[1]}&deg; E
+              Coords: {trip.currentCoordinates ? `${trip.currentCoordinates[0]}° N, ${trip.currentCoordinates[1]}° E` : 'No live GPS data available'}
             </span>
           </div>
 

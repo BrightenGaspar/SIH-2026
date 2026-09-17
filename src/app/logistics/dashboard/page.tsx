@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useBandwidth } from '@/context/BandwidthContext';
 import { logisticsService } from '@/services/logisticsService';
+import { supabase } from '@/lib/supabase';
 import { LogisticsFleetVehicle, ConsolidatedTrip } from '@/types/logistics';
 import { LowBandwidthBanner } from '@/components/common/LowBandwidthBanner';
 import { LazyMap } from '@/components/maps/LazyMap';
@@ -27,6 +28,8 @@ import {
   Zap
 } from 'lucide-react';
 import { cn, formatINR } from '@/lib/utils';
+import { LiveSimulationGraph } from '@/components/tracking/LiveSimulationGraph';
+import { DriverDispatchModal } from '@/components/logistics/DriverDispatchModal';
 
 export default function LogisticsDashboard() {
   const { user, logisticsUser } = useAuth();
@@ -35,6 +38,17 @@ export default function LogisticsDashboard() {
   const [fleet, setFleet] = useState<LogisticsFleetVehicle[]>([]);
   const [trips, setTrips] = useState<ConsolidatedTrip[]>([]);
   const [manualRefreshing, setManualRefreshing] = useState(false);
+
+  // Live simulation state
+  const [simulatedShipments, setSimulatedShipments] = useState<any[]>([]);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string>('TRK-CONS-ROAD-9021');
+  const [breachAlert, setBreachAlert] = useState<{
+    id: string;
+    message: string;
+    temp: number;
+    timestamp: number;
+  } | null>(null);
+  const [lastAlertTime, setLastAlertTime] = useState<number>(0);
 
   // Dynamic user display name (NEVER hardcode reference demo names like Vikram)
   const displayName =
@@ -57,7 +71,108 @@ export default function LogisticsDashboard() {
 
   useEffect(() => {
     loadData();
+
+    const channel = supabase
+      .channel('realtime-logistics-dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'logistics_assignments' },
+        () => {
+          loadData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          loadData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
+
+  // Poll simulation status every 5 seconds
+  useEffect(() => {
+    let isMounted = true;
+
+    const pollSimulation = async () => {
+      try {
+        const res = await fetch('/api/simulate/status', { cache: 'no-store' });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!isMounted) return;
+
+        const shipments: any[] = data.shipments || [];
+        if (shipments.length > 0) {
+          setSimulatedShipments(shipments);
+
+          // Check for temperature breaches
+          const breachedShipment = shipments.find(
+            (s) => s.has_temperature_breach || Number(s.current_temp) > 8.0
+          );
+
+          if (breachedShipment) {
+            const now = Date.now();
+            // Debounce alert notifications by 15 seconds
+            if (now - lastAlertTime > 15000) {
+              setBreachAlert({
+                id: breachedShipment.id,
+                message: `⚠️ Temperature Breach Detected on Trip #${breachedShipment.id} (${Number(breachedShipment.current_temp).toFixed(1)}°C exceeds 8.0°C limit)`,
+                temp: Number(breachedShipment.current_temp),
+                timestamp: now,
+              });
+              setLastAlertTime(now);
+            }
+          }
+        }
+      } catch (err) {
+        // Silently tolerate transient polling hiccups
+      }
+    };
+
+    pollSimulation();
+    const interval = setInterval(pollSimulation, 5000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [lastAlertTime]);
+
+  const handleTriggerBreach = async (shipmentId: string) => {
+    try {
+      await fetch('/api/simulate/trigger-breach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shipment_id: shipmentId }),
+      });
+      setBreachAlert({
+        id: shipmentId,
+        message: `⚠️ Temperature Breach Detected on Trip #${shipmentId} (9.8°C exceeds 8.0°C limit)`,
+        temp: 9.8,
+        timestamp: Date.now(),
+      });
+      setLastAlertTime(Date.now());
+    } catch (err) {
+      console.error('Failed to trigger breach:', err);
+    }
+  };
+
+  const handleReset = async (shipmentId: string) => {
+    try {
+      await fetch('/api/simulate/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ shipment_id: shipmentId }),
+      });
+      setBreachAlert(null);
+    } catch (err) {
+      console.error('Failed to reset simulation:', err);
+    }
+  };
 
   const handleManualRefresh = async () => {
     setManualRefreshing(true);
@@ -65,26 +180,52 @@ export default function LogisticsDashboard() {
     setTimeout(() => setManualRefreshing(false), 500);
   };
 
+  const activeSimulatedShipment =
+    simulatedShipments.find((s) => s.id === selectedShipmentId) ||
+    simulatedShipments[0] ||
+    null;
+
   const activeVehicles = fleet.filter((v) => v.status === 'In Transit');
-  const activeTripsCount = trips.filter((t) => t.status === 'IN TRANSIT').length || activeVehicles.length || 3;
-  const primaryVehicle = fleet[0] || {
-    id: 'FLEET-TS08UB4192',
-    vehicleNumber: 'TS 08 UB 4192',
-    vehicleType: 'Tata 407 Reefer',
-    driverName: 'Mohammed Ismail',
-    currentLocation: 'Shamshabad ORR Tollway',
-    currentTempCelsius: 6.2,
-    targetTempCelsius: 5.0,
-    currentLoadKg: 1850,
-    capacityKg: 2500,
-    reeferActive: true,
-    status: 'In Transit',
-  };
+  const activeTripsCount = trips.filter((t) => t.status === 'IN TRANSIT').length;
+  const primaryVehicle = fleet[0] || null;
+  const totalDistanceLogged = trips.reduce((sum, t) => sum + (t.totalDistanceKm || 0), 0);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
       {/* 1. LOW BANDWIDTH MODE BANNER */}
       <LowBandwidthBanner role="logistics" />
+
+      {/* DRIVER DISPATCH NOTIFICATION & CASCADING RE-ROUTING MODAL */}
+      <DriverDispatchModal onTripAccepted={() => loadData()} />
+
+      {/* CRITICAL TEMPERATURE BREACH ALERT TOAST (Debounced) */}
+      {breachAlert && (
+        <div className="bg-rose-600 text-white rounded-2xl p-4 shadow-lg border-2 border-rose-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-pulse">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-6 h-6 shrink-0 text-amber-200 animate-bounce" />
+            <div>
+              <p className="font-black text-sm tracking-wide">{breachAlert.message}</p>
+              <p className="text-xs text-rose-100">
+                Automated reefer telematics anomaly broadcasted via IoT beacon. Spoilage risk is elevated!
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <button
+              onClick={() => handleReset(breachAlert.id)}
+              className="px-3 py-1.5 rounded-xl bg-white text-rose-700 font-bold text-xs hover:bg-rose-50 transition cursor-pointer"
+            >
+              Reset Setpoint
+            </button>
+            <button
+              onClick={() => setBreachAlert(null)}
+              className="px-2.5 py-1.5 rounded-xl bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 2. WELCOME HEADER (Matching reference visual replica) */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -151,20 +292,20 @@ export default function LogisticsDashboard() {
           </div>
           <div className="text-2xl font-black text-slate-900 mt-2">{activeTripsCount}</div>
           <span className="text-[11px] text-amber-600 font-semibold flex items-center gap-1 mt-1">
-            <Radio className="w-3 h-3 animate-pulse" /> 3 Vehicles on highway
+            <Radio className="w-3 h-3 animate-pulse" /> {activeTripsCount} active on highway
           </span>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500">On Time Rate</span>
+            <span className="text-xs font-bold text-slate-500">Registered Fleet</span>
             <span className="p-2 rounded-xl bg-emerald-50 text-emerald-600">
               <CheckCircle2 className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-black text-slate-900 mt-2">98.4%</div>
+          <div className="text-2xl font-black text-slate-900 mt-2">{fleet.length}</div>
           <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1 mt-1">
-            Zero SLA breaches today
+            Total active vehicles
           </span>
         </div>
 
@@ -175,53 +316,111 @@ export default function LogisticsDashboard() {
               <Navigation className="w-4 h-4" />
             </span>
           </div>
-          <div className="text-2xl font-black text-slate-900 mt-2">420 km</div>
+          <div className="text-2xl font-black text-slate-900 mt-2">{totalDistanceLogged} km</div>
           <span className="text-[11px] text-blue-600 font-semibold flex items-center gap-1 mt-1">
-            18 km saved via route optimization
+            Across active corridors
           </span>
         </div>
       </div>
 
       {/* 4. RETURN LOAD AI HIGHLIGHT ALERT */}
-      <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-start sm:items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-xs font-bold">
-            <AlertTriangle className="w-5 h-5 text-slate-950" />
+      {primaryVehicle && (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center shrink-0 shadow-xs font-bold">
+              <AlertTriangle className="w-5 h-5 text-slate-950" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black uppercase">
+                  AI Optimization Matched
+                </span>
+                <span className="text-xs font-bold text-amber-900">
+                  Bowenpally &rarr; Shadnagar Corridor
+                </span>
+              </div>
+              <h2 className="text-sm font-bold text-slate-900 mt-1">
+                Empty Return Haul Matched (1,200 kg Organic Compost & Seedlings)
+              </h2>
+              <p className="text-xs text-slate-600 mt-0.5">
+                Driver {primaryVehicle.driverName} can earn <strong className="text-emerald-700 font-bold">+₹2,800 added revenue</strong> and avoid 68 km of empty deadhead miles.
+              </p>
+            </div>
           </div>
-          <div>
+
+          <Link href="/logistics/return-loads" className="shrink-0 self-start sm:self-auto">
+            <button
+              type="button"
+              className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
+            >
+              <span>Accept Return Load</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </Link>
+        </div>
+      )}
+
+      {/* SIMULATION ACTIVE TRIPS SWITCHER */}
+      {simulatedShipments.length > 0 && (
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-md bg-amber-500 text-slate-950 text-[10px] font-black uppercase">
-                AI Optimization Matched
-              </span>
-              <span className="text-xs font-bold text-amber-900">
-                Bowenpally &rarr; Shadnagar Corridor
+              <Radio className="w-4 h-4 text-emerald-600 animate-pulse" />
+              <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Live Simulation Telemetry Streams ({simulatedShipments.length} Active Trips)
               </span>
             </div>
-            <h2 className="text-sm font-bold text-slate-900 mt-1">
-              Empty Return Haul Matched (1,200 kg Organic Compost & Seedlings)
-            </h2>
-            <p className="text-xs text-slate-600 mt-0.5">
-              Driver {primaryVehicle.driverName} can earn <strong className="text-emerald-700 font-bold">+₹2,800 added revenue</strong> and avoid 68 km of empty deadhead miles.
-            </p>
+            <span className="text-[11px] text-slate-500">
+              5s Auto-polling active &bull; Click to switch live view or inspect simulated breach trip
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {simulatedShipments.map((s) => {
+              const isSelected = s.id === selectedShipmentId;
+              const isBreach = s.has_temperature_breach || Number(s.current_temp) > 8.0;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => setSelectedShipmentId(s.id)}
+                  className={cn(
+                    'px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 cursor-pointer border shadow-2xs',
+                    isSelected
+                      ? isBreach
+                        ? 'bg-rose-50 border-rose-400 text-rose-900 ring-2 ring-rose-400'
+                        : 'bg-amber-50 border-amber-400 text-amber-950 ring-2 ring-amber-400'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                  )}
+                >
+                  <Truck className={cn('w-3.5 h-3.5', isBreach ? 'text-rose-600 animate-bounce' : 'text-amber-600')} />
+                  <span>{s.id}</span>
+                  <span
+                    className={cn(
+                      'px-1.5 py-0.5 rounded text-[10px] font-black',
+                      isBreach ? 'bg-rose-600 text-white animate-pulse' : 'bg-emerald-100 text-emerald-800'
+                    )}
+                  >
+                    {Number(s.current_temp).toFixed(1)}°C
+                  </span>
+                  {isBreach && <span className="text-[10px] text-rose-700 font-extrabold">(BREACH)</span>}
+                </button>
+              );
+            })}
           </div>
         </div>
-
-        <Link href="/logistics/return-loads" className="shrink-0 self-start sm:self-auto">
-          <button
-            type="button"
-            className="bg-amber-500 hover:bg-amber-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer"
-          >
-            <span>Accept Return Load</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </Link>
-      </div>
+      )}
 
       {/* 5. LIVE VEHICLE STATUS & TELEMETRY (Dual-Mode Normal vs Low Bandwidth) */}
       <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center shrink-0">
+            <div className={cn(
+              "w-10 h-10 rounded-xl border flex items-center justify-center shrink-0",
+              activeSimulatedShipment?.has_temperature_breach || Number(activeSimulatedShipment?.current_temp) > 8.0
+                ? "bg-rose-50 text-rose-600 border-rose-200"
+                : "bg-amber-50 text-amber-600 border-amber-200"
+            )}>
               <Truck className="w-5 h-5" />
             </div>
             <div>
@@ -233,15 +432,20 @@ export default function LogisticsDashboard() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                   IoT Connected
                 </span>
+                {(activeSimulatedShipment?.has_temperature_breach || Number(activeSimulatedShipment?.current_temp) > 8.0) && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-800 border border-rose-300 animate-pulse">
+                    ⚠️ TEMP BREACH
+                  </span>
+                )}
               </div>
               <h3 className="text-sm font-bold text-slate-900 mt-0.5">
-                Vehicle: {primaryVehicle.vehicleType} ({primaryVehicle.vehicleNumber}) &bull; Route: Shadnagar &rarr; Hyderabad
+                Vehicle: {activeSimulatedShipment?.vehicle_type || primaryVehicle.vehicleType} ({activeSimulatedShipment?.vehicle_number || primaryVehicle.vehicleNumber}) &bull; Route: {activeSimulatedShipment?.origin || 'Shadnagar'} &rarr; {activeSimulatedShipment?.destination || 'Hyderabad'}
               </h3>
             </div>
           </div>
 
           <Link
-            href={`/consumer/tracking/TRK-CONS-ROAD-9021`}
+            href={`/consumer/tracking/${activeSimulatedShipment?.id || 'TRK-CONS-ROAD-9021'}`}
             className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold flex items-center gap-1.5 shadow-xs transition cursor-pointer self-start sm:self-auto"
           >
             <MapPin className="w-3.5 h-3.5" /> Full Highway GPS <ArrowRight className="w-3 h-3" />
@@ -251,12 +455,22 @@ export default function LogisticsDashboard() {
         {/* Route Progress Bar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-            <span>Shadnagar Hub (0 km)</span>
-            <span className="font-bold text-slate-900">68% Journey Completed</span>
-            <span>Bowenpally Terminal (74 km)</span>
+            <span>{activeSimulatedShipment?.origin?.split(',')[0] || 'Shadnagar Hub'} (0 km)</span>
+            <span className="font-bold text-slate-900">
+              {Math.round((activeSimulatedShipment?.route_progress ?? 0.68) * 100)}% Journey Completed
+            </span>
+            <span>{activeSimulatedShipment?.destination?.split(',')[0] || 'Bowenpally Terminal'} (74 km)</span>
           </div>
           <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-            <div className="bg-amber-500 h-full rounded-full w-[68%] transition-all duration-500" />
+            <div
+              className={cn(
+                "h-full rounded-full transition-all duration-500",
+                activeSimulatedShipment?.has_temperature_breach || Number(activeSimulatedShipment?.current_temp) > 8.0
+                  ? "bg-rose-500"
+                  : "bg-amber-500"
+              )}
+              style={{ width: `${Math.min(100, Math.max(5, Math.round((activeSimulatedShipment?.route_progress ?? 0.68) * 100)))}%` }}
+            />
           </div>
         </div>
 
@@ -268,39 +482,53 @@ export default function LogisticsDashboard() {
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <span className="text-slate-400 text-[10px] block font-semibold">Cold Chain Temperature</span>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-base font-black text-emerald-600">6.2&deg;C</span>
-                  <span className="text-[10px] text-slate-500">Target 5.0&deg;C</span>
+                  <span className={cn(
+                    "text-base font-black",
+                    Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "text-rose-600" : "text-emerald-600"
+                  )}>
+                    {Number(activeSimulatedShipment?.current_temp ?? 6.2).toFixed(1)}&deg;C
+                  </span>
+                  <span className="text-[10px] text-slate-500">Target {Number(activeSimulatedShipment?.target_temp ?? 5.0).toFixed(1)}&deg;C</span>
                 </div>
-                <span className="text-[10px] text-emerald-600 font-semibold block">Optimal Range (4-8&deg;C)</span>
+                <span className={cn(
+                  "text-[10px] font-semibold block",
+                  Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "text-rose-600 font-bold" : "text-emerald-600"
+                )}>
+                  {Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "⚠️ Limit Breached (>8°C)" : "Optimal Range (2-8°C)"}
+                </span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <span className="text-slate-400 text-[10px] block font-semibold">Chamber Humidity</span>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-base font-black text-blue-600">88%</span>
+                  <span className="text-base font-black text-blue-600">{activeSimulatedShipment?.humidity ?? 88}%</span>
                   <span className="text-[10px] text-slate-500">Relative</span>
                 </div>
-                <span className="text-[10px] text-blue-600 font-semibold block">Low Spoilage Risk</span>
+                <span className="text-[10px] text-blue-600 font-semibold block">
+                  {Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "Elevated Spoilage Risk" : "Low Spoilage Risk"}
+                </span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <span className="text-slate-400 text-[10px] block font-semibold">Current Highway GPS</span>
-                <span className="text-slate-900 font-bold text-xs block">Shamshabad Toll</span>
-                <span className="text-amber-600 font-mono text-[10px] block">17.2403&deg; N, 78.4294&deg; E</span>
+                <span className="text-slate-900 font-bold text-xs block truncate">
+                  {activeSimulatedShipment?.current_lat ? `${activeSimulatedShipment.current_lat}° N, ${activeSimulatedShipment.current_lng}° E` : 'Shamshabad Toll'}
+                </span>
+                <span className="text-amber-600 font-mono text-[10px] block">Live Satellite Link</span>
               </div>
 
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <span className="text-slate-400 text-[10px] block font-semibold">Driver & Load Weight</span>
-                <span className="text-slate-900 font-bold text-xs block">{primaryVehicle.driverName}</span>
+                <span className="text-slate-900 font-bold text-xs block">{activeSimulatedShipment?.driver_name || primaryVehicle.driverName}</span>
                 <span className="text-slate-600 text-[10px] block">1,850 kg / 2,500 kg (74%)</span>
               </div>
             </div>
 
             {/* Map on-demand container */}
             <LazyMap
-              vehicleId="TRK-CONS-ROAD-9021"
-              origin="Shadnagar Farm Hub"
-              destination="Bowenpally Terminal"
+              vehicleId={activeSimulatedShipment?.id || "TRK-CONS-ROAD-9021"}
+              origin={activeSimulatedShipment?.origin || "Shadnagar Farm Hub"}
+              destination={activeSimulatedShipment?.destination || "Bowenpally Terminal"}
               distanceKm={46}
               totalDistanceKm={74}
               status="In Transit"
@@ -316,7 +544,7 @@ export default function LogisticsDashboard() {
             </LazyMap>
           </div>
         ) : (
-          /* NORMAL MODE: Visual Route + Sensor Gauges (Reference design) */
+          /* NORMAL MODE: Visual Route + Sensor Gauges + Live Recharts Temperature Graph */
           <div className="space-y-4">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
               {/* Telemetry Sensor Gauges */}
@@ -325,8 +553,13 @@ export default function LogisticsDashboard() {
                   <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                     <Thermometer className="w-4 h-4 text-emerald-600" /> Cold-Chain Telemetry
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
-                    Live IoT
+                  <span className={cn(
+                    "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                    Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0
+                      ? "bg-rose-100 text-rose-800 animate-pulse"
+                      : "bg-emerald-100 text-emerald-800"
+                  )}>
+                    {Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "Breach Active" : "Live IoT"}
                   </span>
                 </div>
 
@@ -335,9 +568,17 @@ export default function LogisticsDashboard() {
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Temperature
                     </span>
-                    <div className="text-2xl font-black text-emerald-600">6.2&deg;C</div>
-                    <span className="text-[10px] text-emerald-700 font-semibold block">
-                      Optimal (4-8&deg;C)
+                    <div className={cn(
+                      "text-2xl font-black",
+                      Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "text-rose-600" : "text-emerald-600"
+                    )}>
+                      {Number(activeSimulatedShipment?.current_temp ?? 6.2).toFixed(1)}&deg;C
+                    </div>
+                    <span className={cn(
+                      "text-[10px] font-semibold block",
+                      Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "text-rose-600 font-bold" : "text-emerald-700"
+                    )}>
+                      {Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "Limit Breached (>8°C)" : "Optimal (2-8°C)"}
                     </span>
                   </div>
 
@@ -345,16 +586,21 @@ export default function LogisticsDashboard() {
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
                       Humidity
                     </span>
-                    <div className="text-2xl font-black text-blue-600">88%</div>
+                    <div className="text-2xl font-black text-blue-600">{activeSimulatedShipment?.humidity ?? 88}%</div>
                     <span className="text-[10px] text-blue-700 font-semibold block">
-                      High Freshness
+                      {Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "Spoilage Warning" : "High Freshness"}
                     </span>
                   </div>
                 </div>
 
                 <div className="text-[11px] text-slate-500 pt-1 border-t border-slate-200 flex justify-between">
                   <span>Reefer Compressor:</span>
-                  <span className="text-emerald-600 font-bold">Continuous Cycling</span>
+                  <span className={cn(
+                    "font-bold",
+                    Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "text-rose-600" : "text-emerald-600"
+                  )}>
+                    {Number(activeSimulatedShipment?.current_temp ?? 6.2) > 8.0 ? "Compressor Strain / Alarm" : "Continuous Cycling"}
+                  </span>
                 </div>
               </div>
 
@@ -370,7 +616,7 @@ export default function LogisticsDashboard() {
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div>
                     <span className="text-[10px] text-slate-400 block font-medium">Assigned Driver</span>
-                    <strong className="text-slate-900 block text-xs mt-0.5">{primaryVehicle.driverName}</strong>
+                    <strong className="text-slate-900 block text-xs mt-0.5 truncate">{activeSimulatedShipment?.driver_name || primaryVehicle.driverName}</strong>
                     <span className="text-[10px] text-slate-500">Verified Carrier</span>
                   </div>
                   <div>
@@ -387,9 +633,9 @@ export default function LogisticsDashboard() {
 
                 <div className="pt-2">
                   <LazyMap
-                    vehicleId="TRK-CONS-ROAD-9021"
-                    origin="Shadnagar Farm Hub"
-                    destination="Bowenpally Terminal"
+                    vehicleId={activeSimulatedShipment?.id || "TRK-CONS-ROAD-9021"}
+                    origin={activeSimulatedShipment?.origin || "Shadnagar Farm Hub"}
+                    destination={activeSimulatedShipment?.destination || "Bowenpally Terminal"}
                     distanceKm={46}
                     totalDistanceKm={74}
                     status="In Transit"
@@ -406,6 +652,18 @@ export default function LogisticsDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* Live Recharts Temperature Graph with 8°C Spoilage Threshold Line */}
+            <LiveSimulationGraph
+              shipmentId={activeSimulatedShipment?.id || 'TRK-CONS-ROAD-9021'}
+              vehicleNumber={activeSimulatedShipment?.vehicle_number || primaryVehicle.vehicleNumber}
+              currentTemp={Number(activeSimulatedShipment?.current_temp ?? 5.8)}
+              targetTemp={Number(activeSimulatedShipment?.target_temp ?? 5.0)}
+              history={activeSimulatedShipment?.temp_history || []}
+              hasBreach={Boolean(activeSimulatedShipment?.has_temperature_breach || (activeSimulatedShipment?.current_temp && Number(activeSimulatedShipment.current_temp) > 8.0))}
+              onTriggerBreach={() => handleTriggerBreach(activeSimulatedShipment?.id || 'TRK-CONS-ROAD-9021')}
+              onReset={() => handleReset(activeSimulatedShipment?.id || 'TRK-CONS-ROAD-9021')}
+            />
           </div>
         )}
       </div>

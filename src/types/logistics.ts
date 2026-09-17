@@ -31,13 +31,13 @@ export interface LogisticsFleetVehicle {
   capacityKg: number;
   currentLoadKg: number;
   driverName: string;
-  driverPhone: string;
+  driverPhone?: string;
   status: 'In Transit' | 'Available' | 'Maintenance' | 'Loading';
   reeferActive: boolean;
-  currentTempCelsius: number;
+  currentTempCelsius?: number;
   currentLocation: string;
-  currentLat: number;
-  currentLng: number;
+  currentLat?: number;
+  currentLng?: number;
   assignedTripId?: string;
 }
 
@@ -57,10 +57,12 @@ export interface ConsolidatedTrip {
     qtyKg: number;
     status: 'Loaded' | 'Pending' | 'En Route';
   }[];
-  status: 'IN TRANSIT' | 'DELIVERED' | 'SCHEDULED' | 'LOADING';
+  status: 'IN TRANSIT' | 'In Transit' | 'DELIVERED' | 'Delivered' | 'SCHEDULED' | 'LOADING' | 'DISPATCH_OFFERED' | 'DISPATCH_REQUESTED' | 'PLACED';
   estimatedArrival: string;
-  coldChainTemp: number;
+  coldChainTemp?: number;
   spoilageRisk: 'LOW' | 'MEDIUM' | 'HIGH';
+  farmerId?: string;
+  customerId?: string;
   returnLoad?: {
     id: string;
     route: string;

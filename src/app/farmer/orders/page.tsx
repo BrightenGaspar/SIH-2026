@@ -2,19 +2,24 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { trackingService } from '@/services/trackingService';
+import { useAuth } from '@/context/AuthContext';
+import { farmerService } from '@/services/farmerService';
 import { Order } from '@/types/farmer';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { Truck, ArrowRight, CheckCircle2, Clock, Sparkles, Flag } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { Truck, ArrowRight, CheckCircle2, Clock, Sparkles, Flag, PackageCheck, Send, Loader2, XCircle } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 import RateAndReviewModal from '@/components/reviews/RateAndReviewModal';
 import ReportModal from '@/components/reports/ReportModal';
 import { UserRole, ReportType } from '@/types/review';
 
 export default function FarmerOrdersPage() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   // Rating and Report State
   const [selectedRatingOrder, setSelectedRatingOrder] = useState<{
@@ -34,8 +39,50 @@ export default function FarmerOrdersPage() {
   } | null>(null);
 
   useEffect(() => {
-    trackingService.getOrders().then(setOrders);
+    let isMounted = true;
+    async function load() {
+      try {
+        const data = await farmerService.getFarmerOrders();
+        if (isMounted) setOrders(data);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    load();
+
+    // Supabase Realtime subscription: Receive live order creations and status updates instantly
+    const channel = supabase
+      .channel('realtime-farmer-orders')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+        },
+        async () => {
+          const fresh = await farmerService.getFarmerOrders();
+          if (isMounted) setOrders(fresh);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
+
+  const handleUpdateStatus = async (orderId: string, newStatus: string) => {
+    try {
+      setUpdatingOrderId(orderId);
+      await farmerService.updateOrderStatus(orderId, newStatus);
+      const fresh = await farmerService.getFarmerOrders();
+      setOrders(fresh);
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -50,8 +97,22 @@ export default function FarmerOrdersPage() {
 
       {/* Orders List */}
       <div className="space-y-4">
-        {orders.map((order) => (
-          <Card key={order.id} className="p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:border-emerald-500/50 transition">
+        {loading ? (
+          <Card className="p-12 text-center text-slate-500">
+            <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-500" />
+            <p className="text-sm">Connecting to Supabase Realtime & loading orders...</p>
+          </Card>
+        ) : orders.length === 0 ? (
+          <Card className="p-12 text-center border-dashed border-slate-300 dark:border-slate-800">
+            <PackageCheck className="w-12 h-12 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+            <h3 className="text-base font-bold text-slate-900 dark:text-white">No Orders Received Yet</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1">
+              When buyers purchase your listed produce from the marketplace, their live order and escrow status will appear here in real-time.
+            </p>
+          </Card>
+        ) : (
+          orders.map((order) => (
+            <Card key={order.id} className="p-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 hover:border-emerald-500/50 transition">
             
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2.5">
@@ -85,9 +146,80 @@ export default function FarmerOrdersPage() {
               </div>
             </div>
 
-            <div className="w-full lg:w-auto flex flex-col gap-2 shrink-0">
+            <div className="w-full lg:w-auto flex flex-col gap-2 shrink-0 min-w-[200px]">
+              {/* Lifecycle Stage Action: Accept or Reject Order */}
+              {((order.rawStatus?.toLowerCase() === 'pending') || order.status === 'New') && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleUpdateStatus(order.id, 'accepted')}
+                    disabled={updatingOrderId === order.id}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs"
+                  >
+                    {updatingOrderId === order.id ? (
+                      <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                    )}
+                    <span>Accept Order</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleUpdateStatus(order.id, 'rejected')}
+                    disabled={updatingOrderId === order.id}
+                    className="flex-1 border-rose-300 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-bold shadow-xs"
+                  >
+                    <XCircle className="w-4 h-4 mr-1.5" />
+                    <span>Reject Order</span>
+                  </Button>
+                </div>
+              )}
+
+              {/* Lifecycle Stage Action: Mark Preparing */}
+              {((order.rawStatus?.toLowerCase() === 'accepted') || order.status === 'Confirmed' || order.status === 'Escrow Locked') && (
+                <Button
+                  size="sm"
+                  onClick={() => handleUpdateStatus(order.id, 'PREPARING')}
+                  disabled={updatingOrderId === order.id}
+                  className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold shadow-xs"
+                >
+                  {updatingOrderId === order.id ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <PackageCheck className="w-4 h-4 mr-1.5" />
+                  )}
+                  <span>Prepare Harvest</span>
+                </Button>
+              )}
+
+              {/* Lifecycle Stage Action: Ready to Deliver */}
+              {((order.rawStatus?.toLowerCase() === 'preparing') || order.status === 'PREPARING' || order.status === 'Preparing') && (
+                <Button
+                  size="sm"
+                  onClick={() => handleUpdateStatus(order.id, 'READY_TO_DELIVER')}
+                  disabled={updatingOrderId === order.id}
+                  className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold shadow-md shadow-cyan-600/20"
+                >
+                  {updatingOrderId === order.id ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4 mr-1.5" />
+                  )}
+                  <span>Ready to Deliver</span>
+                </Button>
+              )}
+
+              {/* Status Notice when waiting for logistics */}
+              {((order.rawStatus?.toLowerCase() === 'ready_for_pickup') || order.status === 'READY_TO_DELIVER' || order.status === 'Ready to Deliver' || order.status === 'DISPATCH_OFFERED') && (
+                <div className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 dark:text-cyan-400 text-xs font-bold text-center flex items-center justify-center gap-1.5 animate-pulse">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Awaiting Carrier Acceptance</span>
+                </div>
+              )}
+
               <Link href={`/farmer/tracking/${order.logisticsId}`}>
-                <Button className="w-full" size="sm">
+                <Button className="w-full" size="sm" variant="outline">
                   <Truck className="w-4 h-4" />
                   <span>Road Tracking</span>
                   <ArrowRight className="w-4 h-4" />
@@ -102,7 +234,7 @@ export default function FarmerOrdersPage() {
                     onClick={() => {
                       setSelectedRatingOrder({
                         transactionId: order.id,
-                        targetUserId: order.buyerName || 'buyer_01',
+                        targetUserId: order.buyerId || 'buyer_direct',
                         targetRole: 'BUYER',
                         targetName: order.buyerName,
                         productName: order.produceName,
@@ -119,7 +251,7 @@ export default function FarmerOrdersPage() {
                     onClick={() => {
                       setSelectedRatingOrder({
                         transactionId: order.id,
-                        targetUserId: 'logistics_01',
+                        targetUserId: 'logistics_operator',
                         targetRole: 'LOGISTICS',
                         targetName: 'Cold-Chain Reefer Express',
                       });
@@ -135,7 +267,7 @@ export default function FarmerOrdersPage() {
                     onClick={() => {
                       setSelectedReportData({
                         reportType: 'USER',
-                        reportedUserId: 'buyer_01',
+                        reportedUserId: order.buyerId,
                         reportedRole: 'BUYER',
                         reportedName: order.buyerName,
                         transactionId: order.id,
@@ -151,7 +283,7 @@ export default function FarmerOrdersPage() {
             </div>
 
           </Card>
-        ))}
+        )))}
       </div>
 
       {/* Reciprocal Rate and Review Modal */}
@@ -164,9 +296,9 @@ export default function FarmerOrdersPage() {
           targetRole={selectedRatingOrder.targetRole}
           targetName={selectedRatingOrder.targetName}
           productName={selectedRatingOrder.productName}
-          raterUserId="farmer_01"
+          raterUserId={user?.id || 'farmer_user'}
           raterRole="FARMER"
-          raterDisplayName="Ramesh Reddy (Shadnagar FPO)"
+          raterDisplayName={user?.name || 'Verified Farmer'}
         />
       )}
 
@@ -180,9 +312,9 @@ export default function FarmerOrdersPage() {
           reportedRole={selectedReportData.reportedRole}
           reportedName={selectedReportData.reportedName}
           transactionId={selectedReportData.transactionId}
-          reporterUserId="farmer_01"
+          reporterUserId={user?.id || 'farmer_user'}
           reporterRole="FARMER"
-          reporterDisplayName="Ramesh Reddy (Shadnagar FPO)"
+          reporterDisplayName={user?.name || 'Verified Farmer'}
         />
       )}
 

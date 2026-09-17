@@ -19,6 +19,7 @@ import {
   Settings,
   LogOut,
   ChevronRight,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   const navItems = [
     { label: 'Home', href: '/farmer/dashboard', icon: Home },
     { label: 'My Produce', href: '/farmer/produce', icon: Sprout },
+    { label: 'Virtual Cooperative', href: '/farmer/clusters', icon: Users },
     { label: 'Market Prices', href: '/farmer/market-prices', icon: TrendingUp },
     { label: 'Orders', href: '/farmer/orders', icon: ShoppingBag },
     { label: 'Logistics', href: '/farmer/demand-map', icon: Truck },

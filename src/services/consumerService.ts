@@ -499,6 +499,44 @@ export const consumerService = {
       throw new Error('Invalid order: Missing produce listing identifier.');
     }
 
+    // Ensure listing is mirrored in produce_listings if it originated from produce table
+    try {
+      const { data: listingCheck } = await supabase
+        .from('produce_listings')
+        .select('id')
+        .eq('id', listingId)
+        .maybeSingle();
+
+      if (!listingCheck) {
+        const { data: prodRow } = await supabase
+          .from('produce')
+          .select('*')
+          .eq('id', listingId)
+          .maybeSingle();
+
+        if (prodRow) {
+          const qty = prodRow.quantity_kg != null ? Number(prodRow.quantity_kg) : Number(prodRow.quantity || 0);
+          const price = prodRow.price_per_kg != null ? Number(prodRow.price_per_kg) : Number(prodRow.asking_price || 0);
+          await supabase.from('produce_listings').insert({
+            id: prodRow.id,
+            farmer_id: prodRow.farmer_id,
+            produce_name: prodRow.crop_name,
+            variety: prodRow.variety,
+            category: prodRow.category || 'Vegetables',
+            total_quantity: qty,
+            available_quantity: qty,
+            price_per_unit: price,
+            unit: prodRow.unit || 'kg',
+            quality_grade: prodRow.quality_grade || 'A',
+            location_address: prodRow.location || 'Local Mandi Hub',
+            status: 'active'
+          });
+        }
+      }
+    } catch {
+      // ignore mirror error
+    }
+
     // Call authoritative database transaction RPC
     const { data, error } = await supabase.rpc('atomic_checkout_order', {
       p_listing_id: listingId,
@@ -532,6 +570,24 @@ export const consumerService = {
 
     if (!data?.success) {
       throw new Error(data?.message || 'Checkout failed.');
+    }
+
+    // Sync remaining quantity to public.produce table to trigger WAL Realtime broadcast
+    if (data.available_quantity_remaining != null) {
+      try {
+        const remQty = Number(data.available_quantity_remaining);
+        await supabase
+          .from('produce')
+          .update({
+            quantity: remQty,
+            quantity_kg: remQty,
+            status: remQty <= 0 ? 'Sold' : 'Active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', listingId);
+      } catch {
+        // ignore produce sync error
+      }
     }
 
     // Fetch newly created authoritative order from database

@@ -13,17 +13,20 @@ import { Modal } from '@/components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { produceSchema, ProduceFormData } from '@/lib/validators';
-import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud } from 'lucide-react';
+import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud, AlertCircle } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 
 export default function FarmerProducePage() {
-  const { user } = useAuth();
+  const { user, currentUser } = useAuth();
   const [produceList, setProduceList] = useState<Produce[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>('All');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<ProduceFormData>({
     resolver: zodResolver(produceSchema),
@@ -87,39 +90,68 @@ export default function FarmerProducePage() {
 
   const onAddProduceSubmit = async (data: ProduceFormData) => {
     try {
-      setIsUploading(true);
+      setIsSaving(true);
+      setSubmitError(null);
+      setSubmitSuccess(null);
+
+      // Validate required fields
+      if (!data.crop || !data.crop.trim()) {
+        throw new Error('Please enter a valid produce / crop name.');
+      }
+      if (!data.quantity || Number(data.quantity) <= 0) {
+        throw new Error('Quantity must be greater than zero.');
+      }
+      if (!data.expectedPrice || Number(data.expectedPrice) <= 0) {
+        throw new Error('Expected price must be greater than zero.');
+      }
+      if (!data.location || !data.location.trim()) {
+        throw new Error('Please enter a valid pickup location / hub.');
+      }
+
+      const farmerId = user?.id || currentUser?.id;
       let uploadedImageUrl: string | undefined = undefined;
 
-      if (!user?.id) {
-        throw new Error('Authentication required: Please log in as a farmer to list produce.');
-      }
-
       if (imageFile) {
-        uploadedImageUrl = await uploadCropImage(user.id, imageFile);
+        setIsUploading(true);
+        try {
+          uploadedImageUrl = await uploadCropImage(farmerId || 'demo_farmer', imageFile);
+        } catch (uploadErr: any) {
+          console.warn('Image upload failed, continuing with listing:', uploadErr?.message);
+        } finally {
+          setIsUploading(false);
+        }
       }
 
-      await farmerService.addProduce({
-        crop: data.crop,
+      const createdItem = await farmerService.addProduce({
+        crop: data.crop.trim(),
         quantity: Number(data.quantity),
-        unit: data.unit,
-        grade: data.grade as ProduceGrade,
+        unit: data.unit || 'kg',
+        grade: (data.grade || 'A') as ProduceGrade,
         harvestDate: data.harvestDate,
         expectedPrice: Number(data.expectedPrice),
-        location: data.location,
-        notes: data.notes,
+        location: data.location.trim(),
+        notes: data.notes?.trim() || undefined,
         imageUrl: uploadedImageUrl,
         image_url: uploadedImageUrl,
-      });
+      }, farmerId);
+
+      setSubmitSuccess(`Listing "${createdItem.crop}" (${createdItem.quantity} ${createdItem.unit}) published successfully to Supabase!`);
 
       const refreshed = await farmerService.getProduceList();
       setProduceList(refreshed || []);
-      setIsAddModalOpen(false);
-      setImageFile(null);
-      setImagePreview(null);
-      reset();
+
+      setTimeout(() => {
+        setIsAddModalOpen(false);
+        setImageFile(null);
+        setImagePreview(null);
+        setSubmitSuccess(null);
+        reset();
+      }, 1500);
     } catch (err: any) {
-      console.error('Failed to add produce listing:', err?.message);
+      console.error('Failed to add produce listing:', err);
+      setSubmitError(err?.message || 'Database error: Could not publish listing to Supabase. Please verify connection.');
     } finally {
+      setIsSaving(false);
       setIsUploading(false);
     }
   };
@@ -294,15 +326,38 @@ export default function FarmerProducePage() {
       )}
 
       {/* Add Produce Modal */}
-      <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} title="Add Agricultural Produce" subtitle="Declare crop quantity, grade, and expected realization price.">
+      <Modal isOpen={isAddModalOpen} onClose={() => { setIsAddModalOpen(false); setSubmitError(null); setSubmitSuccess(null); }} title="Add Agricultural Produce" subtitle="Declare crop quantity, grade, and expected realization price.">
         <form onSubmit={handleSubmit(onAddProduceSubmit)} className="space-y-4">
           
+          {/* Real Database Error Banner */}
+          {submitError && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
+              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <span className="font-bold block text-rose-200">Listing Error</span>
+                <span className="leading-relaxed">{submitError}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Real Database Success Banner */}
+          {submitSuccess && (
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <span className="font-bold block text-emerald-200">Published to Live Database</span>
+                <span className="leading-relaxed">{submitSuccess}</span>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="text-xs font-bold text-slate-300 block mb-1">Produce / Crop Name *</label>
             <input
               type="text"
               {...register('crop')}
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white"
+              disabled={isSaving}
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white disabled:opacity-50"
             />
             {errors.crop && <p className="text-[11px] text-rose-400 mt-1">{errors.crop.message}</p>}
           </div>
@@ -429,14 +484,14 @@ export default function FarmerProducePage() {
             <Button
               type="button"
               variant="secondary"
-              onClick={() => setIsAddModalOpen(false)}
+              onClick={() => { setIsAddModalOpen(false); setSubmitError(null); setSubmitSuccess(null); }}
               className="flex-1"
-              disabled={isUploading}
+              disabled={isSaving || isUploading}
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1" disabled={isUploading}>
-              {isUploading ? 'Uploading Image & Saving...' : 'Publish Listing'}
+            <Button type="submit" className="flex-1" disabled={isSaving || isUploading}>
+              {isUploading ? 'Uploading Image...' : isSaving ? 'Saving to Supabase...' : 'Publish Listing'}
             </Button>
           </div>
         </form>

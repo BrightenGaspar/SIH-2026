@@ -14,6 +14,7 @@ const testSuites = [
   { name: 'OLS Price Predictor & Math', script: 'test-predictor.js' },
   { name: 'Open-Meteo Meteorological API', script: 'test-weather.js' },
   { name: 'Multi-User Live Demo Flow', script: 'test-live-demo-flow.js' },
+  { name: 'Live Data Repair & Concurrency', script: 'test-live-data-repair.mjs' },
 ];
 
 console.log('================================================================');

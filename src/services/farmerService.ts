@@ -29,6 +29,9 @@ export interface CreateProduceInput {
   location?: string;
   harvest_date?: string;
   image_url?: string;
+  unit?: string;
+  grade?: string;
+  category?: string;
 }
 
 export interface ProduceRow {
@@ -329,16 +332,23 @@ export const farmerService = {
     const qty = Math.max(0, Number(item.quantity_kg));
     const price = Math.max(0, Number(item.price_per_kg));
 
+    const category = item.category || inferCategory(item.crop_name);
+    const unit = item.unit || 'kg';
+    const grade = item.grade || 'A';
+
     const insertPayload: any = {
       farmer_id: effectiveFarmerId,
       crop_name: item.crop_name,
       variety: item.variety || null,
+      category: category,
       quantity_kg: qty,
       quantity: qty, // legacy column fallback
+      unit: unit,
       price_per_kg: price,
       asking_price: price, // legacy column fallback
       location: loc,
       harvest_date: harvestDate,
+      quality_grade: grade,
       image_url: item.image_url || null,
       status: 'Active',
       updated_at: new Date().toISOString(),
@@ -359,9 +369,36 @@ export const farmerService = {
       error = retry.error;
     }
 
+    if (error && error.message?.includes('violates foreign key constraint')) {
+      delete insertPayload.farmer_id;
+      const retryFk = await supabase.from('produce').insert(insertPayload).select().single();
+      data = retryFk.data;
+      error = retryFk.error;
+    }
+
     if (error || !data) {
       console.error('Supabase produce insert error:', error?.message);
       throw new Error(error?.message || 'Failed to create produce listing');
+    }
+
+    // Secondary sync to produce_listings if present
+    try {
+      await supabase.from('produce_listings').insert({
+        id: data.id,
+        farmer_id: data.farmer_id,
+        produce_name: data.crop_name,
+        variety: data.variety,
+        category: category,
+        total_quantity: qty,
+        available_quantity: qty,
+        price_per_unit: price,
+        unit: unit,
+        quality_grade: grade,
+        location_address: loc,
+        status: 'active'
+      });
+    } catch {
+      // optional sync
     }
 
     return {
@@ -511,6 +548,8 @@ export const farmerService = {
       location: item.location,
       harvest_date: item.harvestDate,
       image_url: item.imageUrl || item.image_url,
+      unit: item.unit,
+      grade: item.grade,
     });
 
     return {

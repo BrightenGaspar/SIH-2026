@@ -21,13 +21,22 @@ import {
   CheckCircle2,
   Snowflake,
   Radio,
-  Zap
+  Zap,
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 
 export default function ConsumerMarketplacePage() {
   const { t } = useI18n();
   // Authoritative Supabase Realtime hook (<1s synchronization from farmer inventory)
-  const { items: liveProduce, status: realtimeStatus, recentlyUpdatedIds } = useLiveProduce();
+  const { 
+    items: liveProduce, 
+    status: realtimeStatus, 
+    recentlyUpdatedIds, 
+    error: realtimeError, 
+    isLoading, 
+    reconnect 
+  } = useLiveProduce();
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,10 +74,21 @@ export default function ConsumerMarketplacePage() {
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
               Direct Farm-Gate Sourcing
             </span>
-            {/* Realtime Sub-Second Status Badge */}
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300">
-              <span className={`w-2 h-2 rounded-full ${realtimeStatus === 'SUBSCRIBED' ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
-              <span>{realtimeStatus === 'SUBSCRIBED' ? 'Live (<1s Realtime Sync)' : `Realtime: ${realtimeStatus}`}</span>
+            {/* Realtime Sub-Second Status Badge & Reconnect */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300">
+                <span className={`w-2 h-2 rounded-full ${realtimeStatus === 'SUBSCRIBED' ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
+                <span>{realtimeStatus === 'SUBSCRIBED' ? 'Live (<1s Realtime Sync)' : `Realtime: ${realtimeStatus}`}</span>
+              </div>
+              {realtimeStatus !== 'SUBSCRIBED' && (
+                <button
+                  type="button"
+                  onClick={reconnect}
+                  className="px-2 py-0.5 text-[11px] font-bold rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700 transition cursor-pointer"
+                >
+                  Reconnect
+                </button>
+              )}
             </div>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white mt-0.5">
@@ -172,11 +192,51 @@ export default function ConsumerMarketplacePage() {
         </button>
       </div>
 
+      {/* Realtime / Database Offline Banner */}
+      {realtimeError && (
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-center gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+            <span>{realtimeError}</span>
+          </div>
+          <button
+            type="button"
+            onClick={reconnect}
+            className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold text-xs shrink-0 transition cursor-pointer flex items-center gap-1.5"
+          >
+            <RefreshCw className="w-3 h-3" />
+            Retry Connection
+          </button>
+        </div>
+      )}
+
       {/* Produce Grid / List with Live Realtime Updates */}
-      {realtimeStatus === 'CONNECTING' && liveProduce.length === 0 ? (
+      {isLoading && liveProduce.length === 0 ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-zinc-400 font-medium">Connecting to live Supabase Realtime channel...</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 font-medium">
+            Loading live produce catalog directly from Supabase...
+          </p>
+        </div>
+      ) : liveProduce.length === 0 && realtimeError ? (
+        <div className="py-16 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-rose-200 dark:border-rose-900/50 p-8 space-y-4">
+          <div className="p-4 rounded-full bg-rose-100 dark:bg-rose-950/60 w-14 h-14 mx-auto flex items-center justify-center text-rose-500">
+            <AlertCircle className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-zinc-900 dark:text-white">
+            Connection or Database Offline
+          </h3>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
+            {realtimeError}
+          </p>
+          <button
+            type="button"
+            onClick={reconnect}
+            className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm inline-flex items-center gap-2 cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Reconnect Now
+          </button>
         </div>
       ) : liveProduce.length === 0 ? (
         <div className="py-16 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 space-y-4">
@@ -192,7 +252,7 @@ export default function ConsumerMarketplacePage() {
           <Link href="/farmer/produce" className="inline-block">
             <button
               type="button"
-              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm"
+              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-sm cursor-pointer"
             >
               List Produce as Farmer
             </button>

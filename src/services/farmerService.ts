@@ -9,6 +9,8 @@ export interface FarmerProfileContext {
   fpoName?: string;
   district?: string;
   state?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface FarmerInventorySummary {
@@ -17,6 +19,30 @@ export interface FarmerInventorySummary {
   reservedKg: number;
   deliveredKg: number;
   activeListingsCount: number;
+}
+export interface CreateProduceInput {
+  farmer_id?: string;
+  crop_name: string;
+  variety?: string;
+  quantity_kg: number;
+  price_per_kg: number;
+  location?: string;
+  harvest_date?: string;
+  image_url?: string;
+}
+
+export interface ProduceRow {
+  id: string;
+  farmer_id?: string | null;
+  crop_name: string;
+  variety?: string | null;
+  quantity_kg: number;
+  price_per_kg: number;
+  location?: string | null;
+  harvest_date?: string | null;
+  image_url?: string | null;
+  updated_at?: string;
+  created_at?: string;
 }
 
 /**
@@ -28,7 +54,7 @@ export async function getLoggedInFarmerContext(): Promise<FarmerProfileContext |
     if (user?.id) {
       const { data: profile } = await supabase
         .from('profiles')
-        .select('id, full_name, fpo_name, state, district, place, phone')
+        .select('id, full_name, fpo_name, state, district, place, phone, latitude, longitude')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -44,6 +70,8 @@ export async function getLoggedInFarmerContext(): Promise<FarmerProfileContext |
         fpoName: profile?.fpo_name,
         district: profile?.district,
         state: profile?.state,
+        latitude: profile?.latitude != null ? Number(profile.latitude) : undefined,
+        longitude: profile?.longitude != null ? Number(profile.longitude) : undefined,
       };
     }
   } catch (err) {
@@ -93,15 +121,39 @@ function inferCategory(cropName: string): 'vegetables' | 'fruits' | 'grains' | '
   return 'vegetables';
 }
 
-function mapRowToProduce(row: any): Produce {
+function mapRowToProduce(row: any, relatedOrders: any[] = []): Produce {
   const profile = row.profiles as any;
   const profileLoc = profile
     ? [profile.place, profile.district, profile.state].filter(Boolean).join(', ')
     : undefined;
 
   const rawStatus = (row.status || 'active').toLowerCase();
+  const availableKg = Number(row.available_quantity != null ? row.available_quantity : row.quantity) || 0;
+
+  // Compute live reserved & delivered quantities from authoritative orders ledger
+  let reservedKg = 0;
+  let deliveredKg = 0;
+
+  if (relatedOrders && relatedOrders.length > 0) {
+    for (const o of relatedOrders) {
+      const qty = Number(o.quantity != null ? o.quantity : o.quantity_kg) || 0;
+      const st = (o.status || '').toLowerCase();
+      if (['pending', 'accepted', 'preparing', 'ready_for_pickup', 'pickup_assigned', 'in_transit'].includes(st)) {
+        reservedKg += qty;
+      } else if (st === 'delivered') {
+        deliveredKg += qty;
+      }
+    }
+  }
+
+  const totalKg = Number(row.total_quantity) || (availableKg + reservedKg + deliveredKg);
+
   let mappedStatus: ProduceStatus = 'Active';
-  if (rawStatus === 'sold_out' || rawStatus === 'sold') {
+  if (availableKg <= 0 && reservedKg === 0) {
+    mappedStatus = 'Sold';
+  } else if (availableKg <= 0 && reservedKg > 0) {
+    mappedStatus = 'Reserved';
+  } else if (rawStatus === 'sold_out' || rawStatus === 'sold') {
     mappedStatus = 'Sold';
   } else if (rawStatus === 'reserved') {
     mappedStatus = 'Reserved';
@@ -112,7 +164,13 @@ function mapRowToProduce(row: any): Produce {
   return {
     id: row.id,
     crop: row.produce_name || row.crop_name || 'Produce',
-    quantity: Number(row.available_quantity != null ? row.available_quantity : row.quantity) || 0,
+    quantity: availableKg,
+    totalQuantity: totalKg,
+    availableQuantity: availableKg,
+    reservedQuantity: reservedKg,
+    deliveredQuantity: deliveredKg,
+    locationLat: row.location_lat != null ? Number(row.location_lat) : (profile?.latitude != null ? Number(profile.latitude) : undefined),
+    locationLng: row.location_lng != null ? Number(row.location_lng) : (profile?.longitude != null ? Number(profile.longitude) : undefined),
     unit: row.unit || 'kg',
     grade: (row.quality_grade as ProduceGrade) || 'A',
     harvestDate: row.harvest_date || new Date().toISOString().split('T')[0],
@@ -151,6 +209,8 @@ export const farmerService = {
           harvest_date,
           quality_grade,
           location_address,
+          location_lat,
+          location_lng,
           status,
           image_url,
           created_at,
@@ -161,7 +221,9 @@ export const farmerService = {
             state,
             district,
             place,
-            phone
+            phone,
+            latitude,
+            longitude
           )
         `)
         .order('created_at', { ascending: false });
@@ -181,7 +243,16 @@ export const farmerService = {
         return [];
       }
 
-      return data.map(mapRowToProduce);
+      const listingIds = data.map((l) => l.id);
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('id, listing_id, quantity, quantity_kg, status')
+        .in('listing_id', listingIds);
+
+      return data.map((l) => {
+        const related = (orders || []).filter((o) => o.listing_id === l.id);
+        return mapRowToProduce(l, related);
+      });
     } catch (err: any) {
       console.error('Failed to get farmer produce list:', err?.message);
       throw err;
@@ -208,6 +279,8 @@ export const farmerService = {
           harvest_date,
           quality_grade,
           location_address,
+          location_lat,
+          location_lng,
           status,
           image_url,
           created_at,
@@ -218,7 +291,9 @@ export const farmerService = {
             state,
             district,
             place,
-            phone
+            phone,
+            latitude,
+            longitude
           )
         `)
         .eq('id', id)
@@ -229,7 +304,12 @@ export const farmerService = {
         return null;
       }
 
-      return mapRowToProduce(data);
+      const { data: orders } = await supabase
+        .from('orders')
+        .select('id, listing_id, quantity, quantity_kg, status')
+        .eq('listing_id', id);
+
+      return mapRowToProduce(data, orders || []);
     } catch (err: any) {
       console.error('Failed to get produce by id:', err?.message);
       return null;
@@ -237,116 +317,245 @@ export const farmerService = {
   },
 
   /**
-   * Insert a new produce listing directly into Supabase public.produce_listings
+  /**
+   * Create a new produce record directly in public.produce
+   */
+  async createProduce(item: CreateProduceInput): Promise<ProduceRow> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const effectiveFarmerId = item.farmer_id || user?.id || null;
+    const ctx = await getLoggedInFarmerContext();
+    const loc = item.location || ctx?.location || 'Nashik APMC Hub, Maharashtra';
+    const harvestDate = item.harvest_date || new Date().toISOString().split('T')[0];
+    const qty = Math.max(0, Number(item.quantity_kg));
+    const price = Math.max(0, Number(item.price_per_kg));
+
+    const insertPayload: any = {
+      farmer_id: effectiveFarmerId,
+      crop_name: item.crop_name,
+      variety: item.variety || null,
+      quantity_kg: qty,
+      quantity: qty, // legacy column fallback
+      price_per_kg: price,
+      asking_price: price, // legacy column fallback
+      location: loc,
+      harvest_date: harvestDate,
+      image_url: item.image_url || null,
+      status: 'Active',
+      updated_at: new Date().toISOString(),
+    };
+
+    let { data, error } = await supabase
+      .from('produce')
+      .insert(insertPayload)
+      .select()
+      .single();
+
+    if (error && (error.code === '42703' || error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
+      delete insertPayload.quantity_kg;
+      delete insertPayload.price_per_kg;
+      delete insertPayload.updated_at;
+      const retry = await supabase.from('produce').insert(insertPayload).select().single();
+      data = retry.data;
+      error = retry.error;
+    }
+
+    if (error || !data) {
+      console.error('Supabase produce insert error:', error?.message);
+      throw new Error(error?.message || 'Failed to create produce listing');
+    }
+
+    return {
+      id: String(data.id),
+      farmer_id: data.farmer_id,
+      crop_name: data.crop_name,
+      variety: data.variety,
+      quantity_kg: data.quantity_kg != null ? Number(data.quantity_kg) : Number(data.quantity || 0),
+      price_per_kg: data.price_per_kg != null ? Number(data.price_per_kg) : Number(data.asking_price || 0),
+      location: data.location,
+      harvest_date: data.harvest_date,
+      image_url: data.image_url,
+      updated_at: data.updated_at || data.created_at || new Date().toISOString(),
+      created_at: data.created_at,
+    };
+  },
+
+  /**
+   * Update quantity directly in public.produce table (triggers Realtime broadcast)
+   */
+  async updateQuantity(id: string, qty: number): Promise<ProduceRow> {
+    const numQty = Math.max(0, Number(qty));
+    const now = new Date().toISOString();
+
+    let { data, error } = await supabase
+      .from('produce')
+      .update({
+        quantity_kg: numQty,
+        quantity: numQty, // legacy column compatibility
+        updated_at: now,
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error && (error.code === '42703' || error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
+      const retry = await supabase
+        .from('produce')
+        .update({ quantity: numQty })
+        .eq('id', id)
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
+
+    if (error || !data) {
+      console.error('Supabase updateQuantity error:', error?.message);
+      throw new Error(error?.message || `Failed to update quantity for produce ${id}`);
+    }
+
+    // Also sync to produce_listings if present for secondary views
+    try {
+      await supabase
+        .from('produce_listings')
+        .update({ available_quantity: numQty, updated_at: now })
+        .eq('id', id);
+    } catch {
+      // optional sync
+    }
+
+    return {
+      id: String(data.id),
+      farmer_id: data.farmer_id,
+      crop_name: data.crop_name,
+      variety: data.variety,
+      quantity_kg: data.quantity_kg != null ? Number(data.quantity_kg) : Number(data.quantity || 0),
+      price_per_kg: data.price_per_kg != null ? Number(data.price_per_kg) : Number(data.asking_price || 0),
+      location: data.location,
+      harvest_date: data.harvest_date,
+      image_url: data.image_url,
+      updated_at: data.updated_at || data.created_at || now,
+      created_at: data.created_at,
+    };
+  },
+
+  /**
+   * Delete a produce item directly from public.produce
+   */
+  async deleteProduce(id: string): Promise<boolean> {
+    const { error } = await supabase
+      .from('produce')
+      .delete()
+      .eq('id', id);
+
+    // Also try delete from produce_listings
+    try {
+      await supabase.from('produce_listings').delete().eq('id', id);
+    } catch {
+      // ignore
+    }
+
+    if (error) {
+      console.error('Supabase produce delete error:', error.message);
+      return false;
+    }
+    return true;
+  },
+
+  /**
+   * List produce belonging to farmer directly from public.produce
+   */
+  async listMyProduce(farmerId?: string): Promise<ProduceRow[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    const targetId = farmerId || user?.id;
+
+    let query = supabase.from('produce').select('*');
+    if (targetId) {
+      query = query.eq('farmer_id', targetId);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+    if (error) {
+      console.error('Supabase listMyProduce error:', error.message);
+      throw new Error(error.message);
+    }
+
+    return (data || []).map((row: any) => ({
+      id: String(row.id),
+      farmer_id: row.farmer_id,
+      crop_name: row.crop_name || 'Farm Harvest',
+      variety: row.variety,
+      quantity_kg: row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0),
+      price_per_kg: row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0),
+      location: row.location,
+      harvest_date: row.harvest_date,
+      image_url: row.image_url,
+      updated_at: row.updated_at || row.created_at || new Date().toISOString(),
+      created_at: row.created_at,
+    }));
+  },
+
+  /**
+   * Insert a new produce listing directly into Supabase public.produce
    * strictly linked to the authenticated farmer session.
    */
   async addProduce(
     item: Omit<Produce, "id" | "createdAt" | "status">,
     farmerId?: string
   ): Promise<Produce> {
-    const { data: { user } } = await supabase.auth.getUser();
-    const effectiveFarmerId = user?.id || farmerId;
+    const created = await this.createProduce({
+      farmer_id: farmerId,
+      crop_name: item.crop,
+      variety: item.notes,
+      quantity_kg: Number(item.quantity),
+      price_per_kg: Number(item.expectedPrice),
+      location: item.location,
+      harvest_date: item.harvestDate,
+      image_url: item.imageUrl || item.image_url,
+    });
 
-    if (!effectiveFarmerId) {
-      throw new Error('Authentication required: You must be signed in as a farmer to create a listing.');
-    }
-
-    const ctx = await getLoggedInFarmerContext();
-    const locationToSave = item.location || ctx?.location || 'Nashik APMC Hub, Maharashtra';
-    const categoryToSave = inferCategory(item.crop);
-
-    const { data, error } = await supabase
-      .from('produce_listings')
-      .insert({
-        farmer_id: effectiveFarmerId,
-        produce_name: item.crop,
-        variety: item.notes || null,
-        category: categoryToSave,
-        total_quantity: Number(item.quantity),
-        available_quantity: Number(item.quantity),
-        unit: item.unit || 'kg',
-        quality_grade: item.grade || 'A',
-        harvest_date: item.harvestDate || new Date().toISOString().split('T')[0],
-        price_per_unit: Number(item.expectedPrice),
-        location_address: locationToSave,
-        status: 'active',
-        image_url: item.imageUrl || item.image_url || null,
-        shelf_life_days: 14,
-      })
-      .select(`
-        id,
-        farmer_id,
-        produce_name,
-        variety,
-        category,
-        total_quantity,
-        available_quantity,
-        price_per_unit,
-        unit,
-        harvest_date,
-        quality_grade,
-        location_address,
-        status,
-        image_url,
-        created_at
-      `)
-      .single();
-
-    if (error || !data) {
-      console.error('Supabase produce_listings insert error:', error?.message);
-      throw new Error(error?.message || 'Failed to create produce listing in database.');
-    }
-
-    return mapRowToProduce(data);
+    return {
+      id: created.id,
+      crop: created.crop_name,
+      quantity: created.quantity_kg,
+      totalQuantity: created.quantity_kg,
+      availableQuantity: created.quantity_kg,
+      reservedQuantity: 0,
+      deliveredQuantity: 0,
+      unit: item.unit || 'kg',
+      grade: item.grade || 'A',
+      harvestDate: created.harvest_date || new Date().toISOString().split('T')[0],
+      expectedPrice: created.price_per_kg,
+      location: created.location || 'Local Hub',
+      status: (created.quantity_kg > 0 ? 'Active' : 'Sold') as ProduceStatus,
+      imageUrl: created.image_url || undefined,
+      notes: created.variety || undefined,
+      createdAt: created.created_at || new Date().toISOString(),
+    };
   },
 
   /**
-   * Update an existing produce listing directly in public.produce_listings
+   * Update an existing produce listing status
    */
   async updateProduceStatus(id: string, status: Produce["status"]): Promise<Produce> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.id) {
-      throw new Error('Authentication required to update produce status.');
-    }
+    const dbStatus = status === 'Active' ? 'Active' : status === 'Sold' ? 'Sold' : 'Inactive';
 
-    const dbStatus = status === 'Active' ? 'active' : status === 'Sold' ? 'sold_out' : 'inactive';
-
-    const { data, error } = await supabase
-      .from('produce_listings')
+    await supabase
+      .from('produce')
       .update({ status: dbStatus, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .eq('farmer_id', user.id)
-      .select()
-      .single();
+      .eq('id', id);
 
-    if (error || !data) {
-      console.error('Supabase update error in updateProduceStatus:', error?.message);
-      throw new Error(error?.message || 'Failed to update produce status');
+    try {
+      await supabase
+        .from('produce_listings')
+        .update({ status: dbStatus.toLowerCase(), updated_at: new Date().toISOString() })
+        .eq('id', id);
+    } catch {
+      // ignore
     }
 
-    return mapRowToProduce(data);
-  },
-
-  /**
-   * Delete a produce listing directly from public.produce_listings
-   */
-  async deleteProduce(id: string): Promise<boolean> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.id) {
-      throw new Error('Authentication required to delete produce listing.');
-    }
-
-    const { error } = await supabase
-      .from('produce_listings')
-      .delete()
-      .eq('id', id)
-      .eq('farmer_id', user.id);
-
-    if (error) {
-      console.error('Supabase delete error in deleteProduce:', error.message);
-      return false;
-    }
-    return true;
+    const item = await this.getProduceById(id);
+    if (!item) throw new Error('Produce not found');
+    return item;
   },
 
   /**
@@ -409,6 +618,8 @@ export const farmerService = {
       else if (rawStatus === 'ready_for_pickup') canonicalStatus = 'Ready to Deliver';
       else if (rawStatus === 'in_transit' || rawStatus === 'dispatched') canonicalStatus = 'In Transit';
       else if (rawStatus === 'delivered') canonicalStatus = 'Delivered';
+      else if (rawStatus === 'rejected') canonicalStatus = 'Rejected';
+      else if (rawStatus === 'cancelled') canonicalStatus = 'Cancelled';
 
       return {
         id: o.id,
@@ -504,7 +715,7 @@ export const farmerService = {
       for (const o of ordersRes.data) {
         const qty = Number(o.quantity || o.quantity_kg || 0);
         const st = (o.status || '').toLowerCase();
-        if (st === 'accepted' || st === 'preparing' || st === 'ready_for_pickup') {
+        if (['pending', 'accepted', 'preparing', 'ready_for_pickup', 'pickup_assigned', 'in_transit'].includes(st)) {
           reservedKg += qty;
         } else if (st === 'delivered') {
           deliveredKg += qty;
@@ -521,3 +732,8 @@ export const farmerService = {
     };
   },
 };
+
+export const createProduce = farmerService.createProduce.bind(farmerService);
+export const updateQuantity = farmerService.updateQuantity.bind(farmerService);
+export const deleteProduce = farmerService.deleteProduce.bind(farmerService);
+export const listMyProduce = farmerService.listMyProduce.bind(farmerService);

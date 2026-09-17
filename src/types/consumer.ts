@@ -92,6 +92,10 @@ export interface ProductItem {
   description: string;
   isColdChainEligible: boolean;
   tags: string[];
+  totalQuantityKg?: number;
+  locationLat?: number;
+  locationLng?: number;
+  distanceKm?: number;
 }
 
 export interface ProductDetails extends ProductItem {

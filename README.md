@@ -247,5 +247,43 @@ npx tsc --noEmit
 
 ---
 
+## ⚡ Realtime Inventory Sanity Test (<1s Synchronization)
+
+To verify sub-second real-time synchronization between the Farmer Inventory and Consumer Marketplace across separate browser sessions/devices:
+
+### Step-by-Step Test Procedure:
+1. **Browser A (Farmer Portal)**:
+   - Open `/farmer/produce` (e.g. in Google Chrome).
+   - Locate any active produce item (e.g., `Tomato (Hybrid)` or `Onion - Nashik Red`).
+   - Notice the **"Edit Live Stock (kg)"** input box on the produce card.
+2. **Browser B (Consumer Marketplace)**:
+   - Open `/consumer/marketplace` in an incognito window, another browser (e.g., Microsoft Edge / Firefox), or a mobile device.
+   - Look for the matching crop card with its live available quantity (e.g., `1,000 kg available`) and the header status indicator showing:
+     `● Live (<1s Realtime Sync)`.
+3. **Trigger Realtime Mutation**:
+   - In **Browser A**, change the quantity input from `1000` to `750` and press **Enter** (or blur out of the field).
+   - Farmer portal triggers `farmerService.updateQuantity(id, 750)` directly against Supabase `public.produce`.
+4. **Observe Live Replication**:
+   - Within **< 1 second**, **Browser B** automatically updates to display `750 kg available`.
+   - The card in Browser B highlights with a green ring and displays an animated pulsing **"LIVE UPDATE"** badge for 1 second.
+   - No local page refresh or polling is involved; this is 100% driven by PostgreSQL WAL logical replication (`postgres_changes`).
+
+### Troubleshooting & Diagnostics:
+If Realtime events do not appear in Browser B:
+- **Publication Check**: Confirm that `public.produce` is added to the Supabase publication:
+  ```sql
+  SELECT schemaname, tablename FROM pg_publication_tables WHERE pubname = 'supabase_realtime';
+  ```
+  If missing, run: `ALTER PUBLICATION supabase_realtime ADD TABLE public.produce;`
+- **RLS Policy Check**: Verify that row-level security allows `SELECT` to public/anon:
+  ```sql
+  CREATE POLICY "Produce catalog is viewable by everyone" ON public.produce FOR SELECT USING (true);
+  ```
+- **Console Channel Status**: Open Developer Tools (F12) in Browser B and inspect console logs for:
+  `[useLiveProduce] Channel status: SUBSCRIBED`. If status is `CLOSED` or `CHANNEL_ERROR`, check network/WebSocket connectivity to Supabase Cloud (`*.supabase.co:443`).
+
+---
+
 ## 📄 License
 MIT License. Built with pride for the Smart India Hackathon (SIH).
+

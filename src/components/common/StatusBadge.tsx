@@ -39,6 +39,8 @@ export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
       case 'sold':
       case 'sold out':
       case 'out of stock':
+      case 'rejected':
+      case 'cancelled':
         return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30';
       case 'expired':
         return 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30';

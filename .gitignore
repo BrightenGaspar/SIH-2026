@@ -48,3 +48,6 @@ next-env.d.ts
 SIH-2026/
 SIHFULLCODE/
 
+# temporary scratch directory
+scratch/
+

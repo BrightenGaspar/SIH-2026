@@ -9,7 +9,7 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { supabase } from '@/lib/supabase';
-import { Truck, ArrowRight, CheckCircle2, Clock, Sparkles, Flag, PackageCheck, Send, Loader2 } from 'lucide-react';
+import { Truck, ArrowRight, CheckCircle2, Clock, Sparkles, Flag, PackageCheck, Send, Loader2, XCircle } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 import RateAndReviewModal from '@/components/reviews/RateAndReviewModal';
 import ReportModal from '@/components/reports/ReportModal';
@@ -147,21 +147,33 @@ export default function FarmerOrdersPage() {
             </div>
 
             <div className="w-full lg:w-auto flex flex-col gap-2 shrink-0 min-w-[200px]">
-              {/* Lifecycle Stage Action: Accept Order */}
+              {/* Lifecycle Stage Action: Accept or Reject Order */}
               {((order.rawStatus?.toLowerCase() === 'pending') || order.status === 'New') && (
-                <Button
-                  size="sm"
-                  onClick={() => handleUpdateStatus(order.id, 'accepted')}
-                  disabled={updatingOrderId === order.id}
-                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs"
-                >
-                  {updatingOrderId === order.id ? (
-                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
-                  ) : (
-                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
-                  )}
-                  <span>Accept Order</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => handleUpdateStatus(order.id, 'accepted')}
+                    disabled={updatingOrderId === order.id}
+                    className="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs"
+                  >
+                    {updatingOrderId === order.id ? (
+                      <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                    ) : (
+                      <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                    )}
+                    <span>Accept Order</span>
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleUpdateStatus(order.id, 'rejected')}
+                    disabled={updatingOrderId === order.id}
+                    className="flex-1 border-rose-300 dark:border-rose-800/60 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 font-bold shadow-xs"
+                  >
+                    <XCircle className="w-4 h-4 mr-1.5" />
+                    <span>Reject Order</span>
+                  </Button>
+                </div>
               )}
 
               {/* Lifecycle Stage Action: Mark Preparing */}

@@ -10,7 +10,34 @@ import {
 } from '@/types/consumer';
 import { supabase } from '@/lib/supabase';
 
-function mapListingToProductDetails(row: any): ProductDetails {
+export interface MarketplaceProduceItem {
+  id: string;
+  farmer_id?: string | null;
+  crop_name: string;
+  variety?: string | null;
+  quantity_kg: number;
+  price_per_kg: number;
+  location?: string | null;
+  harvest_date?: string | null;
+  image_url?: string | null;
+  updated_at: string;
+  created_at?: string;
+  farmer_name?: string;
+}
+
+export function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c * 10) / 10;
+}
+
+function mapListingToProductDetails(row: any, userCoords?: { lat: number; lng: number }): ProductDetails {
   const price = Number(row.price_per_unit || row.asking_price) || 30;
   const profile = row.profiles as any;
 
@@ -31,6 +58,15 @@ function mapListingToProductDetails(row: any): ProductDetails {
   const grade: ProduceGrade = validGrades.includes(rawGrade as any) ? (rawGrade as ProduceGrade) : 'A';
 
   const availableKg = Number(row.available_quantity != null ? row.available_quantity : row.quantity) || 0;
+  const totalKg = Number(row.total_quantity) || availableKg;
+
+  const locLat = row.location_lat != null ? Number(row.location_lat) : (profile?.latitude != null ? Number(profile.latitude) : undefined);
+  const locLng = row.location_lng != null ? Number(row.location_lng) : (profile?.longitude != null ? Number(profile.longitude) : undefined);
+
+  let distanceKm: number | undefined = undefined;
+  if (userCoords && locLat != null && locLng != null) {
+    distanceKm = calculateDistanceKm(userCoords.lat, userCoords.lng, locLat, locLng);
+  }
 
   return {
     id: String(row.id),
@@ -40,6 +76,10 @@ function mapListingToProductDetails(row: any): ProductDetails {
     grade,
     gradeDescription: `Grade ${grade} Certified Farm Harvest`,
     availableQuantityKg: availableKg,
+    totalQuantityKg: totalKg,
+    locationLat: locLat,
+    locationLng: locLng,
+    distanceKm,
     minOrderQuantityKg: Math.min(10, Math.max(1, availableKg || 1)),
     harvestDate: row.harvest_date || new Date().toISOString().split('T')[0],
     freshness: 'Harvested Today' as FreshnessLevel,
@@ -193,12 +233,88 @@ function mapRowToConsumerOrder(o: any): ConsumerOrder {
 
 export const consumerService = {
   /**
-   * Fetch live orderable produce listings directly from public.produce_listings.
-   * Strictly returns active listings with available quantity > 0.
+   * Return live marketplace rows from public.produce where quantity_kg > 0, ordered by updated_at desc.
+   * Hits Supabase produce table directly with zero mock fallback.
+   */
+  async listMarketplace(): Promise<MarketplaceProduceItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('produce')
+        .select('*');
+
+      if (error) {
+        console.error('Supabase listMarketplace error:', error.message);
+        throw new Error(error.message);
+      }
+
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      const items: MarketplaceProduceItem[] = data.map((row: any) => {
+        const qty = row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0);
+        const price = row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0);
+        const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
+
+        return {
+          id: String(row.id),
+          farmer_id: row.farmer_id,
+          crop_name: row.crop_name || 'Farm Harvest',
+          variety: row.variety || null,
+          quantity_kg: qty,
+          price_per_kg: price,
+          location: row.location || 'Local FPO Hub',
+          harvest_date: row.harvest_date || null,
+          image_url: row.image_url || null,
+          updated_at: updatedAt,
+          created_at: row.created_at,
+          farmer_name: 'Verified Kisan Partner',
+        };
+      });
+
+      return items
+        .filter((item) => item.quantity_kg > 0)
+        .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+    } catch (err: any) {
+      console.error('Failed to list marketplace produce from Supabase:', err?.message);
+      throw err;
+    }
+  },
+
+  /**
+   * Fetch live orderable produce listings directly from public.produce & public.produce_listings.
+   * Includes active listings with authoritative database quantities.
    * Zero hardcoded mock fallback.
    */
-  async getProducts(): Promise<ProductDetails[]> {
+  async getProducts(userCoords?: { lat: number; lng: number }): Promise<ProductDetails[]> {
     try {
+      // 1. Try public.produce first
+      const marketplaceRows = await this.listMarketplace();
+      if (marketplaceRows && marketplaceRows.length > 0) {
+        return marketplaceRows.map((item) => {
+          return mapListingToProductDetails(
+            {
+              id: item.id,
+              farmer_id: item.farmer_id,
+              crop_name: item.crop_name,
+              produce_name: item.crop_name,
+              variety: item.variety,
+              quantity_kg: item.quantity_kg,
+              available_quantity: item.quantity_kg,
+              price_per_unit: item.price_per_kg,
+              asking_price: item.price_per_kg,
+              location: item.location,
+              harvest_date: item.harvest_date,
+              image_url: item.image_url,
+              created_at: item.created_at,
+              updated_at: item.updated_at,
+            },
+            userCoords
+          );
+        });
+      }
+
+      // 2. Fallback to produce_listings if produce table returned 0 rows
       const { data, error } = await supabase
         .from('produce_listings')
         .select(`
@@ -214,6 +330,8 @@ export const consumerService = {
           harvest_date,
           quality_grade,
           location_address,
+          location_lat,
+          location_lng,
           status,
           image_url,
           shelf_life_days,
@@ -225,11 +343,13 @@ export const consumerService = {
             state,
             district,
             place,
-            phone
+            phone,
+            latitude,
+            longitude
           )
         `)
-        .eq('status', 'active')
-        .gt('available_quantity', 0)
+        .in('status', ['active', 'sold_out'])
+        .gte('available_quantity', 0)
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -241,7 +361,7 @@ export const consumerService = {
         return [];
       }
 
-      return data.map(mapListingToProductDetails);
+      return data.map((row) => mapListingToProductDetails(row, userCoords));
     } catch (err: any) {
       console.error('Failed to get marketplace products from Supabase:', err?.message);
       throw err;
@@ -251,7 +371,7 @@ export const consumerService = {
   /**
    * Fetch single product details by ID directly from public.produce_listings
    */
-  async getProductById(id: string): Promise<ProductDetails | null> {
+  async getProductById(id: string, userCoords?: { lat: number; lng: number }): Promise<ProductDetails | null> {
     try {
       const { data, error } = await supabase
         .from('produce_listings')
@@ -268,6 +388,8 @@ export const consumerService = {
           harvest_date,
           quality_grade,
           location_address,
+          location_lat,
+          location_lng,
           status,
           image_url,
           shelf_life_days,
@@ -279,7 +401,9 @@ export const consumerService = {
             state,
             district,
             place,
-            phone
+            phone,
+            latitude,
+            longitude
           )
         `)
         .eq('id', id)
@@ -290,7 +414,7 @@ export const consumerService = {
         return null;
       }
 
-      return mapListingToProductDetails(data);
+      return mapListingToProductDetails(data, userCoords);
     } catch (err: any) {
       console.error('Failed to get product by id:', err?.message);
       return null;
@@ -388,10 +512,15 @@ export const consumerService = {
 
     if (error) {
       console.error('atomic_checkout_order RPC error:', error.message);
-      // Clean, user-friendly message for stock exhaustion
+      // Clean, user-friendly message for stock exhaustion matching prompt requirements
+      const match = error.message.match(/Available:\s*([0-9.]+)/i);
+      if (match) {
+        throw new Error(`Only ${match[1]} kg is currently available. Please reduce your quantity.`);
+      }
       if (
         error.message.toLowerCase().includes('insufficient') ||
         error.message.toLowerCase().includes('unavailable') ||
+        error.message.toLowerCase().includes('sold_out') ||
         error.code === '22000'
       ) {
         throw new Error(
@@ -657,3 +786,6 @@ export const consumerService = {
     }
   },
 };
+
+export const listMarketplace = consumerService.listMarketplace.bind(consumerService);
+

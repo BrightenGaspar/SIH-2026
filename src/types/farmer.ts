@@ -12,7 +12,9 @@ export type OrderStatus =
   | 'Ready to Deliver'
   | 'DISPATCH_OFFERED'
   | 'Escrow Locked'
-  | 'LOGISTICS_ACCEPTED';
+  | 'LOGISTICS_ACCEPTED'
+  | 'Rejected'
+  | 'Cancelled';
 export type OpportunityLevel = 'High' | 'Medium' | 'Moderate' | 'Normal';
 
 export type SupportedLanguage = 'en' | 'te' | 'ta' | 'ml' | 'hi' | 'bn' | 'mr';
@@ -46,6 +48,12 @@ export interface Produce {
   id: string;
   crop: string;
   quantity: number;
+  totalQuantity?: number;
+  availableQuantity?: number;
+  reservedQuantity?: number;
+  deliveredQuantity?: number;
+  locationLat?: number;
+  locationLng?: number;
   unit: string;
   grade: ProduceGrade;
   harvestDate: string;

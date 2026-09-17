@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { consumerService } from '@/services/consumerService';
-import { supabase } from '@/lib/supabase';
+import { consumerService, MarketplaceProduceItem } from '@/services/consumerService';
+import { supabase } from '@/lib/supabaseClient';
+import { useLiveProduce } from '@/hooks/useLiveProduce';
 import { ProductItem } from '@/types/consumer';
 import ProductCard from '@/components/consumer/ProductCard';
+import ProduceCard from '@/components/consumer/ProduceCard';
 import GradeFilterTabs from '@/components/consumer/GradeFilterTabs';
 import { useI18n } from '@/context/I18nContext';
 import { 
@@ -18,13 +20,14 @@ import {
   ArrowUpDown,
   CheckCircle2,
   Snowflake,
-  Radio
+  Radio,
+  Zap
 } from 'lucide-react';
 
 export default function ConsumerMarketplacePage() {
   const { t } = useI18n();
-  const [products, setProducts] = useState<ProductItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Authoritative Supabase Realtime hook (<1s synchronization from farmer inventory)
+  const { items: liveProduce, status: realtimeStatus, recentlyUpdatedIds } = useLiveProduce();
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,92 +37,40 @@ export default function ConsumerMarketplacePage() {
   const [sortBy, setSortBy] = useState<'recommended' | 'price-asc' | 'price-desc' | 'freshness'>('recommended');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  useEffect(() => {
-    let isMounted = true;
-
-    async function load() {
-      setLoading(true);
-      const data = await consumerService.getProducts();
-      if (isMounted) {
-        setProducts(data);
-        setLoading(false);
-      }
-    }
-    load();
-
-    // Active Supabase realtime stream subscription listening for live INSERT and UPDATE on public.produce_listings
-    const channel = supabase
-      .channel('realtime-marketplace-produce')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'produce_listings',
-        },
-        async () => {
-          const freshData = await consumerService.getProducts();
-          if (isMounted) {
-            setProducts(freshData);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      isMounted = false;
-      supabase.removeChannel(channel);
-    };
-  }, []);
-
   const categories = ['All', 'Vegetables', 'Fruits', 'Grains', 'Spices'];
 
-  const gradeCounts = useMemo(() => {
-    return {
-      all: products.length,
-      A: products.filter(p => p.grade === 'A').length,
-      B: products.filter(p => p.grade === 'B').length,
-      'Organic Certified': products.filter(p => p.grade === 'Organic Certified').length,
-    };
-  }, [products]);
+  const filteredProduce = useMemo(() => {
+    return liveProduce.filter((item) => {
+      const matchesSearch =
+        item.crop_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.variety && item.variety.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (item.location && item.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (item.farmer_name && item.farmer_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      // Search
-      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.farmerStory.farmerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.farmerStory.district.toLowerCase().includes(searchQuery.toLowerCase());
-
-      // Category
-      const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-
-      // Grade
-      const matchesGrade = selectedGrade === 'all' || product.grade === selectedGrade;
-
-      // Cold Chain
-      const matchesColdChain = !coldChainOnly || product.isColdChainEligible;
-
-      return matchesSearch && matchesCategory && matchesGrade && matchesColdChain;
+      return matchesSearch;
     }).sort((a, b) => {
-      if (sortBy === 'price-asc') return a.pricePerKg - b.pricePerKg;
-      if (sortBy === 'price-desc') return b.pricePerKg - a.pricePerKg;
-      if (sortBy === 'freshness') {
-        const order: Record<string, number> = { 'Harvested Today': 0, 'Harvested 1 Day Ago': 1, 'Harvested 2 Days Ago': 2, 'Harvested 3 Days Ago': 3, 'Harvested 4 Days Ago': 4 };
-        return (order[a.freshness] ?? 99) - (order[b.freshness] ?? 99);
-      }
-      return 0; // recommended default
+      if (sortBy === 'price-asc') return a.price_per_kg - b.price_per_kg;
+      if (sortBy === 'price-desc') return b.price_per_kg - a.price_per_kg;
+      // Default: order by updated_at descending (freshest live updates first)
+      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
     });
-  }, [products, searchQuery, selectedCategory, selectedGrade, coldChainOnly, sortBy]);
+  }, [liveProduce, searchQuery, sortBy]);
 
   return (
     <div className="space-y-8">
       {/* Header & Title */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-            Direct Farm-Gate Sourcing
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+              Direct Farm-Gate Sourcing
+            </span>
+            {/* Realtime Sub-Second Status Badge */}
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300">
+              <span className={`w-2 h-2 rounded-full ${realtimeStatus === 'SUBSCRIBED' ? 'bg-emerald-500 animate-ping' : 'bg-amber-500'}`} />
+              <span>{realtimeStatus === 'SUBSCRIBED' ? 'Live (<1s Realtime Sync)' : `Realtime: ${realtimeStatus}`}</span>
+            </div>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white mt-0.5">
             Produce Marketplace
           </h1>
@@ -138,8 +89,7 @@ export default function ConsumerMarketplacePage() {
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent font-semibold text-zinc-900 dark:text-white focus:outline-none cursor-pointer"
             >
-              <option value="recommended">AI Recommended</option>
-              <option value="freshness">Freshest First (Harvest Date)</option>
+              <option value="recommended">Freshest First (Live Updated)</option>
               <option value="price-asc">Price: Low to High</option>
               <option value="price-desc">Price: High to Low</option>
             </select>
@@ -174,13 +124,6 @@ export default function ConsumerMarketplacePage() {
           </div>
         </div>
       </div>
-
-      {/* Grade Filter Tabs */}
-      <GradeFilterTabs
-        selectedGrade={selectedGrade}
-        onSelectGrade={setSelectedGrade}
-        counts={gradeCounts}
-      />
 
       {/* Search & Category Filter Bar */}
       <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm">
@@ -229,13 +172,13 @@ export default function ConsumerMarketplacePage() {
         </button>
       </div>
 
-      {/* Produce Grid / List */}
-      {loading ? (
+      {/* Produce Grid / List with Live Realtime Updates */}
+      {realtimeStatus === 'CONNECTING' && liveProduce.length === 0 ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
-          <p className="text-xs text-zinc-400 font-medium">Fetching verified farm listings...</p>
+          <p className="text-xs text-zinc-400 font-medium">Connecting to live Supabase Realtime channel...</p>
         </div>
-      ) : products.length === 0 ? (
+      ) : liveProduce.length === 0 ? (
         <div className="py-16 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 space-y-4">
           <div className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 w-14 h-14 mx-auto flex items-center justify-center text-zinc-400">
             <Filter className="w-6 h-6" />
@@ -255,7 +198,7 @@ export default function ConsumerMarketplacePage() {
             </button>
           </Link>
         </div>
-      ) : filteredProducts.length === 0 ? (
+      ) : filteredProduce.length === 0 ? (
         <div className="py-16 text-center bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 p-8 space-y-4">
           <div className="p-4 rounded-full bg-zinc-100 dark:bg-zinc-800 w-14 h-14 mx-auto flex items-center justify-center text-zinc-400">
             <Filter className="w-6 h-6" />
@@ -264,7 +207,7 @@ export default function ConsumerMarketplacePage() {
             No produce found matching your filters
           </h3>
           <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm mx-auto">
-            Try resetting your search query, changing the quality grade, or disabling specific filter criteria.
+            Try resetting your search query or categories.
           </p>
           <button
             type="button"
@@ -280,16 +223,12 @@ export default function ConsumerMarketplacePage() {
           </button>
         </div>
       ) : (
-        <div className={
-          viewMode === 'grid'
-            ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5'
-            : 'space-y-4'
-        }>
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              viewMode={viewMode}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {filteredProduce.map((item) => (
+            <ProduceCard
+              key={item.id}
+              produce={item}
+              isRecentlyUpdated={recentlyUpdatedIds.has(item.id)}
             />
           ))}
         </div>

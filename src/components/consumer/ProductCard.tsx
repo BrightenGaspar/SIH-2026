@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ProductItem } from '@/types/consumer';
 import { useCart } from '@/context/CartContext';
 import { useI18n } from '@/context/I18nContext';
+import { useBandwidth } from '@/context/BandwidthContext';
 import { KnowYourFarmerModal } from './KnowYourFarmerModal';
 import { 
   Sparkles, 
@@ -13,7 +15,10 @@ import {
   ShoppingBag, 
   Eye, 
   TrendingUp,
-  Check
+  Check,
+  Zap,
+  Minus,
+  Plus
 } from 'lucide-react';
 
 interface ProductCardProps {
@@ -22,19 +27,50 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, viewMode = 'grid' }) => {
+  const router = useRouter();
   const { t } = useI18n();
   const { addToCart } = useCart();
+  const { isLowBandwidth } = useBandwidth();
   const [showFarmerModal, setShowFarmerModal] = useState(false);
   const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
   const [quantity, setQuantity] = useState<number>(product.minOrderQuantityKg || 1);
   const [isAdded, setIsAdded] = useState(false);
 
+  const isOutOfStock = product.availableQuantityKg <= 0;
+  const minQty = product.minOrderQuantityKg || 1;
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity(prev => Math.max(minQty, prev - (prev > 50 ? 10 : 1)));
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity(prev => Math.min(product.availableQuantityKg, prev + (prev >= 50 ? 10 : 1)));
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value) || minQty;
+    setQuantity(Math.min(product.availableQuantityKg, Math.max(minQty, val)));
+  };
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
     addToCart(product, quantity);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1800);
+  };
+
+  const handleOrderNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock) return;
+    addToCart(product, quantity);
+    router.push('/consumer/checkout');
   };
 
   const getGradeBadgeColor = (grade: string) => {

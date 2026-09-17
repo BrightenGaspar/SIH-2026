@@ -103,7 +103,7 @@ export default function ConsumerSettingsPage() {
           </div>
         </div>
 
-        {/* SIH Judges Demo Session Reset */}
+        {/* Application Session Reset */}
         <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-zinc-900 border border-red-500/30 shadow-sm space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400">
@@ -111,10 +111,10 @@ export default function ConsumerSettingsPage() {
             </div>
             <div>
               <h3 className="text-base font-bold text-zinc-900 dark:text-white">
-                SIH Evaluation Demo Reset
+                Workspace Session &amp; Cache Reset
               </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                Reset local simulation storage, demo cart, and orders back to default SIH presentation state.
+                Clear temporary session storage, local cart items, and reset cached workspace state.
               </p>
             </div>
           </div>
@@ -122,11 +122,11 @@ export default function ConsumerSettingsPage() {
           <div className="flex items-center justify-between pt-2">
             {resetSuccess ? (
               <span className="text-xs font-bold text-emerald-600">
-                Resetting environment... reloading page
+                Resetting session cache... reloading page
               </span>
             ) : (
               <span className="text-xs text-zinc-400">
-                Re-seeds default 5,000 kg Hyderabad Tomato Multi-Farmer data.
+                Clears active browser state and refreshes application session.
               </span>
             )}
 
@@ -135,7 +135,7 @@ export default function ConsumerSettingsPage() {
               onClick={handleResetDemo}
               className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md transition-colors"
             >
-              Reset Demo State
+              Reset Session State
             </button>
           </div>
         </div>

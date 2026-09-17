@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { farmerService } from '@/services/farmerService';
 import { uploadCropImage } from '@/services/storageService';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { Produce, ProduceGrade } from '@/types/farmer';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
@@ -40,10 +41,48 @@ export default function FarmerProducePage() {
 
   useEffect(() => {
     let isMounted = true;
-    farmerService.getProduceList()
-      .then(data => { if (isMounted) setProduceList(data || []); })
-      .catch(() => { if (isMounted) setProduceList([]); });
-    return () => { isMounted = false; };
+    async function load() {
+      try {
+        const data = await farmerService.getProduceList();
+        if (isMounted) setProduceList(data || []);
+      } catch {
+        if (isMounted) setProduceList([]);
+      }
+    }
+    load();
+
+    const channel = supabase
+      .channel('realtime-farmer-produce')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'produce',
+        },
+        async () => {
+          const refreshed = await farmerService.getProduceList();
+          if (isMounted) setProduceList(refreshed || []);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'produce_listings',
+        },
+        async () => {
+          const refreshed = await farmerService.getProduceList();
+          if (isMounted) setProduceList(refreshed || []);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const onAddProduceSubmit = async (data: ProduceFormData) => {
@@ -51,9 +90,12 @@ export default function FarmerProducePage() {
       setIsUploading(true);
       let uploadedImageUrl: string | undefined = undefined;
 
+      if (!user?.id) {
+        throw new Error('Authentication required: Please log in as a farmer to list produce.');
+      }
+
       if (imageFile) {
-        const farmerId = user?.id || 'farmer-001';
-        uploadedImageUrl = await uploadCropImage(farmerId, imageFile);
+        uploadedImageUrl = await uploadCropImage(user.id, imageFile);
       }
 
       await farmerService.addProduce({
@@ -152,21 +194,48 @@ export default function FarmerProducePage() {
                   <StatusBadge status={item.status} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 my-4 text-xs">
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <span className="text-slate-400 block">Quantity</span>
-                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{item.quantity.toLocaleString()} {item.unit}</span>
+                {/* 4-Metric Live Stock Breakdown */}
+                <div className="my-3 p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-800/80">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Live Inventory Breakdown</span>
+                  <div className="grid grid-cols-4 gap-2 text-center">
+                    <div className="p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                      <span className="text-[10px] text-slate-400 block">Total</span>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                        {(item.totalQuantity ?? item.quantity).toLocaleString()} {item.unit}
+                      </span>
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 block">Reserved</span>
+                      <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                        {(item.reservedQuantity ?? 0).toLocaleString()} {item.unit}
+                      </span>
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400 block">Delivered</span>
+                      <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                        {(item.deliveredQuantity ?? 0).toLocaleString()} {item.unit}
+                      </span>
+                    </div>
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 block">Available</span>
+                      <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">
+                        {(item.availableQuantity ?? item.quantity).toLocaleString()} {item.unit}
+                      </span>
+                    </div>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <span className="text-slate-400 block">Quality Grade</span>
-                    <span className="text-sm font-black text-emerald-500">Grade {item.grade}</span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 my-3 text-xs">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                    <span className="text-slate-400 block text-[10px]">Quality Grade</span>
+                    <span className="text-xs font-black text-emerald-500">Grade {item.grade}</span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <span className="text-slate-400 block">Expected Price</span>
-                    <span className="text-sm font-bold text-emerald-500">{formatINR(item.expectedPrice)}/{item.unit}</span>
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                    <span className="text-slate-400 block text-[10px]">Expected Price</span>
+                    <span className="text-xs font-bold text-emerald-500">{formatINR(item.expectedPrice)}/{item.unit}</span>
                   </div>
-                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800">
-                    <span className="text-slate-400 block">Harvest Date</span>
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-center">
+                    <span className="text-slate-400 block text-[10px]">Harvest Date</span>
                     <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">{item.harvestDate}</span>
                   </div>
                 </div>
@@ -176,6 +245,41 @@ export default function FarmerProducePage() {
                     &ldquo;{item.notes}&rdquo;
                   </p>
                 )}
+                {/* Real-time Inventory Quantity Updater (Realtime echo back) */}
+                <div className="my-3 p-3 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-between gap-3">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
+                      Edit Live Stock ({item.unit})
+                    </label>
+                    <span className="text-[10px] text-slate-400">Updates marketplace in &lt;1s</span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="number"
+                      min={0}
+                      defaultValue={item.availableQuantity ?? item.quantity}
+                      key={`${item.id}-${item.availableQuantity ?? item.quantity}`}
+                      onBlur={async (e) => {
+                        const newQty = Math.max(0, parseInt(e.target.value) || 0);
+                        if (newQty !== (item.availableQuantity ?? item.quantity)) {
+                          await farmerService.updateQuantity(item.id, newQty);
+                        }
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          const target = e.target as HTMLInputElement;
+                          const newQty = Math.max(0, parseInt(target.value) || 0);
+                          target.blur();
+                          await farmerService.updateQuantity(item.id, newQty);
+                        }
+                      }}
+                      className="w-20 px-2 py-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-center font-bold text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <span className="text-xs font-semibold text-slate-500">{item.unit}</span>
+                  </div>
+                </div>
               </div>
 
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">

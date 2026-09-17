@@ -11,7 +11,9 @@
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
     "@supabase/supabase-js": "^2.116.0",
+    "@types/cors": "^2.8.19",
     "@types/leaflet": "^1.9.22",
+    "@types/ws": "^8.18.1",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "clsx": "^2.1.1",
@@ -26,6 +28,7 @@
     "react-leaflet": "^5.0.0",
     "recharts": "^3.10.1",
     "tailwind-merge": "^3.6.0",
+    "ws": "^8.21.3",
     "zod": "^4.5.4"
   },
   "devDependencies": {

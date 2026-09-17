@@ -217,11 +217,11 @@ export default function ConsumerLandingPage() {
         </div>
       </section>
 
-      {/* SIH 5,000 kg Live Demo Callout */}
+      {/* 5,000 kg Live Sourcing Callout */}
       <section className="p-8 rounded-3xl bg-gradient-to-r from-emerald-900 to-zinc-900 border border-emerald-500/40 text-white flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="space-y-2 max-w-2xl">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500 text-zinc-950 font-extrabold text-[11px] uppercase tracking-wider">
-            SIH Highlight Demo
+            Consolidated Sourcing Spotlight
           </div>
           <h3 className="text-xl sm:text-2xl font-black">
             5,000 kg Hyderabad Tomato Multi-Farmer Fulfillment
@@ -235,7 +235,7 @@ export default function ConsumerLandingPage() {
           href="/consumer/dashboard"
           className="px-6 py-3 rounded-xl bg-white text-zinc-950 hover:bg-emerald-400 font-extrabold text-xs shrink-0 transition-colors shadow-md"
         >
-          View Live Demo Order
+          View Sourcing Details
         </Link>
       </section>
     </div>

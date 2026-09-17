@@ -63,9 +63,9 @@ export interface DeliveryTracking {
   pickupLocation: string;
   destinationLocation: string;
   currentLocationName: string;
-  currentCoordinates: [number, number];
-  pickupCoordinates: [number, number];
-  destinationCoordinates: [number, number];
+  currentCoordinates?: [number, number];
+  pickupCoordinates?: [number, number];
+  destinationCoordinates?: [number, number];
   estimatedArrival: string;
   distanceRemainingKm: number;
   distanceCompletedKm: number;

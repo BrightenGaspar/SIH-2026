@@ -4,12 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { consumerService } from '@/services/consumerService';
 import { ConsumerOrder } from '@/types/consumer';
+import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
 import MultiFarmerConsolidationCard from '@/components/consumer/MultiFarmerConsolidationCard';
 import ImpactReceiptModal from '@/components/consumer/ImpactReceiptModal';
 import RateAndReviewModal from '@/components/reviews/RateAndReviewModal';
 import ReportModal from '@/components/reports/ReportModal';
 import { UserRole, ReportType } from '@/types/review';
+import { supabase } from '@/lib/supabase';
 import { 
   Package, 
   Truck, 
@@ -20,16 +22,20 @@ import {
   MapPin, 
   TrendingUp, 
   Users, 
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
-  Flag
+  Sparkles, 
+  ChevronDown, 
+  ChevronUp, 
+  Flag,
+  Loader2,
+  XCircle
 } from 'lucide-react';
 
 export default function ConsumerOrdersPage() {
+  const { user } = useAuth();
   const { t } = useI18n();
   const [orders, setOrders] = useState<ConsumerOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'completed'>('all');
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>('ORD-HYD-5000');
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState<ConsumerOrder | null>(null);
@@ -51,32 +57,84 @@ export default function ConsumerOrdersPage() {
   } | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     async function load() {
       setLoading(true);
-      const data = await consumerService.getOrders();
-      setOrders(data);
-      setLoading(false);
+      try {
+        const data = await consumerService.getOrders();
+        if (isMounted) setOrders(data);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
     }
     load();
+
+    const channel = supabase
+      .channel('realtime-consumer-orders')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders',
+        },
+        async () => {
+          const fresh = await consumerService.getOrders();
+          if (isMounted) setOrders(fresh);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
+  const handleCancelOrder = async (orderId: string) => {
+    if (!window.confirm('Are you sure you want to cancel this order? Produce stock will be restored immediately.')) {
+      return;
+    }
+    try {
+      setCancellingOrderId(orderId);
+      const success = await consumerService.cancelOrder(orderId, 'Cancelled by consumer');
+      if (success) {
+        const fresh = await consumerService.getOrders();
+        setOrders(fresh);
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Failed to cancel order.');
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
+
   const filteredOrders = orders.filter(o => {
-    if (activeTab === 'active') return o.status !== 'Delivered' && o.status !== 'Cancelled';
-    if (activeTab === 'completed') return o.status === 'Delivered';
+    const s = (o.status || '').toLowerCase();
+    const isCompleted = s === 'delivered' || s === 'cancelled' || s === 'canceled';
+    if (activeTab === 'active') return !isCompleted;
+    if (activeTab === 'completed') return s === 'delivered';
     return true;
   });
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'In Transit':
-      case 'Preparing':
-      case 'Pickup':
-        return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
-      case 'Delivered':
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
-      default:
-        return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
+    const s = (status || '').toUpperCase();
+    if (s === 'CANCELLED' || s === 'CANCELED') {
+      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
     }
+    if (s === 'IN TRANSIT' || s === 'PICKUP') {
+      return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
+    }
+    if (s === 'READY_TO_DELIVER' || s === 'READY TO DELIVER' || s === 'DISPATCH_OFFERED') {
+      return 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20';
+    }
+    if (s === 'PREPARING') {
+      return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
+    }
+    if (s === 'DELIVERED') {
+      return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+    }
+    return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20';
   };
 
   return (
@@ -154,7 +212,7 @@ export default function ConsumerOrdersPage() {
                       <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getStatusBadge(order.status)}`}>
                         {order.status}
                       </span>
-                      {order.status === 'In Transit' && (
+                      {(order.status === 'In Transit' || order.status === 'IN TRANSIT') && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 animate-pulse">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                           Live GPS Active
@@ -180,7 +238,7 @@ export default function ConsumerOrdersPage() {
                     </div>
 
                     <Link
-                      href={`/consumer/tracking/${order.logisticsId || 'TRK-CONS-ROAD-9021'}`}
+                      href={`/consumer/tracking/${order.logisticsId || order.id}`}
                       className="px-3.5 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all flex items-center gap-1.5 shadow-xs"
                       title="Open Live GPS Tracking Map"
                     >
@@ -299,7 +357,7 @@ export default function ConsumerOrdersPage() {
                               onClick={() => {
                                 setSelectedRatingOrder({
                                   transactionId: order.id,
-                                  targetUserId: 'farmer_01',
+                                  targetUserId: order.farmerId || order.items[0]?.product.farmerStory.id || 'farmer_direct',
                                   targetRole: 'FARMER',
                                   targetName: order.items[0]?.product.farmerStory.farmerName || 'Farmer',
                                   productId: order.items[0]?.product.id,
@@ -317,7 +375,7 @@ export default function ConsumerOrdersPage() {
                               onClick={() => {
                                 setSelectedRatingOrder({
                                   transactionId: order.id,
-                                  targetUserId: 'logistics_01',
+                                  targetUserId: order.operatorId || 'logistics_direct',
                                   targetRole: 'LOGISTICS',
                                   targetName: 'Reefer Express Carrier',
                                 });
@@ -329,6 +387,29 @@ export default function ConsumerOrdersPage() {
                             </button>
                           </>
                         )}
+
+                        {/* Cancel Order (Atomic rollback RPC: allowed ONLY in pending or accepted before preparation) */}
+                        {(() => {
+                          const dbStatus = (order.rawStatus || '').toLowerCase();
+                          const isCancellable = dbStatus
+                            ? (dbStatus === 'pending' || dbStatus === 'accepted')
+                            : (order.status === 'Escrow Locked' || order.status === 'Confirmed');
+                          return isCancellable ? (
+                            <button
+                              type="button"
+                              onClick={() => handleCancelOrder(order.id)}
+                              disabled={cancellingOrderId === order.id}
+                              className="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              {cancellingOrderId === order.id ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5" />
+                              )}
+                              <span>Cancel Order</span>
+                            </button>
+                          ) : null;
+                        })()}
 
                         {/* Report Order / Incident */}
                         <button
@@ -373,9 +454,9 @@ export default function ConsumerOrdersPage() {
           targetName={selectedRatingOrder.targetName}
           productId={selectedRatingOrder.productId}
           productName={selectedRatingOrder.productName}
-          raterUserId="user_consumer_demo"
+          raterUserId={user?.id || 'consumer_user'}
           raterRole="BUYER"
-          raterDisplayName="Priya S. (Retail Buyer)"
+          raterDisplayName={user?.name || 'Verified Buyer'}
         />
       )}
 
@@ -387,9 +468,9 @@ export default function ConsumerOrdersPage() {
           reportType={selectedReportData.reportType}
           transactionId={selectedReportData.transactionId}
           reportedName={selectedReportData.reportedName}
-          reporterUserId="user_consumer_demo"
+          reporterUserId={user?.id || 'consumer_user'}
           reporterRole="BUYER"
-          reporterDisplayName="Priya S. (Retail Buyer)"
+          reporterDisplayName={user?.name || 'Verified Buyer'}
         />
       )}
 

@@ -6,7 +6,6 @@ export type OrderStatus =
   | 'Pickup' 
   | 'In Transit' 
   | 'Delivered'
-  | 'PLACED'
   | 'PREPARING'
   | 'Preparing'
   | 'READY_TO_DELIVER'
@@ -200,8 +199,10 @@ export interface Order {
   pickupDate: string;
   deliveryDate?: string;
   status: OrderStatus;
+  rawStatus?: string;
   logisticsId: string;
   destinationCity: string;
+  buyerId?: string;
 }
 
 export interface SIHScenarioData {

@@ -1,7 +1,7 @@
 export type BuyerType = 'household' | 'retailer' | 'restaurant' | 'bulk-buyer' | 'institution';
 export type ProduceGrade = 'A' | 'B' | 'Organic Certified';
 export type FreshnessLevel = 'Harvested Today' | 'Harvested 1 Day Ago' | 'Harvested 2 Days Ago' | 'Harvested 3 Days Ago' | 'Harvested 4 Days Ago' | string;
-export type ConsumerOrderStatus = 'Escrow Locked' | 'Order Placed' | 'Confirmed' | 'Preparing' | 'PREPARING' | 'Pickup' | 'In Transit' | 'IN TRANSIT' | 'Dispatched' | 'READY_TO_DELIVER' | 'DISPATCH_OFFERED' | 'PLACED' | 'Delivered' | 'Cancelled';
+export type ConsumerOrderStatus = 'Escrow Locked' | 'Order Placed' | 'Confirmed' | 'Preparing' | 'PREPARING' | 'Pickup' | 'In Transit' | 'IN TRANSIT' | 'Dispatched' | 'READY_TO_DELIVER' | 'DISPATCH_OFFERED' | 'Delivered' | 'Cancelled';
 export type RiskLevel = 'Low' | 'Medium' | 'High';
 export type RoadVehicleType = 'Tata Ace' | 'Tata 407 Reefer' | 'Mahindra Bolero Maxi Truck';
 
@@ -210,6 +210,9 @@ export interface ConsumerOrder {
   paymentMethod: 'UPI' | 'Card' | 'Demo Cash';
   orderDate: string;
   status: ConsumerOrderStatus;
+  rawStatus?: string;
+  farmerId?: string;
+  operatorId?: string;
   logisticsId?: string;
   multiFarmerSources?: MultiFarmerSource[];
   impactReceipt?: ImpactReceipt;

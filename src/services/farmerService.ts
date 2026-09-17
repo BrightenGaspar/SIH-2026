@@ -1,4 +1,4 @@
-import { Produce, ProduceGrade, ProduceStatus } from "@/types/farmer";
+import { Produce, ProduceGrade, ProduceStatus, Order, OrderStatus } from "@/types/farmer";
 import { supabase } from "@/lib/supabase";
 
 export interface FarmerProfileContext {
@@ -11,12 +11,19 @@ export interface FarmerProfileContext {
   state?: string;
 }
 
+export interface FarmerInventorySummary {
+  totalKg: number;
+  availableKg: number;
+  reservedKg: number;
+  deliveredKg: number;
+  activeListingsCount: number;
+}
+
 /**
- * Retrieve the active logged-in farmer profile context from Supabase Auth or Session Storage
+ * Retrieve the active logged-in farmer profile context from Supabase Auth
  */
 export async function getLoggedInFarmerContext(): Promise<FarmerProfileContext | null> {
   try {
-    // 1. Supabase Auth state
     const { data: { user } } = await supabase.auth.getUser();
     if (user?.id) {
       const { data: profile } = await supabase
@@ -39,38 +46,13 @@ export async function getLoggedInFarmerContext(): Promise<FarmerProfileContext |
         state: profile?.state,
       };
     }
-  } catch {
-    // Continue to session storage fallback
+  } catch (err) {
+    console.warn('Error resolving logged-in farmer context:', err);
   }
-
-  // 2. Browser session storage fallback
-  if (typeof window !== 'undefined') {
-    try {
-      const stored = sessionStorage.getItem('agriflow_farmer_auth');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (parsed) {
-          const loc = parsed.location || [parsed.place, parsed.district, parsed.state].filter(Boolean).join(', ');
-          return {
-            userId: parsed.id,
-            fullName: parsed.name,
-            location: loc,
-            phone: parsed.phone,
-            fpoName: parsed.farmName,
-            district: parsed.district,
-            state: parsed.state,
-          };
-        }
-      }
-    } catch {
-      // Ignore JSON parse errors
-    }
-  }
-
   return null;
 }
 
-function inferCategory(cropName: string): 'Vegetables' | 'Fruits' | 'Grains' | 'Spices' {
+function inferCategory(cropName: string): 'vegetables' | 'fruits' | 'grains' | 'spices' {
   const lower = cropName.toLowerCase();
   if (
     lower.includes('mango') ||
@@ -83,7 +65,7 @@ function inferCategory(cropName: string): 'Vegetables' | 'Fruits' | 'Grains' | '
     lower.includes('pomegranate') ||
     lower.includes('citrus')
   ) {
-    return 'Fruits';
+    return 'fruits';
   }
   if (
     lower.includes('rice') ||
@@ -94,7 +76,7 @@ function inferCategory(cropName: string): 'Vegetables' | 'Fruits' | 'Grains' | '
     lower.includes('corn') ||
     lower.includes('paddy')
   ) {
-    return 'Grains';
+    return 'grains';
   }
   if (
     lower.includes('chilli') ||
@@ -106,63 +88,72 @@ function inferCategory(cropName: string): 'Vegetables' | 'Fruits' | 'Grains' | '
     lower.includes('cumin') ||
     lower.includes('coriander')
   ) {
-    return 'Spices';
+    return 'spices';
   }
-  return 'Vegetables';
+  return 'vegetables';
 }
 
-const SESSION_FARMER_PRODUCE_KEY = 'agriflow_cached_farmer_produce';
+function mapRowToProduce(row: any): Produce {
+  const profile = row.profiles as any;
+  const profileLoc = profile
+    ? [profile.place, profile.district, profile.state].filter(Boolean).join(', ')
+    : undefined;
 
-export function getCachedFarmerProduce(): Produce[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = sessionStorage.getItem(SESSION_FARMER_PRODUCE_KEY) || localStorage.getItem(SESSION_FARMER_PRODUCE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
+  const rawStatus = (row.status || 'active').toLowerCase();
+  let mappedStatus: ProduceStatus = 'Active';
+  if (rawStatus === 'sold_out' || rawStatus === 'sold') {
+    mappedStatus = 'Sold';
+  } else if (rawStatus === 'reserved') {
+    mappedStatus = 'Reserved';
+  } else if (rawStatus === 'inactive' || rawStatus === 'expired') {
+    mappedStatus = 'Expired';
   }
-}
 
-export function saveCachedFarmerProduce(item: Produce): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const existing = getCachedFarmerProduce();
-    const updated = [item, ...existing.filter((p) => p.id !== item.id)];
-    sessionStorage.setItem(SESSION_FARMER_PRODUCE_KEY, JSON.stringify(updated));
-    localStorage.setItem(SESSION_FARMER_PRODUCE_KEY, JSON.stringify(updated));
-  } catch {}
+  return {
+    id: row.id,
+    crop: row.produce_name || row.crop_name || 'Produce',
+    quantity: Number(row.available_quantity != null ? row.available_quantity : row.quantity) || 0,
+    unit: row.unit || 'kg',
+    grade: (row.quality_grade as ProduceGrade) || 'A',
+    harvestDate: row.harvest_date || new Date().toISOString().split('T')[0],
+    expectedPrice: Number(row.price_per_unit || row.asking_price) || 0,
+    location: row.location_address || row.location || profileLoc || 'Farm Location',
+    status: mappedStatus,
+    notes: row.variety ? `${row.variety}${row.category ? ` • ${row.category}` : ''}` : undefined,
+    imageUrl: row.image_url,
+    image_url: row.image_url,
+    createdAt: row.created_at || new Date().toISOString(),
+  };
 }
-
-export const BASELINE_FARMER_PRODUCE: Produce[] = [];
 
 export const farmerService = {
   /**
-   * Fetch produce listings directly from Supabase public.produce table
-   * based on the logged-in farmer profile context, merged with local cache and baseline stock.
+   * Fetch produce listings directly from authoritative public.produce_listings table
+   * strictly scoped to the authenticated farmer (auth.uid()).
    */
   async getProduceList(farmerId?: string): Promise<Produce[]> {
-    let dbProduce: Produce[] = [];
     try {
       const ctx = await getLoggedInFarmerContext();
       const targetFarmerId = farmerId || ctx?.userId;
 
       let query = supabase
-        .from('produce')
+        .from('produce_listings')
         .select(`
           id,
-          crop_name,
+          farmer_id,
+          produce_name,
           variety,
           category,
-          quantity,
+          total_quantity,
+          available_quantity,
+          price_per_unit,
           unit,
-          asking_price,
           harvest_date,
           quality_grade,
-          location,
+          location_address,
           status,
           image_url,
           created_at,
-          farmer_id,
           profiles:farmer_id (
             id,
             full_name,
@@ -175,79 +166,51 @@ export const farmerService = {
         `)
         .order('created_at', { ascending: false });
 
-      const isUuid = Boolean(
-        targetFarmerId &&
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(targetFarmerId)
-      );
-
-      if (isUuid) {
+      if (targetFarmerId) {
         query = query.eq('farmer_id', targetFarmerId);
       }
 
       const { data, error } = await query;
 
-      if (!error && data && data.length > 0) {
-        dbProduce = data.map((row: any): Produce => {
-          const profile = row.profiles as any;
-          const profileLoc = profile
-            ? [profile.place, profile.district, profile.state].filter(Boolean).join(', ')
-            : undefined;
-
-          return {
-            id: row.id,
-            crop: row.crop_name || 'Produce',
-            quantity: Number(row.quantity) || 0,
-            unit: row.unit || 'kg',
-            grade: (row.quality_grade as ProduceGrade) || 'A',
-            harvestDate: row.harvest_date || new Date().toISOString().split('T')[0],
-            expectedPrice: Number(row.asking_price) || 0,
-            location: row.location || profileLoc || 'Farm Location',
-            status: (row.status as ProduceStatus) || 'Active',
-            notes: row.variety ? `${row.variety}${row.category ? ` • ${row.category}` : ''}` : undefined,
-            imageUrl: row.image_url,
-            image_url: row.image_url,
-            createdAt: row.created_at || new Date().toISOString(),
-          };
-        });
+      if (error) {
+        console.error('Error fetching produce listings from Supabase:', error.message);
+        throw new Error(error.message);
       }
+
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      return data.map(mapRowToProduce);
     } catch (err: any) {
-      console.warn('Notice fetching produce from Supabase, using resilient local store:', err?.message);
+      console.error('Failed to get farmer produce list:', err?.message);
+      throw err;
     }
-
-    const cached = getCachedFarmerProduce();
-    const combined: Produce[] = [...dbProduce];
-
-    for (const c of cached) {
-      if (!combined.some(p => p.id === c.id || (p.crop === c.crop && p.quantity === c.quantity))) {
-        combined.unshift(c);
-      }
-    }
-
-    return combined;
   },
 
   /**
-   * Fetch a single produce item by ID directly from public.produce
+   * Fetch a single produce item by ID directly from public.produce_listings
    */
   async getProduceById(id: string): Promise<Produce | null> {
     try {
       const { data, error } = await supabase
-        .from('produce')
+        .from('produce_listings')
         .select(`
           id,
-          crop_name,
+          farmer_id,
+          produce_name,
           variety,
           category,
-          quantity,
+          total_quantity,
+          available_quantity,
+          price_per_unit,
           unit,
-          asking_price,
           harvest_date,
           quality_grade,
-          location,
+          location_address,
           status,
           image_url,
           created_at,
-          farmer_id,
           profiles:farmer_id (
             id,
             full_name,
@@ -266,26 +229,7 @@ export const farmerService = {
         return null;
       }
 
-      const profile = data.profiles as any;
-      const profileLoc = profile
-        ? [profile.place, profile.district, profile.state].filter(Boolean).join(', ')
-        : undefined;
-
-      return {
-        id: data.id,
-        crop: data.crop_name || 'Produce',
-        quantity: Number(data.quantity) || 0,
-        unit: data.unit || 'kg',
-        grade: (data.quality_grade as ProduceGrade) || 'A',
-        harvestDate: data.harvest_date || new Date().toISOString().split('T')[0],
-        expectedPrice: Number(data.asking_price) || 0,
-        location: data.location || profileLoc || 'Farm Location',
-        status: (data.status as ProduceStatus) || 'Active',
-        notes: data.variety ? `${data.variety}${data.category ? ` • ${data.category}` : ''}` : undefined,
-        imageUrl: data.image_url,
-        image_url: data.image_url,
-        createdAt: data.created_at || new Date().toISOString(),
-      };
+      return mapRowToProduce(data);
     } catch (err: any) {
       console.error('Failed to get produce by id:', err?.message);
       return null;
@@ -293,128 +237,85 @@ export const farmerService = {
   },
 
   /**
-   * Insert a new produce lot directly into Supabase public.produce
-   * linked to the logged-in farmer profile context, with automatic local cache backup.
+   * Insert a new produce listing directly into Supabase public.produce_listings
+   * strictly linked to the authenticated farmer session.
    */
   async addProduce(
     item: Omit<Produce, "id" | "createdAt" | "status">,
     farmerId?: string
   ): Promise<Produce> {
-    const ctx = await getLoggedInFarmerContext();
-    const candidateId = farmerId || ctx?.userId;
-    let validFarmerUuid: string | null = null;
+    const { data: { user } } = await supabase.auth.getUser();
+    const effectiveFarmerId = user?.id || farmerId;
 
-    if (
-      candidateId &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candidateId)
-    ) {
-      try {
-        const { data: prof } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', candidateId)
-          .maybeSingle();
-
-        if (prof?.id) {
-          validFarmerUuid = prof.id;
-        }
-      } catch {}
+    if (!effectiveFarmerId) {
+      throw new Error('Authentication required: You must be signed in as a farmer to create a listing.');
     }
 
+    const ctx = await getLoggedInFarmerContext();
     const locationToSave = item.location || ctx?.location || 'Nashik APMC Hub, Maharashtra';
     const categoryToSave = inferCategory(item.crop);
-    const newId = `prod-db-${Date.now()}`;
 
-    try {
-      const { data, error } = await supabase
-        .from('produce')
-        .insert({
-          crop_name: item.crop,
-          variety: item.notes || null,
-          category: categoryToSave,
-          quantity: item.quantity,
-          unit: item.unit || 'kg',
-          quality_grade: item.grade || 'A',
-          harvest_date: item.harvestDate,
-          asking_price: item.expectedPrice,
-          location: locationToSave,
-          status: 'Active',
-          image_url: item.imageUrl || item.image_url || null,
-          farmer_id: validFarmerUuid,
-          brix: 5.2,
-          shelf_life_days: 14,
-        })
-        .select(`
-          id,
-          crop_name,
-          variety,
-          category,
-          quantity,
-          unit,
-          asking_price,
-          harvest_date,
-          quality_grade,
-          location,
-          status,
-          image_url,
-          created_at,
-          farmer_id
-        `)
-        .single();
+    const { data, error } = await supabase
+      .from('produce_listings')
+      .insert({
+        farmer_id: effectiveFarmerId,
+        produce_name: item.crop,
+        variety: item.notes || null,
+        category: categoryToSave,
+        total_quantity: Number(item.quantity),
+        available_quantity: Number(item.quantity),
+        unit: item.unit || 'kg',
+        quality_grade: item.grade || 'A',
+        harvest_date: item.harvestDate || new Date().toISOString().split('T')[0],
+        price_per_unit: Number(item.expectedPrice),
+        location_address: locationToSave,
+        status: 'active',
+        image_url: item.imageUrl || item.image_url || null,
+        shelf_life_days: 14,
+      })
+      .select(`
+        id,
+        farmer_id,
+        produce_name,
+        variety,
+        category,
+        total_quantity,
+        available_quantity,
+        price_per_unit,
+        unit,
+        harvest_date,
+        quality_grade,
+        location_address,
+        status,
+        image_url,
+        created_at
+      `)
+      .single();
 
-      if (!error && data) {
-        const createdProduce: Produce = {
-          id: data.id,
-          crop: data.crop_name,
-          quantity: Number(data.quantity),
-          unit: data.unit || 'kg',
-          grade: (data.quality_grade as ProduceGrade) || item.grade,
-          harvestDate: data.harvest_date,
-          expectedPrice: Number(data.asking_price),
-          location: data.location,
-          status: (data.status as ProduceStatus) || 'Active',
-          notes: data.variety || item.notes,
-          imageUrl: data.image_url || item.imageUrl,
-          image_url: data.image_url || item.image_url,
-          createdAt: data.created_at || new Date().toISOString(),
-        };
-        saveCachedFarmerProduce(createdProduce);
-        return createdProduce;
-      } else if (error) {
-        console.warn('Supabase produce insert notice (using local sync fallback):', error.message);
-      }
-    } catch (insertErr: any) {
-      console.warn('Supabase produce insert notice:', insertErr?.message);
+    if (error || !data) {
+      console.error('Supabase produce_listings insert error:', error?.message);
+      throw new Error(error?.message || 'Failed to create produce listing in database.');
     }
 
-    // Resilient fallback produce listing so UI succeeds regardless of RLS or offline network
-    const fallbackProduce: Produce = {
-      id: newId,
-      crop: item.crop,
-      quantity: Number(item.quantity),
-      unit: item.unit || 'kg',
-      grade: item.grade || 'A',
-      harvestDate: item.harvestDate,
-      expectedPrice: Number(item.expectedPrice),
-      location: locationToSave,
-      status: 'Active',
-      notes: item.notes,
-      imageUrl: item.imageUrl || item.image_url || 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600',
-      image_url: item.imageUrl || item.image_url || 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=600',
-      createdAt: new Date().toISOString(),
-    };
-    saveCachedFarmerProduce(fallbackProduce);
-    return fallbackProduce;
+    return mapRowToProduce(data);
   },
 
   /**
-   * Update the status of an existing produce lot directly in Supabase
+   * Update an existing produce listing directly in public.produce_listings
    */
   async updateProduceStatus(id: string, status: Produce["status"]): Promise<Produce> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('Authentication required to update produce status.');
+    }
+
+    const dbStatus = status === 'Active' ? 'active' : status === 'Sold' ? 'sold_out' : 'inactive';
+
     const { data, error } = await supabase
-      .from('produce')
-      .update({ status })
+      .from('produce_listings')
+      .update({ status: dbStatus, updated_at: new Date().toISOString() })
       .eq('id', id)
+      .eq('farmer_id', user.id)
       .select()
       .single();
 
@@ -423,35 +324,200 @@ export const farmerService = {
       throw new Error(error?.message || 'Failed to update produce status');
     }
 
-    return {
-      id: data.id,
-      crop: data.crop_name,
-      quantity: Number(data.quantity),
-      unit: data.unit,
-      grade: data.quality_grade as ProduceGrade,
-      harvestDate: data.harvest_date,
-      expectedPrice: Number(data.asking_price),
-      location: data.location,
-      status: data.status as ProduceStatus,
-      imageUrl: data.image_url,
-      image_url: data.image_url,
-      createdAt: data.created_at,
-    };
+    return mapRowToProduce(data);
   },
 
   /**
-   * Delete a produce listing directly from Supabase
+   * Delete a produce listing directly from public.produce_listings
    */
   async deleteProduce(id: string): Promise<boolean> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('Authentication required to delete produce listing.');
+    }
+
     const { error } = await supabase
-      .from('produce')
+      .from('produce_listings')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('farmer_id', user.id);
 
     if (error) {
       console.error('Supabase delete error in deleteProduce:', error.message);
       return false;
     }
     return true;
-  }
+  },
+
+  /**
+   * Fetch incoming orders for the authenticated farmer directly from public.orders
+   */
+  async getFarmerOrders(): Promise<Order[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('orders')
+      .select(`
+        id,
+        order_number,
+        listing_id,
+        commodity,
+        quantity,
+        quantity_kg,
+        unit_price,
+        total_amount,
+        farmer_realization,
+        status,
+        delivery_address,
+        payment_status,
+        created_at,
+        customer_id,
+        buyer_id,
+        profiles:customer_id (
+          id,
+          full_name,
+          phone,
+          place,
+          area
+        )
+      `)
+      .eq('farmer_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching farmer orders from Supabase:', error.message);
+      throw new Error(error.message);
+    }
+
+    if (!data) return [];
+
+    return data.map((o: any): Order => {
+      const profile = o.profiles as any;
+      const buyerName = profile?.full_name || 'AgriFlow Verified Buyer';
+      const quantityKg = Number(o.quantity || o.quantity_kg || 0);
+      const totalValue = Number(o.farmer_realization || o.total_amount || 0);
+
+      let canonicalStatus: OrderStatus = 'New';
+      const rawStatus = (o.status || 'pending').toLowerCase();
+
+      if (rawStatus === 'pending') canonicalStatus = 'New';
+      else if (rawStatus === 'accepted') canonicalStatus = 'Confirmed';
+      else if (rawStatus === 'preparing') canonicalStatus = 'Preparing';
+      else if (rawStatus === 'ready_for_pickup') canonicalStatus = 'Ready to Deliver';
+      else if (rawStatus === 'in_transit' || rawStatus === 'dispatched') canonicalStatus = 'In Transit';
+      else if (rawStatus === 'delivered') canonicalStatus = 'Delivered';
+
+      return {
+        id: o.id,
+        buyerName,
+        buyerType: 'Direct Commercial Buyer',
+        produceName: o.commodity || 'Farm Harvest',
+        quantityKg,
+        grade: 'A',
+        pricePerKg: quantityKg > 0 ? Math.round(totalValue / quantityKg) : Number(o.unit_price) || 30,
+        totalOrderValue: totalValue,
+        orderDate: o.created_at ? o.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+        pickupDate: 'Scheduled for Pickup',
+        deliveryDate: o.created_at,
+        status: canonicalStatus,
+        rawStatus: rawStatus,
+        logisticsId: `TRK-${o.id}`,
+        destinationCity: o.delivery_address || 'Regional Distribution Hub',
+        buyerId: o.customer_id || o.buyer_id,
+      };
+    });
+  },
+
+  /**
+   * Transition order lifecycle state using the authoritative database RPC:
+   * farmer_update_order_status(p_order_id, p_new_status)
+   */
+  async updateOrderStatus(orderId: string, newStatus: string): Promise<boolean> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('Authentication required to transition order status.');
+    }
+
+    let targetDbStatus = newStatus.toLowerCase();
+    if (newStatus === 'READY_TO_DELIVER' || newStatus === 'Ready to Deliver') {
+      targetDbStatus = 'ready_for_pickup';
+    } else if (newStatus === 'PREPARING' || newStatus === 'Preparing') {
+      targetDbStatus = 'preparing';
+    } else if (newStatus === 'Confirmed' || newStatus === 'accepted' || newStatus === 'ACCEPTED') {
+      targetDbStatus = 'accepted';
+    } else if (newStatus === 'Rejected' || newStatus === 'rejected' || newStatus === 'REJECTED') {
+      targetDbStatus = 'rejected';
+    }
+
+    const { data, error } = await supabase.rpc('farmer_update_order_status', {
+      p_order_id: orderId,
+      p_new_status: targetDbStatus,
+    });
+
+    if (error) {
+      console.error('farmer_update_order_status RPC error:', error.message);
+      throw new Error(error.message);
+    }
+
+    return (data?.success === true);
+  },
+
+  /**
+   * Compute live inventory metrics directly from database state (zero client-side math)
+   */
+  async getInventorySummary(): Promise<FarmerInventorySummary> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      return { totalKg: 0, availableKg: 0, reservedKg: 0, deliveredKg: 0, activeListingsCount: 0 };
+    }
+
+    const [listingsRes, ordersRes] = await Promise.all([
+      supabase
+        .from('produce_listings')
+        .select('total_quantity, available_quantity, status')
+        .eq('farmer_id', user.id),
+      supabase
+        .from('orders')
+        .select('quantity, quantity_kg, status')
+        .eq('farmer_id', user.id),
+    ]);
+
+    let totalKg = 0;
+    let availableKg = 0;
+    let activeListingsCount = 0;
+
+    if (listingsRes.data) {
+      for (const l of listingsRes.data) {
+        totalKg += Number(l.total_quantity) || 0;
+        availableKg += Number(l.available_quantity) || 0;
+        if (l.status === 'active') activeListingsCount++;
+      }
+    }
+
+    let reservedKg = 0;
+    let deliveredKg = 0;
+
+    if (ordersRes.data) {
+      for (const o of ordersRes.data) {
+        const qty = Number(o.quantity || o.quantity_kg || 0);
+        const st = (o.status || '').toLowerCase();
+        if (st === 'accepted' || st === 'preparing' || st === 'ready_for_pickup') {
+          reservedKg += qty;
+        } else if (st === 'delivered') {
+          deliveredKg += qty;
+        }
+      }
+    }
+
+    return {
+      totalKg,
+      availableKg,
+      reservedKg,
+      deliveredKg,
+      activeListingsCount,
+    };
+  },
 };

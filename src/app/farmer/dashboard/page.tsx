@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useBandwidth } from '@/context/BandwidthContext';
 import { useI18n } from '@/context/I18nContext';
-import { farmerService } from '@/services/farmerService';
-import { trackingService } from '@/services/trackingService';
+import { farmerService, FarmerInventorySummary } from '@/services/farmerService';
+import { supabase } from '@/lib/supabase';
 import { sharedTrackingService } from '@/services/sharedTrackingService';
 import { Produce, Order } from '@/types/farmer';
 import { DeliveryTracking } from '@/types/delivery';
@@ -44,6 +44,13 @@ export default function FarmerDashboard() {
 
   const [produceList, setProduceList] = useState<Produce[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [inventorySummary, setInventorySummary] = useState<FarmerInventorySummary>({
+    totalKg: 0,
+    availableKg: 0,
+    reservedKg: 0,
+    deliveredKg: 0,
+    activeListingsCount: 0,
+  });
   const [activeTrip, setActiveTrip] = useState<DeliveryTracking | null>(null);
   const [activeCluster, setActiveCluster] = useState<FarmerCluster | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,18 +63,26 @@ export default function FarmerDashboard() {
       .replace(/[\uD800-\uDFFF]|[\u2600-\u27BF]|\u00f0[^\s]*|\u00e2[^\s]*/g, '')
       .trim() || 'Farmer';
 
-  // Fetch real live farmer data from service
+  // Fetch real live farmer data from authoritative service layer
   const loadFarmerData = async () => {
     try {
       setLoading(true);
-      const [prods, ords, clusters, allTrips] = await Promise.all([
+      const [prods, ords, summary, clusters, allTrips] = await Promise.all([
         farmerService.getProduceList().catch(() => []),
-        trackingService.getOrders().catch(() => []),
+        farmerService.getFarmerOrders().catch(() => []),
+        farmerService.getInventorySummary().catch(() => ({
+          totalKg: 0,
+          availableKg: 0,
+          reservedKg: 0,
+          deliveredKg: 0,
+          activeListingsCount: 0,
+        })),
         clusterService.getClusters().catch(() => []),
         sharedTrackingService.getAllTrips().catch(() => []),
       ]);
       setProduceList(prods || []);
       setOrders(ords || []);
+      setInventorySummary(summary);
       if (clusters && clusters.length > 0) {
         setActiveCluster(clusters[0]);
       }
@@ -87,18 +102,34 @@ export default function FarmerDashboard() {
 
   useEffect(() => {
     loadFarmerData();
+
+    const channel = supabase
+      .channel('realtime-farmer-dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          loadFarmerData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'produce_listings' },
+        () => {
+          loadFarmerData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleManualRefresh = () => {
     setManualRefreshing(true);
     loadFarmerData();
   };
-
-  // Compute real metrics from live database strictly without defaults
-  const totalProduceKg = produceList.reduce(
-    (acc, p) => acc + (Number(p.quantity) || 0),
-    0
-  );
 
   const activeOrdersCount = orders.filter(o => o.status !== 'Delivered').length;
   const topProducePrice = produceList.length > 0 && produceList[0]?.expectedPrice 
@@ -166,9 +197,13 @@ export default function FarmerDashboard() {
           <div>
             <p className="text-xs font-bold text-slate-500">My Produce</p>
             <p className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">
-              {totalProduceKg.toLocaleString()} kg
+              {inventorySummary.availableKg.toLocaleString()} kg
             </p>
-            <p className="text-[11px] text-emerald-600 font-semibold">Total Listed Available</p>
+            <p className="text-[11px] text-emerald-600 font-semibold">
+              {inventorySummary.reservedKg > 0
+                ? `${inventorySummary.reservedKg.toLocaleString()} kg reserved in orders`
+                : `${inventorySummary.activeListingsCount} Active Listings`}
+            </p>
           </div>
         </div>
 

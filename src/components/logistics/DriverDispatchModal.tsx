@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { logisticsService, FLEET_DRIVERS_QUEUE, FleetDriverCandidate } from '@/services/logisticsService';
+import { supabase } from '@/lib/supabase';
 import { ConsolidatedTrip } from '@/types/logistics';
 import { 
   Bell, 
@@ -32,7 +33,7 @@ export function DriverDispatchModal({ onTripAccepted }: DriverDispatchModalProps
 
   const currentDriver: FleetDriverCandidate = FLEET_DRIVERS_QUEUE[driverIndex] || FLEET_DRIVERS_QUEUE[0];
 
-  // Poll for new dispatch offers every 4 seconds
+  // Realtime subscription for incoming dispatch offers (zero polling loop)
   useEffect(() => {
     let isMounted = true;
 
@@ -48,15 +49,33 @@ export function DriverDispatchModal({ onTripAccepted }: DriverDispatchModalProps
           }
         }
       } catch {
-        // ignore polling error
+        // ignore fetch error
       }
     };
 
     checkDispatch();
-    const interval = setInterval(checkDispatch, 4000);
+
+    const channel = supabase
+      .channel('realtime-driver-dispatch-modal')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'logistics_assignments' },
+        () => {
+          checkDispatch();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          checkDispatch();
+        }
+      )
+      .subscribe();
+
     return () => {
       isMounted = false;
-      clearInterval(interval);
+      supabase.removeChannel(channel);
     };
   }, [isAccepting, isDeclining]);
 

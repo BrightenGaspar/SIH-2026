@@ -47,7 +47,7 @@ export default function ConsumerMarketplacePage() {
     }
     load();
 
-    // Active Supabase realtime stream subscription listening for live INSERT and UPDATE on public.produce
+    // Active Supabase realtime stream subscription listening for live INSERT and UPDATE on public.produce_listings
     const channel = supabase
       .channel('realtime-marketplace-produce')
       .on(
@@ -55,7 +55,7 @@ export default function ConsumerMarketplacePage() {
         {
           event: '*',
           schema: 'public',
-          table: 'produce',
+          table: 'produce_listings',
         },
         async () => {
           const freshData = await consumerService.getProducts();

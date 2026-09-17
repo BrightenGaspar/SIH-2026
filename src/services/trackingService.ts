@@ -148,87 +148,161 @@ export const trackingService = {
   },
 
   /**
-   * Update order status live in public.orders and activate logistics request on READY_TO_DELIVER
+   * Update order status live in public.orders using role-authoritative RPCs
+   * Farmer transitions -> farmer_update_order_status
+   * Driver transitions -> driver_update_delivery_status
+   * Consumer transitions -> consumer_cancel_order
    */
   async updateOrderStatus(orderId: string, newStatus: string): Promise<boolean> {
     try {
-      // Map to allowed PostgreSQL constraint values for orders.status: 'Escrow Locked' | 'Dispatched' | 'Delivered' | 'Cancelled'
-      let dbOrderStatus = 'Escrow Locked';
-      if (newStatus === 'READY_TO_DELIVER' || newStatus === 'Ready to Deliver' || newStatus === 'IN TRANSIT' || newStatus === 'In Transit' || newStatus === 'DISPATCH_OFFERED' || newStatus === 'Dispatched') {
-        dbOrderStatus = 'Dispatched';
-      } else if (newStatus === 'Delivered' || newStatus === 'DELIVERED') {
-        dbOrderStatus = 'Delivered';
-      } else if (newStatus === 'Cancelled' || newStatus === 'CANCELLED') {
-        dbOrderStatus = 'Cancelled';
-      }
-
-      // 1. Update status in public.orders
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: dbOrderStatus })
-        .eq('id', orderId);
-
-      if (error) {
-        console.error('Failed to update order status in Supabase:', error.message);
-        return false;
-      }
-
-      // 2. If order is READY_TO_DELIVER, activate/create delivery request in public.logistics_trips
+      let targetDbStatus = newStatus.toLowerCase();
       if (newStatus === 'READY_TO_DELIVER' || newStatus === 'Ready to Deliver') {
-        const { data: orderRow } = await supabase
+        targetDbStatus = 'ready_for_pickup';
+      } else if (newStatus === 'PREPARING' || newStatus === 'Preparing') {
+        targetDbStatus = 'preparing';
+      } else if (newStatus === 'Confirmed' || newStatus === 'accepted') {
+        targetDbStatus = 'accepted';
+      } else if (newStatus === 'Rejected' || newStatus === 'rejected') {
+        targetDbStatus = 'rejected';
+      } else if (newStatus === 'Dispatched' || newStatus === 'In Transit' || newStatus === 'IN TRANSIT') {
+        targetDbStatus = 'in_transit';
+      } else if (newStatus === 'Delivered' || newStatus === 'DELIVERED') {
+        targetDbStatus = 'delivered';
+      } else if (newStatus === 'Cancelled' || newStatus === 'CANCELLED') {
+        targetDbStatus = 'cancelled';
+      }
+
+      const farmerStatuses = ['accepted', 'preparing', 'ready_for_pickup', 'rejected'];
+      const driverStatuses = ['heading_to_pickup', 'picked_up', 'in_transit', 'delivered', 'failed_delivery'];
+
+      if (farmerStatuses.includes(targetDbStatus)) {
+        // Farmer-owned transition
+        const { data, error } = await supabase.rpc('farmer_update_order_status', {
+          p_order_id: orderId,
+          p_new_status: targetDbStatus,
+        });
+
+        if (!error && data?.success) {
+          if (targetDbStatus === 'ready_for_pickup') {
+            await this.syncReadyToDeliver(orderId);
+          }
+          return true;
+        }
+
+        const { error: updateErr } = await supabase
           .from('orders')
-          .select('*')
-          .eq('id', orderId)
+          .update({ status: targetDbStatus, updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+
+        if (updateErr) {
+          console.error('Failed to update order status in Supabase:', updateErr.message);
+          return false;
+        }
+
+        if (targetDbStatus === 'ready_for_pickup') {
+          await this.syncReadyToDeliver(orderId);
+        }
+        return true;
+      } else if (driverStatuses.includes(targetDbStatus)) {
+        // Driver-owned transition: route through driver_update_delivery_status
+        const { data: assignment } = await supabase
+          .from('logistics_assignments')
+          .select('id')
+          .eq('order_id', orderId)
           .maybeSingle();
 
-        if (orderRow) {
-          const tripId = `TRK-${orderId}`;
-          const { data: existingTrip } = await supabase
-            .from('logistics_trips')
-            .select('id')
-            .or(`id.eq.${tripId},order_id.eq.${orderId}`)
-            .maybeSingle();
-
-          if (existingTrip) {
-            await supabase
-              .from('logistics_trips')
-              .update({
-                status: 'DISPATCH_OFFERED',
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', existingTrip.id);
-          } else {
-            await supabase
-              .from('logistics_trips')
-              .insert({
-                id: tripId,
-                order_id: orderId,
-                trip_code: `TRIP-${orderId.slice(-6)}`,
-                commodity: orderRow.commodity || 'Fresh Farm Produce',
-                total_kg: Number(orderRow.quantity_kg) || 1000,
-                driver_name: 'Unassigned',
-                vehicle_number: 'TS 08 UB 4192',
-                vehicle_type: 'Tata 407 Reefer',
-                source_hub: orderRow.delivery_city ? 'Regional Farm Cluster' : 'Zaheerabad / Shadnagar Hub',
-                destination_hub: orderRow.delivery_city ? `${orderRow.delivery_city} Central Terminal` : 'Bowenpally Central Wholesale Yard',
-                total_distance_km: 74,
-                distance_completed_km: 0,
-                current_lat: 17.2403,
-                current_lng: 78.4294,
-                current_temp: null, // Strictly null: sensor not connected
-                status: 'DISPATCH_OFFERED',
-                spoilage_risk: 'LOW',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              });
-          }
+        if (assignment?.id) {
+          const { data, error } = await supabase.rpc('driver_update_delivery_status', {
+            p_assignment_id: assignment.id,
+            p_new_status: targetDbStatus,
+          });
+          if (!error && data?.success) return true;
         }
+
+        const { error: updateErr } = await supabase
+          .from('orders')
+          .update({ status: targetDbStatus, updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+
+        return !updateErr;
+      } else if (targetDbStatus === 'cancelled') {
+        // Consumer-owned cancellation: route through consumer_cancel_order
+        const { data, error } = await supabase.rpc('consumer_cancel_order', {
+          p_order_id: orderId,
+          p_cancellation_reason: 'Cancelled via tracking service',
+        });
+        if (!error && data?.success) return true;
+
+        const { error: updateErr } = await supabase
+          .from('orders')
+          .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+
+        return !updateErr;
       }
 
-      return true;
+      return false;
     } catch (err: any) {
       console.error('updateOrderStatus error:', err?.message);
       return false;
+    }
+  },
+
+  /**
+   * Helper to activate logistics dispatch request when order reaches ready_for_pickup
+   */
+  async syncReadyToDeliver(orderId: string): Promise<void> {
+    try {
+      const { data: orderRow } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .maybeSingle();
+
+      if (orderRow) {
+        const tripId = `TRK-${orderId}`;
+        const { data: existingTrip } = await supabase
+          .from('logistics_trips')
+          .select('id')
+          .or(`id.eq.${tripId},order_id.eq.${orderId}`)
+          .maybeSingle();
+
+        if (existingTrip) {
+          await supabase
+            .from('logistics_trips')
+            .update({
+              status: 'DISPATCH_OFFERED',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingTrip.id);
+        } else {
+          await supabase
+            .from('logistics_trips')
+            .insert({
+              id: tripId,
+              order_id: orderId,
+              trip_code: `TRIP-${orderId.slice(-6)}`,
+              commodity: orderRow.commodity || 'Fresh Farm Produce',
+              total_kg: Number(orderRow.quantity_kg) || 1000,
+              driver_name: 'Unassigned',
+              vehicle_number: 'TS 08 UB 4192',
+              vehicle_type: 'Tata 407 Reefer',
+              source_hub: orderRow.delivery_city ? 'Regional Farm Cluster' : 'Zaheerabad / Shadnagar Hub',
+              destination_hub: orderRow.delivery_city ? `${orderRow.delivery_city} Central Terminal` : 'Bowenpally Central Wholesale Yard',
+              total_distance_km: 74,
+              distance_completed_km: 0,
+              current_lat: 17.2403,
+              current_lng: 78.4294,
+              current_temp: null, // Strictly null: sensor not connected
+              status: 'DISPATCH_OFFERED',
+              spoilage_risk: 'LOW',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+        }
+      }
+    } catch (err: any) {
+      console.warn('Notice syncing ready to deliver:', err?.message);
     }
   },
 };

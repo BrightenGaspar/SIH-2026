@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { farmerService } from '@/services/farmerService';
 import { uploadCropImage } from '@/services/storageService';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { Produce, ProduceGrade } from '@/types/farmer';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
@@ -40,10 +41,36 @@ export default function FarmerProducePage() {
 
   useEffect(() => {
     let isMounted = true;
-    farmerService.getProduceList()
-      .then(data => { if (isMounted) setProduceList(data || []); })
-      .catch(() => { if (isMounted) setProduceList([]); });
-    return () => { isMounted = false; };
+    async function load() {
+      try {
+        const data = await farmerService.getProduceList();
+        if (isMounted) setProduceList(data || []);
+      } catch {
+        if (isMounted) setProduceList([]);
+      }
+    }
+    load();
+
+    const channel = supabase
+      .channel('realtime-farmer-produce')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'produce_listings',
+        },
+        async () => {
+          const refreshed = await farmerService.getProduceList();
+          if (isMounted) setProduceList(refreshed || []);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      isMounted = false;
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const onAddProduceSubmit = async (data: ProduceFormData) => {
@@ -51,9 +78,12 @@ export default function FarmerProducePage() {
       setIsUploading(true);
       let uploadedImageUrl: string | undefined = undefined;
 
+      if (!user?.id) {
+        throw new Error('Authentication required: Please log in as a farmer to list produce.');
+      }
+
       if (imageFile) {
-        const farmerId = user?.id || 'farmer-001';
-        uploadedImageUrl = await uploadCropImage(farmerId, imageFile);
+        uploadedImageUrl = await uploadCropImage(user.id, imageFile);
       }
 
       await farmerService.addProduce({

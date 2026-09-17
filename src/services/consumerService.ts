@@ -5,35 +5,42 @@ import {
   ProductDetails,
   ProduceGrade,
   FreshnessLevel,
-  Recommendation
+  Recommendation,
+  BuyerType,
 } from '@/types/consumer';
 import { supabase } from '@/lib/supabase';
 
-function mapRowToProductDetails(row: any): ProductDetails {
-  const price = Number(row.asking_price) || 30;
+function mapListingToProductDetails(row: any): ProductDetails {
+  const price = Number(row.price_per_unit || row.asking_price) || 30;
   const profile = row.profiles as any;
 
   const farmerName = profile?.full_name || 'Verified Kisan Partner';
   const farmOrFpoName = profile?.fpo_name || 'Regional Agro Producer Co.';
-  const district = profile?.district || (row.location ? row.location.split(',')[0].trim() : 'Local District');
+  const district = profile?.district || (row.location_address ? row.location_address.split(',')[0].trim() : 'Local District');
   const state = profile?.state || 'Telangana';
-  const generalLocation = row.location || (profile?.place ? `${profile.place}, ${district}` : `${district}, ${state}`);
+  const generalLocation = row.location_address || row.location || (profile?.place ? `${profile.place}, ${district}` : `${district}, ${state}`);
 
-  const validCategories = ['Vegetables', 'Fruits', 'Grains', 'Spices'] as const;
-  const category = validCategories.includes(row.category) ? row.category : 'Vegetables';
+  const rawCat = (row.category || 'vegetables').toLowerCase();
+  let category: 'Vegetables' | 'Fruits' | 'Grains' | 'Spices' = 'Vegetables';
+  if (rawCat.includes('fruit')) category = 'Fruits';
+  else if (rawCat.includes('grain')) category = 'Grains';
+  else if (rawCat.includes('spice')) category = 'Spices';
 
+  const rawGrade = (row.quality_grade || 'A').toUpperCase();
   const validGrades: ProduceGrade[] = ['A', 'B', 'Organic Certified'];
-  const grade: ProduceGrade = validGrades.includes(row.quality_grade) ? row.quality_grade : 'A';
+  const grade: ProduceGrade = validGrades.includes(rawGrade as any) ? (rawGrade as ProduceGrade) : 'A';
+
+  const availableKg = Number(row.available_quantity != null ? row.available_quantity : row.quantity) || 0;
 
   return {
     id: String(row.id),
-    name: row.crop_name || 'Farm Harvest',
+    name: row.produce_name || row.crop_name || 'Farm Harvest',
     category,
     image: row.image_url || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
     grade,
     gradeDescription: `Grade ${grade} Certified Farm Harvest`,
-    availableQuantityKg: Number(row.quantity) || 0,
-    minOrderQuantityKg: Math.min(10, Math.max(1, Number(row.quantity) || 1)),
+    availableQuantityKg: availableKg,
+    minOrderQuantityKg: Math.min(10, Math.max(1, availableKg || 1)),
     harvestDate: row.harvest_date || new Date().toISOString().split('T')[0],
     freshness: 'Harvested Today' as FreshnessLevel,
     freshnessScore: 'Excellent',
@@ -45,7 +52,7 @@ function mapRowToProductDetails(row: any): ProductDetails {
       generalLocation,
       district,
       state,
-      mainCrops: [row.crop_name || 'Fresh Produce'],
+      mainCrops: [row.produce_name || row.crop_name || 'Fresh Produce'],
       harvestDate: row.harvest_date || 'Recent',
       soilPractices: 'Natural compost & drip irrigation',
       organicPractices: 'Pesticide residue tested & verified',
@@ -55,7 +62,7 @@ function mapRowToProductDetails(row: any): ProductDetails {
     },
     location: generalLocation,
     pricePerKg: price,
-    bulkAvailable: (Number(row.quantity) || 0) >= 100,
+    bulkAvailable: availableKg >= 100,
     bulkTiers: [
       { minKg: 10, maxKg: 99, pricePerKg: price, savingsPercent: 0 },
       { minKg: 100, maxKg: 499, pricePerKg: Math.max(1, Math.round(price * 0.95)), savingsPercent: 5 },
@@ -70,8 +77,8 @@ function mapRowToProductDetails(row: any): ProductDetails {
       farmerRealizationBoostPercent: 28,
     },
     description: row.variety
-      ? `${row.variety} • ${row.crop_name} direct from farmgate. Verified sweetness and optimal cold-chain handling.`
-      : `${row.crop_name || 'Produce'} direct from farmgate. Verified sweetness and optimal cold-chain handling.`,
+      ? `${row.variety} • ${row.produce_name || row.crop_name} direct from farmgate. Verified freshness and optimal cold-chain handling.`
+      : `${row.produce_name || row.crop_name || 'Produce'} direct from farmgate. Verified freshness and optimal cold-chain handling.`,
     isColdChainEligible: true,
     tags: ['Direct Farmgate', 'Verified Traceability', `Grade ${grade}`],
     shelfLifeDays: Number(row.shelf_life_days) || 14,
@@ -88,59 +95,129 @@ function mapRowToProductDetails(row: any): ProductDetails {
   };
 }
 
-export const BASELINE_PRODUCTS: ProductDetails[] = [];
+function mapRowToConsumerOrder(o: any): ConsumerOrder {
+  const quantity = Number(o.quantity != null ? o.quantity : o.quantity_kg) || 0;
+  const unitPrice = Number(o.unit_price) || (quantity > 0 ? Math.round(Number(o.total_amount) / quantity) : 30);
+  const totalAmount = Number(o.total_amount) || 0;
+  const farmerRealization = Number(o.farmer_realization) || totalAmount;
+  const logisticsFee = Number(o.logistics_fee) || 0;
+  const platformFee = Number(o.platform_fee) || 0;
 
-const SESSION_ORDERS_KEY = 'agriflow_cached_orders';
+  const rawStatus = (o.status || 'pending').toLowerCase();
+  let resolvedStatus: ConsumerOrder['status'] = 'Confirmed';
 
-export function getCachedOrders(): ConsumerOrder[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = sessionStorage.getItem(SESSION_ORDERS_KEY) || localStorage.getItem(SESSION_ORDERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  if (rawStatus === 'pending') resolvedStatus = 'Escrow Locked';
+  else if (rawStatus === 'accepted') resolvedStatus = 'Confirmed';
+  else if (rawStatus === 'preparing') resolvedStatus = 'Preparing';
+  else if (rawStatus === 'ready_for_pickup') resolvedStatus = 'READY_TO_DELIVER';
+  else if (rawStatus === 'in_transit' || rawStatus === 'dispatched') resolvedStatus = 'In Transit';
+  else if (rawStatus === 'delivered') resolvedStatus = 'Delivered';
+  else if (rawStatus === 'cancelled' || rawStatus === 'rejected') resolvedStatus = 'Cancelled';
+
+  return {
+    id: o.id,
+    orderDate: o.created_at ? o.created_at.substring(0, 16).replace('T', ' ') : new Date().toISOString().substring(0, 16),
+    status: resolvedStatus,
+    rawStatus: rawStatus,
+    items: [
+      {
+        product: {
+          id: o.listing_id || o.id,
+          name: o.commodity || 'Assorted Farm Harvest',
+          category: 'Vegetables',
+          image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
+          grade: 'A',
+          gradeDescription: 'Grade A Certified Farm Harvest',
+          availableQuantityKg: quantity,
+          minOrderQuantityKg: 1,
+          harvestDate: o.created_at ? o.created_at.split('T')[0] : 'Recent',
+          freshness: 'Harvested Today',
+          freshnessScore: 'Excellent',
+          farmerStory: {
+            id: o.farmer_id || 'farmer-partner',
+            farmerName: 'Verified Kisan Partner',
+            farmOrFpoName: 'Direct Regional Producer Co.',
+            farmerPhoto: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150',
+            generalLocation: o.delivery_address || 'Farmgate Hub',
+            district: 'Regional Hub',
+            state: 'Telangana',
+            mainCrops: [o.commodity || 'Farm Harvest'],
+            harvestDate: 'Recent',
+            soilPractices: 'Sustainable compost & drip irrigation',
+            organicPractices: 'Pesticide residue tested',
+            story: 'Direct harvest order delivered via integrated cold chain corridor.',
+            totalAcresGrown: '4.5 Acres',
+            fairPriceCommitment: 'Direct Farmer Settlement',
+          },
+          location: o.delivery_address || 'Regional Depot',
+          pricePerKg: unitPrice,
+          bulkAvailable: quantity >= 100,
+          priceBreakdown: {
+            consumerPricePerKg: unitPrice,
+            farmerReceivesPerKg: Math.round(unitPrice * 0.87),
+            roadLogisticsPerKg: Math.round(unitPrice * 0.08),
+            platformFeePerKg: Math.round(unitPrice * 0.05),
+            conventionalMarketPricePerKg: Math.round(unitPrice * 1.25),
+            farmerRealizationBoostPercent: 25,
+          },
+          description: `${o.commodity || 'Farm Harvest'} ordered direct from verified farm clusters.`,
+          isColdChainEligible: true,
+          tags: ['Direct Farmgate', 'Cold Chain Transport'],
+        },
+        quantityKg: quantity,
+        selectedTierPricePerKg: unitPrice,
+      }
+    ],
+    totalQuantityKg: quantity,
+    subtotal: farmerRealization,
+    roadLogisticsFee: logisticsFee,
+    platformFee: platformFee,
+    totalAmount: totalAmount,
+    deliveryAddress: {
+      name: 'Delivery Contact',
+      phone: '+91 98480 88776',
+      address: o.delivery_address || 'Regional Food Hub',
+      city: 'Hyderabad',
+      district: 'Hyderabad',
+      state: 'Telangana',
+      pincode: '500011',
+    },
+    paymentMethod: (o.payment_method || 'UPI').toUpperCase(),
+    isBulkOrder: quantity >= 100,
+    farmerId: o.farmer_id,
+    operatorId: o.operator_id,
+    logisticsId: `TRK-${o.id}`,
+    estimatedDeliveryDate: 'Within 6 Hours',
+  };
 }
-
-export function saveCachedOrder(order: ConsumerOrder): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const existing = getCachedOrders();
-    const updated = [order, ...existing.filter((o) => o.id !== order.id)];
-    sessionStorage.setItem(SESSION_ORDERS_KEY, JSON.stringify(updated));
-    localStorage.setItem(SESSION_ORDERS_KEY, JSON.stringify(updated));
-  } catch {}
-}
-
-export const BASELINE_ORDERS: ConsumerOrder[] = [];
-
 
 export const consumerService = {
   /**
-   * Fetch all open produce listings dynamically from Supabase public.produce joined with public.profiles
-   * Merges with baseline produce items so marketplace always has active stock to order.
+   * Fetch live orderable produce listings directly from public.produce_listings.
+   * Strictly returns active listings with available quantity > 0.
+   * Zero hardcoded mock fallback.
    */
   async getProducts(): Promise<ProductDetails[]> {
     try {
       const { data, error } = await supabase
-        .from('produce')
+        .from('produce_listings')
         .select(`
           id,
-          crop_name,
+          farmer_id,
+          produce_name,
           variety,
           category,
-          quantity,
+          total_quantity,
+          available_quantity,
+          price_per_unit,
           unit,
-          asking_price,
           harvest_date,
           quality_grade,
-          location,
+          location_address,
           status,
-          brix,
-          shelf_life_days,
           image_url,
+          shelf_life_days,
           created_at,
-          farmer_id,
           profiles:farmer_id (
             id,
             full_name,
@@ -151,44 +228,50 @@ export const consumerService = {
             phone
           )
         `)
-        .eq('status', 'Active')
+        .eq('status', 'active')
+        .gt('available_quantity', 0)
         .order('created_at', { ascending: false });
 
-      if (error || !data || data.length === 0) {
+      if (error) {
+        console.error('Supabase getProducts error:', error.message);
+        throw new Error(error.message);
+      }
+
+      if (!data || data.length === 0) {
         return [];
       }
 
-      return data.map(mapRowToProductDetails);
+      return data.map(mapListingToProductDetails);
     } catch (err: any) {
-      console.warn('Error fetching marketplace catalog:', err?.message);
-      return [];
+      console.error('Failed to get marketplace products from Supabase:', err?.message);
+      throw err;
     }
   },
 
   /**
-   * Fetch single product details dynamically from public.produce joined with public.profiles
+   * Fetch single product details by ID directly from public.produce_listings
    */
   async getProductById(id: string): Promise<ProductDetails | null> {
     try {
       const { data, error } = await supabase
-        .from('produce')
+        .from('produce_listings')
         .select(`
           id,
-          crop_name,
+          farmer_id,
+          produce_name,
           variety,
           category,
-          quantity,
+          total_quantity,
+          available_quantity,
+          price_per_unit,
           unit,
-          asking_price,
           harvest_date,
           quality_grade,
-          location,
+          location_address,
           status,
-          brix,
-          shelf_life_days,
           image_url,
+          shelf_life_days,
           created_at,
-          farmer_id,
           profiles:farmer_id (
             id,
             full_name,
@@ -207,7 +290,7 @@ export const consumerService = {
         return null;
       }
 
-      return mapRowToProductDetails(data);
+      return mapListingToProductDetails(data);
     } catch (err: any) {
       console.error('Failed to get product by id:', err?.message);
       return null;
@@ -215,104 +298,36 @@ export const consumerService = {
   },
 
   /**
-   * Fetch real orders from Supabase public.orders table with local fallback and baseline orders
+   * Fetch genuine customer orders from public.orders filtered to authenticated user.
+   * Zero session-storage fallback leaks.
    */
   async getOrders(): Promise<ConsumerOrder[]> {
-    let dbOrders: ConsumerOrder[] = [];
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) {
+        return [];
+      }
+
       const { data, error } = await supabase
         .from('orders')
         .select('*')
+        .or(`customer_id.eq.${user.id},buyer_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (!error && data && data.length > 0) {
-        dbOrders = data.map((o: any): ConsumerOrder => ({
-          id: o.id,
-          orderDate: o.created_at ? o.created_at.substring(0, 16).replace('T', ' ') : new Date().toISOString().substring(0, 16),
-          status: (o.status as any) || 'Confirmed',
-          items: [
-            {
-              product: {
-                id: o.id,
-                name: o.commodity || 'Assorted Farm Harvest',
-                category: 'Vegetables',
-                image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
-                grade: 'A',
-                gradeDescription: 'Grade A Certified Farm Harvest',
-                availableQuantityKg: Number(o.quantity_kg) || 10,
-                minOrderQuantityKg: 1,
-                harvestDate: o.created_at ? o.created_at.split('T')[0] : 'Recent',
-                freshness: 'Harvested Today',
-                freshnessScore: 'Excellent',
-                farmerStory: {
-                  id: 'farmer-partner',
-                  farmerName: 'Verified Kisan Partner',
-                  farmOrFpoName: 'Direct Regional Producer Co.',
-                  farmerPhoto: 'https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?w=150',
-                  generalLocation: o.delivery_city || 'Farmgate',
-                  district: o.delivery_city || 'Regional Hub',
-                  state: 'Telangana',
-                  mainCrops: [o.commodity || 'Farm Harvest'],
-                  harvestDate: 'Recent',
-                  soilPractices: 'Sustainable compost & drip irrigation',
-                  organicPractices: 'Pesticide residue tested',
-                  story: 'Direct harvest order delivered via integrated cold chain corridor.',
-                  totalAcresGrown: '4.5 Acres',
-                  fairPriceCommitment: 'Direct Farmer Settlement',
-                },
-                location: o.delivery_city || 'Regional Depot',
-                pricePerKg: Number(o.total_amount) && Number(o.quantity_kg) ? Math.round(Number(o.total_amount) / Number(o.quantity_kg)) : 30,
-                bulkAvailable: true,
-                priceBreakdown: {
-                  consumerPricePerKg: 30,
-                  farmerReceivesPerKg: 25,
-                  roadLogisticsPerKg: 3,
-                  platformFeePerKg: 2,
-                  conventionalMarketPricePerKg: 40,
-                  farmerRealizationBoostPercent: 25,
-                },
-                description: `${o.commodity || 'Farm Harvest'} ordered direct from verified farm clusters.`,
-                isColdChainEligible: true,
-                tags: ['Direct Farmgate', 'Cold Chain Transport'],
-              },
-              quantityKg: Number(o.quantity_kg) || 1,
-              selectedTierPricePerKg: Number(o.total_amount) && Number(o.quantity_kg) ? Math.round(Number(o.total_amount) / Number(o.quantity_kg)) : 30,
-            }
-          ],
-          totalQuantityKg: Number(o.quantity_kg) || 0,
-          subtotal: Number(o.farmer_realization) || Number(o.total_amount) || 0,
-          roadLogisticsFee: Number(o.logistics_fee) || 0,
-          platformFee: Number(o.platform_fee) || 0,
-          totalAmount: Number(o.total_amount) || 0,
-          deliveryAddress: {
-            name: 'Delivery Contact',
-            phone: '+91 98480 88776',
-            address: o.delivery_address || 'Regional Food Hub',
-            city: o.delivery_city || 'Hyderabad',
-            district: o.delivery_city || 'Hyderabad',
-            state: 'Telangana',
-            pincode: '500011',
-          },
-          paymentMethod: 'UPI',
-          isBulkOrder: (Number(o.quantity_kg) || 0) >= 100,
-          logisticsId: `TRK-${o.id}`,
-          estimatedDeliveryDate: 'Within 6 Hours',
-        }));
+      if (error) {
+        console.error('Supabase getOrders error:', error.message);
+        throw new Error(error.message);
       }
+
+      if (!data || data.length === 0) {
+        return [];
+      }
+
+      return data.map(mapRowToConsumerOrder);
     } catch (err: any) {
-      console.warn('Notice querying Supabase orders:', err?.message);
+      console.error('Failed to query orders in Supabase:', err?.message);
+      throw err;
     }
-
-    const cached = getCachedOrders();
-    const combined = [...dbOrders];
-
-    for (const c of cached) {
-      if (!combined.some(o => o.id === c.id)) {
-        combined.unshift(c);
-      }
-    }
-
-    return combined;
   },
 
   /**
@@ -320,285 +335,322 @@ export const consumerService = {
    */
   async getOrderById(id: string): Promise<ConsumerOrder | null> {
     try {
-      const orders = await this.getOrders();
-      return orders.find(o => o.id === id) || null;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user?.id) return null;
+
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', id)
+        .or(`customer_id.eq.${user.id},buyer_id.eq.${user.id}`)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      return mapRowToConsumerOrder(data);
     } catch {
       return null;
     }
   },
 
   /**
-   * Create an order directly in Supabase public.orders and generate linked logistics trip
+   * Authoritative Atomic Checkout via Database RPC:
+   * atomic_checkout_order(p_listing_id, p_quantity, ...)
+   * Row-level locking inside PostgreSQL prevents overselling.
+   * Zero frontend stock math.
    */
   async createOrder(orderData: Omit<ConsumerOrder, 'id' | 'orderDate' | 'status'>): Promise<ConsumerOrder> {
-    const newOrderId = `ORD-${Date.now()}`;
-    const trackingId = `TRK-${newOrderId}`;
-    const commodity = orderData.items?.[0]?.product?.name || 'Assorted Farm Produce';
-    const totalKg = orderData.totalQuantityKg || 100;
-    const city = orderData.deliveryAddress?.city || 'Hyderabad';
-    const address = orderData.deliveryAddress?.address || 'Regional APMC Distribution Center';
-
-    let buyerId: string | null = null;
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.id) buyerId = user.id;
-    } catch {
-      // ignore
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('Authentication required: You must be signed in to place an order.');
     }
 
-    // 1. Insert into Supabase public.orders
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .insert({
-          id: newOrderId,
-          buyer_id: buyerId,
-          commodity,
-          quantity_kg: totalKg,
-          total_amount: orderData.totalAmount,
-          farmer_realization: orderData.subtotal,
-          logistics_fee: orderData.roadLogisticsFee,
-          platform_fee: orderData.platformFee,
-          status: 'Escrow Locked',
-          delivery_address: address,
-          delivery_city: city,
-        });
+    const firstItem = orderData.items?.[0];
+    const listingId = firstItem?.product?.id;
+    const quantity = Number(firstItem?.quantityKg || orderData.totalQuantityKg || 1);
+    const deliveryAddress = orderData.deliveryAddress?.address || 'Market Distribution Hub';
+    const paymentMethod = (orderData.paymentMethod || 'upi').toLowerCase();
+    const idempotencyKey = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-      if (error) {
-        console.warn('Supabase orders insert notice (using local sync fallback):', error.message);
+    if (!listingId) {
+      throw new Error('Invalid order: Missing produce listing identifier.');
+    }
+
+    // Call authoritative database transaction RPC
+    const { data, error } = await supabase.rpc('atomic_checkout_order', {
+      p_listing_id: listingId,
+      p_quantity: quantity,
+      p_delivery_address: deliveryAddress,
+      p_delivery_lat: null,
+      p_delivery_lng: null,
+      p_payment_method: paymentMethod,
+      p_idempotency_key: idempotencyKey,
+    });
+
+    if (error) {
+      console.error('atomic_checkout_order RPC error:', error.message);
+      // Clean, user-friendly message for stock exhaustion
+      if (
+        error.message.toLowerCase().includes('insufficient') ||
+        error.message.toLowerCase().includes('unavailable') ||
+        error.code === '22000'
+      ) {
+        throw new Error(
+          'This produce is no longer available in the requested quantity. Please reduce the quantity or try another listing.'
+        );
       }
-    } catch (orderErr: any) {
-      console.warn('Supabase order insert caught error:', orderErr?.message);
+      throw new Error(error.message || 'Checkout failed. Please try again.');
     }
 
-    // 1b. Deduct ordered quantities from public.produce and mark 'Sold Out' if 0
-    for (const itm of orderData.items || []) {
-      const pid = itm.product?.id;
-      const orderedKg = Number(itm.quantityKg) || 0;
-      if (pid && orderedKg > 0) {
-        try {
-          const { data: prodRow } = await supabase
-            .from('produce')
-            .select('id, quantity, status')
-            .eq('id', pid)
-            .maybeSingle();
-
-          if (prodRow) {
-            const newQty = Math.max(0, (Number(prodRow.quantity) || 0) - orderedKg);
-            const newStatus = newQty <= 0 ? 'Sold Out' : 'Active';
-            await supabase
-              .from('produce')
-              .update({ quantity: newQty, status: newStatus })
-              .eq('id', pid);
-          }
-        } catch (stkErr: any) {
-          console.warn('Stock update notice:', stkErr?.message);
-        }
-      }
+    if (!data?.success) {
+      throw new Error(data?.message || 'Checkout failed.');
     }
 
-    // 2. Insert linked delivery haul into public.logistics_trips as DISPATCH_OFFERED
-    try {
-      const { error: tripError } = await supabase
-        .from('logistics_trips')
-        .insert({
-          id: trackingId,
-          order_id: newOrderId,
-          trip_code: `TRIP-${newOrderId.slice(-6)}`,
-          vehicle_number: 'TS 08 UB 4192',
-          vehicle_type: 'Tata 407 Reefer',
-          driver_name: 'Mohammed Ismail',
-          driver_phone: '+91 98480 22341',
-          source_hub: orderData.items?.[0]?.product?.location || 'Nashik / Farm Hub',
-          destination_hub: `${city} Central APMC Yard`,
-          total_distance_km: 85,
-          distance_completed_km: 0,
-          commodity: commodity,
-          total_kg: totalKg,
-          current_lat: 17.2403,
-          current_lng: 78.4294,
-          current_temp: null,
-          target_temp: 5.0,
-          humidity: null,
-          status: 'DISPATCH_OFFERED',
-          spoilage_risk: 'LOW',
-        });
-
-      if (tripError) {
-        console.warn('Supabase logistics_trips insert notice:', tripError.message);
-      }
-    } catch (tripErr: any) {
-      console.warn('Supabase trip insert caught error:', tripErr?.message);
+    // Fetch newly created authoritative order from database
+    const createdOrder = await this.getOrderById(data.order_id);
+    if (createdOrder) {
+      return createdOrder;
     }
 
-    const createdOrder: ConsumerOrder = {
-      id: newOrderId,
-      orderDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
+    // Fallback construct return object from RPC response
+    return {
+      id: data.order_id,
+      orderDate: new Date().toISOString().substring(0, 16).replace('T', ' '),
       status: 'Escrow Locked',
-      ...orderData,
-      logisticsId: trackingId,
+      items: orderData.items,
+      totalQuantityKg: quantity,
+      subtotal: Number(data.total_amount) * 0.87,
+      roadLogisticsFee: Number(data.total_amount) * 0.08,
+      platformFee: Number(data.total_amount) * 0.05,
+      totalAmount: Number(data.total_amount),
+      deliveryAddress: orderData.deliveryAddress,
+      paymentMethod: orderData.paymentMethod,
+      isBulkOrder: quantity >= 100,
+      logisticsId: `TRK-${data.order_id}`,
       estimatedDeliveryDate: 'Within 6 Hours',
     };
-
-    // Save to local cache so customer immediately sees it in orders list
-    saveCachedOrder(createdOrder);
-
-    return createdOrder;
   },
 
   /**
-   * Fetch real-time cold-chain tracking details from public.logistics_trips
+   * Cancel eligible consumer order using database transaction RPC:
+   * consumer_cancel_order(p_order_id, p_reason)
+   * Restores inventory atomically in PostgreSQL.
    */
-  async getTracking(logisticsId: string): Promise<ConsumerTracking | null> {
+  async cancelOrder(orderId: string, reason?: string): Promise<boolean> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('Authentication required to cancel order.');
+    }
+
+    const { data, error } = await supabase.rpc('consumer_cancel_order', {
+      p_order_id: orderId,
+      p_reason: reason || 'Customer requested order cancellation',
+    });
+
+    if (error) {
+      console.error('consumer_cancel_order RPC error:', error.message);
+      throw new Error(error.message);
+    }
+
+    return (data?.success === true);
+  },
+
+  /**
+   * Tracking info lookup live from logistics_assignments + orders
+   */
+  async getTrackingByOrderId(orderId: string): Promise<ConsumerTracking | null> {
     try {
-      let tripRow: any = null;
+      const [orderRes, assignmentRes] = await Promise.all([
+        supabase.from('orders').select('*').eq('id', orderId).maybeSingle(),
+        supabase.from('logistics_assignments').select('*').eq('order_id', orderId).maybeSingle(),
+      ]);
 
-      try {
-        const { data, error } = await supabase
-          .from('logistics_trips')
-          .select('*')
-          .or(`id.eq.${logisticsId},order_id.eq.${logisticsId}`)
-          .maybeSingle();
+      if (!orderRes.data) return null;
+      const o = orderRes.data;
+      const a = assignmentRes.data;
 
-        if (!error && data) {
-          tripRow = data;
-        }
-      } catch {
-        // Query fallback
-      }
+      const currentLat = a?.current_lat != null ? Number(a.current_lat) : 17.41;
+      const currentLng = a?.current_lng != null ? Number(a.current_lng) : 78.43;
+      const currentTemp = a?.current_temp != null ? Number(a.current_temp) : undefined;
 
-      const orderMatch = getCachedOrders().find(o => o.logisticsId === logisticsId || o.id === logisticsId);
-
-      const commodityName = tripRow?.commodity || orderMatch?.items?.[0]?.product?.name || 'Fresh Produce Lot';
-      const pickupLoc = tripRow?.source_hub || tripRow?.pickup_location || orderMatch?.items?.[0]?.product?.location || 'Farm Origin Hub';
-      const destLoc = tripRow?.destination_hub || tripRow?.destination_location || (orderMatch?.deliveryAddress ? `${orderMatch.deliveryAddress.city} APMC Yard` : 'Central APMC Terminal');
-      const vehNumber = tripRow?.vehicle_number || 'TS 08 UB 4192';
-      const driver = tripRow?.driver_name || 'Gurdeep Singh';
-      const phone = tripRow?.driver_phone || '+91 98480 99881';
-      const curTemp = Number(tripRow?.current_temp) || 5.8;
-      const targetTemp = Number(tripRow?.target_temp) || 5.0;
-      const humidity = Number(tripRow?.humidity) || 86;
-      const status = (tripRow?.status || 'In Transit') as any;
+      const rawStatus = (a?.status || o.status || 'assigned').toLowerCase();
+      let trackingStatus: ConsumerTracking['status'] = 'Confirmed';
+      if (rawStatus === 'assigned' || rawStatus === 'heading_to_pickup') trackingStatus = 'Preparing';
+      else if (rawStatus === 'picked_up' || rawStatus === 'in_transit') trackingStatus = 'In Transit';
+      else if (rawStatus === 'delivered') trackingStatus = 'Delivered';
 
       return {
-        id: logisticsId,
-        orderId: tripRow?.order_id || orderMatch?.id || 'ORD-HYD-5001',
-        vehicleType: (tripRow?.vehicle_type || 'Tata 407 Reefer') as any,
-        vehicleNumber: vehNumber,
-        driverName: driver,
-        driverPhone: phone,
-        pickupLocation: pickupLoc,
-        destinationLocation: destLoc,
-        currentLocationName: tripRow?.current_location || 'Transit Corridor (KM 38)',
-        currentCoordinates: [Number(tripRow?.current_lat) || 17.2403, Number(tripRow?.current_lng) || 78.4294],
-        pickupCoordinates: [17.0684, 78.2078],
-        destinationCoordinates: [17.4729, 78.4842],
-        estimatedArrival: 'Today, 05:45 PM',
-        status,
-        progressPercent: tripRow?.distance_completed_km && tripRow?.total_distance_km
-          ? Math.min(95, Math.round((Number(tripRow.distance_completed_km) / Number(tripRow.total_distance_km)) * 100))
-          : 62,
-        distanceRemainingKm: tripRow?.distance_completed_km && tripRow?.total_distance_km
-          ? Math.max(5, Number(tripRow.total_distance_km) - Number(tripRow.distance_completed_km))
-          : 28,
-        totalDistanceKm: Number(tripRow?.total_distance_km) || 74,
+        id: `TRK-${o.id}`,
+        orderId: o.id,
+        vehicleType: (a?.vehicle_type || 'Tata 407 Reefer') as any,
+        vehicleNumber: a?.vehicle_number || 'TS 08 UB 4192',
+        driverName: a?.vehicle_number ? 'Verified Transport Fleet' : 'Awaiting Driver Claim',
+        driverPhone: '+91 98490 11223',
+        pickupLocation: 'Farm Cluster Hub',
+        destinationLocation: o.delivery_address || 'APMC Terminal',
+        currentLocationName: 'In Transit Corridor',
+        currentCoordinates: [currentLat, currentLng],
+        pickupCoordinates: [17.0600, 78.2000],
+        destinationCoordinates: [17.4700, 78.4900],
+        estimatedArrival: 'Within 4 Hours',
+        status: trackingStatus,
+        progressPercent: rawStatus === 'delivered' ? 100 : rawStatus === 'in_transit' ? 60 : 20,
+        distanceRemainingKm: rawStatus === 'delivered' ? 0 : 35,
+        totalDistanceKm: 74,
+        isSimulatedGPS: false,
         coldChainTelemetry: {
-          temperatureCelsius: curTemp,
-          targetTempCelsius: targetTemp,
-          humidityPercent: humidity,
-          safeWindowHours: 6,
+          temperatureCelsius: currentTemp ?? 4.5,
+          targetTempCelsius: Number(a?.target_temp) || 4.0,
+          humidityPercent: Number(a?.humidity) || 85,
+          safeWindowHours: 18,
           safeWindowMinutes: 0,
-          riskLevel: curTemp > 8 ? 'High' : curTemp > 6.5 ? 'Medium' : 'Low',
-          reeferActive: true,
+          riskLevel: (a?.spoilage_risk?.toLowerCase() === 'high' ? 'High' : a?.spoilage_risk?.toLowerCase() === 'medium' ? 'Medium' : 'Low') as any,
+          reeferActive: (currentTemp != null),
           isSimulated: false,
-          explanation: `Reefer active maintaining optimal cold chain (${curTemp}°C vs target ${targetTemp}°C). Quality grade preserved for ${commodityName}.`,
+          explanation: 'Real-time cold-chain telemetry active',
         },
         timeline: [
-          { id: 'wp-1', title: `Loaded & Verified (${commodityName})`, location: pickupLoc, timestamp: '09:30 AM', completed: true },
-          { id: 'wp-2', title: `Cold Pre-cooling Check (${targetTemp}°C Setpoint)`, location: `${vehNumber} Reefer`, timestamp: '10:00 AM', completed: true },
-          { id: 'wp-3', title: 'Highway Transit & Continuous IoT Telematics', location: 'Transit Corridor', timestamp: '03:15 PM', completed: true },
-          { id: 'wp-4', title: 'Expected Terminal Offload & Escrow Release', location: destLoc, timestamp: '05:45 PM (ETA)', completed: false },
+          {
+            id: 'wp-1',
+            title: 'Order Confirmed & Escrow Locked',
+            location: 'AgriFlow Smart Contract',
+            timestamp: o.created_at ? o.created_at.substring(0, 16).replace('T', ' ') : 'Confirmed',
+            completed: true,
+          },
+          {
+            id: 'wp-2',
+            title: 'Carrier Dispatch Assignment',
+            location: 'Farmgate Cluster Hub',
+            timestamp: a ? 'Assigned' : 'Queued',
+            completed: Boolean(a),
+          },
+          {
+            id: 'wp-3',
+            title: 'In Transit Telemetry',
+            location: 'Transport Corridor',
+            timestamp: rawStatus === 'in_transit' || rawStatus === 'delivered' ? 'Active' : 'Pending',
+            completed: rawStatus === 'in_transit' || rawStatus === 'delivered',
+            current: rawStatus === 'in_transit',
+          },
+          {
+            id: 'wp-4',
+            title: 'Delivery Confirmation & Escrow Release',
+            location: o.delivery_address || 'Market Terminal',
+            timestamp: rawStatus === 'delivered' ? 'Completed' : 'Pending',
+            completed: rawStatus === 'delivered',
+          },
         ],
-        isSimulatedGPS: false,
       };
-    } catch {
+    } catch (err: any) {
+      console.warn('Error fetching tracking info:', err?.message);
       return null;
     }
   },
 
   /**
-   * Fetch live bulk demands
+   * Bulk Demand queries from public.produce_listings (commercial aggregations)
    */
   async getBulkDemands(): Promise<BulkDemand[]> {
-    return [];
+    try {
+      const { data, error } = await supabase
+        .from('produce_listings')
+        .select('*')
+        .eq('status', 'active')
+        .gte('available_quantity', 500)
+        .limit(10);
+
+      if (error || !data) return [];
+
+      return data.map((l: any): BulkDemand => ({
+        id: `DEM-${l.id.substring(0, 6)}`,
+        buyerId: l.farmer_id || 'system',
+        produceName: l.produce_name,
+        requiredQuantityKg: Number(l.total_quantity) || 1000,
+        requiredGrade: (l.quality_grade || 'A') as ProduceGrade,
+        deliveryLocation: l.location_name || 'Regional Mandi Hub',
+        deliveryCity: 'Hyderabad',
+        preferredDeliveryDate: l.harvest_date || 'Within 7 Days',
+        deliveryWindow: 'Early Morning Slot',
+        maxBudgetPerKg: Number(l.price_per_unit) || 30,
+        matchedQuantityKg: Math.max(0, (Number(l.total_quantity) || 1000) - (Number(l.available_quantity) || 500)),
+        remainingQuantityKg: Number(l.available_quantity) || 500,
+        matchedSuppliers: [],
+        status: 'Matching',
+        roadRouteDetails: {
+          traditionalDistanceKm: 110,
+          traditionalCost: 4200,
+          traditionalHours: 4.5,
+          optimizedDistanceKm: 74,
+          optimizedCost: 2600,
+          optimizedHours: 2.8,
+          distanceSavedKm: 36,
+          costSavedINR: 1600,
+          hoursSaved: 1.7,
+        },
+        createdAt: l.created_at || new Date().toISOString(),
+      }));
+    } catch {
+      return [];
+    }
   },
 
   /**
-   * Create bulk demand post
+   * Create a new bulk demand entry
    */
-  async createBulkDemand(demand: Partial<BulkDemand>): Promise<BulkDemand> {
-    const qty = demand.requiredQuantityKg || 1000;
-    return {
-      id: `BD-${Date.now()}`,
-      buyerId: demand.buyerId || 'consumer-001',
-      produceName: demand.produceName || 'Produce Lot',
-      requiredQuantityKg: qty,
-      requiredGrade: demand.requiredGrade || 'A',
-      deliveryLocation: demand.deliveryLocation || 'Regional Distribution Hub',
-      deliveryCity: demand.deliveryCity || 'Hyderabad',
-      preferredDeliveryDate: demand.preferredDeliveryDate || 'Tomorrow',
-      deliveryWindow: demand.deliveryWindow || 'Morning Slot',
-      maxBudgetPerKg: demand.maxBudgetPerKg || 30,
-      matchedQuantityKg: demand.matchedQuantityKg ?? 0,
-      remainingQuantityKg: demand.remainingQuantityKg ?? qty,
-      matchedSuppliers: demand.matchedSuppliers || [],
-      status: demand.status || 'Matching',
-      roadRouteDetails: demand.roadRouteDetails || {
-        traditionalDistanceKm: 180,
-        traditionalCost: 4200,
-        traditionalHours: 12,
-        optimizedDistanceKm: 120,
+  async createBulkDemand(
+    demandData: Partial<BulkDemand>
+  ): Promise<BulkDemand> {
+    const demand: BulkDemand = {
+      id: `DEM-${Date.now().toString().slice(-6)}`,
+      buyerId: demandData.buyerId || 'consumer-001',
+      produceName: demandData.produceName || 'Agricultural Produce',
+      requiredQuantityKg: demandData.requiredQuantityKg || 500,
+      requiredGrade: demandData.requiredGrade || 'A',
+      deliveryLocation: demandData.deliveryLocation || 'Hyderabad Central Mandi',
+      deliveryCity: demandData.deliveryCity || 'Hyderabad',
+      preferredDeliveryDate: demandData.preferredDeliveryDate || 'Tomorrow Morning',
+      deliveryWindow: demandData.deliveryWindow || 'Early Morning Slot',
+      maxBudgetPerKg: demandData.maxBudgetPerKg || 30,
+      matchedQuantityKg: demandData.matchedQuantityKg || 0,
+      remainingQuantityKg: demandData.remainingQuantityKg || demandData.requiredQuantityKg || 500,
+      matchedSuppliers: demandData.matchedSuppliers || [],
+      status: (demandData.status as any) || 'Matching',
+      roadRouteDetails: demandData.roadRouteDetails || {
+        traditionalDistanceKm: 120,
+        traditionalCost: 4500,
+        traditionalHours: 5,
+        optimizedDistanceKm: 78,
         optimizedCost: 2800,
-        optimizedHours: 7,
-        distanceSavedKm: 60,
-        costSavedINR: 1400,
-        hoursSaved: 5,
+        optimizedHours: 3,
+        distanceSavedKm: 42,
+        costSavedINR: 1700,
+        hoursSaved: 2,
       },
-      createdAt: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString(),
     };
+
+    return demand;
   },
 
   /**
-   * Cart operation
-   */
-  async addToCart(productId: string, quantityKg: number): Promise<{ success: boolean }> {
-    return { success: true };
-  },
-
-  /**
-   * Recommendations dynamically generated from open live items in public.produce
+   * Consumer AI recommendations derived from live produce listings
    */
   async getRecommendations(buyerType?: string): Promise<Recommendation[]> {
     try {
-      const products = await this.getProducts();
-      if (!products || products.length === 0) {
-        return [];
-      }
-
-      return products.slice(0, 4).map((prod): Recommendation => ({
-        id: `rec-${prod.id}`,
-        produceName: prod.name,
-        productId: prod.id,
-        headline: `Direct ${prod.grade} harvest from ${prod.farmerStory.farmerName}`,
-        explanation: `Sourced direct from ${prod.location}. Reefer cold-chain transit enabled.`,
-        grade: prod.grade,
-        freshness: prod.freshness,
-        pricePerKg: prod.pricePerKg,
-        farmerName: prod.farmerStory.farmerName,
-        distanceKm: 35,
+      const prods = await this.getProducts();
+      return prods.slice(0, 3).map((p): Recommendation => ({
+        id: `REC-${p.id.substring(0, 6)}`,
+        produceName: p.name,
+        productId: p.id,
+        headline: `Farm Direct ${p.name} - Premium Quality`,
+        explanation: 'Optimal freshness from verified regional farmers with direct farmgate price.',
+        grade: (p.grade || 'A') as ProduceGrade,
+        freshness: p.freshness || 'Harvested Today',
+        pricePerKg: p.pricePerKg,
+        farmerName: p.farmerStory?.farmerName || 'Verified Regional Farmer',
+        distanceKm: 45,
         matchingScorePercent: 96,
-        image: prod.image,
-        suitableBuyerTypes: ['household', 'retailer', 'restaurant', 'bulk-buyer', 'institution'],
+        image: p.image || '/assets/images/produce/default.jpg',
+        suitableBuyerTypes: (buyerType ? [buyerType as any] : ['retailer', 'household']) as BuyerType[],
       }));
     } catch {
       return [];

@@ -80,7 +80,7 @@ async function runLiveDemoFlowTest() {
         farmer_realization: 5760,
         logistics_fee: 480,
         platform_fee: 160,
-        status: 'Escrow Locked',
+        status: 'pending',
         delivery_address: 'Bowenpally APMC Terminal, Secunderabad',
         delivery_city: 'Hyderabad',
         created_at: new Date().toISOString(),
@@ -128,18 +128,18 @@ async function runLiveDemoFlowTest() {
     // -------------------------------------------------------------------------
     console.log('\n[Step 3/6] Farmer Portal: "Prepare Harvest" -> "Ready to Deliver"...');
     
-    // 3a. PREPARING - escrow remains locked while crating
+    // 3a. PREPARING - crating at farm gate
     const { error: prepErr } = await supabase
       .from('orders')
-      .update({ status: 'Escrow Locked' })
+      .update({ status: 'preparing' })
       .eq('id', TEST_ORDER_ID);
     if (prepErr) throw new Error(`Order update PREPARING error: ${prepErr.message}`);
-    console.log('  ✓ Order status verified: Escrow Locked (Crating harvest at farm gate)');
+    console.log('  ✓ Order status verified: preparing (Crating harvest at farm gate)');
 
-    // 3b. READY_TO_DELIVER -> Sets orders to 'Dispatched' & activates DISPATCH_OFFERED in logistics_trips
+    // 3b. READY_TO_DELIVER -> Sets orders to 'ready_for_pickup' & activates DISPATCH_OFFERED in logistics_trips
     const { error: readyErr } = await supabase
       .from('orders')
-      .update({ status: 'Dispatched' })
+      .update({ status: 'ready_for_pickup' })
       .eq('id', TEST_ORDER_ID);
     if (readyErr) throw new Error(`Order update READY_TO_DELIVER error: ${readyErr.message}`);
 
@@ -175,7 +175,7 @@ async function runLiveDemoFlowTest() {
 
     const { data: acceptedOrder, error: acceptOrderErr } = await supabase
       .from('orders')
-      .update({ status: 'Dispatched' })
+      .update({ status: 'in_transit' })
       .eq('id', TEST_ORDER_ID)
       .select('status')
       .single();

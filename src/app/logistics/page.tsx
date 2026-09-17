@@ -51,9 +51,23 @@ export default function LogisticsDashboardPage() {
   useEffect(() => {
     loadTrips();
 
-    // Realtime Supabase Channel
+    // Realtime Supabase Channel listening to authoritative logistics_assignments and orders
     const channel = supabase
       .channel('logistics-trips-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'logistics_assignments' },
+        () => {
+          loadTrips();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          loadTrips();
+        }
+      )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'logistics_trips' },

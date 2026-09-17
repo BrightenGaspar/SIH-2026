@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 import { logisticsService, FLEET_DRIVERS_QUEUE } from '@/services/logisticsService';
 import { ConsolidatedTrip } from '@/types/logistics';
 import { Card } from '@/components/common/Card';
@@ -25,6 +26,7 @@ import ReportModal from '@/components/reports/ReportModal';
 import { UserRole, ReportType } from '@/types/review';
 
 export default function LogisticsTripsPage() {
+  const { user } = useAuth();
   const [trips, setTrips] = useState<ConsolidatedTrip[]>([]);
   const [loading, setLoading] = useState(true);
   const [acceptingTripId, setAcceptingTripId] = useState<string | null>(null);
@@ -57,9 +59,21 @@ export default function LogisticsTripsPage() {
   useEffect(() => {
     loadTrips();
 
-    // Realtime subscription on public.logistics_trips
+    // Realtime subscription on public.logistics_assignments and public.logistics_trips
     const channel = supabase
       .channel('realtime-logistics-trips')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'logistics_assignments',
+        },
+        async () => {
+          const fresh = await logisticsService.getTrips();
+          setTrips(fresh);
+        }
+      )
       .on(
         'postgres_changes',
         {
@@ -288,7 +302,7 @@ export default function LogisticsTripsPage() {
                     onClick={() => {
                       setSelectedRatingTrip({
                         transactionId: trip.id,
-                        targetUserId: 'farmer_01',
+                        targetUserId: trip.farmerId || 'farmer_direct',
                         targetRole: 'FARMER',
                         targetName: `${trip.sourceHub} Dispatcher`,
                         productName: trip.commodity,
@@ -331,9 +345,9 @@ export default function LogisticsTripsPage() {
           targetRole={selectedRatingTrip.targetRole}
           targetName={selectedRatingTrip.targetName}
           productName={selectedRatingTrip.productName}
-          raterUserId="logistics_01"
+          raterUserId={user?.id || 'logistics_operator'}
           raterRole="LOGISTICS"
-          raterDisplayName="AgriFlow Reefer Carrier Ops"
+          raterDisplayName={user?.name || 'AgriFlow Reefer Carrier Ops'}
         />
       )}
 
@@ -345,9 +359,9 @@ export default function LogisticsTripsPage() {
           reportType={selectedReportData.reportType}
           transactionId={selectedReportData.transactionId}
           reportedName={selectedReportData.reportedName}
-          reporterUserId="logistics_01"
+          reporterUserId={user?.id || 'logistics_operator'}
           reporterRole="LOGISTICS"
-          reporterDisplayName="AgriFlow Reefer Carrier Ops"
+          reporterDisplayName={user?.name || 'AgriFlow Reefer Carrier Ops'}
         />
       )}
     </div>

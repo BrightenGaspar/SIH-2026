@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useBandwidth } from '@/context/BandwidthContext';
 import { logisticsService } from '@/services/logisticsService';
+import { supabase } from '@/lib/supabase';
 import { LogisticsFleetVehicle, ConsolidatedTrip } from '@/types/logistics';
 import { LowBandwidthBanner } from '@/components/common/LowBandwidthBanner';
 import { LazyMap } from '@/components/maps/LazyMap';
@@ -70,6 +71,28 @@ export default function LogisticsDashboard() {
 
   useEffect(() => {
     loadData();
+
+    const channel = supabase
+      .channel('realtime-logistics-dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'logistics_assignments' },
+        () => {
+          loadData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          loadData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Poll simulation status every 5 seconds

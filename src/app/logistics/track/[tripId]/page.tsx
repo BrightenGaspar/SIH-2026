@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
+import { logisticsService } from '@/services/logisticsService';
 import PhoneGpsBeacon from '@/components/logistics/PhoneGpsBeacon';
 import { 
   ArrowLeft, 
@@ -46,16 +47,27 @@ export default function LogisticsTrackTripPage() {
     async function loadTrip() {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('logistics_trips')
-          .select('*')
-          .eq('id', tripId)
-          .maybeSingle();
+        const tripData = await logisticsService.getTripById(tripId);
+        if (tripData) {
+          setTrip(tripData);
+          const lat = tripData.vehicle?.currentLat;
+          const lng = tripData.vehicle?.currentLng;
+          if (lat != null && lng != null) {
+            setCurrentCoords({ lat: Number(lat), lng: Number(lng) });
+          }
+        } else {
+          // Direct table fallback
+          const { data } = await supabase
+            .from('logistics_trips')
+            .select('*')
+            .eq('id', tripId)
+            .maybeSingle();
 
-        if (data) {
-          setTrip(data);
-          if (data.current_lat && data.current_lng) {
-            setCurrentCoords({ lat: Number(data.current_lat), lng: Number(data.current_lng) });
+          if (data) {
+            setTrip(data);
+            if (data.current_lat && data.current_lng) {
+              setCurrentCoords({ lat: Number(data.current_lat), lng: Number(data.current_lng) });
+            }
           }
         }
       } catch (err) {
@@ -67,25 +79,41 @@ export default function LogisticsTrackTripPage() {
 
     loadTrip();
 
-    // Subscribe to Realtime updates for this trip
+    // Subscribe to Realtime updates for this trip on both tables
     const channel = supabase
-      .channel(`public:logistics_trips:${tripId}`)
+      .channel(`track:${tripId}`)
       .on(
         'postgres_changes',
         {
-          event: 'UPDATE',
+          event: '*',
+          schema: 'public',
+          table: 'logistics_assignments',
+          filter: `id=eq.${tripId}`,
+        },
+        async () => {
+          const fresh = await logisticsService.getTripById(tripId);
+          if (fresh) {
+            setTrip(fresh);
+            if (fresh.vehicle?.currentLat && fresh.vehicle?.currentLng) {
+              setCurrentCoords({ lat: fresh.vehicle.currentLat, lng: fresh.vehicle.currentLng });
+            }
+          }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
           schema: 'public',
           table: 'logistics_trips',
           filter: `id=eq.${tripId}`,
         },
-        (payload) => {
-          if (payload.new) {
-            setTrip(payload.new);
-            if (payload.new.current_lat && payload.new.current_lng) {
-              setCurrentCoords({
-                lat: Number(payload.new.current_lat),
-                lng: Number(payload.new.current_lng),
-              });
+        async () => {
+          const fresh = await logisticsService.getTripById(tripId);
+          if (fresh) {
+            setTrip(fresh);
+            if (fresh.vehicle?.currentLat && fresh.vehicle?.currentLng) {
+              setCurrentCoords({ lat: fresh.vehicle.currentLat, lng: fresh.vehicle.currentLng });
             }
           }
         }
@@ -100,6 +128,22 @@ export default function LogisticsTrackTripPage() {
   const handlePositionUpdate = (lat: number, lng: number) => {
     setCurrentCoords({ lat, lng });
   };
+
+  const tripCode = trip?.tripCode || trip?.trip_code || (tripId ? `TRIP-${tripId.slice(-6)}` : 'TRIP-ACTIVE');
+  const vehicleNumber = trip?.vehicle?.vehicleNumber || trip?.vehicle_number || 'TS 08 UB 4192';
+  const vehicleType = trip?.vehicle?.vehicleType || trip?.vehicle_type || 'Tata 407 Reefer';
+  const driverName = trip?.vehicle?.driverName || trip?.driver_name || 'Active Operator';
+  const driverPhone = trip?.vehicle?.driverPhone || trip?.driver_phone || '+91 98480 22341';
+  const commodity = trip?.commodity || 'Perishable Produce';
+  const totalKg = trip?.totalKg || trip?.total_kg || 0;
+  const sourceHub = trip?.sourceHub || trip?.source_hub || 'Origin Farm Hub';
+  const destinationHub = trip?.destinationHub || trip?.destination_hub || 'Destination APMC Terminal';
+  const status = trip?.status || 'IN TRANSIT';
+  const totalDistanceKm = Number(trip?.totalDistanceKm || trip?.total_distance_km) || 80;
+  const distanceCompletedKm = Number(trip?.distanceCompletedKm || trip?.distance_completed_km) || 0;
+  const distanceRemainingKm = Math.max(0, totalDistanceKm - distanceCompletedKm);
+  const currentTemp = trip?.coldChainTemp ?? trip?.current_temp ?? null;
+  const humidity = trip?.humidity ?? null;
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto p-4 sm:p-6 pb-20">
@@ -127,10 +171,10 @@ export default function LogisticsTrackTripPage() {
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/30 text-[11px] font-black tracking-wider uppercase">
-              {trip?.status || 'IN TRANSIT'}
+              {status}
             </span>
             <span className="text-xs font-mono text-slate-400">
-              #{trip?.trip_code || tripId}
+              #{tripCode}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -143,7 +187,7 @@ export default function LogisticsTrackTripPage() {
 
         <div>
           <DataStatusBadge
-            lastUpdated={trip?.last_telemetry_at}
+            lastUpdated={trip?.last_telemetry_at || trip?.updated_at}
             freshnessThresholdMinutes={1}
             source={trip?.telemetry_source || 'driver-phone-gps'}
             showSource={true}
@@ -154,11 +198,11 @@ export default function LogisticsTrackTripPage() {
       {/* Main Driver Phone GPS Beacon Control Component */}
       <PhoneGpsBeacon
         tripId={tripId}
-        tripCode={trip?.trip_code || `TRIP-${tripId.slice(-6)}`}
-        carrierVehicle={trip?.vehicle_number ? `${trip.vehicle_number} (${trip.vehicle_type || 'Reefer'})` : undefined}
-        commodity={trip?.commodity ? `${trip.commodity} � ${trip.total_kg || 0} kg` : undefined}
-        sourceHub={trip?.source_hub}
-        destinationHub={trip?.destination_hub}
+        tripCode={tripCode}
+        carrierVehicle={`${vehicleNumber} (${vehicleType})`}
+        commodity={`${commodity} • ${totalKg} kg`}
+        sourceHub={sourceHub}
+        destinationHub={destinationHub}
         onPositionUpdate={handlePositionUpdate}
       />
 
@@ -169,7 +213,7 @@ export default function LogisticsTrackTripPage() {
             <Navigation className="w-4 h-4 text-emerald-500" /> Real GPS Location Broadcast
           </h3>
           <span className="text-[11px] text-slate-400 font-mono">
-            {currentCoords ? `${currentCoords.lat.toFixed(4)}�, ${currentCoords.lng.toFixed(4)}�` : 'Awaiting fix'}
+            {currentCoords ? `${currentCoords.lat.toFixed(4)}°, ${currentCoords.lng.toFixed(4)}°` : 'Awaiting fix'}
           </span>
         </div>
 
@@ -179,29 +223,29 @@ export default function LogisticsTrackTripPage() {
               id: tripId,
               orderId: trip?.order_id || tripId,
               tripId: tripId,
-              vehicleNumber: trip?.vehicle_number || 'TS 08 UB 4192',
-              vehicleType: (trip?.vehicle_type || 'Tata 407 Reefer') as any,
-              driverName: trip?.driver_name || 'Active Operator',
-              driverPhone: trip?.driver_phone || '+91 98480 22341',
-              status: trip?.status || 'IN TRANSIT',
+              vehicleNumber: vehicleNumber,
+              vehicleType: vehicleType as any,
+              driverName: driverName,
+              driverPhone: driverPhone,
+              status: status as any,
               currentCoordinates: currentCoords ? [currentCoords.lat, currentCoords.lng] : undefined,
               pickupCoordinates: [17.3850, 78.4867],
               destinationCoordinates: [17.4400, 78.3800],
               currentLocationName: trip?.current_location || 'Live Driver Phone Beacon',
-              pickupLocation: trip?.source_hub || 'Origin Farm',
-              destinationLocation: trip?.destination_hub || 'Destination Yard',
-              produceName: trip?.commodity || 'Perishable Produce',
-              totalQuantityKg: trip?.total_kg || 1000,
-              estimatedArrival: 'En Route',
-              distanceRemainingKm: Math.max(0, (Number(trip?.total_distance_km) || 80) - (Number(trip?.distance_completed_km) || 0)),
-              distanceCompletedKm: Number(trip?.distance_completed_km) || 0,
-              totalDistanceKm: Number(trip?.total_distance_km) || 80,
-              progressPercentage: 45,
+              pickupLocation: sourceHub,
+              destinationLocation: destinationHub,
+              produceName: commodity,
+              totalQuantityKg: totalKg,
+              estimatedArrival: trip?.estimatedArrival || 'En Route',
+              distanceRemainingKm: distanceRemainingKm,
+              distanceCompletedKm: distanceCompletedKm,
+              totalDistanceKm: totalDistanceKm,
+              progressPercentage: totalDistanceKm > 0 ? Math.round((distanceCompletedKm / totalDistanceKm) * 100) : 50,
               etaMinutes: 45,
               telemetry: {
-                temperatureCelsius: trip?.current_temp != null ? Number(trip.current_temp) : (null as any),
+                temperatureCelsius: currentTemp != null ? Number(currentTemp) : (null as any),
                 targetTempCelsius: Number(trip?.target_temp) || 5.0,
-                humidityPercent: trip?.humidity != null ? Number(trip.humidity) : (null as any),
+                humidityPercent: humidity != null ? Number(humidity) : (null as any),
                 safeWindowHours: 4,
                 safeWindowMinutes: 0,
                 spoilageRisk: 'LOW',

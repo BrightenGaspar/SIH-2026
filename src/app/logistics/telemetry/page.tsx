@@ -6,6 +6,7 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { logisticsService } from '@/services/logisticsService';
 import {
   Thermometer,
   Snowflake,
@@ -60,31 +61,22 @@ export default function ColdChainTelemetryPage() {
     const fetchLiveTelemetry = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from('logistics_trips')
-          .select('*')
-          .order('updated_at', { ascending: false });
-
-        if (error) {
-          console.warn('Supabase telemetry query notice:', error.message);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          const mapped: TelemetryVehicle[] = data.map((row: any) => ({
-            id: row.id,
-            vehicle_number: row.vehicle_number || 'TS 08 UB 4192',
-            vehicle_type: row.vehicle_type || 'Tata 407 Reefer',
-            driver_name: row.driver_name || 'Fleet Operator',
-            commodity: row.commodity || 'Farm Produce',
-            current_temp: row.current_temp != null ? Number(row.current_temp) : null,
-            target_temp: Number(row.target_temp) || 6.0,
-            humidity: row.humidity != null ? Number(row.humidity) : null,
-            current_location: row.current_location || (row.current_lat ? `${Number(row.current_lat).toFixed(3)}, ${Number(row.current_lng).toFixed(3)}` : 'En Route'),
-            status: row.status || 'IN TRANSIT',
-            telemetry_source: row.telemetry_source || 'Awaiting Device Ping',
-            last_ping: row.last_telemetry_at || row.updated_at || null,
-            safe_threshold: Number(row.safe_temp_threshold) || 8.0,
+        const trips = await logisticsService.getTrips();
+        if (trips && trips.length > 0) {
+          const mapped: TelemetryVehicle[] = trips.map((t) => ({
+            id: t.id,
+            vehicle_number: t.vehicle?.vehicleNumber || 'TS 08 UB 4192',
+            vehicle_type: t.vehicle?.vehicleType || 'Tata 407 Reefer',
+            driver_name: t.vehicle?.driverName || 'Fleet Operator',
+            commodity: t.commodity || 'Farm Harvest',
+            current_temp: t.vehicle?.currentTempCelsius ?? null,
+            target_temp: 6.0,
+            humidity: null,
+            current_location: t.vehicle?.currentLocation || (t.vehicle?.currentLat ? `${Number(t.vehicle.currentLat).toFixed(3)}, ${Number(t.vehicle.currentLng).toFixed(3)}` : 'En Route'),
+            status: t.status || 'IN TRANSIT',
+            telemetry_source: t.vehicle?.currentTempCelsius != null ? 'Reefer Sensor' : 'Driver GPS Beacon (Sensor unattached)',
+            last_ping: new Date().toISOString(),
+            safe_threshold: 8.0,
           }));
           setVehicles(mapped);
           if (mapped.length > 0 && !selectedVehicleId) {
@@ -111,48 +103,23 @@ export default function ColdChainTelemetryPage() {
         {
           event: '*',
           schema: 'public',
+          table: 'logistics_assignments',
+        },
+        () => {
+          setLastHeartbeat(new Date().toLocaleTimeString());
+          fetchLiveTelemetry();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
           table: 'logistics_trips',
         },
-        (payload) => {
+        () => {
           setLastHeartbeat(new Date().toLocaleTimeString());
-          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-            const updatedRow: any = payload.new;
-            setVehicles((prev) => {
-              const exists = prev.some((v) => v.id === updatedRow.id);
-              if (exists) {
-                return prev.map((v) =>
-                  v.id === updatedRow.id
-                    ? {
-                        ...v,
-                        current_temp: updatedRow.current_temp != null ? Number(updatedRow.current_temp) : null,
-                        humidity: updatedRow.humidity != null ? Number(updatedRow.humidity) : null,
-                        current_location: updatedRow.current_location || v.current_location,
-                        status: updatedRow.status || v.status,
-                        telemetry_source: updatedRow.telemetry_source || v.telemetry_source,
-                        last_ping: updatedRow.last_telemetry_at || updatedRow.updated_at || new Date().toISOString(),
-                      }
-                    : v
-                );
-              }
-              return [
-                {
-                  id: updatedRow.id,
-                  vehicle_number: updatedRow.vehicle_number || 'TS 08 UB 4192',
-                  vehicle_type: updatedRow.vehicle_type || 'Tata 407 Reefer',
-                  driver_name: updatedRow.driver_name,
-                  commodity: updatedRow.commodity,
-                  current_temp: updatedRow.current_temp != null ? Number(updatedRow.current_temp) : null,
-                  target_temp: Number(updatedRow.target_temp) || 6.0,
-                  humidity: updatedRow.humidity != null ? Number(updatedRow.humidity) : null,
-                  status: updatedRow.status || 'IN TRANSIT',
-                  telemetry_source: updatedRow.telemetry_source || 'Verified Device',
-                  last_ping: updatedRow.last_telemetry_at || updatedRow.updated_at || new Date().toISOString(),
-                  safe_threshold: Number(updatedRow.safe_temp_threshold) || 8.0,
-                },
-                ...prev,
-              ];
-            });
-          }
+          fetchLiveTelemetry();
         }
       )
       .subscribe((status) => {

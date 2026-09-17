@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { consumerService } from '@/services/consumerService';
 import { ConsumerOrder } from '@/types/consumer';
+import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
 import MultiFarmerConsolidationCard from '@/components/consumer/MultiFarmerConsolidationCard';
 import ImpactReceiptModal from '@/components/consumer/ImpactReceiptModal';
@@ -21,16 +22,20 @@ import {
   MapPin, 
   TrendingUp, 
   Users, 
-  Sparkles,
-  ChevronDown,
-  ChevronUp,
-  Flag
+  Sparkles, 
+  ChevronDown, 
+  ChevronUp, 
+  Flag,
+  Loader2,
+  XCircle
 } from 'lucide-react';
 
 export default function ConsumerOrdersPage() {
+  const { user } = useAuth();
   const { t } = useI18n();
   const [orders, setOrders] = useState<ConsumerOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cancellingOrderId, setCancellingOrderId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'completed'>('all');
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>('ORD-HYD-5000');
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState<ConsumerOrder | null>(null);
@@ -86,9 +91,27 @@ export default function ConsumerOrdersPage() {
     };
   }, []);
 
+  const handleCancelOrder = async (orderId: string) => {
+    if (!window.confirm('Are you sure you want to cancel this order? Produce stock will be restored immediately.')) {
+      return;
+    }
+    try {
+      setCancellingOrderId(orderId);
+      const success = await consumerService.cancelOrder(orderId, 'Cancelled by consumer');
+      if (success) {
+        const fresh = await consumerService.getOrders();
+        setOrders(fresh);
+      }
+    } catch (err: any) {
+      alert(err?.message || 'Failed to cancel order.');
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
+
   const filteredOrders = orders.filter(o => {
     const s = (o.status || '').toLowerCase();
-    const isCompleted = s === 'delivered' || s === 'cancelled';
+    const isCompleted = s === 'delivered' || s === 'cancelled' || s === 'canceled';
     if (activeTab === 'active') return !isCompleted;
     if (activeTab === 'completed') return s === 'delivered';
     return true;
@@ -96,6 +119,9 @@ export default function ConsumerOrdersPage() {
 
   const getStatusBadge = (status: string) => {
     const s = (status || '').toUpperCase();
+    if (s === 'CANCELLED' || s === 'CANCELED') {
+      return 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20';
+    }
     if (s === 'IN TRANSIT' || s === 'PICKUP') {
       return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20';
     }
@@ -331,7 +357,7 @@ export default function ConsumerOrdersPage() {
                               onClick={() => {
                                 setSelectedRatingOrder({
                                   transactionId: order.id,
-                                  targetUserId: 'farmer_01',
+                                  targetUserId: order.farmerId || order.items[0]?.product.farmerStory.id || 'farmer_direct',
                                   targetRole: 'FARMER',
                                   targetName: order.items[0]?.product.farmerStory.farmerName || 'Farmer',
                                   productId: order.items[0]?.product.id,
@@ -349,7 +375,7 @@ export default function ConsumerOrdersPage() {
                               onClick={() => {
                                 setSelectedRatingOrder({
                                   transactionId: order.id,
-                                  targetUserId: 'logistics_01',
+                                  targetUserId: order.operatorId || 'logistics_direct',
                                   targetRole: 'LOGISTICS',
                                   targetName: 'Reefer Express Carrier',
                                 });
@@ -361,6 +387,29 @@ export default function ConsumerOrdersPage() {
                             </button>
                           </>
                         )}
+
+                        {/* Cancel Order (Atomic rollback RPC: allowed ONLY in pending or accepted before preparation) */}
+                        {(() => {
+                          const dbStatus = (order.rawStatus || '').toLowerCase();
+                          const isCancellable = dbStatus
+                            ? (dbStatus === 'pending' || dbStatus === 'accepted')
+                            : (order.status === 'Escrow Locked' || order.status === 'Confirmed');
+                          return isCancellable ? (
+                            <button
+                              type="button"
+                              onClick={() => handleCancelOrder(order.id)}
+                              disabled={cancellingOrderId === order.id}
+                              className="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/30 dark:hover:bg-rose-900/40 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                            >
+                              {cancellingOrderId === order.id ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <XCircle className="w-3.5 h-3.5" />
+                              )}
+                              <span>Cancel Order</span>
+                            </button>
+                          ) : null;
+                        })()}
 
                         {/* Report Order / Incident */}
                         <button
@@ -405,9 +454,9 @@ export default function ConsumerOrdersPage() {
           targetName={selectedRatingOrder.targetName}
           productId={selectedRatingOrder.productId}
           productName={selectedRatingOrder.productName}
-          raterUserId="user_consumer_demo"
+          raterUserId={user?.id || 'consumer_user'}
           raterRole="BUYER"
-          raterDisplayName="Priya S. (Retail Buyer)"
+          raterDisplayName={user?.name || 'Verified Buyer'}
         />
       )}
 
@@ -419,9 +468,9 @@ export default function ConsumerOrdersPage() {
           reportType={selectedReportData.reportType}
           transactionId={selectedReportData.transactionId}
           reportedName={selectedReportData.reportedName}
-          reporterUserId="user_consumer_demo"
+          reporterUserId={user?.id || 'consumer_user'}
           reporterRole="BUYER"
-          reporterDisplayName="Priya S. (Retail Buyer)"
+          reporterDisplayName={user?.name || 'Verified Buyer'}
         />
       )}
 

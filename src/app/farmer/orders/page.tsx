@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { trackingService } from '@/services/trackingService';
+import { useAuth } from '@/context/AuthContext';
+import { farmerService } from '@/services/farmerService';
 import { Order } from '@/types/farmer';
 import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
@@ -15,6 +16,7 @@ import ReportModal from '@/components/reports/ReportModal';
 import { UserRole, ReportType } from '@/types/review';
 
 export default function FarmerOrdersPage() {
+  const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
@@ -40,7 +42,7 @@ export default function FarmerOrdersPage() {
     let isMounted = true;
     async function load() {
       try {
-        const data = await trackingService.getOrders();
+        const data = await farmerService.getFarmerOrders();
         if (isMounted) setOrders(data);
       } finally {
         if (isMounted) setLoading(false);
@@ -59,7 +61,7 @@ export default function FarmerOrdersPage() {
           table: 'orders',
         },
         async () => {
-          const fresh = await trackingService.getOrders();
+          const fresh = await farmerService.getFarmerOrders();
           if (isMounted) setOrders(fresh);
         }
       )
@@ -74,8 +76,8 @@ export default function FarmerOrdersPage() {
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
       setUpdatingOrderId(orderId);
-      await trackingService.updateOrderStatus(orderId, newStatus);
-      const fresh = await trackingService.getOrders();
+      await farmerService.updateOrderStatus(orderId, newStatus);
+      const fresh = await farmerService.getFarmerOrders();
       setOrders(fresh);
     } finally {
       setUpdatingOrderId(null);
@@ -145,8 +147,25 @@ export default function FarmerOrdersPage() {
             </div>
 
             <div className="w-full lg:w-auto flex flex-col gap-2 shrink-0 min-w-[200px]">
+              {/* Lifecycle Stage Action: Accept Order */}
+              {((order.rawStatus?.toLowerCase() === 'pending') || order.status === 'New') && (
+                <Button
+                  size="sm"
+                  onClick={() => handleUpdateStatus(order.id, 'accepted')}
+                  disabled={updatingOrderId === order.id}
+                  className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold shadow-xs"
+                >
+                  {updatingOrderId === order.id ? (
+                    <Loader2 className="w-4 h-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <CheckCircle2 className="w-4 h-4 mr-1.5" />
+                  )}
+                  <span>Accept Order</span>
+                </Button>
+              )}
+
               {/* Lifecycle Stage Action: Mark Preparing */}
-              {(order.status === 'Escrow Locked' || order.status === 'Confirmed' || order.status === 'PLACED') && (
+              {((order.rawStatus?.toLowerCase() === 'accepted') || order.status === 'Confirmed' || order.status === 'Escrow Locked') && (
                 <Button
                   size="sm"
                   onClick={() => handleUpdateStatus(order.id, 'PREPARING')}
@@ -163,7 +182,7 @@ export default function FarmerOrdersPage() {
               )}
 
               {/* Lifecycle Stage Action: Ready to Deliver */}
-              {(order.status === 'PREPARING' || order.status === 'Preparing') && (
+              {((order.rawStatus?.toLowerCase() === 'preparing') || order.status === 'PREPARING' || order.status === 'Preparing') && (
                 <Button
                   size="sm"
                   onClick={() => handleUpdateStatus(order.id, 'READY_TO_DELIVER')}
@@ -180,7 +199,7 @@ export default function FarmerOrdersPage() {
               )}
 
               {/* Status Notice when waiting for logistics */}
-              {(order.status === 'READY_TO_DELIVER' || order.status === 'Ready to Deliver' || order.status === 'DISPATCH_OFFERED') && (
+              {((order.rawStatus?.toLowerCase() === 'ready_for_pickup') || order.status === 'READY_TO_DELIVER' || order.status === 'Ready to Deliver' || order.status === 'DISPATCH_OFFERED') && (
                 <div className="px-3 py-1.5 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 dark:text-cyan-400 text-xs font-bold text-center flex items-center justify-center gap-1.5 animate-pulse">
                   <Clock className="w-3.5 h-3.5" />
                   <span>Awaiting Carrier Acceptance</span>
@@ -203,7 +222,7 @@ export default function FarmerOrdersPage() {
                     onClick={() => {
                       setSelectedRatingOrder({
                         transactionId: order.id,
-                        targetUserId: order.buyerName || 'buyer_01',
+                        targetUserId: order.buyerId || 'buyer_direct',
                         targetRole: 'BUYER',
                         targetName: order.buyerName,
                         productName: order.produceName,
@@ -220,7 +239,7 @@ export default function FarmerOrdersPage() {
                     onClick={() => {
                       setSelectedRatingOrder({
                         transactionId: order.id,
-                        targetUserId: 'logistics_01',
+                        targetUserId: 'logistics_operator',
                         targetRole: 'LOGISTICS',
                         targetName: 'Cold-Chain Reefer Express',
                       });
@@ -236,7 +255,7 @@ export default function FarmerOrdersPage() {
                     onClick={() => {
                       setSelectedReportData({
                         reportType: 'USER',
-                        reportedUserId: 'buyer_01',
+                        reportedUserId: order.buyerId,
                         reportedRole: 'BUYER',
                         reportedName: order.buyerName,
                         transactionId: order.id,
@@ -265,9 +284,9 @@ export default function FarmerOrdersPage() {
           targetRole={selectedRatingOrder.targetRole}
           targetName={selectedRatingOrder.targetName}
           productName={selectedRatingOrder.productName}
-          raterUserId="farmer_01"
+          raterUserId={user?.id || 'farmer_user'}
           raterRole="FARMER"
-          raterDisplayName="Ramesh Reddy (Shadnagar FPO)"
+          raterDisplayName={user?.name || 'Verified Farmer'}
         />
       )}
 
@@ -281,9 +300,9 @@ export default function FarmerOrdersPage() {
           reportedRole={selectedReportData.reportedRole}
           reportedName={selectedReportData.reportedName}
           transactionId={selectedReportData.transactionId}
-          reporterUserId="farmer_01"
+          reporterUserId={user?.id || 'farmer_user'}
           reporterRole="FARMER"
-          reporterDisplayName="Ramesh Reddy (Shadnagar FPO)"
+          reporterDisplayName={user?.name || 'Verified Farmer'}
         />
       )}
 

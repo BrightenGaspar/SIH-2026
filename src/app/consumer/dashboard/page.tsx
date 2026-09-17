@@ -95,7 +95,7 @@ export default function ConsumerDashboard() {
       .channel('realtime-consumer-dashboard')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'produce' },
+        { event: '*', schema: 'public', table: 'produce_listings' },
         async () => {
           const prodList = await consumerService.getProducts();
           setProducts(prodList || []);

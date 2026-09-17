@@ -61,6 +61,8 @@ export interface ConsolidatedTrip {
   estimatedArrival: string;
   coldChainTemp?: number;
   spoilageRisk: 'LOW' | 'MEDIUM' | 'HIGH';
+  farmerId?: string;
+  customerId?: string;
   returnLoad?: {
     id: string;
     route: string;

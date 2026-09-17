@@ -39,12 +39,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Verify trip exists in public.logistics_trips
-    const { data: trip, error: fetchErr } = await supabase
+    // 1. Verify trip exists in public.logistics_trips or public.logistics_assignments
+    let { data: trip, error: fetchErr } = await supabase
       .from('logistics_trips')
       .select('*')
       .eq('id', trip_id)
       .maybeSingle();
+
+    let matchedAssignment: any = null;
+    if (!trip) {
+      const { data: la } = await supabase
+        .from('logistics_assignments')
+        .select('*')
+        .or(`id.eq.${trip_id},order_id.eq.${trip_id}`)
+        .maybeSingle();
+
+      if (la) {
+        matchedAssignment = la;
+        trip = {
+          id: la.id,
+          driver_id: la.operator_id,
+          current_lat: la.current_lat,
+          current_lng: la.current_lng,
+          current_temp: la.current_temp,
+          humidity: la.humidity,
+          safe_temp_threshold: la.target_temp || 8.0,
+          commodity: 'Harvest',
+          telemetry_source: 'driver-phone-gps',
+        };
+      }
+    }
 
     if (fetchErr) {
       return NextResponse.json(
@@ -187,7 +211,25 @@ export async function POST(req: NextRequest) {
       updateErr = retryResult.error;
     }
 
-    if (updateErr) {
+    if (matchedAssignment) {
+      try {
+        const assignUpdate: Record<string, any> = {
+          current_lat: cleanLat,
+          current_lng: cleanLng,
+          updated_at: recordedAt,
+        };
+        if (cleanTemp !== null) assignUpdate.current_temp = cleanTemp;
+        if (cleanHum !== null) assignUpdate.humidity = cleanHum;
+        await supabase
+          .from('logistics_assignments')
+          .update(assignUpdate)
+          .or(`id.eq.${trip_id},order_id.eq.${trip_id}`);
+      } catch {
+        // Best-effort sync
+      }
+    }
+
+    if (updateErr && !matchedAssignment) {
       return NextResponse.json(
         { error: `Failed to update trip telemetry: ${updateErr.message}` },
         { status: 500 }
@@ -287,11 +329,36 @@ export async function GET(req: NextRequest) {
     }
 
     // Return single trip telemetry
-    const { data: trip, error } = await supabase
+    let { data: trip, error } = await supabase
       .from('logistics_trips')
       .select('*')
       .eq('id', tripId)
       .maybeSingle();
+
+    if (!trip) {
+      const { data: la } = await supabase
+        .from('logistics_assignments')
+        .select('*')
+        .or(`id.eq.${tripId},order_id.eq.${tripId}`)
+        .maybeSingle();
+
+      if (la) {
+        trip = {
+          id: la.id,
+          driver_id: la.operator_id,
+          current_lat: la.current_lat,
+          current_lng: la.current_lng,
+          current_temp: la.current_temp,
+          humidity: la.humidity,
+          safe_temp_threshold: la.target_temp || 8.0,
+          commodity: 'Harvest',
+          telemetry_source: 'driver-phone-gps',
+          last_telemetry_at: la.updated_at,
+          updated_at: la.updated_at,
+          has_temperature_breach: false,
+        };
+      }
+    }
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });

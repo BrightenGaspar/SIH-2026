@@ -22,8 +22,8 @@ export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
       case 'moderate':
         return 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30';
       case 'confirmed':
-      case 'placed':
-      case 'order placed':
+      case 'new':
+      case 'pending':
       case 'escrow locked':
       case 'open':
       case 'high':

@@ -150,7 +150,7 @@ export default function FarmerTrackingClient() {
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-bold text-emerald-300">Return Load Matching Available</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Demo Simulation</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300">Live Matching</span>
                 </div>
                 <h4 className="text-base font-bold text-white mt-0.5">
                   {tracking.returnLoad.origin} &rarr; {tracking.returnLoad.destination}

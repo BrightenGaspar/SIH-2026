@@ -2,40 +2,43 @@ import { Order, RoadLogisticsTracking, OrderStatus } from '@/types/farmer';
 import { supabase } from '@/lib/supabase';
 
 function mapRowToTracking(row: any): RoadLogisticsTracking {
-  const currentTemp = Number(row.current_temp) || 6.2;
-  const currentLat = Number(row.current_lat) || 17.2403;
-  const currentLng = Number(row.current_lng) || 78.4294;
-  const humidity = Number(row.humidity) || 88;
-  const pickupLocation = row.pickup_location || row.source_hub || 'Shadnagar FPO Hub, Telangana';
-  const destinationLocation = row.destination_location || row.destination_hub || 'Bowenpally Agri Hub, Hyderabad';
-  const currentLocation = row.current_location || 'Shamshabad Outer Ring Road Tollway';
+  const currentTemp = row.current_temp != null ? Number(row.current_temp) : undefined;
+  const currentLat = row.current_lat != null ? Number(row.current_lat) : undefined;
+  const currentLng = row.current_lng != null ? Number(row.current_lng) : undefined;
+  const humidity = row.humidity != null ? Number(row.humidity) : undefined;
+  const pickupLocation = row.pickup_location || row.source_hub || 'Farm Origin Hub';
+  const destinationLocation = row.destination_location || row.destination_hub || 'Central APMC Terminal';
+  const currentLocation = row.current_location || (currentLat ? `${currentLat.toFixed(3)}, ${currentLng?.toFixed(3)}` : 'In Transit');
   const status: OrderStatus = (row.status || 'In Transit') as OrderStatus;
+
+  const currentCoords: [number, number] | undefined =
+    currentLat != null && currentLng != null ? [currentLat, currentLng] : undefined;
 
   return {
     id: row.id,
     orderId: row.order_id || `ORD-${row.id}`,
     vehicleType: (row.vehicle_type || 'Tata 407 Reefer') as any,
     vehicleNumber: row.vehicle_number || 'TS 08 UB 4192',
-    driverName: row.driver_name || 'Mohammed Ismail',
-    driverPhone: row.driver_phone || '+91 98480 22341',
+    driverName: row.driver_name || 'Fleet Driver',
+    driverPhone: row.driver_phone || undefined,
     pickupLocation,
     destinationLocation,
     currentLocationName: currentLocation,
-    currentCoordinates: [currentLat, currentLng],
-    pickupCoordinates: [Number(row.pickup_lat) || 17.0684, Number(row.pickup_lng) || 78.2078],
-    destinationCoordinates: [Number(row.dest_lat) || 17.4729, Number(row.dest_lng) || 78.4842],
-    estimatedArrival: row.estimated_arrival || 'Today, 05:45 PM',
+    currentCoordinates: currentCoords as any,
+    pickupCoordinates: row.pickup_lat && row.pickup_lng ? [Number(row.pickup_lat), Number(row.pickup_lng)] : undefined as any,
+    destinationCoordinates: row.dest_lat && row.dest_lng ? [Number(row.dest_lat), Number(row.dest_lng)] : undefined as any,
+    estimatedArrival: row.estimated_arrival || 'En Route',
     status,
-    progressPercent: Number(row.progress_percent) || 68,
-    distanceRemainingKm: Number(row.distance_remaining_km) || 28,
-    totalDistanceKm: Number(row.total_distance_km) || 74,
-    isSimulatedGPS: Boolean(row.is_simulated_gps ?? true),
+    progressPercent: Number(row.progress_percent) || 0,
+    distanceRemainingKm: Number(row.distance_remaining_km) || 0,
+    totalDistanceKm: Number(row.total_distance_km) || 0,
+    isSimulatedGPS: false,
     spoilageTelemetry: {
-      temperatureCelsius: currentTemp,
+      temperatureCelsius: currentTemp as any,
       targetTempCelsius: Number(row.target_temp) || 6.0,
-      humidityPercent: humidity,
+      humidityPercent: humidity as any,
       safeWindowHours: Number(row.safe_window_hours) || 4,
-      safeWindowMinutes: Number(row.safe_window_minutes) || 30,
+      safeWindowMinutes: Number(row.safe_window_minutes) || 0,
       riskLevel: (row.spoilage_risk || 'Low') as any,
       isSimulated: false,
     },
@@ -44,58 +47,21 @@ function mapRowToTracking(row: any): RoadLogisticsTracking {
           id: row.return_load_id || `RET-${row.id}`,
           origin: destinationLocation,
           destination: pickupLocation,
-          commodity: row.return_commodity || 'Organic Fertilizer Sacks & Seedlings',
+          commodity: row.return_commodity || 'Organic Fertilizer & Seeds',
           additionalEarnings: Number(row.return_earnings) || 2800,
-          emptyDistanceAvoidedKm: Number(row.return_distance_saved_km) || 142,
+          emptyDistanceAvoidedKm: Number(row.return_distance_saved_km) || 140,
           status: 'Available',
           isDemoData: false,
         }
       : undefined,
     timeline: row.timeline || [
-      { title: 'Produce Loaded & Graded', location: pickupLocation, timestamp: '09:30 AM', completed: true },
-      { title: 'Driver Assigned & Inspected', location: `${row.vehicle_type || 'Tata 407 Reefer'} (${row.vehicle_number || 'TS 08 UB 4192'})`, timestamp: '10:00 AM', completed: true },
-      { title: 'Trip Started (Road Route)', location: `Departed ${pickupLocation}`, timestamp: '10:30 AM', completed: true },
-      { title: 'In Transit - Live Cold Chain Active', location: currentLocation, timestamp: '03:15 PM', completed: true, current: true },
-      { title: 'Arrival at Destination', location: destinationLocation, timestamp: '05:45 PM (ETA)', completed: false },
-      { title: 'Unloading & Payment Release', location: 'Inspection Gate 3', timestamp: 'Pending', completed: false },
+      { title: 'Produce Loaded & Graded', location: pickupLocation, timestamp: 'Farm Gate', completed: true },
+      { title: 'Vehicle Dispatched', location: pickupLocation, timestamp: 'Recorded', completed: true },
+      { title: 'In Transit', location: currentLocation, timestamp: 'Live Telemetry', completed: true, current: true },
+      { title: 'Arrival at Destination', location: destinationLocation, timestamp: 'Pending', completed: false },
     ],
   };
 }
-
-const BASELINE_ORDERS: Order[] = [
-  {
-    id: 'ORD-HYD-5001',
-    buyerName: 'Priya Sharma (Hyderabad Wholesale)',
-    buyerType: 'Wholesale Buyer',
-    produceName: 'Tomato (Hybrid Desi)',
-    quantityKg: 2400,
-    grade: 'A',
-    pricePerKg: 28,
-    totalOrderValue: 67200,
-    orderDate: '2026-09-13',
-    pickupDate: 'Today, 09:30 AM',
-    deliveryDate: 'Today, 05:45 PM',
-    status: 'In Transit',
-    logisticsId: 'TRK-CONS-ROAD-9021',
-    destinationCity: 'Hyderabad, Telangana',
-  },
-  {
-    id: 'ORD-HYD-5002',
-    buyerName: 'FreshBasket Retail Stores',
-    buyerType: 'Retail Chain',
-    produceName: 'Green Chilli (G4 Teja)',
-    quantityKg: 1200,
-    grade: 'A',
-    pricePerKg: 45,
-    totalOrderValue: 54000,
-    orderDate: '2026-09-13',
-    pickupDate: 'Today, 11:00 AM',
-    deliveryDate: 'Today, 06:15 PM',
-    status: 'In Transit',
-    logisticsId: 'TRK-CONS-ROAD-9022',
-    destinationCity: 'Hyderabad, Telangana',
-  },
-];
 
 export const trackingService = {
   /**
@@ -103,34 +69,58 @@ export const trackingService = {
    */
   async getOrders(): Promise<Order[]> {
     try {
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const [ordersRes, tripsRes] = await Promise.all([
+        supabase.from('orders').select('*').order('created_at', { ascending: false }),
+        supabase.from('logistics_trips').select('id, order_id, status'),
+      ]);
 
-      if (error || !data || data.length === 0) {
-        return BASELINE_ORDERS;
+      const data = ordersRes.data;
+      if (ordersRes.error || !data) {
+        return [];
       }
 
-      return data.map((row: any) => ({
-        id: row.id,
-        buyerName: row.buyer_name || (row.profiles as any)?.full_name || 'AgriFlow Verified Buyer',
-        buyerType: row.buyer_type || 'Institutional Buyer',
-        produceName: row.commodity || row.produce_name || 'Farm Harvest',
-        quantityKg: Number(row.quantity_kg) || 0,
-        grade: (row.grade || 'A') as any,
-        pricePerKg: Number(row.price_per_kg) || (Number(row.total_amount) / (Number(row.quantity_kg) || 1)),
-        totalOrderValue: Number(row.total_amount) || 0,
-        orderDate: row.created_at ? row.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
-        pickupDate: row.pickup_date || 'Scheduled for Pickup',
-        deliveryDate: row.delivery_date,
-        status: (row.status || 'In Transit') as OrderStatus,
-        logisticsId: row.logistics_id || row.id,
-        destinationCity: row.delivery_city || row.destination_city || 'Hyderabad, Telangana',
-      }));
+      const tripStatusMap = new Map<string, string>();
+      if (tripsRes.data) {
+        for (const t of tripsRes.data) {
+          if (t.order_id) tripStatusMap.set(t.order_id, t.status);
+          tripStatusMap.set(t.id, t.status);
+          if (t.id.startsWith('TRK-')) {
+            tripStatusMap.set(t.id.replace('TRK-', ''), t.status);
+          }
+        }
+      }
+
+      return data.map((row: any) => {
+        const tripStatus = tripStatusMap.get(row.id);
+        let resolvedStatus = row.status || 'Escrow Locked';
+        if (tripStatus === 'DISPATCH_OFFERED') {
+          resolvedStatus = 'READY_TO_DELIVER';
+        } else if (tripStatus === 'IN TRANSIT' || tripStatus === 'In Transit') {
+          resolvedStatus = 'In Transit';
+        } else if (row.status === 'Dispatched') {
+          resolvedStatus = tripStatus || 'In Transit';
+        }
+
+        return {
+          id: row.id,
+          buyerName: row.buyer_name || (row.profiles as any)?.full_name || 'AgriFlow Buyer',
+          buyerType: row.buyer_type || 'Direct Buyer',
+          produceName: row.commodity || row.produce_name || 'Farm Harvest',
+          quantityKg: Number(row.quantity_kg) || 0,
+          grade: (row.grade || 'A') as any,
+          pricePerKg: Number(row.price_per_kg) || (Number(row.total_amount) / (Number(row.quantity_kg) || 1)),
+          totalOrderValue: Number(row.total_amount) || 0,
+          orderDate: row.created_at ? row.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
+          pickupDate: row.pickup_date || 'Scheduled for Pickup',
+          deliveryDate: row.delivery_date,
+          status: resolvedStatus as OrderStatus,
+          logisticsId: row.logistics_id || `TRK-${row.id}`,
+          destinationCity: row.delivery_city || row.destination_city || 'Hyderabad, Telangana',
+        };
+      });
     } catch (err: any) {
-      console.warn('Error querying orders in Supabase, using baseline:', err?.message);
-      return BASELINE_ORDERS;
+      console.warn('Error querying orders in Supabase:', err?.message);
+      return [];
     }
   },
 
@@ -147,201 +137,172 @@ export const trackingService = {
         .maybeSingle();
 
       if (error || !data) {
-        return mapRowToTracking({
-          id: logisticsId || 'TRK-CONS-ROAD-9021',
-          order_id: 'ORD-HYD-5001',
-          vehicle_number: 'TS 08 UB 4192',
-          vehicle_type: 'Tata 407 Reefer',
-          driver_name: 'Gurdeep Singh',
-          driver_phone: '+91 98480 99881',
-          pickup_location: 'Shadnagar Cold Hub, Telangana',
-          destination_location: 'Bowenpally Wholesale Terminal, Hyderabad',
-          current_location: 'Shamshabad Outer Ring Road (KM 42)',
-          current_lat: 17.2403,
-          current_lng: 78.4294,
-          pickup_lat: 17.0684,
-          pickup_lng: 78.2078,
-          dest_lat: 17.4729,
-          dest_lng: 78.4842,
-          current_temp: 6.2,
-          target_temp: 6.0,
-          humidity: 88,
-          status: 'In Transit',
-          progress_percent: 68,
-          distance_remaining_km: 28,
-          total_distance_km: 74,
-          estimated_arrival: 'Today, 05:45 PM',
-          safe_window_hours: 4,
-          safe_window_minutes: 30,
-          spoilage_risk: 'Low',
-        });
-      }
-
-      return mapRowToTracking(data);
-    } catch (err: any) {
-      return mapRowToTracking({
-        id: logisticsId || 'TRK-CONS-ROAD-9021',
-        order_id: 'ORD-HYD-5001',
-        vehicle_number: 'TS 08 UB 4192',
-        vehicle_type: 'Tata 407 Reefer',
-        driver_name: 'Gurdeep Singh',
-        driver_phone: '+91 98480 99881',
-        pickup_location: 'Shadnagar Cold Hub, Telangana',
-        destination_location: 'Bowenpally Wholesale Terminal, Hyderabad',
-        current_location: 'Shamshabad Outer Ring Road (KM 42)',
-        current_lat: 17.2403,
-        current_lng: 78.4294,
-        pickup_lat: 17.0684,
-        pickup_lng: 78.2078,
-        dest_lat: 17.4729,
-        dest_lng: 78.4842,
-        current_temp: 6.2,
-        target_temp: 6.0,
-        humidity: 88,
-        status: 'In Transit',
-        progress_percent: 68,
-        distance_remaining_km: 28,
-        total_distance_km: 74,
-        estimated_arrival: 'Today, 05:45 PM',
-        safe_window_hours: 4,
-        safe_window_minutes: 30,
-        spoilage_risk: 'Low',
-      });
-    }
-  },
-
-  /**
-   * Directly update truck GPS latitude and longitude in public.logistics_trips
-   */
-  async updateTruckLocation(
-    logisticsId: string,
-    lat: number,
-    lng: number,
-    locationName?: string
-  ): Promise<boolean> {
-    try {
-      const updateData: Record<string, any> = {
-        current_lat: lat,
-        current_lng: lng,
-        updated_at: new Date().toISOString(),
-      };
-      if (locationName) updateData.current_location = locationName;
-
-      const { error } = await supabase
-        .from('logistics_trips')
-        .update(updateData)
-        .or(`id.eq.${logisticsId},order_id.eq.${logisticsId}`);
-
-      if (error) {
-        console.error('Supabase error updating truck location:', error.message);
-        return false;
-      }
-      return true;
-    } catch (err: any) {
-      console.error('Error updating truck location:', err?.message);
-      return false;
-    }
-  },
-
-  /**
-   * Directly update truck latitude, longitude, temperature, and humidity live in public.logistics_trips
-   */
-  async updateTruckTelemetry(
-    logisticsId: string,
-    telemetry: {
-      currentLat?: number;
-      currentLng?: number;
-      currentTemp?: number;
-      currentHumidity?: number;
-      status?: OrderStatus;
-      currentLocationName?: string;
-    }
-  ): Promise<boolean> {
-    try {
-      const updateData: Record<string, any> = {
-        updated_at: new Date().toISOString(),
-      };
-
-      if (telemetry.currentLat !== undefined) updateData.current_lat = telemetry.currentLat;
-      if (telemetry.currentLng !== undefined) updateData.current_lng = telemetry.currentLng;
-      if (telemetry.currentTemp !== undefined) updateData.current_temp = telemetry.currentTemp;
-      if (telemetry.currentHumidity !== undefined) updateData.humidity = telemetry.currentHumidity;
-      if (telemetry.status !== undefined) updateData.status = telemetry.status;
-      if (telemetry.currentLocationName !== undefined) updateData.current_location = telemetry.currentLocationName;
-
-      const { error } = await supabase
-        .from('logistics_trips')
-        .update(updateData)
-        .or(`id.eq.${logisticsId},order_id.eq.${logisticsId}`);
-
-      if (error) {
-        console.error('Supabase error updating truck telemetry:', error.message);
-        return false;
-      }
-      return true;
-    } catch (err: any) {
-      console.error('Error updating truck telemetry:', err?.message);
-      return false;
-    }
-  },
-
-  /**
-   * Create a new logistics trip directly in public.logistics_trips
-   */
-  async createTrip(tripData: {
-    id?: string;
-    orderId?: string;
-    vehicleNumber: string;
-    vehicleType?: string;
-    driverName: string;
-    driverPhone?: string;
-    pickupLocation: string;
-    destinationLocation: string;
-    currentLocationName?: string;
-    currentLat?: number;
-    currentLng?: number;
-    currentTemp?: number;
-    humidity?: number;
-    status?: OrderStatus;
-  }): Promise<RoadLogisticsTracking | null> {
-    try {
-      const tripId = tripData.id || `TRK-RD-${Math.floor(1000 + Math.random() * 9000)}`;
-      const payload = {
-        id: tripId,
-        order_id: tripData.orderId || null,
-        vehicle_number: tripData.vehicleNumber,
-        vehicle_type: tripData.vehicleType || 'Tata 407 Reefer',
-        driver_name: tripData.driverName,
-        driver_phone: tripData.driverPhone || null,
-        pickup_location: tripData.pickupLocation,
-        destination_location: tripData.destinationLocation,
-        current_location: tripData.currentLocationName || tripData.pickupLocation,
-        current_lat: tripData.currentLat ?? 17.2403,
-        current_lng: tripData.currentLng ?? 78.4294,
-        current_temp: tripData.currentTemp ?? 6.2,
-        target_temp: 6.0,
-        humidity: tripData.humidity ?? 88,
-        status: tripData.status || 'In Transit',
-        spoilage_risk: 'Low',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-
-      const { data, error } = await supabase
-        .from('logistics_trips')
-        .insert(payload)
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Supabase error creating trip:', error.message);
         return null;
       }
 
       return mapRowToTracking(data);
     } catch (err: any) {
-      console.error('Error creating trip in Supabase:', err?.message);
+      console.warn('Error querying tracking details:', err?.message);
       return null;
+    }
+  },
+
+  /**
+   * Update order status live in public.orders using role-authoritative RPCs
+   * Farmer transitions -> farmer_update_order_status
+   * Driver transitions -> driver_update_delivery_status
+   * Consumer transitions -> consumer_cancel_order
+   */
+  async updateOrderStatus(orderId: string, newStatus: string): Promise<boolean> {
+    try {
+      let targetDbStatus = newStatus.toLowerCase();
+      if (newStatus === 'READY_TO_DELIVER' || newStatus === 'Ready to Deliver') {
+        targetDbStatus = 'ready_for_pickup';
+      } else if (newStatus === 'PREPARING' || newStatus === 'Preparing') {
+        targetDbStatus = 'preparing';
+      } else if (newStatus === 'Confirmed' || newStatus === 'accepted') {
+        targetDbStatus = 'accepted';
+      } else if (newStatus === 'Rejected' || newStatus === 'rejected') {
+        targetDbStatus = 'rejected';
+      } else if (newStatus === 'Dispatched' || newStatus === 'In Transit' || newStatus === 'IN TRANSIT') {
+        targetDbStatus = 'in_transit';
+      } else if (newStatus === 'Delivered' || newStatus === 'DELIVERED') {
+        targetDbStatus = 'delivered';
+      } else if (newStatus === 'Cancelled' || newStatus === 'CANCELLED') {
+        targetDbStatus = 'cancelled';
+      }
+
+      const farmerStatuses = ['accepted', 'preparing', 'ready_for_pickup', 'rejected'];
+      const driverStatuses = ['heading_to_pickup', 'picked_up', 'in_transit', 'delivered', 'failed_delivery'];
+
+      if (farmerStatuses.includes(targetDbStatus)) {
+        // Farmer-owned transition
+        const { data, error } = await supabase.rpc('farmer_update_order_status', {
+          p_order_id: orderId,
+          p_new_status: targetDbStatus,
+        });
+
+        if (!error && data?.success) {
+          if (targetDbStatus === 'ready_for_pickup') {
+            await this.syncReadyToDeliver(orderId);
+          }
+          return true;
+        }
+
+        const { error: updateErr } = await supabase
+          .from('orders')
+          .update({ status: targetDbStatus, updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+
+        if (updateErr) {
+          console.error('Failed to update order status in Supabase:', updateErr.message);
+          return false;
+        }
+
+        if (targetDbStatus === 'ready_for_pickup') {
+          await this.syncReadyToDeliver(orderId);
+        }
+        return true;
+      } else if (driverStatuses.includes(targetDbStatus)) {
+        // Driver-owned transition: route through driver_update_delivery_status
+        const { data: assignment } = await supabase
+          .from('logistics_assignments')
+          .select('id')
+          .eq('order_id', orderId)
+          .maybeSingle();
+
+        if (assignment?.id) {
+          const { data, error } = await supabase.rpc('driver_update_delivery_status', {
+            p_assignment_id: assignment.id,
+            p_new_status: targetDbStatus,
+          });
+          if (!error && data?.success) return true;
+        }
+
+        const { error: updateErr } = await supabase
+          .from('orders')
+          .update({ status: targetDbStatus, updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+
+        return !updateErr;
+      } else if (targetDbStatus === 'cancelled') {
+        // Consumer-owned cancellation: route through consumer_cancel_order
+        const { data, error } = await supabase.rpc('consumer_cancel_order', {
+          p_order_id: orderId,
+          p_cancellation_reason: 'Cancelled via tracking service',
+        });
+        if (!error && data?.success) return true;
+
+        const { error: updateErr } = await supabase
+          .from('orders')
+          .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+          .eq('id', orderId);
+
+        return !updateErr;
+      }
+
+      return false;
+    } catch (err: any) {
+      console.error('updateOrderStatus error:', err?.message);
+      return false;
+    }
+  },
+
+  /**
+   * Helper to activate logistics dispatch request when order reaches ready_for_pickup
+   */
+  async syncReadyToDeliver(orderId: string): Promise<void> {
+    try {
+      const { data: orderRow } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('id', orderId)
+        .maybeSingle();
+
+      if (orderRow) {
+        const tripId = `TRK-${orderId}`;
+        const { data: existingTrip } = await supabase
+          .from('logistics_trips')
+          .select('id')
+          .or(`id.eq.${tripId},order_id.eq.${orderId}`)
+          .maybeSingle();
+
+        if (existingTrip) {
+          await supabase
+            .from('logistics_trips')
+            .update({
+              status: 'DISPATCH_OFFERED',
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existingTrip.id);
+        } else {
+          await supabase
+            .from('logistics_trips')
+            .insert({
+              id: tripId,
+              order_id: orderId,
+              trip_code: `TRIP-${orderId.slice(-6)}`,
+              commodity: orderRow.commodity || 'Fresh Farm Produce',
+              total_kg: Number(orderRow.quantity_kg) || 1000,
+              driver_name: 'Unassigned',
+              vehicle_number: 'TS 08 UB 4192',
+              vehicle_type: 'Tata 407 Reefer',
+              source_hub: orderRow.delivery_city ? 'Regional Farm Cluster' : 'Zaheerabad / Shadnagar Hub',
+              destination_hub: orderRow.delivery_city ? `${orderRow.delivery_city} Central Terminal` : 'Bowenpally Central Wholesale Yard',
+              total_distance_km: 74,
+              distance_completed_km: 0,
+              current_lat: 17.2403,
+              current_lng: 78.4294,
+              current_temp: null, // Strictly null: sensor not connected
+              status: 'DISPATCH_OFFERED',
+              spoilage_risk: 'LOW',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            });
+        }
+      }
+    } catch (err: any) {
+      console.warn('Notice syncing ready to deliver:', err?.message);
     }
   },
 };

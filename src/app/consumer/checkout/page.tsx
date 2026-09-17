@@ -17,7 +17,8 @@ import {
   Wallet, 
   Banknote,
   Sparkles,
-  Lock
+  Lock,
+  AlertCircle
 } from 'lucide-react';
 
 export default function ConsumerCheckoutPage() {
@@ -42,9 +43,10 @@ export default function ConsumerCheckoutPage() {
   );
   const [deliveryCity, setDeliveryCity] = useState(consumerUser?.savedAddresses?.[0]?.city || 'Hyderabad');
   const [deliveryPincode, setDeliveryPincode] = useState(consumerUser?.savedAddresses?.[0]?.pincode || '500011');
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Demo Cash'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'COD'>('UPI');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderCreatedSuccess, setOrderCreatedSuccess] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   if (items.length === 0 && !orderCreatedSuccess) {
     return (
@@ -61,6 +63,7 @@ export default function ConsumerCheckoutPage() {
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
+    setCheckoutError(null);
 
     try {
       const newOrder = await consumerService.createOrder({
@@ -89,7 +92,9 @@ export default function ConsumerCheckoutPage() {
       setTimeout(() => {
         router.push(`/consumer/orders`);
       }, 2000);
-    } catch {
+    } catch (err: any) {
+      console.error('Checkout error:', err);
+      setCheckoutError(err?.message || 'Checkout failed. Please check stock availability and try again.');
       setIsProcessing(false);
     }
   };
@@ -113,6 +118,25 @@ export default function ConsumerCheckoutPage() {
           <ArrowLeft className="w-4 h-4" /> Edit Cart
         </Link>
       </div>
+
+      {checkoutError && (
+        <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200 flex items-start justify-between gap-3 shadow-sm">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <div className="text-xs">
+              <h4 className="font-bold text-sm text-rose-900 dark:text-rose-100">Checkout Rejection</h4>
+              <p className="mt-0.5 text-rose-700 dark:text-rose-300">{checkoutError}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCheckoutError(null)}
+            className="text-xs font-bold text-rose-600 hover:text-rose-800 dark:hover:text-rose-100 cursor-pointer"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {orderCreatedSuccess ? (
         <div className="p-8 rounded-3xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/40 text-center max-w-lg mx-auto space-y-4">
@@ -222,7 +246,7 @@ export default function ConsumerCheckoutPage() {
                 {[
                   { id: 'UPI' as const, label: 'Instant UPI / QR', icon: Wallet, desc: 'Google Pay, PhonePe, BHIM' },
                   { id: 'Card' as const, label: 'Corporate Card / NetBanking', icon: CreditCard, desc: 'Visa, Master, RuPay, RTGS' },
-                  { id: 'Demo Cash' as const, label: 'Demo Cash On Delivery', icon: Banknote, desc: 'Physical verification demo' },
+                  { id: 'COD' as const, label: 'Cash on Delivery (COD)', icon: Banknote, desc: 'Pay upon physical delivery & verification' },
                 ].map((m) => {
                   const Icon = m.icon;
                   const isSelected = paymentMethod === m.id;

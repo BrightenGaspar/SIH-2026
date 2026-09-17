@@ -5,13 +5,18 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useBandwidth } from '@/context/BandwidthContext';
 import { useI18n } from '@/context/I18nContext';
-import { farmerService } from '@/services/farmerService';
-import { trackingService } from '@/services/trackingService';
-import { Produce, Order, AIRecommendation } from '@/types/farmer';
-import { defaultMockDeliveryTrip } from '@/services/sharedTrackingService';
+import { farmerService, FarmerInventorySummary } from '@/services/farmerService';
+import { supabase } from '@/lib/supabase';
+import { sharedTrackingService } from '@/services/sharedTrackingService';
+import { Produce, Order } from '@/types/farmer';
+import { DeliveryTracking } from '@/types/delivery';
 import dynamic from 'next/dynamic';
 import { LowBandwidthBanner } from '@/components/common/LowBandwidthBanner';
 import { LazyMap } from '@/components/maps/LazyMap';
+import { VirtualCooperativeCard } from '@/components/farmer/VirtualCooperativeCard';
+import { clusterService } from '@/services/clusterService';
+import { FarmerCluster } from '@/types/cluster';
+import { DataStatusBadge } from '@/components/common/DataStatusBadge';
 
 const LiveTrackingMap = dynamic(() => import('@/components/maps/LiveTrackingMap'), {
   ssr: false,
@@ -26,16 +31,11 @@ import {
   TrendingUp,
   Package,
   Truck,
-  Sparkles,
-  ArrowRight,
   Plus,
   RefreshCw,
-  MapPin,
-  CheckCircle2,
-  Clock,
-  Radio,
+  AlertCircle,
 } from 'lucide-react';
-import { formatINR, cn } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 
 export default function FarmerDashboard() {
   const { user } = useAuth();
@@ -44,9 +44,18 @@ export default function FarmerDashboard() {
 
   const [produceList, setProduceList] = useState<Produce[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [recommendations, setRecommendations] = useState<AIRecommendation[]>([]);
+  const [inventorySummary, setInventorySummary] = useState<FarmerInventorySummary>({
+    totalKg: 0,
+    availableKg: 0,
+    reservedKg: 0,
+    deliveredKg: 0,
+    activeListingsCount: 0,
+  });
+  const [activeTrip, setActiveTrip] = useState<DeliveryTracking | null>(null);
+  const [activeCluster, setActiveCluster] = useState<FarmerCluster | null>(null);
   const [loading, setLoading] = useState(true);
   const [manualRefreshing, setManualRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
   // Real user name (never hardcode demo name)
   const displayName =
@@ -54,16 +63,35 @@ export default function FarmerDashboard() {
       .replace(/[\uD800-\uDFFF]|[\u2600-\u27BF]|\u00f0[^\s]*|\u00e2[^\s]*/g, '')
       .trim() || 'Farmer';
 
-  // Fetch real live farmer data from service
+  // Fetch real live farmer data from authoritative service layer
   const loadFarmerData = async () => {
     try {
       setLoading(true);
-      const [prods, ords] = await Promise.all([
+      const [prods, ords, summary, clusters, allTrips] = await Promise.all([
         farmerService.getProduceList().catch(() => []),
-        trackingService.getOrders().catch(() => []),
+        farmerService.getFarmerOrders().catch(() => []),
+        farmerService.getInventorySummary().catch(() => ({
+          totalKg: 0,
+          availableKg: 0,
+          reservedKg: 0,
+          deliveredKg: 0,
+          activeListingsCount: 0,
+        })),
+        clusterService.getClusters().catch(() => []),
+        sharedTrackingService.getAllTrips().catch(() => []),
       ]);
       setProduceList(prods || []);
       setOrders(ords || []);
+      setInventorySummary(summary);
+      if (clusters && clusters.length > 0) {
+        setActiveCluster(clusters[0]);
+      }
+      if (allTrips && allTrips.length > 0) {
+        setActiveTrip(allTrips[0]);
+      } else {
+        setActiveTrip(null);
+      }
+      setLastUpdated(new Date().toISOString());
     } catch {
       // Fallbacks if network is offline
     } finally {
@@ -74,6 +102,28 @@ export default function FarmerDashboard() {
 
   useEffect(() => {
     loadFarmerData();
+
+    const channel = supabase
+      .channel('realtime-farmer-dashboard')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'orders' },
+        () => {
+          loadFarmerData();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'produce_listings' },
+        () => {
+          loadFarmerData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const handleManualRefresh = () => {
@@ -81,33 +131,10 @@ export default function FarmerDashboard() {
     loadFarmerData();
   };
 
-  // Compute real metrics from live database
-  const totalProduceKg = produceList.reduce(
-    (acc, p) => acc + (Number(p.quantity) || 0),
-    0
-  ) || 2500;
-
-  const activeOrdersCount = orders.filter(o => o.status !== 'Delivered').length || 3;
-  const topProducePrice = produceList[0]?.expectedPrice ? `₹${produceList[0].expectedPrice}/kg` : '₹28/kg';
-
-  // Sample or live delivery trip for tracking
-  const sampleTrip = {
-    tripId: 'TRK-CONS-ROAD-9021',
-    orderId: 'ORD-HYD-5000',
-    vehicleId: 'Tata 407 Reefer (TS 08 UB 4192)',
-    driverName: 'Mohammed Ismail',
-    status: 'IN_TRANSIT' as const,
-    originHub: 'Shadnagar Perishable Collection Center',
-    destinationHub: 'Hyderabad Bowenpally APMC',
-    pickupCoordinates: [17.0722, 78.2078] as [number, number],
-    destinationCoordinates: [17.4722, 78.4878] as [number, number],
-    currentCoordinates: [17.2522, 78.3478] as [number, number],
-    currentTemp: 6.2,
-    targetTemp: 6.0,
-    humidity: 88,
-    distanceRemainingKm: 28,
-    estimatedMinutesRemaining: 42,
-  };
+  const activeOrdersCount = orders.filter(o => o.status !== 'Delivered').length;
+  const topProducePrice = produceList.length > 0 && produceList[0]?.expectedPrice 
+    ? `₹${produceList[0].expectedPrice}/kg` 
+    : '—';
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -123,15 +150,20 @@ export default function FarmerDashboard() {
             <span className="text-xs text-slate-500">{user?.location || 'Nashik, Maharashtra'}</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mt-0.5">
-            Good Morning, {displayName}!
+            Good Day, {displayName}!
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Here&apos;s your farm overview and real-time mandi prices.
+            Real-time farm inventory, incoming orders, and live produce realization.
           </p>
         </div>
 
         {/* Action button / Manual refresh for low bandwidth */}
         <div className="flex items-center gap-2">
+          <DataStatusBadge
+            lastUpdated={lastUpdated}
+            freshnessThresholdMinutes={3}
+            source="Supabase"
+          />
           {isLowBandwidth && (
             <button
               type="button"
@@ -155,7 +187,7 @@ export default function FarmerDashboard() {
         </div>
       </div>
 
-      {/* 3. THREE STAT KPI CARDS (Exact match to reference image) */}
+      {/* 3. THREE STAT KPI CARDS (Real numbers only) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Card 1: My Produce */}
         <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex items-center gap-4">
@@ -165,9 +197,13 @@ export default function FarmerDashboard() {
           <div>
             <p className="text-xs font-bold text-slate-500">My Produce</p>
             <p className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">
-              {totalProduceKg.toLocaleString()} kg
+              {inventorySummary.availableKg.toLocaleString()} kg
             </p>
-            <p className="text-[11px] text-emerald-600 font-semibold">Total Available</p>
+            <p className="text-[11px] text-emerald-600 font-semibold">
+              {inventorySummary.reservedKg > 0
+                ? `${inventorySummary.reservedKg.toLocaleString()} kg reserved in orders`
+                : `${inventorySummary.activeListingsCount} Active Listings`}
+            </p>
           </div>
         </div>
 
@@ -189,46 +225,24 @@ export default function FarmerDashboard() {
             <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-500">Market Price</p>
+            <p className="text-xs font-bold text-slate-500">Produce Price</p>
             <p className="text-2xl font-black text-slate-900 tracking-tight mt-0.5">{topProducePrice}</p>
-            <p className="text-[11px] text-amber-600 font-semibold">Tomato / Nashik</p>
+            <p className="text-[11px] text-amber-600 font-semibold">
+              {produceList.length > 0 ? produceList[0].crop : 'No active listings'}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* 4. REAL-TIME AI DEMAND ALERT (Preserved feature, redesigned light) */}
-      <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-3.5">
-          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-emerald-200 text-emerald-900 text-[10px] font-black uppercase tracking-wider">
-                High Demand Opportunity
-              </span>
-              <span className="text-xs font-bold text-emerald-800">Hyderabad Urban Corridor</span>
-            </div>
-            <p className="text-sm font-bold text-slate-900 mt-1">
-              Tomato demand is 18% above local supply (1,800 kg deficit)
-            </p>
-            <p className="text-xs text-slate-600">
-              Bowenpally direct buyer offering <strong>₹42.00/kg</strong> vs current mandi ₹38.00/kg.
-            </p>
-          </div>
-        </div>
-        <Link href="/farmer/recommendations">
-          <button
-            type="button"
-            className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1 shrink-0 shadow-xs cursor-pointer"
-          >
-            <span>View Opportunity</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
-        </Link>
-      </div>
+      {/* 4. VIRTUAL COOPERATIVE SMART FARMER CLUSTER */}
+      {activeCluster && (
+        <VirtualCooperativeCard
+          cluster={activeCluster}
+          showAllDetails={true}
+        />
+      )}
 
-      {/* 5. 2-COLUMN SPLIT: RECENT PRODUCE + TRACK DELIVERY (Exact reference match) */}
+      {/* 5. 2-COLUMN SPLIT: RECENT PRODUCE + TRACK DELIVERY */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Recent Produce */}
         <div className="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between">
@@ -249,63 +263,69 @@ export default function FarmerDashboard() {
               </Link>
             </div>
 
-            {/* Produce Listing */}
-            {isLowBandwidth ? (
-              /* Low Bandwidth Mode: Clean, lightweight text-first rows */
+            {/* Produce Listing or Honest Empty State */}
+            {produceList.length === 0 ? (
+              <div className="py-10 text-center border border-dashed border-slate-200 rounded-xl my-2">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-2">
+                  <Package className="w-5 h-5" />
+                </div>
+                <p className="text-xs font-bold text-slate-800">No produce listed yet</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 max-w-xs mx-auto">
+                  Click &apos;+ Add Produce&apos; to list your harvest directly for buyers.
+                </p>
+                <Link href="/farmer/produce" className="inline-block mt-3">
+                  <span className="text-xs font-bold text-emerald-600 hover:underline">
+                    + Add First Crop Listing
+                  </span>
+                </Link>
+              </div>
+            ) : isLowBandwidth ? (
+              /* Low Bandwidth Mode */
               <div className="divide-y divide-slate-100">
-                {(produceList.length > 0
-                  ? produceList.map(p => ({ id: p.id, name: p.crop, quantityKg: p.quantity, pricePerKg: p.expectedPrice }))
-                  : [
-                      { id: '1', name: 'Tomato', quantityKg: 2500, pricePerKg: 28 },
-                      { id: '2', name: 'Green Chilli', quantityKg: 1200, pricePerKg: 45 },
-                      { id: '3', name: 'Potato', quantityKg: 850, pricePerKg: 14 },
-                    ]
-                ).map(p => (
+                {produceList.map(p => (
                   <div key={p.id} className="py-3 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                      <span className="font-bold text-slate-900">{p.name}</span>
+                      <span className="font-bold text-slate-900">{p.crop}</span>
                     </div>
                     <div className="flex items-center gap-6">
                       <span className="text-slate-600 font-medium">
-                        {p.quantityKg.toLocaleString()} kg
+                        {(Number(p.quantity) || 0).toLocaleString()} {p.unit || 'kg'}
                       </span>
                       <span className="font-bold text-emerald-700 min-w-[60px] text-right">
-                        ₹{p.pricePerKg}/kg
+                        ₹{p.expectedPrice}/kg
                       </span>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              /* Normal Mode: Produce cards with visual vegetable badge / photo */
+              /* Normal Mode */
               <div className="space-y-3">
-                {(produceList.length > 0
-                  ? produceList.map(p => ({ id: p.id, name: p.crop, quantityKg: p.quantity, pricePerKg: p.expectedPrice }))
-                  : [
-                      { id: '1', name: 'Tomato', quantityKg: 2500, pricePerKg: 28 },
-                      { id: '2', name: 'Green Chilli', quantityKg: 1200, pricePerKg: 45 },
-                      { id: '3', name: 'Potato', quantityKg: 850, pricePerKg: 14 },
-                    ]
-                ).map(p => (
+                {produceList.map(p => (
                   <div
                     key={p.id}
                     className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm shrink-0">
-                        {p.name.slice(0, 2).toUpperCase()}
+                        {p.crop.slice(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900">{p.name}</p>
+                        <p className="text-xs font-bold text-slate-900">{p.crop}</p>
                         <p className="text-[11px] text-slate-500">
-                          {p.quantityKg.toLocaleString()} kg available
+                          {(Number(p.quantity) || 0).toLocaleString()} {p.unit || 'kg'} available
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-black text-emerald-700">₹{p.pricePerKg}/kg</p>
-                      <p className="text-[10px] text-slate-400">Direct Farm</p>
+                      <p className="text-xs font-black text-emerald-700">₹{p.expectedPrice}/kg</p>
+                      <span className={cn(
+                        "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                        p.status === 'Active' ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-600"
+                      )}>
+                        {p.status || 'Active'}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -321,27 +341,39 @@ export default function FarmerDashboard() {
           </div>
         </div>
 
-        {/* Right Column: Track Delivery (Using LazyMap) */}
+        {/* Right Column: Track Delivery (Using LazyMap or Honest Empty State) */}
         <div className="lg:col-span-5 flex flex-col">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="text-base font-bold text-slate-900">Track Delivery</h3>
             <span className="text-[11px] text-slate-500 font-medium">Reefer Truck Dispatch</span>
           </div>
 
-          <LazyMap
-            vehicleId="TRK-CONS-ROAD-9021"
-            origin="Shadnagar Farm Depot"
-            destination="Hyderabad APMC"
-            distanceKm={46}
-            totalDistanceKm={74}
-            status="In Transit"
-            role="farmer"
-            className="flex-1"
-          >
-            <div className="h-64 sm:h-72 w-full">
-              <LiveTrackingMap trip={defaultMockDeliveryTrip} showTelemetryPopup={true} />
+          {activeTrip ? (
+            <LazyMap
+              vehicleId={activeTrip.vehicleNumber}
+              origin={activeTrip.pickupLocation}
+              destination={activeTrip.destinationLocation}
+              distanceKm={activeTrip.distanceCompletedKm}
+              totalDistanceKm={activeTrip.totalDistanceKm}
+              status={activeTrip.status}
+              role="farmer"
+              className="flex-1"
+            >
+              <div className="h-64 sm:h-72 w-full">
+                <LiveTrackingMap trip={activeTrip} showTelemetryPopup={true} />
+              </div>
+            </LazyMap>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center shadow-xs flex-1 flex flex-col items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mb-3">
+                <Truck className="w-5 h-5" />
+              </div>
+              <p className="text-xs font-bold text-slate-800">No active shipments in transit</p>
+              <p className="text-[11px] text-slate-500 max-w-xs mt-1">
+                When a buyer order is dispatched, live vehicle telemetry and route tracking will appear here.
+              </p>
             </div>
-          </LazyMap>
+          )}
         </div>
       </div>
     </div>

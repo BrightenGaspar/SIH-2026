@@ -348,7 +348,7 @@ function ConsumerTrackingContent() {
                   </span>
                 </div>
                 <p className="text-xs text-zinc-300 font-mono mt-0.5">
-                  Coords: {activeTrip.currentCoordinates[0].toFixed(4)}&deg; N, {activeTrip.currentCoordinates[1].toFixed(4)}&deg; E &bull; Speed: {isSimulating ? '58 km/h' : '52 km/h'}
+                  Coords: {activeTrip.currentCoordinates ? `${activeTrip.currentCoordinates[0].toFixed(4)}° N, ${activeTrip.currentCoordinates[1].toFixed(4)}° E` : 'Waiting for driver phone GPS'}
                 </p>
               </div>
             </div>

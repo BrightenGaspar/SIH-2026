@@ -2,9 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ProductItem } from '@/types/consumer';
 import { useCart } from '@/context/CartContext';
 import { useI18n } from '@/context/I18nContext';
+import { useBandwidth } from '@/context/BandwidthContext';
 import { KnowYourFarmerModal } from './KnowYourFarmerModal';
 import { 
   Sparkles, 
@@ -13,7 +15,10 @@ import {
   ShoppingBag, 
   Eye, 
   TrendingUp,
-  Check
+  Check,
+  Zap,
+  Minus,
+  Plus
 } from 'lucide-react';
 
 interface ProductCardProps {
@@ -22,19 +27,50 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, viewMode = 'grid' }) => {
+  const router = useRouter();
   const { t } = useI18n();
   const { addToCart } = useCart();
+  const { isLowBandwidth } = useBandwidth();
   const [showFarmerModal, setShowFarmerModal] = useState(false);
   const [showPriceBreakdown, setShowPriceBreakdown] = useState(false);
   const [quantity, setQuantity] = useState<number>(product.minOrderQuantityKg || 1);
   const [isAdded, setIsAdded] = useState(false);
 
+  const isOutOfStock = product.availableQuantityKg <= 0;
+  const minQty = product.minOrderQuantityKg || 1;
+
+  const handleDecrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity(prev => Math.max(minQty, prev - (prev > 50 ? 10 : 1)));
+  };
+
+  const handleIncrement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setQuantity(prev => Math.min(product.availableQuantityKg, prev + (prev >= 50 ? 10 : 1)));
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value) || minQty;
+    setQuantity(Math.min(product.availableQuantityKg, Math.max(minQty, val)));
+  };
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    if (isOutOfStock) return;
     addToCart(product, quantity);
     setIsAdded(true);
     setTimeout(() => setIsAdded(false), 1800);
+  };
+
+  const handleOrderNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isOutOfStock) return;
+    addToCart(product, quantity);
+    router.push('/consumer/checkout');
   };
 
   const getGradeBadgeColor = (grade: string) => {
@@ -75,6 +111,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, viewMode = 'g
             {product.isColdChainEligible && (
               <span className="text-xs font-medium px-2 py-1 rounded-full bg-cyan-500/90 text-white backdrop-blur-md flex items-center gap-1 shadow-sm">
                 <Sparkles className="w-3 h-3" /> Cold-Chain
+              </span>
+            )}
+            {product.availableQuantityKg <= 0 && (
+              <span className="text-xs font-black px-2.5 py-1 rounded-full bg-rose-600 text-white shadow-md uppercase tracking-wider">
+                Sold Out
               </span>
             )}
           </div>
@@ -188,29 +229,39 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, viewMode = 'g
 
             {/* Quantity Stepper and Add to Cart */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-50 dark:bg-zinc-800 px-2 py-1">
-                <input
-                  type="number"
-                  min={product.minOrderQuantityKg || 1}
-                  max={product.availableQuantityKg}
-                  value={quantity}
-                  onChange={(e) => setQuantity(Math.max(product.minOrderQuantityKg || 1, parseInt(e.target.value) || 1))}
-                  className="w-12 bg-transparent text-center font-bold text-xs text-zinc-900 dark:text-white focus:outline-none"
-                />
-                <span className="text-[11px] text-zinc-400">kg</span>
-              </div>
+              {product.availableQuantityKg <= 0 ? (
+                <div className="px-3 py-2 bg-rose-50 dark:bg-rose-950/40 rounded-xl border border-rose-200 dark:border-rose-900/60 text-[11px] font-bold text-rose-600 dark:text-rose-400">
+                  0 kg Left
+                </div>
+              ) : (
+                <div className="flex items-center border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-50 dark:bg-zinc-800 px-2 py-1">
+                  <input
+                    type="number"
+                    min={product.minOrderQuantityKg || 1}
+                    max={product.availableQuantityKg}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(product.minOrderQuantityKg || 1, parseInt(e.target.value) || 1))}
+                    className="w-12 bg-transparent text-center font-bold text-xs text-zinc-900 dark:text-white focus:outline-none"
+                  />
+                  <span className="text-[11px] text-zinc-400">kg</span>
+                </div>
+              )}
 
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={product.availableQuantityKg <= 0}
                 className={`flex-1 py-2.5 px-4 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 transition-all duration-200 shadow-sm ${
-                  isAdded 
-                    ? 'bg-emerald-600 text-white' 
-                    : 'bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white'
-                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  product.availableQuantityKg <= 0
+                    ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 cursor-not-allowed border border-zinc-300 dark:border-zinc-700'
+                    : isAdded 
+                      ? 'bg-emerald-600 text-white' 
+                      : 'bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white'
+                } disabled:opacity-60 disabled:cursor-not-allowed`}
               >
-                {isAdded ? (
+                {product.availableQuantityKg <= 0 ? (
+                  <span>Sold Out</span>
+                ) : isAdded ? (
                   <>
                     <Check className="w-4 h-4" /> Added ({quantity}kg)
                   </>

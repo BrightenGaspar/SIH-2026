@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { consumerService } from '@/services/consumerService';
 import { ProductDetails } from '@/types/consumer';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
 import KnowYourFarmerModal from '@/components/consumer/KnowYourFarmerModal';
 import PriceBreakdownCard from '@/components/consumer/PriceBreakdownCard';
@@ -32,6 +33,7 @@ export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addToCart } = useCart();
+  const { user } = useAuth();
   const { t } = useI18n();
 
   const [product, setProduct] = useState<ProductDetails | null>(null);
@@ -380,9 +382,9 @@ export default function ProductDetailPage() {
           reportedUserId={product.farmerStory.id}
           reportedRole="FARMER"
           reportedName={`${product.name} (by ${product.farmerStory.farmerName})`}
-          reporterUserId="user_consumer_demo"
+          reporterUserId={user?.id || 'anonymous_buyer'}
           reporterRole="BUYER"
-          reporterDisplayName="Verified Buyer"
+          reporterDisplayName={user?.name || 'Verified Buyer'}
         />
       )}
     </div>

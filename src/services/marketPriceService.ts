@@ -1,24 +1,29 @@
 import { MarketPrice, PriceTrendPoint } from "@/types/farmer";
-import { apiClient } from "@/lib/apiClient";
-import { mockMarketPrices, mockPriceTrendData } from "./mockData/mockPrices";
 
 export const marketPriceService = {
-  async getMarketPrices(): Promise<MarketPrice[]> {
+  async getMarketPrices(commodity?: string): Promise<MarketPrice[]> {
     try {
-      return await apiClient<MarketPrice[]>('/api/farmer/market-prices', { method: 'GET' });
+      const url = commodity 
+        ? `/api/farmer/market-prices?commodity=${encodeURIComponent(commodity)}`
+        : '/api/farmer/market-prices';
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
     } catch {
-      return mockMarketPrices;
+      return [];
     }
   },
 
   async getPriceTrends(commodity: string): Promise<PriceTrendPoint[]> {
     try {
-      return await apiClient<PriceTrendPoint[]>('/api/farmer/price-trends', {
-        method: 'GET',
-        params: { commodity },
-      });
+      const url = `/api/farmer/price-trends?commodity=${encodeURIComponent(commodity)}`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
     } catch {
-      return mockPriceTrendData;
+      return [];
     }
   }
 };

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { ratingService } from '@/services/ratingService';
+import { supabase } from '@/lib/supabase';
 import { RatingReview, ParticipantRatingSummary } from '@/types/review';
 import { StarRating } from '@/components/common/StarRating';
 import ReportModal from '@/components/reports/ReportModal';
@@ -37,24 +38,40 @@ export default function ProductReviewsSection({
     let isMounted = true;
     setLoading(true);
 
-    ratingService.getReviewsForProduct(productId)
-      .then((res) => {
-        if (isMounted) {
-          setReviews(res.reviews || []);
-          setSummary(res.summary || null);
-          setLoading(false);
+    const loadReviews = () => {
+      ratingService.getReviewsForProduct(productId)
+        .then((res) => {
+          if (isMounted) {
+            setReviews(res.reviews || []);
+            setSummary(res.summary || null);
+            setLoading(false);
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setReviews([]);
+            setSummary(null);
+            setLoading(false);
+          }
+        });
+    };
+
+    loadReviews();
+
+    const channel = supabase
+      .channel(`realtime-reviews-${productId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reviews' },
+        () => {
+          loadReviews();
         }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setReviews([]);
-          setSummary(null);
-          setLoading(false);
-        }
-      });
+      )
+      .subscribe();
 
     return () => {
       isMounted = false;
+      supabase.removeChannel(channel);
     };
   }, [productId]);
 

@@ -7,6 +7,7 @@ import { BandwidthProvider } from "@/context/BandwidthContext";
 import { I18nProvider } from "@/context/I18nContext";
 import { CartProvider } from "@/context/CartContext";
 import { TrackingProvider } from "@/context/TrackingContext";
+import AutoReloadController from "@/components/common/AutoReloadController";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -48,6 +49,7 @@ export default function RootLayout({
                 <CartProvider>
                   <TrackingProvider>
                     {children}
+                    <AutoReloadController />
                   </TrackingProvider>
                 </CartProvider>
               </AuthProvider>

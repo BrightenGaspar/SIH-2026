@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card } from '@/components/common/Card';
+import { Button } from '@/components/common/Button';
+import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { logisticsService } from '@/services/logisticsService';
 import {
   Thermometer,
   Snowflake,
@@ -15,7 +19,10 @@ import {
   Truck,
   RefreshCw,
   Clock,
+  Send,
+  AlertCircle,
 } from 'lucide-react';
+import { DataStatusBadge } from '@/components/common/DataStatusBadge';
 
 interface TelemetryVehicle {
   id: string;
@@ -23,61 +30,29 @@ interface TelemetryVehicle {
   vehicle_type: string;
   driver_name?: string;
   commodity?: string;
-  current_temp: number;
+  current_temp: number | null;
   target_temp: number;
-  humidity: number;
+  humidity: number | null;
   current_location?: string;
   status: string;
-  last_ping?: string;
+  telemetry_source?: string;
+  last_ping?: string | null;
+  safe_threshold: number;
 }
 
-const DEFAULT_TELEMETRY: TelemetryVehicle[] = [
-  {
-    id: 'TRK-CONS-ROAD-9021',
-    vehicle_number: 'TS 08 UB 4192',
-    vehicle_type: 'Tata 407 Reefer',
-    driver_name: 'Gurdeep Singh',
-    commodity: 'Tomato (Hybrid Desi)',
-    current_temp: 6.2,
-    target_temp: 6.0,
-    humidity: 88,
-    current_location: 'Shamshabad Corridor (KM 42)',
-    status: 'IN TRANSIT',
-    last_ping: 'Just now',
-  },
-  {
-    id: 'TRK-CONS-ROAD-9022',
-    vehicle_number: 'TS 07 EA 8831',
-    vehicle_type: 'Mahindra Bolero Maxi',
-    driver_name: 'Suresh Mane',
-    commodity: 'Green Chilli (G4)',
-    current_temp: 8.5,
-    target_temp: 8.0,
-    humidity: 75,
-    current_location: 'Kothur Perishable Bypass',
-    status: 'IN TRANSIT',
-    last_ping: '1 min ago',
-  },
-  {
-    id: 'TRK-CONS-ROAD-9023',
-    vehicle_number: 'TS 09 XY 1029',
-    vehicle_type: 'Tata Ace Reefer',
-    driver_name: 'Venkatesh Rao',
-    commodity: 'Fresh Spinach / Leafy Greens',
-    current_temp: 4.1,
-    target_temp: 4.0,
-    humidity: 92,
-    current_location: 'Bowenpally Wholesale Ingate',
-    status: 'SCHEDULED',
-    last_ping: '2 mins ago',
-  },
-];
-
 export default function ColdChainTelemetryPage() {
-  const [vehicles, setVehicles] = useState<TelemetryVehicle[]>(DEFAULT_TELEMETRY);
+  const [vehicles, setVehicles] = useState<TelemetryVehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isRealtimeActive, setIsRealtimeActive] = useState(true);
-  const [isSimulatingPing, setIsSimulatingPing] = useState(false);
   const [lastHeartbeat, setLastHeartbeat] = useState<string>(new Date().toLocaleTimeString());
+
+  // Real Telemetry Ingestion Test State
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
+  const [inputTemp, setInputTemp] = useState<string>('6.5');
+  const [inputHum, setInputHum] = useState<string>('75');
+  const [inputSource, setInputSource] = useState<string>('Teltonika FMB920 Reefer Sensor');
+  const [isSubmittingTelemetry, setIsSubmittingTelemetry] = useState(false);
+  const [ingestResult, setIngestResult] = useState<{ success?: boolean; message?: string } | null>(null);
 
   // Fetch initial telemetry and subscribe to Supabase Realtime
   useEffect(() => {
@@ -85,35 +60,36 @@ export default function ColdChainTelemetryPage() {
 
     const fetchLiveTelemetry = async () => {
       try {
-        const { data, error } = await supabase
-          .from('logistics_trips')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.warn('Supabase telemetry query error, using active defaults:', error.message);
-          return;
-        }
-
-        if (data && data.length > 0) {
-          const mapped: TelemetryVehicle[] = data.map((row: any) => ({
-            id: row.id,
-            vehicle_number: row.vehicle_number || 'TS 08 UB 4192',
-            vehicle_type: row.vehicle_type || 'Tata 407 Reefer',
-            driver_name: row.driver_name || 'Fleet Operator',
-            commodity: row.commodity || 'Farm Produce',
-            current_temp: Number(row.current_temp) || 6.2,
-            target_temp: Number(row.target_temp) || 6.0,
-            humidity: Number(row.humidity) || 85,
-            current_location: row.current_location || 'Transit Route',
-            status: row.status || 'IN TRANSIT',
-            last_ping: new Date().toLocaleTimeString(),
+        setLoading(true);
+        const trips = await logisticsService.getTrips();
+        if (trips && trips.length > 0) {
+          const mapped: TelemetryVehicle[] = trips.map((t) => ({
+            id: t.id,
+            vehicle_number: t.vehicle?.vehicleNumber || 'TS 08 UB 4192',
+            vehicle_type: t.vehicle?.vehicleType || 'Tata 407 Reefer',
+            driver_name: t.vehicle?.driverName || 'Fleet Operator',
+            commodity: t.commodity || 'Farm Harvest',
+            current_temp: t.vehicle?.currentTempCelsius ?? null,
+            target_temp: 6.0,
+            humidity: null,
+            current_location: t.vehicle?.currentLocation || (t.vehicle?.currentLat ? `${Number(t.vehicle.currentLat).toFixed(3)}, ${Number(t.vehicle.currentLng).toFixed(3)}` : 'En Route'),
+            status: t.status || 'IN TRANSIT',
+            telemetry_source: t.vehicle?.currentTempCelsius != null ? 'Reefer Sensor' : 'Driver GPS Beacon (Sensor unattached)',
+            last_ping: new Date().toISOString(),
+            safe_threshold: 8.0,
           }));
           setVehicles(mapped);
+          if (mapped.length > 0 && !selectedVehicleId) {
+            setSelectedVehicleId(mapped[0].id);
+          }
           setLastHeartbeat(new Date().toLocaleTimeString());
+        } else {
+          setVehicles([]);
         }
       } catch (err) {
         console.warn('Live telemetry fetch exception:', err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -121,7 +97,19 @@ export default function ColdChainTelemetryPage() {
 
     // Supabase Realtime WebSocket Channel
     channel = supabase
-      .channel('telemetry-realtime')
+      .channel('telemetry-realtime-production')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'logistics_assignments',
+        },
+        () => {
+          setLastHeartbeat(new Date().toLocaleTimeString());
+          fetchLiveTelemetry();
+        }
+      )
       .on(
         'postgres_changes',
         {
@@ -129,46 +117,9 @@ export default function ColdChainTelemetryPage() {
           schema: 'public',
           table: 'logistics_trips',
         },
-        (payload) => {
+        () => {
           setLastHeartbeat(new Date().toLocaleTimeString());
-          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-            const updatedRow: any = payload.new;
-            setVehicles((prev) => {
-              const exists = prev.some((v) => v.id === updatedRow.id);
-              if (exists) {
-                return prev.map((v) =>
-                  v.id === updatedRow.id
-                    ? {
-                        ...v,
-                        current_temp: Number(updatedRow.current_temp) ?? v.current_temp,
-                        target_temp: Number(updatedRow.target_temp) ?? v.target_temp,
-                        humidity: Number(updatedRow.humidity) ?? v.humidity,
-                        current_location: updatedRow.current_location ?? v.current_location,
-                        status: updatedRow.status ?? v.status,
-                        last_ping: 'Live Realtime Ping',
-                      }
-                    : v
-                );
-              } else {
-                return [
-                  {
-                    id: updatedRow.id,
-                    vehicle_number: updatedRow.vehicle_number || 'TS 08 UB 4192',
-                    vehicle_type: updatedRow.vehicle_type || 'Tata 407 Reefer',
-                    driver_name: updatedRow.driver_name || 'Fleet Operator',
-                    commodity: updatedRow.commodity || 'Fresh Produce',
-                    current_temp: Number(updatedRow.current_temp) || 6.0,
-                    target_temp: Number(updatedRow.target_temp) || 6.0,
-                    humidity: Number(updatedRow.humidity) || 85,
-                    current_location: updatedRow.current_location || 'Transit Corridor',
-                    status: updatedRow.status || 'IN TRANSIT',
-                    last_ping: 'Live Realtime Ping',
-                  },
-                  ...prev,
-                ];
-              }
-            });
-          }
+          fetchLiveTelemetry();
         }
       )
       .subscribe((status) => {
@@ -182,196 +133,325 @@ export default function ColdChainTelemetryPage() {
         supabase.removeChannel(channel);
       }
     };
-  }, []);
+  }, [selectedVehicleId]);
 
-  // Simulate an IoT Telemetry Ping to Supabase to verify live updates
-  const handleSimulateSensorPing = async (vehicleId: string) => {
-    setIsSimulatingPing(true);
-    const randomTemp = Number((5.5 + Math.random() * 2.5).toFixed(1));
-    const randomHum = Math.floor(80 + Math.random() * 12);
+  // Submit genuine telemetry ping to /api/telemetry
+  const handleSendTelemetryPing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedVehicleId) return;
+
+    setIsSubmittingTelemetry(true);
+    setIngestResult(null);
 
     try {
-      // Optimistic update
-      setVehicles((prev) =>
-        prev.map((v) =>
-          v.id === vehicleId
-            ? {
-                ...v,
-                current_temp: randomTemp,
-                humidity: randomHum,
-                last_ping: 'Sensor ping sent',
-              }
-            : v
-        )
-      );
+      const parsedTemp = parseFloat(inputTemp);
+      const parsedHum = parseFloat(inputHum);
 
-      // Persist to Supabase public.logistics_trips
-      await supabase
-        .from('logistics_trips')
-        .update({
-          current_temp: randomTemp,
-          humidity: randomHum,
-        })
-        .eq('id', vehicleId);
-    } catch {
-      // Offline fallback
+      const res = await fetch('/api/telemetry', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          trip_id: selectedVehicleId,
+          temperature: isNaN(parsedTemp) ? null : parsedTemp,
+          humidity: isNaN(parsedHum) ? null : parsedHum,
+          source: inputSource,
+          timestamp: new Date().toISOString(),
+        }),
+      });
+
+      const json = await res.json();
+      if (res.ok) {
+        setIngestResult({
+          success: true,
+          message: `Ingested ${json.telemetry?.temperature ?? 'null'}°C via ${json.telemetry?.source} (Status: ${json.status})`,
+        });
+      } else {
+        setIngestResult({
+          success: false,
+          message: json.error || 'Failed to ingest telemetry',
+        });
+      }
+    } catch (err: any) {
+      setIngestResult({
+        success: false,
+        message: err?.message || 'Network error sending telemetry',
+      });
     } finally {
-      setIsSimulatingPing(false);
-      setLastHeartbeat(new Date().toLocaleTimeString());
-    }
-  };
-
-  // Helper for computing cold-chain spoilage metrics
-  const getSpoilageAnalysis = (current: number, target: number, humidity: number) => {
-    const delta = Math.abs(current - target);
-
-    if (delta <= 1.0 && humidity >= 70 && humidity <= 95) {
-      return {
-        level: 'Low Risk',
-        badgeBg: 'bg-emerald-950/40 border-emerald-500/30 text-emerald-400',
-        textColor: 'text-emerald-400',
-        window: 'Spoilage Safe Window: 8h+ (Optimum Perishable Zone)',
-        icon: ShieldCheck,
-      };
-    } else if (delta <= 2.5) {
-      return {
-        level: 'Moderate Drift',
-        badgeBg: 'bg-amber-950/40 border-amber-500/30 text-amber-400',
-        textColor: 'text-amber-400',
-        window: 'Safe Window: ~3h 30m (Minor Temperature Deviation)',
-        icon: AlertTriangle,
-      };
-    } else {
-      return {
-        level: 'Critical Spoilage Risk',
-        badgeBg: 'bg-rose-950/40 border-rose-500/30 text-rose-400',
-        textColor: 'text-rose-400',
-        window: 'Immediate Recalibration Needed (< 1h Safe Window)',
-        icon: AlertTriangle,
-      };
+      setIsSubmittingTelemetry(false);
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header Banner with Realtime Status */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Live Cold-Chain Telemetry</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Real-time IoT sensors streaming temperature, target variance, humidity, and dynamic perishable spoilage risk.
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+              Cold-Chain Operations
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
+            <span className="text-xs text-slate-500 font-mono">Live Telemetry Gateway</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            Active Reefer Telemetry
+          </h1>
+          <p className="text-xs text-slate-500 mt-1 max-w-xl">
+            Real-time IoT environmental readings ingested from vehicle sensors and authenticated driver gateways.
           </p>
         </div>
 
+        {/* Realtime Status Pill */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-mono">
-            <span className="relative flex h-2 w-2">
-              <span
-                className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                  isRealtimeActive ? 'bg-emerald-400' : 'bg-amber-400'
-                }`}
-              />
-              <span
-                className={`relative inline-flex rounded-full h-2 w-2 ${
-                  isRealtimeActive ? 'bg-emerald-500' : 'bg-amber-500'
-                }`}
-              />
-            </span>
-            <span className="text-slate-300">
-              {isRealtimeActive ? 'Supabase Realtime Live' : 'Polling Fallback'}
-            </span>
-            <span className="text-slate-500">&bull; {lastHeartbeat}</span>
-          </div>
+          <DataStatusBadge
+            status={isRealtimeActive ? 'LIVE' : 'OFFLINE'}
+            source="Supabase Realtime WebSocket"
+            showSource={true}
+          />
+          <span className="text-[11px] text-slate-400 font-mono hidden sm:inline">
+            Heartbeat: {lastHeartbeat}
+          </span>
         </div>
       </div>
 
-      {/* Fleet Telemetry Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {vehicles.map((v) => {
-          const analysis = getSpoilageAnalysis(v.current_temp, v.target_temp, v.humidity);
-          const AnalysisIcon = analysis.icon;
-          const tempVariance = (v.current_temp - v.target_temp).toFixed(1);
-          const varianceSign = Number(tempVariance) > 0 ? `+${tempVariance}` : tempVariance;
+      {/* Loading State */}
+      {loading && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center shadow-xs">
+          <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Loading active reefer telemetry...</p>
+        </div>
+      )}
 
-          return (
-            <Card key={v.id} className="p-6 space-y-4 border border-slate-800 bg-slate-900/90 backdrop-blur">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-slate-400" />
-                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">{v.vehicle_type}</span>
-                </div>
-                <span className="text-xs font-mono font-bold text-amber-400 bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/20">
-                  {v.vehicle_number}
-                </span>
-              </div>
+      {/* Honest Empty State: No active vehicles */}
+      {!loading && vehicles.length === 0 && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center mx-auto mb-4">
+            <Truck className="w-6 h-6" />
+          </div>
+          <h2 className="text-xl font-black text-slate-900 dark:text-white">
+            No Active Shipments
+          </h2>
+          <p className="text-xs text-slate-500 max-w-md mx-auto mt-2">
+            No logistics trips are currently active in the database. When an order is accepted by a driver, its live telemetry stream will appear here.
+          </p>
+        </div>
+      )}
 
-              {/* Temperature Display and Target Gauge */}
-              <div className="space-y-1.5">
-                <div className="flex items-baseline justify-between">
-                  <div className="flex items-center gap-2">
-                    <Thermometer className="w-6 h-6 text-emerald-400" />
-                    <span className="text-3xl font-black text-white">{v.current_temp.toFixed(1)}°C</span>
+      {/* Active Vehicle Telemetry Cards */}
+      {!loading && vehicles.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {vehicles.map((v) => {
+            const hasTemp = v.current_temp !== null;
+            const isBreached = hasTemp && v.current_temp! > v.safe_threshold;
+
+            return (
+              <Card
+                key={v.id}
+                className={cn(
+                  'relative overflow-hidden border transition-all',
+                  isBreached
+                    ? 'border-rose-500/50 bg-rose-500/5'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'
+                )}
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-black text-slate-900 dark:text-white font-mono">
+                        {v.vehicle_number}
+                      </span>
+                      <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                        {v.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-0.5">{v.vehicle_type}</p>
+                    {v.commodity && (
+                      <p className="text-xs font-bold text-emerald-600 mt-1">
+                        Cargo: {v.commodity}
+                      </p>
+                    )}
                   </div>
-                  <span className="text-xs font-mono text-slate-400">
-                    Target: <strong className="text-white">{v.target_temp.toFixed(1)}°C</strong> ({varianceSign}°C)
-                  </span>
-                </div>
 
-                {/* Progress bar visual gauge for target vs current */}
-                <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      Math.abs(v.current_temp - v.target_temp) <= 1.0
-                        ? 'bg-emerald-500'
-                        : Math.abs(v.current_temp - v.target_temp) <= 2.5
-                        ? 'bg-amber-500'
-                        : 'bg-rose-500'
-                    }`}
-                    style={{ width: `${Math.min(100, Math.max(10, (v.current_temp / 15) * 100))}%` }}
+                  <DataStatusBadge
+                    lastUpdated={v.last_ping}
+                    freshnessThresholdMinutes={3}
                   />
                 </div>
-              </div>
 
-              {/* Cargo & Climate Metrics */}
-              <div className="space-y-1 text-xs text-slate-400">
-                <div className="flex justify-between">
-                  <span>Cargo:</span>
-                  <strong className="text-white">{v.commodity}</strong>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="flex items-center gap-1">
-                    <Droplets className="w-3.5 h-3.5 text-blue-400" /> Chamber Humidity:
-                  </span>
-                  <strong className="text-blue-400 font-mono">{v.humidity}%</strong>
-                </div>
-                <div className="flex justify-between">
-                  <span>Location:</span>
-                  <span className="text-slate-300 truncate max-w-[180px]">{v.current_location}</span>
-                </div>
-              </div>
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  {/* Temperature */}
+                  <div
+                    className={cn(
+                      'p-3 rounded-xl border',
+                      !hasTemp
+                        ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800'
+                        : isBreached
+                        ? 'bg-rose-500/10 border-rose-500/30 text-rose-600'
+                        : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600'
+                    )}
+                  >
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold opacity-80 mb-1">
+                      <Thermometer className="w-3.5 h-3.5" />
+                      <span>Temperature</span>
+                    </div>
+                    <div className="text-xl font-black">
+                      {hasTemp ? (
+                        <>
+                          {v.current_temp}°C
+                          <span className="text-[10px] font-normal block text-slate-500 mt-0.5">
+                            Target: {v.target_temp}°C (Safe &le; {v.safe_threshold}°C)
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs font-bold text-slate-400">No live reading</span>
+                      )}
+                    </div>
+                  </div>
 
-              {/* Spoilage Risk Badge */}
-              <div className={`p-3 rounded-xl border text-xs font-bold flex items-center gap-2 ${analysis.badgeBg}`}>
-                <AnalysisIcon className="w-4 h-4 shrink-0" />
-                <span className="leading-snug">{analysis.window}</span>
-              </div>
+                  {/* Humidity */}
+                  <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
+                    <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-500 mb-1">
+                      <Droplets className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Humidity</span>
+                    </div>
+                    <div className="text-xl font-black text-slate-900 dark:text-white">
+                      {v.humidity !== null ? (
+                        <>
+                          {v.humidity}%
+                          <span className="text-[10px] font-normal block text-slate-500 mt-0.5">
+                            Relative RH
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs font-bold text-slate-400">No live reading</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-              {/* Action: Test Live Realtime IoT Sensor Ping */}
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-                <span className="text-slate-500">Last Ping: {v.last_ping || 'Active'}</span>
-                <button
-                  type="button"
-                  onClick={() => handleSimulateSensorPing(v.id)}
-                  disabled={isSimulatingPing}
-                  className="flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-bold transition"
-                >
-                  <RefreshCw className={`w-3 h-3 ${isSimulatingPing ? 'animate-spin' : ''}`} />
-                  <span>Simulate IoT Ping</span>
-                </button>
-              </div>
-            </Card>
-          );
-        })}
+                {/* Footer Metadata */}
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span>Telemetry Source:</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {v.telemetry_source}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Driver:</span>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {v.driver_name}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Link href={`/logistics/track/${v.id}`} className="block">
+                    <Button size="sm" className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 text-xs flex items-center justify-center gap-1.5 shadow-sm shadow-emerald-600/20">
+                      <Radio className="w-3.5 h-3.5 animate-pulse" />
+                      <span>Launch Phone GPS Beacon</span>
+                    </Button>
+                  </Link>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Real Ingest & Device Verification Console */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
+        <div className="flex items-center gap-2 mb-2">
+          <Activity className="w-4 h-4 text-emerald-600" />
+          <h2 className="text-base font-black text-slate-900 dark:text-white">
+            Telemetry Ingestion & Integration Console
+          </h2>
+        </div>
+        <p className="text-xs text-slate-500 mb-5 max-w-2xl">
+          Transmit genuine hardware sensor readings to <code className="font-mono bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">POST /api/telemetry</code>. Used by IoT gateways and driver telematics units.
+        </p>
+
+        {vehicles.length === 0 ? (
+          <p className="text-xs text-slate-400">
+            Telemetry transmission console will become active when a trip is dispatched.
+          </p>
+        ) : (
+          <form onSubmit={handleSendTelemetryPing} className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+            <div>
+              <label className="text-[11px] font-bold text-slate-500 block mb-1">Target Trip</label>
+              <select
+                value={selectedVehicleId}
+                onChange={(e) => setSelectedVehicleId(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono"
+              >
+                {vehicles.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.vehicle_number} ({v.commodity || v.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="text-[11px] font-bold text-slate-500 block mb-1">
+                Temperature (°C)
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                value={inputTemp}
+                onChange={(e) => setInputTemp(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono"
+                placeholder="e.g. 6.5"
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-bold text-slate-500 block mb-1">
+                Humidity (%)
+              </label>
+              <input
+                type="number"
+                step="1"
+                value={inputHum}
+                onChange={(e) => setInputHum(e.target.value)}
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs font-mono"
+                placeholder="e.g. 78"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button
+                type="submit"
+                disabled={isSubmittingTelemetry}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs disabled:opacity-50"
+              >
+                {isSubmittingTelemetry ? (
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Send className="w-3.5 h-3.5" />
+                )}
+                <span>{isSubmittingTelemetry ? 'Transmitting...' : 'Send Telemetry Ping'}</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {ingestResult && (
+          <div
+            className={cn(
+              'mt-4 p-3 rounded-xl border text-xs font-mono flex items-center gap-2',
+              ingestResult.success
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                : 'bg-rose-500/10 border-rose-500/30 text-rose-600'
+            )}
+          >
+            {ingestResult.success ? <ShieldCheck className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+            <span>{ingestResult.message}</span>
+          </div>
+        )}
       </div>
     </div>
   );

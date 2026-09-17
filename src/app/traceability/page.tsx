@@ -99,7 +99,7 @@ export default function TraceabilityLookupPage() {
           </div>
         )}
 
-        {/* Demo Callout */}
+        {/* Featured Batch Callout */}
         <div className='bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 max-w-md w-full text-left space-y-2 text-xs shadow-xs'>
           <div className='flex items-center justify-between'>
             <span className='font-bold text-slate-700 dark:text-slate-300'>Featured Verified Batch:</span>

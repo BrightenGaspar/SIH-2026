@@ -43,7 +43,7 @@ export default function ConsumerCheckoutPage() {
   );
   const [deliveryCity, setDeliveryCity] = useState(consumerUser?.savedAddresses?.[0]?.city || 'Hyderabad');
   const [deliveryPincode, setDeliveryPincode] = useState(consumerUser?.savedAddresses?.[0]?.pincode || '500011');
-  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'Demo Cash'>('UPI');
+  const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'Card' | 'COD'>('UPI');
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderCreatedSuccess, setOrderCreatedSuccess] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
@@ -246,7 +246,7 @@ export default function ConsumerCheckoutPage() {
                 {[
                   { id: 'UPI' as const, label: 'Instant UPI / QR', icon: Wallet, desc: 'Google Pay, PhonePe, BHIM' },
                   { id: 'Card' as const, label: 'Corporate Card / NetBanking', icon: CreditCard, desc: 'Visa, Master, RuPay, RTGS' },
-                  { id: 'Demo Cash' as const, label: 'Demo Cash On Delivery', icon: Banknote, desc: 'Physical verification demo' },
+                  { id: 'COD' as const, label: 'Cash on Delivery (COD)', icon: Banknote, desc: 'Pay upon physical delivery & verification' },
                 ].map((m) => {
                   const Icon = m.icon;
                   const isSelected = paymentMethod === m.id;

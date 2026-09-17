@@ -207,7 +207,7 @@ export interface ConsumerOrder {
     state: string;
     pincode: string;
   };
-  paymentMethod: 'UPI' | 'Card' | 'Demo Cash';
+  paymentMethod: 'UPI' | 'Card' | 'COD' | 'Demo Cash';
   orderDate: string;
   status: ConsumerOrderStatus;
   rawStatus?: string;

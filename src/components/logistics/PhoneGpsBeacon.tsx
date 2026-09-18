@@ -236,11 +236,25 @@ export default function PhoneGpsBeacon({
     };
   }, []);
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     if (!coords) return;
-    navigator.clipboard.writeText(`${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`);
-    setCopiedCoords(true);
-    setTimeout(() => setCopiedCoords(false), 2000);
+    const text = `${coords.latitude.toFixed(6)}, ${coords.longitude.toFixed(6)}`;
+    try {
+      if (typeof navigator !== 'undefined' && navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+      } else if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopiedCoords(true);
+      setTimeout(() => setCopiedCoords(false), 2000);
+    } catch (e) {
+      console.warn('Clipboard copy not permitted:', e);
+    }
   };
 
   return (

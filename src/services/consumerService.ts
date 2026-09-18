@@ -9,12 +9,15 @@ import {
   BuyerType,
 } from '@/types/consumer';
 import { supabase } from '@/lib/supabase';
+import { normalizeCategory, inferProduceCategory, ProduceCategory } from '@/lib/categoryHelpers';
 
 export interface MarketplaceProduceItem {
   id: string;
   farmer_id?: string | null;
   crop_name: string;
   variety?: string | null;
+  category?: ProduceCategory;
+  quality_grade?: string;
   quantity_kg: number;
   price_per_kg: number;
   location?: string | null;
@@ -23,6 +26,8 @@ export interface MarketplaceProduceItem {
   updated_at: string;
   created_at?: string;
   farmer_name?: string;
+  shelf_life_days?: number | null;
+  is_cold_chain?: boolean;
 }
 
 export function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -47,11 +52,7 @@ function mapListingToProductDetails(row: any, userCoords?: { lat: number; lng: n
   const state = profile?.state || 'Telangana';
   const generalLocation = row.location_address || row.location || (profile?.place ? `${profile.place}, ${district}` : `${district}, ${state}`);
 
-  const rawCat = (row.category || 'vegetables').toLowerCase();
-  let category: 'Vegetables' | 'Fruits' | 'Grains' | 'Spices' = 'Vegetables';
-  if (rawCat.includes('fruit')) category = 'Fruits';
-  else if (rawCat.includes('grain')) category = 'Grains';
-  else if (rawCat.includes('spice')) category = 'Spices';
+  const category = normalizeCategory(row.category, row.produce_name || row.crop_name, row.variety);
 
   const rawGrade = (row.quality_grade || 'A').toUpperCase();
   const validGrades: ProduceGrade[] = ['A', 'B', 'Organic Certified'];
@@ -255,12 +256,16 @@ export const consumerService = {
         const qty = row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0);
         const price = row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0);
         const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
+        const category = normalizeCategory(row.category, row.crop_name, row.variety);
+        const qualityGrade = (row.quality_grade || 'A').toUpperCase();
 
         return {
           id: String(row.id),
           farmer_id: row.farmer_id,
           crop_name: row.crop_name || 'Farm Harvest',
           variety: row.variety || null,
+          category,
+          quality_grade: qualityGrade,
           quantity_kg: qty,
           price_per_kg: price,
           location: row.location || 'Local FPO Hub',
@@ -269,6 +274,12 @@ export const consumerService = {
           updated_at: updatedAt,
           created_at: row.created_at,
           farmer_name: 'Verified Kisan Partner',
+          shelf_life_days: row.shelf_life_days ?? 7,
+          is_cold_chain: Boolean(
+            row.is_cold_chain ||
+            row.cold_chain_eligible ||
+            ['Vegetables', 'Fruits'].includes(category)
+          ),
         };
       });
 

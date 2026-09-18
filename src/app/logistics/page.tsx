@@ -2,284 +2,311 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { 
-  Truck, 
-  MapPin, 
-  ThermometerSnowflake, 
-  ArrowRight, 
-  Activity, 
+import { useAuth } from '@/context/AuthContext';
+import { Button } from '@/components/common/Button';
+import { sharedTrackingService } from '@/services/sharedTrackingService';
+import { DeliveryTracking } from '@/types/delivery';
+import { DriverDispatchModal } from '@/components/logistics/DriverDispatchModal';
+import {
+  Truck,
+  MapPin,
+  ThermometerSnowflake,
+  ArrowRight,
+  Activity,
   AlertTriangle,
   Radio,
-  AlertCircle
+  CheckCircle2,
+  ShieldCheck,
+  RotateCcw,
+  Navigation,
+  ArrowLeft,
+  Sparkles,
+  ChevronRight,
 } from 'lucide-react';
-import { DeliveryTracking } from '@/types/delivery';
-import { sharedTrackingService } from '@/services/sharedTrackingService';
-import RouteMap from '@/components/maps/RouteMap';
-import ColdChainTelemetryCard from '@/components/tracking/ColdChainTelemetryCard';
-import DeliveryStatusCard from '@/components/tracking/DeliveryStatusCard';
-import DriverCard from '@/components/tracking/DriverCard';
-import ETACard from '@/components/tracking/ETACard';
-import ProofOfDeliveryCard from '@/components/tracking/ProofOfDeliveryCard';
-import ReturnLoadCard from '@/components/tracking/ReturnLoadCard';
-import TrackingTimeline from '@/components/tracking/TrackingTimeline';
-import { DriverDispatchModal } from '@/components/logistics/DriverDispatchModal';
-import { DataStatusBadge } from '@/components/common/DataStatusBadge';
-import { supabase } from '@/lib/supabase';
 
-export default function LogisticsDashboardPage() {
+export default function LogisticsLandingPage() {
+  const { isLogisticsAuthenticated } = useAuth();
   const [trips, setTrips] = useState<DeliveryTracking[]>([]);
-  const [selectedTripId, setSelectedTripId] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  // Load real trips from Supabase
-  const loadTrips = async () => {
-    try {
-      setLoading(true);
-      const all = await sharedTrackingService.getAllTrips();
-      setTrips(all);
-      if (all.length > 0 && !selectedTripId) {
-        setSelectedTripId(all[0].id);
-      }
-    } catch (err) {
-      console.warn('Error loading logistics trips:', err);
-      setTrips([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    loadTrips();
-
-    // Realtime Supabase Channel listening to authoritative logistics_assignments and orders
-    const channel = supabase
-      .channel('logistics-trips-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'logistics_assignments' },
-        () => {
-          loadTrips();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        () => {
-          loadTrips();
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'logistics_trips' },
-        () => {
-          loadTrips();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    sharedTrackingService.getAllTrips()
+      .then((data) => setTrips(data || []))
+      .catch(() => setTrips([]))
+      .finally(() => setLoading(false));
   }, []);
 
-  const activeTrip = trips.find((t) => t.id === selectedTripId) || trips[0] || null;
+  const logisticsPillars = [
+    {
+      icon: ThermometerSnowflake,
+      title: 'IoT Cold-Chain Surveillance',
+      desc: 'Automated 4-8°C reefer temperature monitoring with real-time breach detection and instant IoT alert notifications.',
+      color: 'text-amber-600 bg-amber-500/10 border-amber-500/20',
+    },
+    {
+      icon: RotateCcw,
+      title: 'Return Load Matching AI',
+      desc: 'Eliminate deadhead miles on return legs with automated backhaul cargo matching (fertilizer, empty harvest crates).',
+      color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20',
+    },
+    {
+      icon: Radio,
+      title: 'Phone GPS Beacon',
+      desc: 'Turn any driver smartphone into an encrypted telematics beacon with wake-lock support and SMS offline fallback.',
+      color: 'text-blue-600 bg-blue-500/10 border-blue-500/20',
+    },
+    {
+      icon: ShieldCheck,
+      title: 'Guaranteed Transporter Escrow',
+      desc: 'Transparent per-kilometer freight pricing with instant UPI bank payouts automatically disbursed upon verified delivery OTP.',
+      color: 'text-purple-600 bg-purple-500/10 border-purple-500/20',
+    },
+  ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 p-4 sm:p-6 font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-amber-500 selection:text-white">
       {/* Driver Dispatch Modal for incoming orders */}
-      <DriverDispatchModal onTripAccepted={() => loadTrips()} />
+      <DriverDispatchModal onTripAccepted={() => {}} />
 
-      {/* Top Banner & Telemetry Gateway Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">
-              Logistics Control Center
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-slate-300" />
-            <span className="text-xs text-slate-500 font-mono">Fleet Telemetry</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            Active Freight Corridors
-          </h1>
-          <p className="text-xs text-slate-500 mt-1 max-w-xl">
-            Real-time GPS routing, cold-chain temperature surveillance, and empty return-load optimization.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Link
-            href="/logistics/telemetry"
-            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
-          >
-            <Activity className="w-3.5 h-3.5" />
-            <span>Telemetry Console</span>
-          </Link>
-          <Link
-            href="/logistics/return-loads"
-            className="px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition"
-          >
-            Return Loads
-          </Link>
-        </div>
+      {/* Top Eco Gateway Bar */}
+      <div className="bg-white border-b border-slate-200 text-xs py-2 px-4 flex items-center justify-between text-slate-500">
+        <Link href="/" className="hover:text-amber-600 flex items-center gap-1 font-semibold transition">
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to Main AgriFlow Ecosystem Gateway
+        </Link>
+        <span className="text-amber-700 font-bold">Logistics & Cold-Chain Fleet Network</span>
       </div>
 
-      {/* Loading State */}
-      {loading && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center shadow-xs">
-          <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Loading live logistics fleet...</p>
-        </div>
-      )}
-
-      {/* Honest Empty State: No active shipments */}
-      {!loading && !activeTrip && (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center shadow-xs">
-          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 flex items-center justify-center mx-auto mb-4">
-            <Truck className="w-6 h-6" />
+      {/* Public Header */}
+      <header className="border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-600 flex items-center justify-center text-white font-black shadow-xs">
+              <Truck className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <span className="font-extrabold text-xl tracking-tight text-slate-900">
+                AgriFlow<span className="text-amber-600"> Logistics</span>
+              </span>
+              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                Cold-Chain Fleet Network
+              </span>
+            </div>
           </div>
-          <h2 className="text-xl font-black text-slate-900 dark:text-white">
-            No Active Shipments
+
+          <div className="flex items-center gap-3">
+            {isLogisticsAuthenticated ? (
+              <Link href="/logistics/dashboard">
+                <Button variant="primary" size="sm" className="bg-amber-600 hover:bg-amber-500 text-white shadow-xs font-bold">
+                  Go to Fleet Dashboard &rarr;
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/logistics/login">
+                  <Button variant="ghost" size="sm" className="text-slate-700 hover:bg-slate-100 font-semibold">
+                    Operator Login
+                  </Button>
+                </Link>
+                <Link href="/logistics/register">
+                  <Button variant="primary" size="sm" className="bg-amber-600 hover:bg-amber-500 text-white shadow-xs font-bold">
+                    Register Vehicle Fleet
+                  </Button>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 flex flex-col items-center text-center">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold mb-6 shadow-xs">
+          <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Perishable Road Freight & Reefer Command Center
+        </div>
+
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight max-w-4xl mb-6">
+          Smarter farm routes, zero deadhead miles, and{' '}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">
+            guaranteed cold-chain freshness
+          </span>
+          .
+        </h1>
+
+        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          AgriFlow connects truck operators, local pickups, and regional wholesale mandis. Reduce empty return runs, earn up to ₹4,500 extra per corridor, and ensure 100% farm-traceable produce delivery.
+        </p>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+          {isLogisticsAuthenticated ? (
+            <Link href="/logistics/dashboard" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full text-base px-8 py-4 shadow-sm bg-amber-600 hover:bg-amber-500 text-white font-bold">
+                <span>Access Operator Dashboard</span>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/logistics/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full text-base px-8 py-4 shadow-sm bg-amber-600 hover:bg-amber-500 text-white font-bold">
+                  <span>Register Vehicle Fleet</span>
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/logistics/login" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full text-base px-8 py-4 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold shadow-xs">
+                  <span>Operator Login</span>
+                </Button>
+              </Link>
+            </>
+          )}
+
+          <Link href="/logistics/telemetry" className="w-full sm:w-auto">
+            <Button variant="outline" size="lg" className="w-full text-base px-6 py-4 border-amber-300 text-amber-800 hover:bg-amber-50 font-bold">
+              <Activity className="w-4 h-4 mr-2 text-amber-600" />
+              <span>Live Telemetry Console</span>
+            </Button>
+          </Link>
+        </div>
+
+        {/* Live Network KPI Strip */}
+        <div className="mt-14 w-full max-w-4xl bg-white border border-slate-200 rounded-3xl p-6 shadow-xs grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div>
+            <span className="text-2xl sm:text-3xl font-black text-slate-900">4-8°C</span>
+            <p className="text-xs text-slate-500 mt-0.5">Cold Chain Setpoint</p>
+          </div>
+          <div>
+            <span className="text-2xl sm:text-3xl font-black text-emerald-600">+₹2,800</span>
+            <p className="text-xs text-slate-500 mt-0.5">Avg Return Load Gain</p>
+          </div>
+          <div>
+            <span className="text-2xl sm:text-3xl font-black text-amber-600">68 km</span>
+            <p className="text-xs text-slate-500 mt-0.5">Empty Miles Avoided</p>
+          </div>
+          <div>
+            <span className="text-2xl sm:text-3xl font-black text-blue-600">100%</span>
+            <p className="text-xs text-slate-500 mt-0.5">Highway GPS Coverage</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 4 Technology Pillars */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-slate-200">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 mb-2">
+            Built for Real Indian Highways & Mandis
           </h2>
-          <p className="text-xs text-slate-500 max-w-md mx-auto mt-2">
-            There are currently no freight trips dispatched or in transit. When a consumer order is confirmed and accepted by a driver, live vehicle telemetry and route tracking will appear here.
+          <p className="text-xs sm:text-sm text-slate-500">
+            High performance, low bandwidth optimization, phone-based tracking, and instant escrow settlement.
           </p>
-          <div className="mt-5 flex justify-center gap-3">
-            <Link
-              href="/consumer/marketplace"
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors"
-            >
-              Go to Marketplace
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {logisticsPillars.map((pillar, i) => {
+            const Icon = pillar.icon;
+            return (
+              <div key={i} className="bg-white border border-slate-200 p-6 rounded-2xl shadow-xs flex flex-col justify-between space-y-4 hover:border-amber-400 transition-all">
+                <div className="space-y-3">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${pillar.color}`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-base font-bold text-slate-900">{pillar.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{pillar.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Live Dispatches Preview */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                  Active Dispatch Stream
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                Regional Highway Trips & Telemetry
+              </h2>
+            </div>
+
+            <Link href="/logistics/trips">
+              <Button size="sm" variant="secondary" className="border border-slate-200 text-xs font-bold">
+                View All Trips ({trips.length}) &rarr;
+              </Button>
             </Link>
           </div>
-        </div>
-      )}
 
-      {/* Active Shipment Display */}
-      {!loading && activeTrip && (
-        <>
-          {/* Trip Selector (when multiple exist) */}
-          {trips.length > 1 && (
-            <div className="flex items-center gap-2 overflow-x-auto pb-2">
-              <span className="text-xs font-bold text-slate-500 whitespace-nowrap">Active Hauls:</span>
-              {trips.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedTripId(t.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition cursor-pointer border ${
-                    t.id === activeTrip.id
-                      ? 'bg-emerald-600 text-white border-emerald-600'
-                      : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-50'
-                  }`}
-                >
-                  {t.vehicleNumber} ({t.produceName.slice(0, 16)}...)
-                </button>
+          {loading ? (
+            <div className="py-12 text-center text-slate-400 text-xs">
+              <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              Loading live highway routes...
+            </div>
+          ) : trips.length === 0 ? (
+            <div className="py-8 text-center text-slate-400 text-xs">
+              No trips currently active. Incoming farmer-to-consumer orders will appear here for driver acceptance.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {trips.slice(0, 4).map((t) => (
+                <div key={t.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs font-bold text-slate-900">{t.id}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                        {t.status}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-700 font-semibold mt-1">
+                      {t.produceName} ({t.totalQuantityKg} kg) &bull; {t.pickupLocation} &rarr; {t.destinationLocation}
+                    </p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Carrier: {t.vehicleNumber} ({t.vehicleType})
+                    </p>
+                  </div>
+
+                  <Link href={`/consumer/tracking/${t.id}`}>
+                    <Button size="sm" variant="secondary" className="shrink-0 text-xs font-bold bg-white hover:bg-slate-100 shadow-2xs">
+                      <MapPin className="w-3.5 h-3.5 text-amber-600 mr-1" /> Map
+                    </Button>
+                  </Link>
+                </div>
               ))}
             </div>
           )}
+        </div>
+      </section>
 
-          {/* Active Trip Header */}
-          <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <DataStatusBadge
-                  status="LIVE"
-                  source="Supabase Telemetry Engine"
-                  showSource={true}
-                />
-                <span className="text-xs text-slate-500 font-mono">Trip ID: {activeTrip.tripId}</span>
-              </div>
-              <h1 className="text-2xl font-black text-slate-900 dark:text-white">{activeTrip.produceName}</h1>
-              <p className="text-sm text-slate-500 mt-0.5">
-                {activeTrip.pickupLocation} &rarr; {activeTrip.destinationLocation}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <span className="text-xs text-slate-500 block">Status</span>
-                <span className="text-sm font-bold text-emerald-600">{activeTrip.status}</span>
-              </div>
-              <div className="h-8 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
-              <Link
-                href={`/consumer/tracking/${activeTrip.id}`}
-                className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
-              >
-                <span>Buyer View</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
+      {/* Bottom CTA */}
+      <section className="bg-slate-900 text-white py-14 mt-auto">
+        <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
+          <div className="w-12 h-12 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center mx-auto shadow-md font-bold">
+            <Truck className="w-6 h-6" />
           </div>
-
-          {/* Main Grid: Live Map & Status */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Route Map & Timeline (2 cols) */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-900 shadow-xl">
-                <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-cyan-400" />
-                    <span className="text-sm font-bold text-white">Live Route & Vehicle GPS</span>
-                  </div>
-                  <span className="text-xs text-slate-400 font-mono">
-                    {activeTrip.distanceCompletedKm} / {activeTrip.totalDistanceKm} km ({activeTrip.progressPercentage}%)
-                  </span>
-                </div>
-                <div className="h-[420px] w-full relative">
-                  {activeTrip.currentCoordinates ? (
-                    <RouteMap trip={activeTrip} />
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-slate-400 text-xs">
-                      No live GPS telemetry available
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Delivery & Timeline Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <DeliveryStatusCard 
-                  status={activeTrip.status} 
-                  orderId={activeTrip.orderId} 
-                  tripId={activeTrip.tripId} 
-                />
-                <TrackingTimeline 
-                  waypoints={activeTrip.waypoints} 
-                  status={activeTrip.status} 
-                />
-              </div>
-            </div>
-
-            {/* Right Column: Telemetry, Driver & Return Load (1 col) */}
-            <div className="space-y-6">
-              <ColdChainTelemetryCard telemetry={activeTrip.telemetry} />
-              <ETACard 
-                estimatedArrival={activeTrip.estimatedArrival}
-                etaMinutes={activeTrip.etaMinutes}
-                distanceRemainingKm={activeTrip.distanceRemainingKm}
-                distanceCompletedKm={activeTrip.distanceCompletedKm}
-                totalDistanceKm={activeTrip.totalDistanceKm}
-                progressPercentage={activeTrip.progressPercentage}
-                currentLocationName={activeTrip.currentLocationName}
-              />
-              <DriverCard 
-                driverName={activeTrip.driverName}
-                driverPhone={activeTrip.driverPhone}
-                vehicleType={activeTrip.vehicleType}
-                vehicleNumber={activeTrip.vehicleNumber}
-              />
-              {activeTrip.returnLoad && <ReturnLoadCard returnLoad={activeTrip.returnLoad} />}
-              {activeTrip.proofOfDelivery && (
-                <ProofOfDeliveryCard 
-                  pod={activeTrip.proofOfDelivery} 
-                  orderId={activeTrip.orderId} 
-                  isDelivered={activeTrip.status === 'DELIVERED'} 
-                />
-              )}
-            </div>
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+            Ready to Run Efficient Perishable Road Freight?
+          </h2>
+          <p className="text-slate-400 text-xs sm:text-sm max-w-xl mx-auto leading-relaxed">
+            Register your vehicle, start receiving daily cluster pickups, and optimize your revenue with AI return loads.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 pt-2">
+            <Link href="/logistics/register">
+              <Button size="lg" className="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-8 shadow-md">
+                Register as Transporter
+              </Button>
+            </Link>
+            <Link href="/logistics/login">
+              <Button variant="secondary" size="lg" className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700 font-bold px-8">
+                Operator Login
+              </Button>
+            </Link>
           </div>
-        </>
-      )}
+        </div>
+      </section>
     </div>
   );
 }

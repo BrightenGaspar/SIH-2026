@@ -143,12 +143,25 @@ function ConsumerTrackingContent() {
     }
   };
 
-  const handleCopyShareLink = () => {
+  const handleCopyShareLink = async () => {
     if (!activeTrip) return;
-    const url = `${window.location.origin}/consumer/tracking/${activeTrip.id}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const url = `${typeof window !== 'undefined' ? window.location.origin : ''}/consumer/tracking/${activeTrip.id}`;
+    try {
+      if (typeof navigator !== 'undefined' && navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea');
+        textarea.value = url;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.warn('Clipboard copy not permitted:', e);
+    }
   };
 
   if (loading) {

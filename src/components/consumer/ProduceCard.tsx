@@ -52,10 +52,10 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
   const getProductItem = () => ({
     id: produce.id,
     name: produce.crop_name,
-    category: 'Vegetables' as const,
+    category: (produce.category || 'Vegetables') as any,
     image: produce.image_url || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
-    grade: 'A' as const,
-    gradeDescription: 'Grade A Certified Farm Harvest',
+    grade: (produce.quality_grade || 'A') as any,
+    gradeDescription: `Grade ${produce.quality_grade || 'A'} Certified Farm Harvest`,
     availableQuantityKg: produce.quantity_kg,
     totalQuantityKg: produce.quantity_kg,
     minOrderQuantityKg: 1,
@@ -158,7 +158,7 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
             {produce.location || 'Nashik APMC Hub'}
           </span>
           <span className="bg-black/60 backdrop-blur-md px-2 py-1 rounded-lg text-[11px] font-semibold text-zinc-300">
-            Grade A
+            Grade {produce.quality_grade || 'A'}
           </span>
         </div>
       </div>
@@ -169,7 +169,7 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                Direct Farm Produce
+                {produce.category || 'Direct Farm Produce'}
               </span>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-emerald-600 transition-colors">
                 {produce.crop_name}

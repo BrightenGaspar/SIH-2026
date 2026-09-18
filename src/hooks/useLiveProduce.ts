@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { consumerService, MarketplaceProduceItem } from '@/services/consumerService';
+import { normalizeCategory } from '@/lib/categoryHelpers';
 
 export interface UseLiveProduceReturn {
   items: MarketplaceProduceItem[];
@@ -104,11 +105,16 @@ export function useLiveProduce(): UseLiveProduceReturn {
             const price = row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0);
             const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
 
+            const category = normalizeCategory(row.category, row.crop_name, row.variety);
+            const qualityGrade = (row.quality_grade || 'A').toUpperCase();
+
             const updatedItem: MarketplaceProduceItem = {
               id,
               farmer_id: row.farmer_id,
               crop_name: row.crop_name || 'Farm Harvest',
               variety: row.variety || null,
+              category,
+              quality_grade: qualityGrade,
               quantity_kg: qty,
               price_per_kg: price,
               location: row.location || 'Local FPO Hub',
@@ -117,6 +123,12 @@ export function useLiveProduce(): UseLiveProduceReturn {
               updated_at: updatedAt,
               created_at: row.created_at,
               farmer_name: 'Verified Kisan Partner',
+              shelf_life_days: row.shelf_life_days ?? 7,
+              is_cold_chain: Boolean(
+                row.is_cold_chain ||
+                row.cold_chain_eligible ||
+                ['Vegetables', 'Fruits'].includes(category)
+              ),
             };
 
             // Trigger 1s "LIVE" pulse badge
@@ -159,6 +171,8 @@ export function useLiveProduce(): UseLiveProduceReturn {
             const qty = row.available_quantity != null ? Number(row.available_quantity) : Number(row.quantity_kg || row.quantity || 0);
             const price = row.price_per_unit != null ? Number(row.price_per_unit) : Number(row.price_per_kg || row.asking_price || 0);
             const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
+            const category = normalizeCategory(row.category, row.produce_name || row.crop_name, row.variety);
+            const qualityGrade = (row.quality_grade || 'A').toUpperCase();
 
             // Trigger 1s "LIVE" pulse badge
             pulseUpdatedId(id);
@@ -170,10 +184,19 @@ export function useLiveProduce(): UseLiveProduceReturn {
                 nextList[existingIndex] = {
                   ...prev[existingIndex],
                   crop_name: row.produce_name || row.crop_name || prev[existingIndex].crop_name,
+                  variety: row.variety !== undefined ? row.variety : prev[existingIndex].variety,
+                  category,
+                  quality_grade: qualityGrade,
                   quantity_kg: qty,
                   price_per_kg: price > 0 ? price : prev[existingIndex].price_per_kg,
                   location: row.location_address || row.location || prev[existingIndex].location,
                   updated_at: updatedAt,
+                  shelf_life_days: row.shelf_life_days ?? prev[existingIndex].shelf_life_days,
+                  is_cold_chain: Boolean(
+                    row.is_cold_chain ||
+                    row.cold_chain_eligible ||
+                    ['Vegetables', 'Fruits'].includes(category)
+                  ),
                 };
                 return nextList
                   .filter((p) => p.quantity_kg > 0)
@@ -185,6 +208,8 @@ export function useLiveProduce(): UseLiveProduceReturn {
                   farmer_id: row.farmer_id,
                   crop_name: row.produce_name || row.crop_name || 'Farm Harvest',
                   variety: row.variety || null,
+                  category,
+                  quality_grade: qualityGrade,
                   quantity_kg: qty,
                   price_per_kg: price,
                   location: row.location_address || row.location || 'Local FPO Hub',
@@ -193,6 +218,12 @@ export function useLiveProduce(): UseLiveProduceReturn {
                   updated_at: updatedAt,
                   created_at: row.created_at,
                   farmer_name: 'Verified Kisan Partner',
+                  shelf_life_days: row.shelf_life_days ?? 7,
+                  is_cold_chain: Boolean(
+                    row.is_cold_chain ||
+                    row.cold_chain_eligible ||
+                    ['Vegetables', 'Fruits'].includes(category)
+                  ),
                 };
                 return [newItem, ...prev]
                   .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());

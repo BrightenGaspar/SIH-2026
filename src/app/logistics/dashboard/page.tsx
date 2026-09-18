@@ -439,7 +439,7 @@ export default function LogisticsDashboard() {
                 )}
               </div>
               <h3 className="text-sm font-bold text-slate-900 mt-0.5">
-                Vehicle: {activeSimulatedShipment?.vehicle_type || primaryVehicle.vehicleType} ({activeSimulatedShipment?.vehicle_number || primaryVehicle.vehicleNumber}) &bull; Route: {activeSimulatedShipment?.origin || 'Shadnagar'} &rarr; {activeSimulatedShipment?.destination || 'Hyderabad'}
+                Vehicle: {activeSimulatedShipment?.vehicle_type || primaryVehicle?.vehicleType || 'Tata 407 Reefer'} ({activeSimulatedShipment?.vehicle_number || primaryVehicle?.vehicleNumber || 'TS 08 UB 4192'}) &bull; Route: {activeSimulatedShipment?.origin || 'Shadnagar'} &rarr; {activeSimulatedShipment?.destination || 'Hyderabad'}
               </h3>
             </div>
           </div>
@@ -519,7 +519,7 @@ export default function LogisticsDashboard() {
 
               <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
                 <span className="text-slate-400 text-[10px] block font-semibold">Driver & Load Weight</span>
-                <span className="text-slate-900 font-bold text-xs block">{activeSimulatedShipment?.driver_name || primaryVehicle.driverName}</span>
+                <span className="text-slate-900 font-bold text-xs block">{activeSimulatedShipment?.driver_name || primaryVehicle?.driverName || 'Mohammed Ismail'}</span>
                 <span className="text-slate-600 text-[10px] block">1,850 kg / 2,500 kg (74%)</span>
               </div>
             </div>
@@ -616,7 +616,7 @@ export default function LogisticsDashboard() {
                 <div className="grid grid-cols-3 gap-2 text-xs">
                   <div>
                     <span className="text-[10px] text-slate-400 block font-medium">Assigned Driver</span>
-                    <strong className="text-slate-900 block text-xs mt-0.5 truncate">{activeSimulatedShipment?.driver_name || primaryVehicle.driverName}</strong>
+                    <strong className="text-slate-900 block text-xs mt-0.5 truncate">{activeSimulatedShipment?.driver_name || primaryVehicle?.driverName || 'Mohammed Ismail'}</strong>
                     <span className="text-[10px] text-slate-500">Verified Carrier</span>
                   </div>
                   <div>
@@ -656,7 +656,7 @@ export default function LogisticsDashboard() {
             {/* Live Recharts Temperature Graph with 8°C Spoilage Threshold Line */}
             <LiveSimulationGraph
               shipmentId={activeSimulatedShipment?.id || 'TRK-CONS-ROAD-9021'}
-              vehicleNumber={activeSimulatedShipment?.vehicle_number || primaryVehicle.vehicleNumber}
+              vehicleNumber={activeSimulatedShipment?.vehicle_number || primaryVehicle?.vehicleNumber || 'TS 08 UB 4192'}
               currentTemp={Number(activeSimulatedShipment?.current_temp ?? 5.8)}
               targetTemp={Number(activeSimulatedShipment?.target_temp ?? 5.0)}
               history={activeSimulatedShipment?.temp_history || []}
@@ -703,7 +703,14 @@ export default function LogisticsDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {fleet.map((veh) => (
+                  {fleet.length === 0 ? (
+                    <tr>
+                      <td colSpan={7} className="py-8 text-center text-slate-400 text-xs">
+                        No active vehicles registered in your regional fleet.
+                      </td>
+                    </tr>
+                  ) : (
+                    fleet.map((veh) => (
                     <tr key={veh.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-3 px-4">
                         <span className="font-bold text-slate-900 block font-mono">{veh.vehicleNumber}</span>
@@ -740,10 +747,20 @@ export default function LogisticsDashboard() {
                         </Link>
                       </td>
                     </tr>
-                  ))}
+                  )))}
                 </tbody>
               </table>
             </div>
+          </div>
+        ) : fleet.length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto">
+              <Truck className="w-6 h-6" />
+            </div>
+            <h4 className="text-sm font-bold text-slate-900">No Vehicles Currently En Route</h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+              Active fleet carriers and assigned delivery vehicles will appear here with real-time temperature telemetry.
+            </p>
           </div>
         ) : (
           /* NORMAL MODE: Visual Fleet Cards */

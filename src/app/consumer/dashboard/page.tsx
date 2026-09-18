@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
@@ -29,9 +29,11 @@ import {
   Wheat,
   Apple,
   Carrot,
-  Flame
+  Flame,
+  Tag
 } from 'lucide-react';
 import { cn, formatINR } from '@/lib/utils';
+import { getAvailableSubCategories, matchesSubCategory } from '@/lib/categoryHelpers';
 
 export default function ConsumerDashboard() {
   const { user, consumerUser } = useAuth();
@@ -47,6 +49,7 @@ export default function ConsumerDashboard() {
   // Search and Category Filter
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedSubCategory, setSelectedSubCategory] = useState<string>('all');
 
   // Modal State
   const [showDemandModal, setShowDemandModal] = useState(false);
@@ -164,16 +167,33 @@ export default function ConsumerDashboard() {
     }, 1500);
   };
 
-  // Filter products by search and category
+  // Available sub-categories for selected category
+  const subCategories = useMemo(() => {
+    const items = products.map((p) => ({
+      crop_name: p.name,
+      variety: p.description,
+      category: p.category,
+    }));
+    return getAvailableSubCategories(selectedCategory, items);
+  }, [selectedCategory, products]);
+
+  // Filter products by search, category, and subcategory
   const filteredProducts = products.filter((item) => {
     const matchesCategory =
       selectedCategory === 'All' || item.category.toLowerCase() === selectedCategory.toLowerCase();
+    const matchesSub =
+      selectedSubCategory === 'all' ||
+      matchesSubCategory(
+        { crop_name: item.name, variety: item.description, category: item.category },
+        selectedCategory,
+        selectedSubCategory
+      );
     const matchesSearch =
       searchQuery.trim() === '' ||
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.tags?.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
+    return matchesCategory && matchesSub && matchesSearch;
   });
 
   const activeOrders = orders.filter((o) => o.status !== 'Delivered' && o.status !== 'Cancelled');
@@ -265,7 +285,10 @@ export default function ConsumerDashboard() {
               <button
                 key={cat.name}
                 type="button"
-                onClick={() => setSelectedCategory(cat.name)}
+                onClick={() => {
+                  setSelectedCategory(cat.name);
+                  setSelectedSubCategory('all');
+                }}
                 className={cn(
                   'px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0',
                   isSelected
@@ -279,6 +302,42 @@ export default function ConsumerDashboard() {
             );
           })}
         </div>
+
+        {/* Sub-Category Filter Pills */}
+        {subCategories.length > 1 && (
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none pt-1">
+            <div className="flex items-center gap-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 shrink-0">
+              <Tag className="w-3 h-3 text-blue-500" />
+              <span>Sub-categories:</span>
+            </div>
+            {subCategories.map((sub: { id: string; label: string; count: number }) => {
+              const isSelected = selectedSubCategory === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => setSelectedSubCategory(sub.id)}
+                  className={cn(
+                    'px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shrink-0',
+                    isSelected
+                      ? 'bg-blue-100 text-blue-800 border border-blue-300 font-bold shadow-xs'
+                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  )}
+                >
+                  <span>{sub.label}</span>
+                  <span
+                    className={cn(
+                      'text-[10px] px-1.5 py-0.2 rounded-full font-bold',
+                      isSelected ? 'bg-blue-200 text-blue-900' : 'bg-slate-100 text-slate-500'
+                    )}
+                  >
+                    {sub.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* 4. 3 KPI STAT CARDS */}

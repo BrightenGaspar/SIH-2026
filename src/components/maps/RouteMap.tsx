@@ -29,10 +29,23 @@ export default function RouteMap({ trip, isLowBandwidth = false }: RouteMapProps
 
   const smsTrackingBody = `AGRIFLOW STATUS: Trip ${trip.id} | Vehicle: ${trip.vehicleNumber} | Cargo: ${trip.produceName} (${trip.totalQuantityKg}kg) | Driver: ${trip.driverName} (${trip.driverPhone}) | Last Point: ${trip.currentLocationName} | Status: ${trip.status} | ETA: ${trip.estimatedArrival}`;
 
-  const handleCopySMS = () => {
-    navigator.clipboard.writeText(smsTrackingBody);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+  const handleCopySMS = async () => {
+    try {
+      if (typeof navigator !== 'undefined' && navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(smsTrackingBody);
+      } else if (typeof document !== 'undefined') {
+        const textarea = document.createElement('textarea');
+        textarea.value = smsTrackingBody;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch (e) {
+      console.warn('Clipboard copy not permitted:', e);
+    }
   };
 
   if (isLowBandwidth || showDesperateMode) {

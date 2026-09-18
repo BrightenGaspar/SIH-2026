@@ -148,8 +148,8 @@ export function PhoneAuthForm({
       const targetPhone = sentPhone || phoneNumber;
       const result = await verifyPhoneOtp(targetPhone, cleanOtp, role);
       setStatusMsg('OTP verified successfully! Entering dashboard...');
-      const targetRole = result.role || role;
-      router.push(`/${targetRole}/dashboard`);
+      const targetDestination = redirectUrl || `/${result.role || role}/dashboard`;
+      router.push(targetDestination);
     } catch (err: unknown) {
       const error = err as Error;
       setErrorMsg(error.message || 'Verification failed. Please check the OTP code.');
@@ -189,9 +189,10 @@ export function PhoneAuthForm({
 
     setSubmitting(true);
     try {
-      const res = await loginWithUsernamePassword(identifier.trim(), password);
-      if (res.success && res.role) {
-        router.push(`/${res.role}/dashboard`);
+      const res = await loginWithUsernamePassword(identifier.trim(), password, role);
+      if (res.success) {
+        const dest = redirectUrl || `/${res.role || role}/dashboard`;
+        router.push(dest);
       }
     } catch (err: unknown) {
       const error = err as Error;

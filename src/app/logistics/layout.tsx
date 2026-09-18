@@ -27,7 +27,7 @@ export default function LogisticsLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logisticsUser, isLogisticsAuthenticated, isLoading, logoutLogistics } = useAuth();
+  const { currentUser, logisticsUser, isLogisticsAuthenticated, isLoading, logoutLogistics } = useAuth();
   const { t } = useI18n();
 
   const isPublic =
@@ -36,9 +36,13 @@ export default function LogisticsLayout({
     pathname === '/logistics/register' ||
     pathname === '/logistics/complete-profile';
 
+  const isGuestAllowed =
+    isPublic ||
+    pathname.startsWith('/logistics/track');
+
   useEffect(() => {
-    if (!isPublic && !isLoading) {
-      if (!isLogisticsAuthenticated && !logisticsUser) {
+    if (!isGuestAllowed && !isLoading) {
+      if (!isLogisticsAuthenticated && !logisticsUser && !currentUser) {
         router.push('/logistics/login');
       } else if (
         logisticsUser &&
@@ -48,7 +52,7 @@ export default function LogisticsLayout({
         router.push('/logistics/complete-profile');
       }
     }
-  }, [isPublic, isLoading, isLogisticsAuthenticated, logisticsUser, pathname, router]);
+  }, [isGuestAllowed, isLoading, isLogisticsAuthenticated, logisticsUser, currentUser, pathname, router]);
 
   if (isPublic) {
     return <>{children}</>;
@@ -63,7 +67,7 @@ export default function LogisticsLayout({
     );
   }
 
-  if (!logisticsUser) {
+  if (!isGuestAllowed && !isLogisticsAuthenticated && !logisticsUser && !currentUser) {
     return null;
   }
 

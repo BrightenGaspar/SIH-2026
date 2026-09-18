@@ -14,12 +14,15 @@ import {
   HeartHandshake, 
   CheckCircle2, 
   ArrowRight,
+  ArrowLeft,
   Snowflake,
   BarChart3
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
 
 export default function ConsumerLandingPage() {
+  const { isConsumerAuthenticated } = useAuth();
   const { t } = useI18n();
 
   const buyerProfiles = [
@@ -77,48 +80,115 @@ export default function ConsumerLandingPage() {
   ];
 
   return (
-    <div className="space-y-16 py-4 sm:py-8">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 border border-blue-500/30 p-8 sm:p-14 text-white shadow-sm">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        
-        <div className="max-w-3xl relative z-10 space-y-6">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold tracking-wide uppercase backdrop-blur-xs">
-            <Sparkles className="w-3.5 h-3.5" /> Next-Gen Direct Farm Procurement
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-blue-500 selection:text-white">
+      {/* Top Eco Gateway Bar */}
+      <div className="bg-white border-b border-slate-200 text-xs py-2 px-4 flex items-center justify-between text-slate-500">
+        <Link href="/" className="hover:text-blue-600 flex items-center gap-1 font-semibold transition">
+          <ArrowLeft className="w-3.5 h-3.5" /> Back to Main AgriFlow Ecosystem Gateway
+        </Link>
+        <span className="text-blue-700 font-bold">Consumer & Buyer Direct Marketplace</span>
+      </div>
+
+      {/* Public Header */}
+      <header className="border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black shadow-xs">
+              <Store className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <span className="font-extrabold text-xl tracking-tight text-slate-900">
+                AgriFlow<span className="text-blue-600"> Consumer</span>
+              </span>
+              <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                Direct Farm-Gate Marketplace
+              </span>
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
-            Fresh Produce Directly From <span className="text-blue-100">Verified Indian Farms</span>.
-          </h1>
-
-          <p className="text-sm sm:text-lg text-blue-100 font-normal leading-relaxed">
-            Eliminate commission agents. Buy directly from FPOs and progressive farmers with verified farm quality, cold-chain road transport, and transparent escrow pricing.
-          </p>
-
-          {/* Action CTAs */}
-          <div className="flex flex-wrap items-center gap-4 pt-4">
-            <Link
-              href="/consumer/marketplace"
-              className="px-6 py-3.5 rounded-2xl bg-white hover:bg-blue-50 text-blue-700 font-bold text-sm flex items-center gap-2 shadow-xs transition-all duration-200 active:scale-95 cursor-pointer"
-            >
-              <Store className="w-4 h-4 text-blue-600" /> Explore Marketplace <ArrowRight className="w-4 h-4" />
-            </Link>
-
-            <Link
-              href="/consumer/register"
-              className="px-6 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white border border-blue-400 font-bold text-sm flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-xs"
-            >
-              Create Buyer Account
-            </Link>
-
-            <Link
-              href="/consumer/login"
-              className="px-4 py-3.5 text-xs text-blue-100 hover:text-white font-semibold transition-colors"
-            >
-              Already registered? Sign In
-            </Link>
+          <div className="flex items-center gap-3">
+            {isConsumerAuthenticated ? (
+              <Link href="/consumer/dashboard">
+                <button type="button" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-xs transition cursor-pointer">
+                  Go to Buyer Dashboard &rarr;
+                </button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/consumer/marketplace">
+                  <button type="button" className="px-3.5 py-2 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-xl transition cursor-pointer">
+                    Marketplace
+                  </button>
+                </Link>
+                <Link href="/consumer/login">
+                  <button type="button" className="px-3.5 py-2 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-xl transition cursor-pointer">
+                    Buyer Login
+                  </button>
+                </Link>
+                <Link href="/consumer/register">
+                  <button type="button" className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+                    Register as Buyer
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
+      </header>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 py-8 flex-1 w-full">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 border border-blue-500/30 p-8 sm:p-14 text-white shadow-sm">
+          <div className="absolute top-0 right-0 -mt-12 -mr-12 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="max-w-3xl relative z-10 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/20 border border-white/30 text-white text-xs font-bold tracking-wide uppercase backdrop-blur-xs">
+              <Sparkles className="w-3.5 h-3.5" /> Next-Gen Direct Farm Procurement
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15]">
+              Fresh Produce Directly From <span className="text-blue-100">Verified Indian Farms</span>.
+            </h1>
+
+            <p className="text-sm sm:text-lg text-blue-100 font-normal leading-relaxed">
+              Eliminate commission agents. Buy directly from FPOs and progressive farmers with verified farm quality, cold-chain road transport, and transparent escrow pricing.
+            </p>
+
+            {/* Action CTAs */}
+            <div className="flex flex-wrap items-center gap-4 pt-4">
+              <Link
+                href="/consumer/marketplace"
+                className="px-6 py-3.5 rounded-2xl bg-white hover:bg-blue-50 text-blue-700 font-bold text-sm flex items-center gap-2 shadow-xs transition-all duration-200 active:scale-95 cursor-pointer"
+              >
+                <Store className="w-4 h-4 text-blue-600" /> Explore Marketplace <ArrowRight className="w-4 h-4" />
+              </Link>
+
+              {isConsumerAuthenticated ? (
+                <Link
+                  href="/consumer/dashboard"
+                  className="px-6 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white border border-blue-400 font-bold text-sm flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-xs"
+                >
+                  Access Dashboard &rarr;
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/consumer/register"
+                    className="px-6 py-3.5 rounded-2xl bg-blue-700 hover:bg-blue-800 text-white border border-blue-400 font-bold text-sm flex items-center gap-2 transition-all duration-200 cursor-pointer shadow-xs"
+                  >
+                    Create Buyer Account
+                  </Link>
+
+                  <Link
+                    href="/consumer/login"
+                    className="px-4 py-3.5 text-xs text-blue-100 hover:text-white font-semibold transition-colors"
+                  >
+                    Already registered? Sign In
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
 
         {/* Live Metrics Row */}
         <div className="mt-12 pt-8 border-t border-white/20 grid grid-cols-2 sm:grid-cols-4 gap-4 relative z-10">
@@ -238,6 +308,14 @@ export default function ConsumerLandingPage() {
           View Sourcing Details
         </Link>
       </section>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500 bg-white">
+        <p className="font-medium">
+          &copy; {new Date().getFullYear()} AgriFlow AI &bull; Smart India Hackathon Verified Consumer Marketplace
+        </p>
+      </footer>
     </div>
   );
 }

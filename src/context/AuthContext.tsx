@@ -63,7 +63,7 @@ interface AuthContextType {
   loginLogistics: (identifier: string, pass: string) => Promise<boolean>;
   registerLogistics: (data: Partial<LogisticsOperator>) => Promise<boolean>;
   logoutLogistics: () => Promise<void>;
-  loginWithUsernamePassword: (identifier: string, pass: string) => Promise<{ success: boolean; role?: string }>;
+  loginWithUsernamePassword: (identifier: string, pass: string, targetRole?: string) => Promise<{ success: boolean; role?: string }>;
   updateFarmerLanguage: (lang: string) => Promise<boolean>;
   updateConsumerLanguage: (lang: string) => Promise<boolean>;
   updateLogisticsLanguage: (lang: string) => Promise<boolean>;
@@ -200,19 +200,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    if (profile.role === 'farmer') {
-      setUser(normalizeToFarmer(profile));
-      setConsumerUser(null);
-      setLogisticsUser(null);
-    } else if (profile.role === 'consumer') {
-      setUser(null);
-      setConsumerUser(normalizeToConsumer(profile));
-      setLogisticsUser(null);
-    } else if (profile.role === 'logistics') {
-      setUser(null);
-      setConsumerUser(null);
-      setLogisticsUser(normalizeToLogistics(profile));
-    }
+    // Populate all role personas from the user's verified profile so that
+    // the user can navigate to /farmer, /consumer, or /logistics seamlessly
+    setUser(normalizeToFarmer(profile));
+    setConsumerUser(normalizeToConsumer(profile));
+    setLogisticsUser(normalizeToLogistics(profile));
   }, []);
 
   // Fetch real persistent profile from Supabase Database (Source of Truth)
@@ -428,7 +420,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       applyProfileState(profile, data.user);
 
       // Navigate directly to the authenticated role dashboard
-      const activeRole = profile?.role || targetRole;
+      const activeRole = targetRole || profile?.role || 'consumer';
       router.push(`/${activeRole}/dashboard`);
       return { isReturningUser: true, role: activeRole };
     } finally {
@@ -463,7 +455,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 4. Username + Password Login: Secure resolution & Supabase Auth authentication
   const loginWithUsernamePassword = async (
     identifier: string,
-    pass: string
+    pass: string,
+    targetRole?: string
   ): Promise<{ success: boolean; role?: string }> => {
     setIsLoading(true);
     try {
@@ -490,12 +483,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const profile = await getProfileByUserId(data.user.id);
       if (profile && isProfileComplete(profile)) {
-        applyProfileState(profile);
-        router.push(`/${profile.role}/dashboard`);
-        return { success: true, role: profile.role };
+        applyProfileState(profile, data.user);
+        const destRole = targetRole || profile.role || 'farmer';
+        router.push(`/${destRole}/dashboard`);
+        return { success: true, role: destRole };
       } else {
-        router.push('/auth/complete-profile');
-        return { success: true };
+        const destRole = targetRole || 'farmer';
+        router.push(`/auth/complete-profile?role=${destRole}`);
+        return { success: true, role: destRole };
       }
     } finally {
       setIsLoading(false);
@@ -504,17 +499,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Backward-compatible login wrappers
   const login = async (identifier: string, pass: string): Promise<boolean> => {
-    const res = await loginWithUsernamePassword(identifier, pass);
+    const res = await loginWithUsernamePassword(identifier, pass, 'farmer');
     return res.success;
   };
 
   const loginConsumer = async (identifier: string, pass: string): Promise<boolean> => {
-    const res = await loginWithUsernamePassword(identifier, pass);
+    const res = await loginWithUsernamePassword(identifier, pass, 'consumer');
     return res.success;
   };
 
   const loginLogistics = async (identifier: string, pass: string): Promise<boolean> => {
-    const res = await loginWithUsernamePassword(identifier, pass);
+    const res = await loginWithUsernamePassword(identifier, pass, 'logistics');
     return res.success;
   };
 
@@ -816,9 +811,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         consumerUser,
         logisticsUser,
         currentProfile,
-        isAuthenticated: !!user || (!!currentUser && currentUser.role === 'farmer'),
-        isConsumerAuthenticated: !!consumerUser || (!!currentUser && currentUser.role === 'consumer'),
-        isLogisticsAuthenticated: !!logisticsUser || (!!currentUser && currentUser.role === 'logistics'),
+        isAuthenticated: !!user || !!currentUser,
+        isConsumerAuthenticated: !!consumerUser || !!currentUser,
+        isLogisticsAuthenticated: !!logisticsUser || !!currentUser,
         isLoading,
         login,
         register,

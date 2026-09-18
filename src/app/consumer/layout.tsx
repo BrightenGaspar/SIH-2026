@@ -28,7 +28,7 @@ export default function ConsumerLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { consumerUser, isConsumerAuthenticated, isLoading, logoutConsumer } = useAuth();
+  const { currentUser, consumerUser, isConsumerAuthenticated, isLoading, logoutConsumer } = useAuth();
   const { totalItems } = useCart();
   const { t } = useI18n();
 
@@ -38,9 +38,15 @@ export default function ConsumerLayout({
     pathname === '/consumer/register' ||
     pathname === '/consumer/complete-profile';
 
+  const isGuestAllowed =
+    isPublicPage ||
+    pathname === '/consumer/marketplace' ||
+    pathname.startsWith('/consumer/product') ||
+    pathname.startsWith('/consumer/tracking');
+
   useEffect(() => {
-    if (!isPublicPage && !isLoading) {
-      if (!isConsumerAuthenticated) {
+    if (!isGuestAllowed && !isLoading) {
+      if (!isConsumerAuthenticated && !consumerUser && !currentUser) {
         router.push('/consumer/login');
       } else if (
         consumerUser &&
@@ -50,7 +56,7 @@ export default function ConsumerLayout({
         router.push('/consumer/complete-profile');
       }
     }
-  }, [isPublicPage, isLoading, isConsumerAuthenticated, consumerUser, pathname, router]);
+  }, [isGuestAllowed, isLoading, isConsumerAuthenticated, consumerUser, currentUser, pathname, router]);
 
   // If on login/register/splash public page, render children directly without dashboard sidebar
   if (isPublicPage) {
@@ -66,7 +72,7 @@ export default function ConsumerLayout({
     );
   }
 
-  if (!isConsumerAuthenticated) {
+  if (!isGuestAllowed && !isConsumerAuthenticated && !consumerUser && !currentUser) {
     return null;
   }
 

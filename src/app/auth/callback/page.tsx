@@ -51,7 +51,7 @@ function AuthCallbackContent() {
 
         // 3. Fetch persistent profile from public.profiles
         const profile = await getProfileByUserId(user.id);
-        const resolvedRole = fromDbRole(profile?.role || roleParam || 'consumer');
+        const resolvedRole = fromDbRole(roleParam || profile?.role || 'consumer');
 
         if (profile && isProfileComplete(profile)) {
           // Returning user with completed profile: direct to role dashboard

@@ -85,17 +85,28 @@ export default function FarmerPublicLandingPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <Link href="/farmer/register" className="w-full sm:w-auto">
-            <Button size="lg" className="w-full text-base px-8 py-4 shadow-sm bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
-              <span>Register Farmer / FPO</span>
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </Link>
-          <Link href="/farmer/login" className="w-full sm:w-auto">
-            <Button variant="secondary" size="lg" className="w-full text-base px-8 py-4 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold shadow-xs">
-              <span>Farmer Login</span>
-            </Button>
-          </Link>
+          {isAuthenticated ? (
+            <Link href="/farmer/dashboard" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full text-base px-8 py-4 shadow-sm bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
+                <span>Enter Farmer Dashboard</span>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link href="/farmer/register" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full text-base px-8 py-4 shadow-sm bg-emerald-600 hover:bg-emerald-500 text-white font-bold">
+                  <span>Register Farmer / FPO</span>
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+              <Link href="/farmer/login" className="w-full sm:w-auto">
+                <Button variant="secondary" size="lg" className="w-full text-base px-8 py-4 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold shadow-xs">
+                  <span>Farmer Login</span>
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
       </section>
 

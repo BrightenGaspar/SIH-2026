@@ -26,7 +26,7 @@ import { cn } from '@/lib/utils';
 export default function FarmerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const { currentUser, user, isAuthenticated, isLoading, logout } = useAuth();
   const { t } = useI18n();
 
   // Navigation items matching reference design while preserving all existing routes
@@ -47,13 +47,13 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 
   React.useEffect(() => {
     if (!isPublicRoute && !isLoading) {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !user && !currentUser) {
         router.push('/farmer/login');
       } else if (user && user.profileCompleted === false && pathname !== '/farmer/complete-profile') {
         router.push('/farmer/complete-profile');
       }
     }
-  }, [isPublicRoute, isLoading, isAuthenticated, user, pathname, router]);
+  }, [isPublicRoute, isLoading, isAuthenticated, user, currentUser, pathname, router]);
 
   if (isPublicRoute) {
     return <>{children}</>;
@@ -68,7 +68,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !user && !currentUser) {
     return null;
   }
 

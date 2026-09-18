@@ -15,10 +15,12 @@ import {
   Leaf 
 } from 'lucide-react';
 import { useBandwidth } from '@/context/BandwidthContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function PublicGateway() {
   const router = useRouter();
   const { isLowBandwidth } = useBandwidth();
+  const { isAuthenticated, isConsumerAuthenticated, isLogisticsAuthenticated } = useAuth();
 
   // Preserve OAuth callback token forwarding
   useEffect(() => {
@@ -275,14 +277,22 @@ export default function PublicGateway() {
               </p>
 
               {/* Action Button */}
-              <div className="pt-4">
+              <div className="pt-4 flex items-center gap-2">
                 <Link
-                  href="/farmer/login"
+                  href={isAuthenticated ? "/farmer/dashboard" : "/farmer"}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#185E32] hover:bg-[#134D28] text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all group-hover:gap-3"
                 >
                   <span>Continue as Farmer</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+                {!isAuthenticated && (
+                  <Link
+                    href="/farmer/login"
+                    className="text-xs font-bold text-[#185E32] hover:underline px-2 py-1"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
 
             </div>
@@ -322,14 +332,22 @@ export default function PublicGateway() {
               </p>
 
               {/* Action Button */}
-              <div className="pt-4">
+              <div className="pt-4 flex items-center gap-2">
                 <Link
-                  href="/consumer/login"
+                  href={isConsumerAuthenticated ? "/consumer/dashboard" : "/consumer"}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1D63D8] hover:bg-[#1752B5] text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all group-hover:gap-3"
                 >
                   <span>Continue as Consumer</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+                {!isConsumerAuthenticated && (
+                  <Link
+                    href="/consumer/login"
+                    className="text-xs font-bold text-[#1D63D8] hover:underline px-2 py-1"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
 
             </div>
@@ -369,14 +387,22 @@ export default function PublicGateway() {
               </p>
 
               {/* Action Button */}
-              <div className="pt-4">
+              <div className="pt-4 flex items-center gap-2">
                 <Link
-                  href="/logistics/login"
+                  href={isLogisticsAuthenticated ? "/logistics/dashboard" : "/logistics"}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#B8710B] hover:bg-[#9E5F07] text-white text-xs font-bold shadow-xs hover:shadow-sm transition-all group-hover:gap-3"
                 >
                   <span>Continue as Logistics</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+                {!isLogisticsAuthenticated && (
+                  <Link
+                    href="/logistics/login"
+                    className="text-xs font-bold text-[#B8710B] hover:underline px-2 py-1"
+                  >
+                    Login
+                  </Link>
+                )}
               </div>
 
             </div>

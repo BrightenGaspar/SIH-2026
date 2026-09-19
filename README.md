@@ -6,9 +6,9 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Realtime%20Postgres-emerald?style=for-the-badge&logo=supabase)](https://supabase.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-cyan?style=for-the-badge&logo=tailwindcss)](https://tailwindcss.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://sihfullcode.vercel.app/)
-[![Tests](https://img.shields.io/badge/Verification-7%2F7%20Passed-brightgreen?style=for-the-badge)](scripts/run-all-tests.js)
+[![Tests](https://img.shields.io/badge/Verification-8%2F8%20Passed-brightgreen?style=for-the-badge)](scripts/run-all-tests.js)
 
-AgriFlow.ai is a production-grade, multi-user agricultural supply chain and perishables distribution platform. It connects **Farmers (FPOs)**, **Institutional Buyers & Consumers**, and **Logistics Carriers** through real-time database transactions, automated escrow locks, and **real smartphone GPS beacon tracking** — built on **100% genuine data, live external APIs, and zero simulated/fabricated metrics**.
+AgriFlow.ai is a production-grade, multi-user agricultural supply chain and perishables distribution platform. It connects **Farmers (FPOs)**, **Institutional Buyers & Consumers**, and **Logistics Carriers** through real-time database transactions, automated escrow locks, strict three-portal role separation, and **real smartphone GPS beacon tracking** — built on **100% genuine data, live external APIs, and zero simulated/fabricated metrics**.
 
 ---
 
@@ -27,11 +27,21 @@ AgriFlow.ai is a production-grade, multi-user agricultural supply chain and peri
 - **Strict Separation of GPS & Temperature**: Phone GPS transmits genuine coordinates to live tracking maps. Cargo temperature honestly displays `"Phone GPS active • Sensor not connected"` and `"No live reading — reefer sensor unattached"` — strictly preventing fabricated temperatures.
 - **Low-Bandwidth Mode**: Switchable between 4-second normal pings and 15-second data/battery saver mode.
 
-### 3. Genuine External Cloud Services & Models
+### 3. Strict Portal Separation & Role Isolation
+- **Farmer Portal (`/farmer/*`)**: Dedicated Green theme, produce inventory management, FPO virtual cooperatives, APMC prices, and AI intelligence.
+- **Consumer Portal (`/consumer/*`)**: Dedicated Blue theme, dynamic subcategory filtering, Grade A/B/C tabs, cold-chain filters, escrow shopping cart, and live order tracking.
+- **Logistics Portal (`/logistics/*`)**: Dedicated Amber theme, trip consolidation, fleet command center, phone GPS tracking, and return load optimization.
+- **Multi-Persona Session Support**: Multi-adapter auth context (`normalizeToFarmer`, `normalizeToConsumer`, `normalizeToLogistics`) eliminating cross-portal redirection hijacking.
+
+### 4. High-Concurrency & Sub-Second Realtime
+- **Decommissioned 10s Polling Reload**: Eliminated destructive 10-second periodic reloads. UI synchronization is 100% driven by Supabase PostgreSQL WebSocket replication (`postgres_changes`) in `<400ms`.
+- **Atomic Concurrency Protection**: PostgreSQL RPC `atomic_checkout_order` with row-level locks (`FOR UPDATE`) guarantees zero overselling during simultaneous buyer purchases.
+- **Hierarchical Subcategories & Produce Classification**: Dynamic category/subcategory mapping (`src/lib/categoryHelpers.ts`) with computer-vision grade filtering.
+
+### 5. Genuine External Cloud Services & Models
 - **Open-Meteo Meteorological API**: Live 2-meter air temperature, relative humidity, precipitation, and wind speeds directly from Open-Meteo (`api.open-meteo.com`).
 - **APMC Mandi Price Forecaster**: Closed-form Ordinary Least Squares (OLS) linear regression computed directly over real historical commodity records, reporting $R^2$, MAE, and RMSE.
 - **Cryptographic Provenance Ledger**: SHA-256 cryptographic verification hashes over each supply chain event for tamper-evident farm-to-fork traceability.
-- **10-Second Auto-Reload Controller**: Floating countdown badge with smart pauses during typing, on authentication screens, and during active GPS tracking.
 - **8 Indian Languages**: Full UI localization in English, Telugu (తెలుగు), Hindi (हिन्दी), Tamil (தமிழ்), Malayalam (മലയാളം), Bengali (বাংলা), and Marathi (मराठी).
 
 ---
@@ -153,8 +163,8 @@ sequenceDiagram
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/teemforge/sihfullcode.git
-cd sihfullcode
+git clone https://github.com/Nikhil-startup/SIHFULLCODE.git
+cd SIHFULLCODE
 npm install
 ```
 
@@ -188,20 +198,21 @@ Run the unified system verification runner:
 node scripts/run-all-tests.js
 ```
 
-### Measured Verification Results (7/7 Suites Passing):
+### Measured Verification Results (8/8 Suites Passing):
 ```
 ================================================================
        AGRIFLOW.AI — COMPLETE SYSTEM VERIFICATION RUNNER       
 ================================================================
-  [PASS] Auth & Profile Completeness          659ms
-  [PASS] Identity & Initials Sync             698ms
-  [PASS] Delete Account Security              4155ms
-  [PASS] Phone GPS & Telemetry Engine         2331ms
-  [PASS] OLS Price Predictor & Math           600ms
-  [PASS] Open-Meteo Meteorological API        2737ms
-  [PASS] Multi-User Live Demo Flow            4653ms
+  [PASS] Auth & Profile Completeness          441ms
+  [PASS] Identity & Initials Sync             441ms
+  [PASS] Delete Account Security              4116ms
+  [PASS] Phone GPS & Telemetry Engine         1680ms
+  [PASS] OLS Price Predictor & Math           382ms
+  [PASS] Open-Meteo Meteorological API        1496ms
+  [PASS] Multi-User Live Demo Flow            3244ms
+  [PASS] Live Data Repair & Concurrency       4469ms
 ================================================================
-  ALL SYSTEM VERIFICATION TESTS PASSED SUCCESSFULLY! (7/7)
+  ALL SYSTEM VERIFICATION TESTS PASSED SUCCESSFULLY! (8/8)
 ```
 
 Run TypeScript compilation check:

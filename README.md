@@ -8,7 +8,24 @@
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-black?style=for-the-badge&logo=vercel)](https://sihfullcode.vercel.app/)
 [![Tests](https://img.shields.io/badge/Verification-8%2F8%20Passed-brightgreen?style=for-the-badge)](scripts/run-all-tests.js)
 
-AgriFlow.ai is a production-grade, multi-user agricultural supply chain and perishables distribution platform. It connects **Farmers (FPOs)**, **Institutional Buyers & Consumers**, and **Logistics Carriers** through real-time database transactions, automated escrow locks, strict three-portal role separation, and **real smartphone GPS beacon tracking** — built on **100% genuine data, live external APIs, and zero simulated/fabricated metrics**.
+AgriFlow.ai is a production-grade, multi-user agricultural supply chain and perishables distribution platform. It connects **Farmers (FPOs)**, **Institutional Buyers & Consumers**, and **Logistics Carriers** through **live real-time database transactions (Supabase WebSockets)**, automated escrow locks, strict three-portal role separation, and **live smartphone GPS beacon tracking** — pre-seeded with **curated Smart India Hackathon (SIH) demonstration scenario data** so evaluators and users can immediately test real-time purchasing, dispatch, and tracking without manual onboarding.
+
+---
+
+## 📊 Data Architecture: Live Realtime Engine vs. Demonstration Mock Data
+
+To ensure complete transparency during evaluation, AgriFlow operates on a **hybrid live-synchronization architecture**: the **data state, transactions, WebSockets, and APIs are 100% live**, while the **initial catalog and scenario entities are pre-seeded demonstration datasets** (curated for the Smart India Hackathon) to enable immediate zero-friction exploration:
+
+| Subsystem / Feature | Data Nature | Underlying Mechanism & Source |
+|---|---|---|
+| **Produce Catalog & Listings** | **Pre-Seeded Mock Dataset + Live User Listings** | Baseline catalog is pre-loaded with realistic crop lots (Shadnagar Hybrid Tomato, Nashik Red Onion, Shimla Apple). Any new produce added via `/farmer/produce` creates live database records in Supabase. |
+| **Inventory & Stock Deductions** | **100% Live Realtime Synchronization** | When inventory is edited or purchased, stock updates propagate across all connected browser sessions in `<400ms` via PostgreSQL WAL replication (`postgres_changes`). |
+| **Order Placement & Concurrency** | **100% Live Database RPC Transactions** | Orders placed via `/consumer/checkout` execute atomic database transactions (`atomic_checkout_order`) with row-level locks (`FOR UPDATE`), preventing overselling. |
+| **Logistics Fleet & Trips** | **Mock Scenario Fleet + Live Dispatches** | Initial fleet vehicles (Tata 407 Reefer `TS 08 UB 4192`, Mahindra Bolero Maxi Truck) are pre-seeded scenario vehicles. When orders are marked ready for delivery, live dispatches appear in real time on `/logistics/trips`. |
+| **GPS Vehicle Telemetry** | **Live Physical Device Telemetry (or Simulated Corridor)** | Drivers can turn their real smartphone into an encrypted telematics beacon via `/logistics/track/[tripId]`, streaming genuine latitude/longitude coordinates to Supabase. If running without a physical moving truck, simulated corridor waypoints are used. |
+| **Meteorological Intelligence** | **100% Live External Weather API** | Live 2-meter air temperature, relative humidity, precipitation, and wind vectors fetched in real time from Open-Meteo (`api.open-meteo.com`). |
+| **Mandi Market Prices & Trends** | **Real Historical Mandi Data + Closed-Form OLS Regression** | Historical Agmarknet wholesale benchmark data analyzed via Ordinary Least Squares (OLS) mathematical models for price trends and arbitrage calculation. |
+| **User Authentication & Personas** | **100% Live Supabase Auth & PostgreSQL Profiles** | Multi-role authentication (Phone OTP, Email/Password, Google OAuth) with isolated Farmer, Consumer, and Logistics layouts. |
 
 ---
 
@@ -109,11 +126,11 @@ sequenceDiagram
 │   │   ├── farmer/         # Farmer Command Center (produce, orders, mandi prices)
 │   │   ├── logistics/      # Logistics Carrier Hub (trips, live phone beacon tracking)
 │   │   ├── traceability/   # Cryptographic farm-to-fork public ledger
-│   │   ├── layout.tsx      # Root layout (AutoReloadController, providers)
+│   │   ├── layout.tsx      # Root layout (Global providers, I18n, Bandwidth)
 │   │   └── page.tsx        # Public landing gateway
 │   │
 │   ├── components/         # Modular UI Components
-│   │   ├── common/         # AutoReloadController, DataStatusBadge, StatusBadge, Cards
+│   │   ├── common/         # DataStatusBadge, StatusBadge, Cards, LanguageSelector
 │   │   ├── logistics/      # PhoneGpsBeacon, DriverDispatchModal
 │   │   ├── maps/           # Leaflet GIS maps (LiveTrackingMap, RouteMap)
 │   │   ├── reviews/        # RateAndReviewModal, verified feedback
@@ -128,6 +145,7 @@ sequenceDiagram
 │   ├── lib/                # Shared Utilities
 │   │   ├── supabase.ts     # Supabase client with resilient failover defaults
 │   │   ├── cryptoHash.ts   # SHA-256 Web Crypto hashing
+│   │   ├── categoryHelpers.ts # Category & subcategory classification
 │   │   └── utils.ts        # INR currency formatting, Tailwind cn
 │   │
 │   ├── services/           # Service Abstraction Layer (Supabase Connected)
@@ -144,14 +162,15 @@ sequenceDiagram
 │       └── review.ts       # Verified ratings & dispute reports
 │
 ├── scripts/                # Automated Verification & Integration Test Suites
-│   ├── run-all-tests.js    # Master test runner (executes all 7 test suites)
+│   ├── run-all-tests.js    # Master test runner (executes all 8 test suites)
 │   ├── test-live-demo-flow.js      # End-to-end multi-user transaction flow
 │   ├── test-phone-telemetry.js    # Phone GPS coordinate ingestion test
 │   ├── test-predictor.js          # OLS linear regression math validation
 │   ├── test-weather.js            # Open-Meteo API network verification
 │   ├── test-auth-profiles.mjs     # Auth & profile schema completeness
 │   ├── test-identity-sync.mjs     # User identity & initials sync
-│   └── test-delete-account-security.mjs # Account deletion & data security
+│   ├── test-delete-account-security.mjs # Account deletion & data security
+│   └── test-live-data-repair.mjs        # WAL realtime sync & atomic concurrency
 │
 └── supabase/               # SQL Migrations & Row Level Security (RLS)
     └── migrations/         # 01-09 production SQL schema and realtime publications

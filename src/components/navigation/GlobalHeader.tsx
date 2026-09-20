@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LanguageSelector } from '@/components/common/LanguageSelector';
+import { NotificationBell } from '@/components/notifications/NotificationBell';
 
 export function GlobalHeader() {
   const pathname = usePathname();
@@ -154,15 +155,8 @@ export function GlobalHeader() {
         {/* Language Selector */}
         <LanguageSelector variant="compact" />
 
-        {/* Notifications */}
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative p-2 rounded-full text-slate-500 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
-        </button>
+        {/* Real-time In-App Notifications */}
+        <NotificationBell />
 
         {/* User Profile Chip */}
         <div className="relative">

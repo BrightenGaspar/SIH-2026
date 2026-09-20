@@ -119,11 +119,13 @@ export default function ConsumerTrackingPage() {
 
           <ColdChainTelemetryCard telemetry={trip.telemetry} />
 
-          {trip.proofOfDelivery && (
+          {(trip.proofOfDelivery || String(trip.status || '').toUpperCase() === 'DELIVERED') && (
             <ProofOfDeliveryCard
               pod={trip.proofOfDelivery}
+              proofPhotoPath={trip.proofOfDelivery?.proofPhotoPath}
               orderId={trip.orderId}
-              isDelivered={trip.status === 'DELIVERED'}
+              isDelivered={String(trip.status || '').toUpperCase() === 'DELIVERED'}
+              onReceiptConfirmed={() => refreshTrip()}
             />
           )}
         </div>

@@ -51,6 +51,15 @@ function mapRowToDeliveryTracking(row: any): DeliveryTracking {
       { id: 'wp-4', title: 'Arrival at Destination', location: dest, coordinates: [currentLat ?? 17.3850, currentLng ?? 78.4867], timestamp: 'Pending', completed: false },
     ],
     routeCoordinates: currentLat != null && currentLng != null ? [[currentLat, currentLng]] : [],
+    proofOfDelivery: (row.proof_photo_path || String(row.status || '').toUpperCase() === 'DELIVERED' || String(row.status || '').toUpperCase() === 'COMPLETED') ? {
+      receivedBy: row.customer_name || 'Destination Recipient',
+      timestamp: row.delivered_at || row.updated_at || new Date().toLocaleString(),
+      verificationCode: `POD-${(row.order_id || row.id).slice(-8).toUpperCase()}`,
+      photoUrl: row.proof_photo_url || undefined,
+      proofPhotoPath: row.proof_photo_path || undefined,
+      isVerified: String(row.status || '').toUpperCase() === 'COMPLETED',
+      notes: row.delivery_notes || undefined,
+    } : undefined,
   };
 }
 

@@ -416,12 +416,14 @@ export const logisticsService = {
    */
   async updateDeliveryStatus(
     assignmentId: string,
-    newStatus: 'assigned' | 'heading_to_pickup' | 'picked_up' | 'in_transit' | 'delivered' | 'failed_delivery' | 'cancelled'
+    newStatus: 'assigned' | 'heading_to_pickup' | 'picked_up' | 'in_transit' | 'delivered' | 'failed_delivery' | 'cancelled',
+    proofPath?: string
   ): Promise<{ success: boolean; data?: any; error?: string }> {
     try {
       const { data, error } = await supabase.rpc('driver_update_delivery_status', {
         p_assignment_id: assignmentId,
         p_new_status: newStatus.toLowerCase(),
+        p_proof_path: proofPath || null,
       });
 
       if (error) {
@@ -431,6 +433,47 @@ export const logisticsService = {
       return { success: true, data };
     } catch (err: any) {
       return { success: false, error: err?.message || 'Failed to update delivery status.' };
+    }
+  },
+
+  /**
+   * Upload mandatory camera delivery proof photo to private delivery-proofs bucket
+   * Path: {driver_uid}/{assignment_id}/proof.jpg
+   */
+  async uploadDeliveryProof(assignmentId: string, file: File | Blob): Promise<string> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) throw new Error('Authentication required: Driver must be signed in.');
+
+    const filePath = `${user.id}/${assignmentId}/proof.jpg`;
+    const { error } = await supabase.storage
+      .from('delivery-proofs')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: 'image/jpeg',
+      });
+
+    if (error) {
+      console.error('Delivery proof upload error:', error.message);
+      throw new Error(`Failed to upload delivery proof photo: ${error.message}`);
+    }
+
+    return filePath;
+  },
+
+  /**
+   * Generate temporary signed URL for delivery proof photo (valid for 1 hour)
+   */
+  async getDeliveryProofSignedUrl(proofPath: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase.storage
+        .from('delivery-proofs')
+        .createSignedUrl(proofPath, 3600);
+
+      if (error || !data?.signedUrl) return null;
+      return data.signedUrl;
+    } catch {
+      return null;
     }
   },
 

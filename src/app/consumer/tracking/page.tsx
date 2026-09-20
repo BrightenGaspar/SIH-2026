@@ -416,11 +416,18 @@ function ConsumerTrackingContent() {
               <ColdChainTelemetryCard telemetry={activeTrip.telemetry} />
 
               {/* Proof of Delivery Card (if available or delivered) */}
-              {activeTrip.proofOfDelivery && (
+              {(activeTrip.proofOfDelivery || String(activeTrip.status || '').toUpperCase() === 'DELIVERED') && (
                 <ProofOfDeliveryCard
                   pod={activeTrip.proofOfDelivery}
+                  proofPhotoPath={activeTrip.proofOfDelivery?.proofPhotoPath}
                   orderId={activeTrip.orderId}
-                  isDelivered={activeTrip.status === 'DELIVERED'}
+                  isDelivered={String(activeTrip.status || '').toUpperCase() === 'DELIVERED'}
+                  onReceiptConfirmed={async () => {
+                    const allTrips = await sharedTrackingService.getAllTrips();
+                    setTrips(allTrips);
+                    const fresh = await sharedTrackingService.getTracking(activeTrip.id);
+                    if (fresh) setActiveTrip(fresh);
+                  }}
                 />
               )}
             </div>

@@ -45,6 +45,7 @@ export interface ProofOfDelivery {
   timestamp: string;
   verificationCode: string;
   photoUrl?: string;
+  proofPhotoPath?: string;
   isVerified: boolean;
   notes?: string;
 }

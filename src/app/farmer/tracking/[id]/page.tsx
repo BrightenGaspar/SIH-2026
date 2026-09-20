@@ -119,11 +119,12 @@ export default function FarmerTrackingPage() {
             <ReturnLoadCard returnLoad={trip.returnLoad} />
           )}
 
-          {trip.proofOfDelivery && (
+          {(trip.proofOfDelivery || String(trip.status || '').toUpperCase() === 'DELIVERED') && (
             <ProofOfDeliveryCard
               pod={trip.proofOfDelivery}
+              proofPhotoPath={trip.proofOfDelivery?.proofPhotoPath}
               orderId={trip.orderId}
-              isDelivered={trip.status === 'DELIVERED'}
+              isDelivered={String(trip.status || '').toUpperCase() === 'DELIVERED'}
             />
           )}
         </div>

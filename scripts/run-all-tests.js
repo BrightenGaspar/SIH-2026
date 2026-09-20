@@ -15,6 +15,7 @@ const testSuites = [
   { name: 'Open-Meteo Meteorological API', script: 'test-weather.js' },
   { name: 'Multi-User Live Demo Flow', script: 'test-live-demo-flow.js' },
   { name: 'Live Data Repair & Concurrency', script: 'test-live-data-repair.mjs' },
+  { name: 'Real-Time Notifications & POD', script: 'test-notifications-live.mjs' },
 ];
 
 console.log('================================================================');

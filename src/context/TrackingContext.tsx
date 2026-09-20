@@ -75,6 +75,13 @@ function mapLogisticsRowToDeliveryTracking(row: any, fallbackId: string): Delive
       [currentLat, currentLng],
       [destLat, destLng],
     ],
+    proofOfDelivery: (row.proof_photo_path || String(row.status || '').toUpperCase() === 'DELIVERED' || String(row.status || '').toUpperCase() === 'COMPLETED') ? {
+      receivedBy: row.customer_name || 'Destination Recipient',
+      timestamp: row.delivered_at || row.updated_at || new Date().toLocaleString(),
+      verificationCode: `POD-${(row.order_id || row.id || fallbackId).slice(-8).toUpperCase()}`,
+      proofPhotoPath: row.proof_photo_path || undefined,
+      isVerified: String(row.status || '').toUpperCase() === 'COMPLETED',
+    } : undefined,
   };
 }
 
@@ -137,6 +144,13 @@ function mapAssignmentToDeliveryTracking(row: any, fallbackId: string): Delivery
       [currentLat, currentLng],
       [destLat, destLng],
     ],
+    proofOfDelivery: (row.proof_photo_path || String(row.status || '').toLowerCase() === 'delivered' || String(row.status || '').toLowerCase() === 'completed') ? {
+      receivedBy: order?.customer_id || 'Destination Recipient',
+      timestamp: row.updated_at || new Date().toLocaleString(),
+      verificationCode: `POD-${(row.order_id || row.id || fallbackId).slice(-8).toUpperCase()}`,
+      proofPhotoPath: row.proof_photo_path || undefined,
+      isVerified: String(row.status || '').toLowerCase() === 'completed',
+    } : undefined,
   };
 }
 
@@ -160,6 +174,7 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
           id,
           order_id,
           operator_id,
+          proof_photo_path,
           pickup_lat,
           pickup_lng,
           delivery_lat,

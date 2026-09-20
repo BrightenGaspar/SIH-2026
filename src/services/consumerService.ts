@@ -854,6 +854,25 @@ export const consumerService = {
       return [];
     }
   },
+
+  /**
+   * Confirm delivery receipt on a delivered order, releasing escrow to the farmer
+   */
+  async confirmReceipt(orderId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { data, error } = await supabase.rpc('consumer_confirm_receipt', {
+        p_order_id: orderId,
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Failed to confirm receipt.' };
+    }
+  },
 };
 
 export const listMarketplace = consumerService.listMarketplace.bind(consumerService);

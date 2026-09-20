@@ -239,11 +239,20 @@ export const consumerService = {
    */
   async listMarketplace(): Promise<MarketplaceProduceItem[]> {
     try {
-      const { data, error } = await supabase
-        .from('produce')
+      // 1. Primary: Query authoritative public.produce_listings table
+      let { data, error } = await supabase
+        .from('produce_listings')
         .select('*');
 
-      if (error) {
+      // 2. Fallback: If produce_listings returned 0 rows, check legacy produce table
+      if (!data || data.length === 0) {
+        const fallbackRes = await supabase.from('produce').select('*');
+        if (fallbackRes.data && fallbackRes.data.length > 0) {
+          data = fallbackRes.data;
+        }
+      }
+
+      if (error && (!data || data.length === 0)) {
         console.error('Supabase listMarketplace error:', error.message);
         throw new Error(error.message);
       }
@@ -253,27 +262,38 @@ export const consumerService = {
       }
 
       const items: MarketplaceProduceItem[] = data.map((row: any) => {
-        const qty = row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0);
-        const price = row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0);
-        const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
-        const category = normalizeCategory(row.category, row.crop_name, row.variety);
+        const cropName = row.produce_name || row.crop_name || 'Farm Harvest';
+        const variety = row.variety || null;
+        const category = normalizeCategory(row.category, cropName, variety);
         const qualityGrade = (row.quality_grade || 'A').toUpperCase();
+
+        const qty = row.available_quantity != null
+          ? Number(row.available_quantity)
+          : (row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0));
+
+        const price = row.price_per_unit != null
+          ? Number(row.price_per_unit)
+          : (row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0));
+
+        const location = row.location_address || row.location || 'Local FPO Hub';
+        const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
+        const imageUrl = (Array.isArray(row.images) && row.images[0]) || row.image_url || null;
 
         return {
           id: String(row.id),
           farmer_id: row.farmer_id,
-          crop_name: row.crop_name || 'Farm Harvest',
-          variety: row.variety || null,
+          crop_name: cropName,
+          variety,
           category,
           quality_grade: qualityGrade,
           quantity_kg: qty,
           price_per_kg: price,
-          location: row.location || 'Local FPO Hub',
+          location,
           harvest_date: row.harvest_date || null,
-          image_url: row.image_url || null,
+          image_url: imageUrl,
           updated_at: updatedAt,
           created_at: row.created_at,
-          farmer_name: 'Verified Kisan Partner',
+          farmer_name: row.farmer_name || 'Verified Kisan Partner',
           shelf_life_days: row.shelf_life_days ?? 7,
           is_cold_chain: Boolean(
             row.is_cold_chain ||

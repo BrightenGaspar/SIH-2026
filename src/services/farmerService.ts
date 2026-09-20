@@ -336,182 +336,216 @@ export const farmerService = {
     const unit = item.unit || 'kg';
     const grade = item.grade || 'A';
 
-    const insertPayload: any = {
+    // 1. Authoritative insert into canonical public.produce_listings table
+    const canonicalPayload: any = {
       farmer_id: effectiveFarmerId,
-      crop_name: item.crop_name,
+      produce_name: item.crop_name,
       variety: item.variety || null,
       category: category,
-      quantity_kg: qty,
-      quantity: qty, // legacy column fallback
+      total_quantity: qty,
+      available_quantity: qty,
+      price_per_unit: price,
       unit: unit,
-      price_per_kg: price,
-      asking_price: price, // legacy column fallback
-      location: loc,
-      harvest_date: harvestDate,
       quality_grade: grade,
-      image_url: item.image_url || null,
-      status: 'Active',
+      harvest_date: harvestDate,
+      location_address: loc,
+      images: item.image_url ? [item.image_url] : [],
+      status: 'active',
       updated_at: new Date().toISOString(),
     };
 
-    let { data, error } = await supabase
-      .from('produce')
-      .insert(insertPayload)
+    let { data: listingData, error: listingError } = await supabase
+      .from('produce_listings')
+      .insert(canonicalPayload)
       .select()
       .single();
 
-    if (error && (error.code === '42703' || error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
-      delete insertPayload.quantity_kg;
-      delete insertPayload.price_per_kg;
-      delete insertPayload.updated_at;
-      const retry = await supabase.from('produce').insert(insertPayload).select().single();
-      data = retry.data;
-      error = retry.error;
+    if (listingError && listingError.message?.includes('violates foreign key constraint')) {
+      delete canonicalPayload.farmer_id;
+      const retryFk = await supabase.from('produce_listings').insert(canonicalPayload).select().single();
+      listingData = retryFk.data;
+      listingError = retryFk.error;
     }
 
-    if (error && error.message?.includes('violates foreign key constraint')) {
-      delete insertPayload.farmer_id;
-      const retryFk = await supabase.from('produce').insert(insertPayload).select().single();
-      data = retryFk.data;
-      error = retryFk.error;
-    }
-
-    if (error || !data) {
-      console.error('Supabase produce insert error:', error?.message);
-      throw new Error(error?.message || 'Failed to create produce listing');
-    }
-
-    // Secondary sync to produce_listings if present
+    // 2. Fallback / mirror to legacy produce table
+    let legacyData: any = null;
     try {
-      await supabase.from('produce_listings').insert({
-        id: data.id,
-        farmer_id: data.farmer_id,
-        produce_name: data.crop_name,
-        variety: data.variety,
+      const insertPayload: any = {
+        farmer_id: effectiveFarmerId,
+        crop_name: item.crop_name,
+        variety: item.variety || null,
         category: category,
-        total_quantity: qty,
-        available_quantity: qty,
-        price_per_unit: price,
+        quantity_kg: qty,
+        quantity: qty,
         unit: unit,
+        price_per_kg: price,
+        asking_price: price,
+        location: loc,
+        harvest_date: harvestDate,
         quality_grade: grade,
-        location_address: loc,
-        status: 'active'
-      });
+        image_url: item.image_url || null,
+        status: 'Active',
+        updated_at: new Date().toISOString(),
+      };
+      if (listingData?.id) {
+        insertPayload.id = listingData.id;
+      }
+      const legacyRes = await supabase.from('produce').insert(insertPayload).select().single();
+      legacyData = legacyRes.data;
     } catch {
-      // optional sync
+      // ignore legacy mirror error
+    }
+
+    const finalRecord = listingData || legacyData;
+    if (!finalRecord) {
+      console.error('Supabase produce insert error:', listingError?.message);
+      throw new Error(listingError?.message || 'Failed to create produce listing');
     }
 
     return {
-      id: String(data.id),
-      farmer_id: data.farmer_id,
-      crop_name: data.crop_name,
-      variety: data.variety,
-      quantity_kg: data.quantity_kg != null ? Number(data.quantity_kg) : Number(data.quantity || 0),
-      price_per_kg: data.price_per_kg != null ? Number(data.price_per_kg) : Number(data.asking_price || 0),
-      location: data.location,
-      harvest_date: data.harvest_date,
-      image_url: data.image_url,
-      updated_at: data.updated_at || data.created_at || new Date().toISOString(),
-      created_at: data.created_at,
+      id: String(finalRecord.id),
+      farmer_id: finalRecord.farmer_id,
+      crop_name: finalRecord.produce_name || finalRecord.crop_name,
+      variety: finalRecord.variety,
+      quantity_kg: finalRecord.available_quantity != null ? Number(finalRecord.available_quantity) : Number(finalRecord.quantity_kg || finalRecord.quantity || 0),
+      price_per_kg: finalRecord.price_per_unit != null ? Number(finalRecord.price_per_unit) : Number(finalRecord.price_per_kg || finalRecord.asking_price || 0),
+      location: finalRecord.location_address || finalRecord.location,
+      harvest_date: finalRecord.harvest_date,
+      image_url: (Array.isArray(finalRecord.images) && finalRecord.images[0]) || finalRecord.image_url,
+      updated_at: finalRecord.updated_at || finalRecord.created_at || new Date().toISOString(),
+      created_at: finalRecord.created_at,
     };
   },
 
   /**
-   * Update quantity directly in public.produce table (triggers Realtime broadcast)
+   * Update quantity directly in public.produce_listings table (triggers Realtime broadcast)
    */
   async updateQuantity(id: string, qty: number): Promise<ProduceRow> {
     const numQty = Math.max(0, Number(qty));
     const now = new Date().toISOString();
 
-    let { data, error } = await supabase
-      .from('produce')
+    // 1. Authoritative update on produce_listings
+    let { data: listingData, error: listingError } = await supabase
+      .from('produce_listings')
       .update({
-        quantity_kg: numQty,
-        quantity: numQty, // legacy column compatibility
+        available_quantity: numQty,
         updated_at: now,
       })
       .eq('id', id)
       .select()
       .single();
 
-    if (error && (error.code === '42703' || error.code === 'PGRST204' || error.message?.includes('schema cache') || error.message?.includes('column'))) {
-      const retry = await supabase
-        .from('produce')
-        .update({ quantity: numQty })
-        .eq('id', id)
-        .select()
-        .single();
-      data = retry.data;
-      error = retry.error;
-    }
-
-    if (error || !data) {
-      console.error('Supabase updateQuantity error:', error?.message);
-      throw new Error(error?.message || `Failed to update quantity for produce ${id}`);
-    }
-
-    // Also sync to produce_listings if present for secondary views
+    // 2. Mirror to legacy produce table
     try {
       await supabase
-        .from('produce_listings')
-        .update({ available_quantity: numQty, updated_at: now })
+        .from('produce')
+        .update({
+          quantity_kg: numQty,
+          quantity: numQty,
+          updated_at: now,
+        })
         .eq('id', id);
     } catch {
-      // optional sync
+      // ignore legacy mirror error
+    }
+
+    if (listingData) {
+      return {
+        id: String(listingData.id),
+        farmer_id: listingData.farmer_id,
+        crop_name: listingData.produce_name || 'Farm Harvest',
+        variety: listingData.variety,
+        quantity_kg: Number(listingData.available_quantity) || 0,
+        price_per_kg: Number(listingData.price_per_unit) || 0,
+        location: listingData.location_address,
+        harvest_date: listingData.harvest_date,
+        image_url: (Array.isArray(listingData.images) && listingData.images[0]) || null,
+        updated_at: listingData.updated_at || now,
+        created_at: listingData.created_at,
+      };
+    }
+
+    // Fallback if produce_listings record was not found
+    let { data: legacyData, error: legacyError } = await supabase
+      .from('produce')
+      .update({
+        quantity_kg: numQty,
+        quantity: numQty,
+        updated_at: now,
+      })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (!legacyData) {
+      console.error('Supabase updateQuantity error:', listingError?.message || legacyError?.message);
+      throw new Error(listingError?.message || legacyError?.message || `Failed to update quantity for produce ${id}`);
     }
 
     return {
-      id: String(data.id),
-      farmer_id: data.farmer_id,
-      crop_name: data.crop_name,
-      variety: data.variety,
-      quantity_kg: data.quantity_kg != null ? Number(data.quantity_kg) : Number(data.quantity || 0),
-      price_per_kg: data.price_per_kg != null ? Number(data.price_per_kg) : Number(data.asking_price || 0),
-      location: data.location,
-      harvest_date: data.harvest_date,
-      image_url: data.image_url,
-      updated_at: data.updated_at || data.created_at || now,
-      created_at: data.created_at,
+      id: String(legacyData.id),
+      farmer_id: legacyData.farmer_id,
+      crop_name: legacyData.crop_name,
+      variety: legacyData.variety,
+      quantity_kg: legacyData.quantity_kg != null ? Number(legacyData.quantity_kg) : Number(legacyData.quantity || 0),
+      price_per_kg: legacyData.price_per_kg != null ? Number(legacyData.price_per_kg) : Number(legacyData.asking_price || 0),
+      location: legacyData.location,
+      harvest_date: legacyData.harvest_date,
+      image_url: legacyData.image_url,
+      updated_at: legacyData.updated_at || legacyData.created_at || now,
+      created_at: legacyData.created_at,
     };
   },
 
   /**
-   * Delete a produce item directly from public.produce
+   * Delete a produce item directly from authoritative public.produce_listings table
    */
   async deleteProduce(id: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('produce')
+    const { error: listingErr } = await supabase
+      .from('produce_listings')
       .delete()
       .eq('id', id);
 
-    // Also try delete from produce_listings
     try {
-      await supabase.from('produce_listings').delete().eq('id', id);
+      await supabase.from('produce').delete().eq('id', id);
     } catch {
       // ignore
     }
 
-    if (error) {
-      console.error('Supabase produce delete error:', error.message);
+    if (listingErr) {
+      console.error('Supabase produce delete error:', listingErr.message);
       return false;
     }
     return true;
   },
 
   /**
-   * List produce belonging to farmer directly from public.produce
+   * List produce belonging to farmer directly from authoritative public.produce_listings table
    */
   async listMyProduce(farmerId?: string): Promise<ProduceRow[]> {
     const { data: { user } } = await supabase.auth.getUser();
     const targetId = farmerId || user?.id;
 
-    let query = supabase.from('produce').select('*');
+    // 1. Primary: query produce_listings
+    let query = supabase.from('produce_listings').select('*');
     if (targetId) {
       query = query.eq('farmer_id', targetId);
     }
+    let { data, error } = await query.order('created_at', { ascending: false });
 
-    const { data, error } = await query.order('created_at', { ascending: false });
-    if (error) {
+    // 2. Fallback: if produce_listings has 0 rows, check legacy produce
+    if (!data || data.length === 0) {
+      let legacyQuery = supabase.from('produce').select('*');
+      if (targetId) {
+        legacyQuery = legacyQuery.eq('farmer_id', targetId);
+      }
+      const legacyRes = await legacyQuery.order('created_at', { ascending: false });
+      if (legacyRes.data && legacyRes.data.length > 0) {
+        data = legacyRes.data;
+      }
+    }
+
+    if (error && (!data || data.length === 0)) {
       console.error('Supabase listMyProduce error:', error.message);
       throw new Error(error.message);
     }
@@ -519,13 +553,13 @@ export const farmerService = {
     return (data || []).map((row: any) => ({
       id: String(row.id),
       farmer_id: row.farmer_id,
-      crop_name: row.crop_name || 'Farm Harvest',
+      crop_name: row.produce_name || row.crop_name || 'Farm Harvest',
       variety: row.variety,
-      quantity_kg: row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0),
-      price_per_kg: row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0),
-      location: row.location,
+      quantity_kg: row.available_quantity != null ? Number(row.available_quantity) : Number(row.quantity_kg || row.quantity || 0),
+      price_per_kg: row.price_per_unit != null ? Number(row.price_per_unit) : Number(row.price_per_kg || row.asking_price || 0),
+      location: row.location_address || row.location,
       harvest_date: row.harvest_date,
-      image_url: row.image_url,
+      image_url: (Array.isArray(row.images) && row.images[0]) || row.image_url,
       updated_at: row.updated_at || row.created_at || new Date().toISOString(),
       created_at: row.created_at,
     }));
@@ -578,15 +612,17 @@ export const farmerService = {
   async updateProduceStatus(id: string, status: Produce["status"]): Promise<Produce> {
     const dbStatus = status === 'Active' ? 'Active' : status === 'Sold' ? 'Sold' : 'Inactive';
 
+    // 1. Authoritative update on produce_listings
     await supabase
-      .from('produce')
-      .update({ status: dbStatus, updated_at: new Date().toISOString() })
+      .from('produce_listings')
+      .update({ status: dbStatus.toLowerCase(), updated_at: new Date().toISOString() })
       .eq('id', id);
 
+    // 2. Mirror to legacy produce
     try {
       await supabase
-        .from('produce_listings')
-        .update({ status: dbStatus.toLowerCase(), updated_at: new Date().toISOString() })
+        .from('produce')
+        .update({ status: dbStatus, updated_at: new Date().toISOString() })
         .eq('id', id);
     } catch {
       // ignore

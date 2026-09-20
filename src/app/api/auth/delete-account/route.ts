@@ -70,12 +70,20 @@ export async function POST(req: NextRequest) {
     // Strategy B: Fallback explicit cleanup if RPC not yet deployed
     if (!rpcSucceeded) {
       // a) Delete farmer produce listings owned by this user
+      const { error: listErr } = await userScopedClient
+        .from('produce_listings')
+        .delete()
+        .eq('farmer_id', canonicalUserId);
+      if (listErr) {
+        console.warn('[Account Deletion] Error clearing produce_listings:', listErr.message);
+      }
+
       const { error: prodErr } = await userScopedClient
         .from('produce')
         .delete()
         .eq('farmer_id', canonicalUserId);
       if (prodErr) {
-        console.warn('[Account Deletion] Error clearing produce listings:', prodErr.message);
+        console.warn('[Account Deletion] Error clearing legacy produce listings:', prodErr.message);
       }
 
       // b) Anonymize shared orders (preserve transaction totals & logistics records, scrub personal delivery details)

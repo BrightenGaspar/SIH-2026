@@ -1242,6 +1242,30 @@ CREATE TRIGGER trg_notify_listing_insert
 -- ------------------------------------------------------------------------------
 -- 12. ROW LEVEL SECURITY (RLS) ON EVERY PUBLIC TABLE (NON-RECURSIVE)
 -- ------------------------------------------------------------------------------
+-- Purge ALL legacy policies to prevent additive OR-logic leaks from old migrations
+DO $$
+DECLARE
+  pol RECORD;
+BEGIN
+  FOR pol IN (
+    SELECT schemaname, tablename, policyname
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename IN (
+        'profiles',
+        'orders',
+        'produce_listings',
+        'logistics_assignments',
+        'logistics_trips',
+        'notifications',
+        'reviews',
+        'ratings',
+        'produce'
+      )
+  ) LOOP
+    EXECUTE format('DROP POLICY IF EXISTS %I ON %I.%I', pol.policyname, pol.schemaname, pol.tablename);
+  END LOOP;
+END $$;
 
 -- ==============================================================================
 -- TABLE 1: profiles

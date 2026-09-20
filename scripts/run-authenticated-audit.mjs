@@ -510,12 +510,14 @@ async function runAuthenticatedAudit() {
       p_new_status: 'in_transit'
     });
 
-    const pass = pickupRes.data?.logistics_status === 'picked_up' && transitRes.data?.logistics_status === 'in_transit';
+    const pickupStatus = pickupRes.data?.status || pickupRes.data?.logistics_status;
+    const transitStatus = transitRes.data?.status || transitRes.data?.logistics_status;
+    const pass = pickupStatus === 'picked_up' && transitStatus === 'in_transit';
     record(
       '9',
       'Driver D marks picked_up then in_transit',
       'Assignment and Order status synced to picked_up and in_transit',
-      pass ? 'Status progressed picked_up -> in_transit successfully' : `Pickup: ${pickupRes.error?.message}, Transit: ${transitRes.error?.message}`,
+      pass ? 'Status progressed picked_up -> in_transit successfully' : `Pickup: ${pickupStatus || pickupRes.error?.message}, Transit: ${transitStatus || transitRes.error?.message}`,
       pass ? 'PASS' : 'FAIL',
       `Order status: ${transitRes.data?.order_status}`,
       Date.now() - t9
@@ -551,12 +553,13 @@ async function runAuthenticatedAudit() {
       p_proof_photo_path: proofPath
     });
 
-    const pass = noPhotoRes.error && withPhotoRes.data?.logistics_status === 'delivered';
+    const deliveredStatus = withPhotoRes.data?.status || withPhotoRes.data?.logistics_status;
+    const pass = Boolean(noPhotoRes.error) && deliveredStatus === 'delivered';
     record(
       '10',
       'Marking delivered WITHOUT proof photo must fail; with photo in delivery-proofs succeeds',
       'Mandatory photo enforcement prevents marking delivered without proof',
-      pass ? 'Rejected without proof photo; succeeded with delivery proof photo' : `NoPhoto: ${noPhotoRes.error?.message}, WithPhoto: ${withPhotoRes.error?.message}`,
+      pass ? 'Rejected without proof photo; succeeded with delivery proof photo' : `NoPhoto: ${noPhotoRes.error?.message}, WithPhoto: ${deliveredStatus || withPhotoRes.error?.message}`,
       pass ? 'PASS' : 'FAIL',
       `Proof photo: ${withPhotoRes.data?.proof_photo_path || proofUpload.error?.message}`,
       Date.now() - t10

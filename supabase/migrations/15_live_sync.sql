@@ -357,29 +357,29 @@ REVOKE ALL ON FUNCTION public.notify FROM PUBLIC, anon, authenticated;
 
 -- ------------------------------------------------------------------------------
 -- 8. DROP ALL LEGACY RPC SIGNATURES
--- ------------------------------------------------------------------------------
-DROP FUNCTION IF EXISTS public.farmer_update_order_status(UUID, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.farmer_update_order_status(TEXT, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.farmer_update_order_status(UUID, TEXT);
-DROP FUNCTION IF EXISTS public.farmer_update_order_status(TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.driver_update_delivery_status(UUID, TEXT, UUID);
-DROP FUNCTION IF EXISTS public.driver_update_delivery_status(TEXT, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.driver_update_delivery_status(UUID, TEXT);
-DROP FUNCTION IF EXISTS public.driver_update_delivery_status(UUID, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.driver_claim_assignment(UUID, UUID);
-DROP FUNCTION IF EXISTS public.driver_claim_assignment(UUID);
-DROP FUNCTION IF EXISTS public.driver_claim_assignment(UUID, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.driver_update_gps(UUID, DOUBLE PRECISION, DOUBLE PRECISION, NUMERIC);
-DROP FUNCTION IF EXISTS public.driver_update_gps(UUID, NUMERIC, NUMERIC, NUMERIC);
-DROP FUNCTION IF EXISTS public.consumer_cancel_order(TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.consumer_cancel_order(UUID, TEXT);
-DROP FUNCTION IF EXISTS public.consumer_confirm_receipt(TEXT);
-DROP FUNCTION IF EXISTS public.consumer_confirm_receipt(UUID);
-DROP FUNCTION IF EXISTS public.atomic_checkout_order(UUID, NUMERIC, TEXT, DOUBLE PRECISION, DOUBLE PRECISION, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.atomic_checkout_order(UUID, NUMERIC, TEXT, TEXT, TEXT);
-DROP FUNCTION IF EXISTS public.submit_verified_review(UUID, TEXT, INTEGER, TEXT, TEXT, JSONB);
-DROP FUNCTION IF EXISTS public.submit_verified_review(TEXT, TEXT, INTEGER, TEXT, TEXT, JSONB);
-DROP FUNCTION IF EXISTS public.set_my_role(TEXT);
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN (
+    SELECT oid::regprocedure AS func_sig
+    FROM pg_proc
+    WHERE pronamespace = 'public'::regnamespace
+      AND proname IN (
+        'atomic_checkout_order',
+        'farmer_update_order_status',
+        'driver_claim_assignment',
+        'driver_update_gps',
+        'driver_update_delivery_status',
+        'consumer_confirm_receipt',
+        'consumer_cancel_order',
+        'submit_verified_review',
+        'set_my_role'
+      )
+  ) LOOP
+    EXECUTE 'DROP FUNCTION IF EXISTS ' || r.func_sig || ' CASCADE';
+  END LOOP;
+END $$;
 
 -- ------------------------------------------------------------------------------
 -- 9. CANONICAL RPC ROUTINES (SECURITY DEFINER + auth.uid() ENFORCED)
@@ -1087,15 +1087,15 @@ REVOKE ALL ON FUNCTION public.set_my_role(TEXT) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.is_order_party(TEXT) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.is_order_party(UUID) TO authenticated;
 GRANT EXECUTE ON FUNCTION public.is_profile_counterparty(UUID) TO authenticated;
-GRANT EXECUTE ON FUNCTION public.atomic_checkout_order TO authenticated;
-GRANT EXECUTE ON FUNCTION public.farmer_update_order_status TO authenticated;
-GRANT EXECUTE ON FUNCTION public.driver_claim_assignment TO authenticated;
-GRANT EXECUTE ON FUNCTION public.driver_update_gps TO authenticated;
-GRANT EXECUTE ON FUNCTION public.driver_update_delivery_status TO authenticated;
-GRANT EXECUTE ON FUNCTION public.consumer_confirm_receipt TO authenticated;
-GRANT EXECUTE ON FUNCTION public.consumer_cancel_order TO authenticated;
-GRANT EXECUTE ON FUNCTION public.submit_verified_review TO authenticated;
-GRANT EXECUTE ON FUNCTION public.set_my_role TO authenticated;
+GRANT EXECUTE ON FUNCTION public.atomic_checkout_order(UUID, NUMERIC, TEXT, DOUBLE PRECISION, DOUBLE PRECISION, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.farmer_update_order_status(TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.driver_claim_assignment(UUID, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.driver_update_gps(UUID, DOUBLE PRECISION, DOUBLE PRECISION, NUMERIC, NUMERIC, NUMERIC, NUMERIC) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.driver_update_delivery_status(UUID, TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.consumer_confirm_receipt(TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.consumer_cancel_order(TEXT, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.submit_verified_review(TEXT, UUID, INTEGER, TEXT, TEXT, JSONB) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.set_my_role(TEXT) TO authenticated;
 
 -- ------------------------------------------------------------------------------
 -- 10. STORAGE BUCKETS & STORAGE RLS POLICIES

@@ -603,24 +603,6 @@ export const consumerService = {
       throw new Error(data?.message || 'Checkout failed.');
     }
 
-    // Sync remaining quantity to public.produce table to trigger WAL Realtime broadcast
-    if (data.available_quantity_remaining != null) {
-      try {
-        const remQty = Number(data.available_quantity_remaining);
-        await supabase
-          .from('produce')
-          .update({
-            quantity: remQty,
-            quantity_kg: remQty,
-            status: remQty <= 0 ? 'Sold' : 'Active',
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', listingId);
-      } catch {
-        // ignore produce sync error
-      }
-    }
-
     // Fetch newly created authoritative order from database
     const createdOrder = await this.getOrderById(data.order_id);
     if (createdOrder) {

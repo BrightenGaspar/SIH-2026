@@ -241,6 +241,8 @@ test('8. Teardown: Clean up all test artifacts from database', async () => {
   await supabase.from('logistics_assignments').delete().eq('order_id', TEST_ORDER_ID_1);
   await supabase.from('orders').delete().eq('id', TEST_ORDER_ID_1);
   await supabase.from('orders').delete().eq('id', TEST_ORDER_ID_2);
+  await supabase.from('produce_listings').delete().eq('id', TEST_PRODUCE_ID);
+  await supabase.from('produce_listings').delete().eq('id', TEST_PRODUCE_ID_2);
   await supabase.from('produce').delete().eq('id', TEST_PRODUCE_ID);
   await supabase.from('produce').delete().eq('id', TEST_PRODUCE_ID_2);
   console.log('   [PASS] Teardown complete: All test artifacts purged from Supabase.');

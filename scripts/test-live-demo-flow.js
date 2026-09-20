@@ -208,6 +208,7 @@ async function runLiveDemoFlowTest() {
     // STEP 6: Teardown Test Data
     // -------------------------------------------------------------------------
     console.log('\n[Step 6/6] Cleaning up test records...');
+    await supabase.from('produce_listings').delete().eq('id', TEST_PRODUCE_ID);
     await supabase.from('produce').delete().eq('id', TEST_PRODUCE_ID);
     await supabase.from('orders').delete().eq('id', TEST_ORDER_ID);
     await supabase.from('logistics_trips').delete().eq('id', TEST_TRIP_ID);
@@ -222,6 +223,7 @@ async function runLiveDemoFlowTest() {
     console.error('\n\x1b[31mDEMO FLOW VERIFICATION FAILED:\x1b[0m', err.message || err);
     // Attempt cleanup on error
     try {
+      await supabase.from('produce_listings').delete().eq('id', TEST_PRODUCE_ID);
       await supabase.from('produce').delete().eq('id', TEST_PRODUCE_ID);
       await supabase.from('orders').delete().eq('id', TEST_ORDER_ID);
       await supabase.from('logistics_trips').delete().eq('id', TEST_TRIP_ID);

@@ -1537,15 +1537,31 @@ END $$;
 -- TABLE 9: produce (legacy table protection)
 -- ==============================================================================
 DO $$
+DECLARE
+  v_has_farmer_id BOOLEAN;
+  v_has_user_id BOOLEAN;
+  v_using_clause TEXT := 'false';
 BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'produce') THEN
     ALTER TABLE public.produce ENABLE ROW LEVEL SECURITY;
+    
     DROP POLICY IF EXISTS "produce_select_policy" ON public.produce;
     DROP POLICY IF EXISTS "produce_write_blocked" ON public.produce;
 
-    CREATE POLICY "produce_select_policy" ON public.produce
-      FOR SELECT TO authenticated
-      USING (farmer_id = auth.uid() OR user_id = auth.uid()::text);
+    SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'produce' AND column_name = 'farmer_id') INTO v_has_farmer_id;
+    SELECT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'produce' AND column_name = 'user_id') INTO v_has_user_id;
+
+    IF v_has_farmer_id AND v_has_user_id THEN
+      v_using_clause := 'farmer_id = auth.uid() OR user_id = auth.uid()::text';
+    ELSIF v_has_farmer_id THEN
+      v_using_clause := 'farmer_id = auth.uid()';
+    ELSIF v_has_user_id THEN
+      v_using_clause := 'user_id = auth.uid()::text';
+    ELSE
+      v_using_clause := 'false';
+    END IF;
+
+    EXECUTE format('CREATE POLICY "produce_select_policy" ON public.produce FOR SELECT TO authenticated USING (%s)', v_using_clause);
 
     CREATE POLICY "produce_write_blocked" ON public.produce
       FOR ALL TO authenticated

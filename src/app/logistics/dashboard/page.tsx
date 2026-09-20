@@ -135,10 +135,8 @@ export default function LogisticsDashboard() {
     };
 
     pollSimulation();
-    const interval = setInterval(pollSimulation, 5000);
     return () => {
       isMounted = false;
-      clearInterval(interval);
     };
   }, [lastAlertTime]);
 

@@ -31,8 +31,8 @@ export default function ConsumerSettingsPage() {
     localStorage.removeItem('agriflow_cart');
     setResetSuccess(true);
     setTimeout(() => {
-      window.location.reload();
-    }, 1200);
+      setResetSuccess(false);
+    }, 2500);
   };
 
   return (
@@ -122,7 +122,7 @@ export default function ConsumerSettingsPage() {
           <div className="flex items-center justify-between pt-2">
             {resetSuccess ? (
               <span className="text-xs font-bold text-emerald-600">
-                Resetting session cache... reloading page
+                Session cache cleared successfully
               </span>
             ) : (
               <span className="text-xs text-zinc-400">

@@ -1,0 +1,128 @@
+flowchart TD
+    %% =======================================================
+    %% 1. GATEWAY & AUTHENTICATION
+    %% =======================================================
+    subgraph G1["1. Entry Gateway & Multi-Role Authentication"]
+        ENTRY["AgriFlow.ai Gateway (/)"]
+        AUTH["Supabase Multi-Role Auth (Phone OTP / Email / Password)"]
+        ROUTER{"Role Router & Session Normalizer"}
+        
+        ENTRY --> AUTH --> ROUTER
+    end
+
+    %% =======================================================
+    %% 2. THREE ISOLATED PORTAL ENVIRONMENTS
+    %% =======================================================
+    subgraph G2["2. Role-Isolated Portals & Layouts"]
+        F_PORTAL["👨‍🌾 Farmer Command Center (/farmer/*)\n(Theme: Emerald Green • Inventory • FPO)"]
+        C_PORTAL["🛒 Consumer Marketplace (/consumer/*)\n(Theme: Ocean Blue • Cart • Escrow)"]
+        L_PORTAL["🚚 Logistics Operations Hub (/logistics/*)\n(Theme: Amber Orange • Fleet • Trips)"]
+        
+        ROUTER -->|"Role: Farmer"| F_PORTAL
+        ROUTER -->|"Role: Consumer"| C_PORTAL
+        ROUTER -->|"Role: Logistics"| L_PORTAL
+    end
+
+    %% =======================================================
+    %% 3. METEOROLOGICAL & MARKET INTELLIGENCE
+    %% =======================================================
+    subgraph G3["3. AI Decision Center & Dynamic Pricing"]
+        API_METEO["Open-Meteo Meteorological API Proxy (/api/weather)\n(Live 2m Temp, Humidity, Rain, Wind)"]
+        API_OLS["APMC Mandi Forecaster (/api/predict)\n(OLS Linear Regression over Agmarknet Data)"]
+        SHOCK_IN["Adverse Climate Shock Event\n(Heatwave, Flood, Frost, Drought)"]
+        
+        MATH_ENGINE["Mathematical Risk & Elasticity Engine\n• Crop Damage % Loss Function\n• Regional Supply Deficit Ratio\n• Minimum Sustainable Price Floor: Costs / Qty"]
+        
+        PRICE_REC["AI Pricing Recommendation\n(Break-Even Floor + Dynamic Elasticity Multiplier)"]
+        
+        API_METEO --> MATH_ENGINE
+        API_OLS --> MATH_ENGINE
+        SHOCK_IN --> MATH_ENGINE
+        MATH_ENGINE --> PRICE_REC
+        F_PORTAL --> MATH_ENGINE
+    end
+
+    %% =======================================================
+    %% 4. PRODUCE LISTING & REALTIME WAL BROADCAST
+    %% =======================================================
+    subgraph G4["4. Produce Listing & Realtime Catalog Sync"]
+        F_LIST["Farmer Lists Harvest Lot (/farmer/produce)\n(Variety, Grade A/B/C, Base Price, Stock Qty)"]
+        DB_PRODUCE[("Supabase public.produce\n(PostgreSQL Relational Storage)")]
+        WAL_PRODUCE["PostgreSQL WAL Replication Engine\n(postgres_changes WebSockets)"]
+        C_MARKET["Consumer Live Marketplace (/consumer/marketplace)\n(Sub-Second Realtime Discovery • Live WebSocket Stream)"]
+        
+        PRICE_REC -.->|"Informs Base Price"| F_LIST
+        F_PORTAL --> F_LIST
+        F_LIST --> DB_PRODUCE
+        DB_PRODUCE --> WAL_PRODUCE
+        WAL_PRODUCE -->|"Sub-400ms Broadcast"| C_MARKET
+        C_PORTAL --> C_MARKET
+    end
+
+    %% =======================================================
+    %% 5. ORDER PLACEMENT & ATOMIC ESCROW LOCK
+    %% =======================================================
+    subgraph G5["5. Order Placement & Atomic Escrow Engine"]
+        C_CART["Buyer Shopping Cart & Grade Filters (/consumer/cart)"]
+        C_CHECKOUT["Direct Checkout Trigger (/consumer/checkout)"]
+        RPC_ATOMIC["PostgreSQL atomic_checkout_order Stored RPC"]
+        LOCK_CHECK{"FOR UPDATE Row Lock:\nSufficient Stock?"}
+        ORDER_ABORT["❌ Transaction Aborted\n(Overselling Concurrency Collision Prevented)"]
+        ESCROW_LOCK["✅ Escrow Lock Activated\n(Funds Held Securely in Smart Escrow Vault)"]
+        DB_ORDER[("Supabase public.orders\n(Status: PENDING • Stock Deducted from Produce)")]
+        
+        C_MARKET --> C_CART --> C_CHECKOUT --> RPC_ATOMIC --> LOCK_CHECK
+        LOCK_CHECK -- "Insufficient" --> ORDER_ABORT
+        LOCK_CHECK -- "Confirmed" --> ESCROW_LOCK --> DB_ORDER
+    end
+
+    %% =======================================================
+    %% 6. HARVEST WORKFLOW & CARRIER DISPATCH
+    %% =======================================================
+    subgraph G6["6. Harvest Preparation & Fleet Dispatch"]
+        F_ORDER_VIEW["Farmer Dashboard Realtime Order Alert (/farmer/orders)"]
+        F_PREP["Farmer Clicks 'Prepare Harvest'\n(Order Status: PREPARING)"]
+        F_READY["Farmer Clicks 'Ready to Deliver'\n(Order Status: READY_TO_DELIVER)"]
+        L_DISPATCH["Logistics Haul Broadcast Card (/logistics/trips)\n(Real-Time Delivery Request Alert)"]
+        L_ACCEPT["Carrier Accepts Haul & Assigns Truck/Driver\n(Order & Trip Status: IN_TRANSIT)"]
+        DB_TRIP[("Supabase public.logistics_trips\n(Driver, Truck No, Corridor Waypoints)")]
+        
+        DB_ORDER --> F_ORDER_VIEW
+        F_ORDER_VIEW --> F_PREP --> F_READY --> L_DISPATCH
+        L_PORTAL --> L_DISPATCH
+        L_DISPATCH --> L_ACCEPT --> DB_TRIP
+    end
+
+    %% =======================================================
+    %% 7. SMARTPHONE GPS TELEMETRY & LIVE TRACKING
+    %% =======================================================
+    subgraph G7["7. Zero-IoT Smartphone GPS Telematics"]
+        D_OPEN["Driver Opens Direct Telematics URL\n(/logistics/track/:tripId)"]
+        D_SENSORS["Browser Sensor Engine\n• navigator.geolocation.watchPosition\n• HTML5 Screen Wake Lock API"]
+        API_TELEMETRY["POST /api/telemetry Ingestion Endpoint\n(4s Normal Ping / 15s Low-Data Battery Saver)"]
+        DB_COORDS["Live Lat/Lng Streamed to public.logistics_trips"]
+        HONEST_TEMP["Strict Sensor Policy\n(Reefer Sensor Unattached: No Fake Temp Readings)"]
+        MAPS["Leaflet GIS Real-Time Maps\n• Buyer Tracking View (/consumer/tracking/:id)\n• Logistics Fleet Command (/logistics/trips)"]
+        
+        L_ACCEPT --> D_OPEN
+        D_OPEN --> D_SENSORS --> API_TELEMETRY --> DB_COORDS
+        D_OPEN --> HONEST_TEMP
+        DB_COORDS -->|"Real-Time Push"| MAPS
+    end
+
+    %% =======================================================
+    %% 8. DELIVERY, SETTLEMENT & CRYPTO PROVENANCE
+    %% =======================================================
+    subgraph G8["8. Delivery, Escrow Payout & Provenance Ledger"]
+        ARRIVE["Logistics Driver Arrives at Buyer Destination"]
+        OTP_VERIFY["Physical Quality Inspection & Secure OTP Verification\n(Buyer Confirms Receipt of Produce)"]
+        ESCROW_PAYOUT["Automated Escrow Fund Release\n(Instant Payout to Farmer Account/Wallet)"]
+        SHA256_ENGINE["SHA-256 Web Crypto Hash Engine\n(Hashes Farm Origin, Driver Telemetry & Timestamps)"]
+        LEDGER[("Farm-to-Fork Traceability Ledger (/traceability)\n(Public Immutable Audit Trail)")]
+        REVIEWS["Verified Reciprocal Reviews (/api/ratings)\n(Buyer & Farmer Mutually Rate Quality & Service)"]
+        
+        MAPS --> ARRIVE --> OTP_VERIFY
+        OTP_VERIFY --> ESCROW_PAYOUT
+        OTP_VERIFY --> SHA256_ENGINE --> LEDGER
+        ESCROW_PAYOUT --> REVIEWS
+    end

@@ -1639,3 +1639,8 @@ GRANT SELECT ON public.unassigned_logistics_pool TO authenticated;
 DELETE FROM public.logistics_assignments WHERE order_id LIKE 'TEST-%';
 DELETE FROM public.orders WHERE id LIKE 'TEST-%';
 DELETE FROM public.produce_listings WHERE id::text LIKE '00000000-0000-0000-0000-%' OR produce_name LIKE 'TEST-%';
+
+-- ------------------------------------------------------------------------------
+-- 15. RELOAD SCHEMA CACHE
+-- ------------------------------------------------------------------------------
+NOTIFY pgrst, 'reload schema';

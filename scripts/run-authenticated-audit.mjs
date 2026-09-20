@@ -296,7 +296,10 @@ async function runAuthenticatedAudit() {
       Date.now() - t3
     );
   } else {
-    const rpcProbe = await anonClient.rpc('atomic_checkout_order', { p_quantity: 0 });
+    const rpcProbe = await anonClient.rpc('atomic_checkout_order', {
+      p_listing_id: '00000000-0000-0000-0000-000000000000',
+      p_quantity: 0
+    });
     record(
       '3',
       'atomic_checkout_order parameter and authorization validation',

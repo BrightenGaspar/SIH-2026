@@ -1,7 +1,33 @@
 export type BuyerType = 'household' | 'retailer' | 'restaurant' | 'bulk-buyer' | 'institution';
 export type ProduceGrade = 'A' | 'B' | 'Organic Certified';
 export type FreshnessLevel = 'Harvested Today' | 'Harvested 1 Day Ago' | 'Harvested 2 Days Ago' | 'Harvested 3 Days Ago' | 'Harvested 4 Days Ago' | string;
-export type ConsumerOrderStatus = 'Escrow Locked' | 'Order Placed' | 'Confirmed' | 'Preparing' | 'PREPARING' | 'Pickup' | 'In Transit' | 'IN TRANSIT' | 'Dispatched' | 'READY_TO_DELIVER' | 'DISPATCH_OFFERED' | 'Delivered' | 'Cancelled';
+export type ConsumerOrderStatus =
+  | 'pending'
+  | 'accepted'
+  | 'preparing'
+  | 'ready_for_pickup'
+  | 'pickup_assigned'
+  | 'picked_up'
+  | 'in_transit'
+  | 'delivered'
+  | 'completed'
+  | 'cancelled'
+  | 'rejected'
+  | 'failed_delivery'
+  | 'Escrow Locked'
+  | 'Order Placed'
+  | 'Confirmed'
+  | 'Preparing'
+  | 'PREPARING'
+  | 'Pickup'
+  | 'In Transit'
+  | 'IN TRANSIT'
+  | 'Dispatched'
+  | 'READY_TO_DELIVER'
+  | 'DISPATCH_OFFERED'
+  | 'Delivered'
+  | 'Completed'
+  | 'Cancelled';
 export type RiskLevel = 'Low' | 'Medium' | 'High';
 export type RoadVehicleType = 'Tata Ace' | 'Tata 407 Reefer' | 'Mahindra Bolero Maxi Truck';
 

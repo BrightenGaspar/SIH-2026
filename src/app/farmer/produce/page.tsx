@@ -109,12 +109,15 @@ export default function FarmerProducePage() {
       }
 
       const farmerId = user?.id || currentUser?.id;
+      if (!farmerId) {
+        throw new Error('Authentication required: You must be signed in as a farmer to create a listing.');
+      }
       let uploadedImageUrl: string | undefined = undefined;
 
       if (imageFile) {
         setIsUploading(true);
         try {
-          uploadedImageUrl = await uploadCropImage(farmerId || 'demo_farmer', imageFile);
+          uploadedImageUrl = await uploadCropImage(farmerId, imageFile);
         } catch (uploadErr: any) {
           console.warn('Image upload failed, continuing with listing:', uploadErr?.message);
         } finally {

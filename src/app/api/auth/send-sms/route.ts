@@ -60,9 +60,19 @@ export async function POST(req: NextRequest) {
     }
 
     const cleanOtp = String(otp).trim();
-    const apiKey =
-      process.env.FAST2SMS_API_KEY ||
-      'j6aFGtwnAVWZE81hQLu4ld5SMmRX2IoHY0KTc9CpBbNvgDekqiETKlR7dtJFoM6NOQ5AuISb9se823CU';
+    const apiKey = process.env.FAST2SMS_API_KEY;
+    if (!apiKey) {
+      console.error('FATAL: FAST2SMS_API_KEY environment variable is not configured.');
+      return NextResponse.json(
+        {
+          error: {
+            http_code: 500,
+            message: 'SMS gateway service is not configured (missing FAST2SMS_API_KEY).',
+          },
+        },
+        { status: 500 }
+      );
+    }
 
     // 3. Primary Dispatch: Fast2SMS Dedicated Transactional OTP Route (Works on DND & Non-DND 24/7)
     let smsResponse = await fetch('https://www.fast2sms.com/dev/bulkV2', {

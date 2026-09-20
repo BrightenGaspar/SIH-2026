@@ -524,7 +524,7 @@ export const consumerService = {
     const quantity = Number(firstItem?.quantityKg || orderData.totalQuantityKg || 1);
     const deliveryAddress = orderData.deliveryAddress?.address || 'Market Distribution Hub';
     const paymentMethod = (orderData.paymentMethod || 'upi').toLowerCase();
-    const idempotencyKey = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     if (!listingId) {
       throw new Error('Invalid order: Missing produce listing identifier.');

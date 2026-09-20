@@ -50,4 +50,5 @@ SIHFULLCODE/
 
 # temporary scratch directory
 scratch/
+supabase/.temp/
 

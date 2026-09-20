@@ -19,23 +19,23 @@ export interface UserProfile {
 }
 
 /**
- * Maps frontend role ('consumer') to database allowed role ('buyer')
- * to guarantee compliance with PostgreSQL check constraint 'profiles_role_check'.
+ * Maps frontend role ('consumer') to database allowed role ('consumer')
+ * and normalizes legacy 'buyer' to 'consumer'.
  */
 export function toDbRole(role: string | null | undefined): string {
-  if (!role) return 'buyer';
+  if (!role) return 'consumer';
   const clean = role.trim().toLowerCase();
-  if (clean === 'consumer') return 'buyer';
+  if (clean === 'buyer') return 'consumer';
   return clean;
 }
 
 /**
- * Maps database role ('buyer') back to frontend role ('consumer').
+ * Maps database role back to frontend role ('consumer').
  */
 export function fromDbRole(role: string | null | undefined): UserRole {
   if (!role) return 'consumer';
   const clean = role.trim().toLowerCase();
-  if (clean === 'buyer') return 'consumer';
+  if (clean === 'buyer' || clean === 'consumer') return 'consumer';
   if (clean === 'farmer' || clean === 'logistics') return clean as UserRole;
   return 'consumer';
 }

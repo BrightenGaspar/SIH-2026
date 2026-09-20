@@ -18,8 +18,6 @@ import {
   Search,
   Navigation,
   Radio,
-  Play,
-  Pause,
   RotateCcw,
   CheckCircle2,
   AlertCircle,
@@ -47,11 +45,6 @@ function ConsumerTrackingContent() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
-  // Live GPS Simulation State
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [simIndex, setSimIndex] = useState(0);
-  const simulationTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   useEffect(() => {
     async function loadTrips() {
       setLoading(true);
@@ -72,51 +65,7 @@ function ConsumerTrackingContent() {
     loadTrips();
   }, [initialId]);
 
-  // Handle Live GPS simulation
-  useEffect(() => {
-    if (!isSimulating || !activeTrip || !activeTrip.routeCoordinates || activeTrip.routeCoordinates.length === 0) {
-      if (simulationTimerRef.current) clearInterval(simulationTimerRef.current);
-      return;
-    }
-
-    simulationTimerRef.current = setInterval(() => {
-      setSimIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % activeTrip.routeCoordinates.length;
-        const nextCoords = activeTrip.routeCoordinates[nextIndex];
-        const progress = Math.round(((nextIndex + 1) / activeTrip.routeCoordinates.length) * 100);
-        const remKm = Math.max(0, Math.round(activeTrip.totalDistanceKm * (1 - progress / 100)));
-        const compKm = activeTrip.totalDistanceKm - remKm;
-
-        setActiveTrip((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            currentCoordinates: nextCoords,
-            progressPercentage: progress,
-            distanceRemainingKm: remKm,
-            distanceCompletedKm: compKm,
-            etaMinutes: Math.max(5, Math.round(remKm * 1.6)),
-            currentLocationName:
-              nextIndex === 0
-                ? prev.pickupLocation
-                : nextIndex === activeTrip.routeCoordinates.length - 1
-                ? prev.destinationLocation
-                : `Highway GPS Checkpoint ${nextIndex + 1} (Moving @ 54 km/h)`,
-          };
-        });
-
-        return nextIndex;
-      });
-    }, 2800);
-
-    return () => {
-      if (simulationTimerRef.current) clearInterval(simulationTimerRef.current);
-    };
-  }, [isSimulating, activeTrip?.id]);
-
   const handleSelectTrip = (trip: DeliveryTracking) => {
-    setIsSimulating(false);
-    setSimIndex(0);
     setActiveTrip(trip);
   };
 
@@ -344,63 +293,39 @@ function ConsumerTrackingContent() {
             tripId={activeTrip.id}
           />
 
-          {/* Live GPS Simulation & Telemetry Controls Strip */}
+          {/* Live GPS Telemetry Status Banner */}
           <div className="bg-gradient-to-r from-emerald-950 via-zinc-900 to-zinc-900 p-4 sm:p-5 rounded-3xl border border-emerald-500/30 text-white shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                <Navigation className={`w-5 h-5 ${isSimulating ? 'animate-spin' : ''}`} />
+                <Navigation className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-400">
-                    GPS Highway Telemetry Stream
+                    Live GPS Telemetry
                   </span>
                   <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                    {isSimulating ? 'Live Motion Simulated' : 'Satellite Connected'}
+                    Realtime Active
                   </span>
                 </div>
                 <p className="text-xs text-zinc-300 font-mono mt-0.5">
-                  Coords: {activeTrip.currentCoordinates ? `${activeTrip.currentCoordinates[0].toFixed(4)}° N, ${activeTrip.currentCoordinates[1].toFixed(4)}° E` : 'Waiting for driver phone GPS'}
+                  Coordinates: {activeTrip.currentCoordinates ? `${activeTrip.currentCoordinates[0].toFixed(4)}° N, ${activeTrip.currentCoordinates[1].toFixed(4)}° E` : 'Transmitting via driver phone beacon'}
                 </p>
               </div>
             </div>
 
-            {/* Simulation Play/Pause buttons */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => setIsSimulating(!isSimulating)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm ${
-                  isSimulating
-                    ? 'bg-amber-500 hover:bg-amber-600 text-zinc-950'
-                    : 'bg-emerald-500 hover:bg-emerald-600 text-zinc-950'
-                }`}
-              >
-                {isSimulating ? (
-                  <>
-                    <Pause className="w-4 h-4" /> Pause GPS Stream
-                  </>
-                ) : (
-                  <>
-                    <Play className="w-4 h-4" /> Simulate Live Movement
-                  </>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSimulating(false);
-                  setSimIndex(0);
-                  sharedTrackingService.getTracking(activeTrip.id).then((t) => {
-                    if (t) setActiveTrip(t);
-                  });
+                onClick={async () => {
+                  const fresh = await sharedTrackingService.getTracking(activeTrip.id);
+                  if (fresh) setActiveTrip(fresh);
                 }}
-                className="p-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition"
-                title="Reset simulation"
+                className="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-bold border border-zinc-700 transition flex items-center gap-1.5"
+                title="Refresh live telemetry"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-3.5 h-3.5" /> Refresh Telemetry
               </button>
             </div>
           </div>

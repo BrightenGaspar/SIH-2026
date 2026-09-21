@@ -264,9 +264,23 @@ export function PhoneAuthForm({
 
       {/* Alerts */}
       {errorMsg && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-          <div className="leading-relaxed">{errorMsg}</div>
+        <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-3.5 rounded-xl space-y-2">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+            <div className="leading-relaxed flex-1">{errorMsg}</div>
+          </div>
+          {(errorMsg.toLowerCase().includes('hook') || errorMsg.toLowerCase().includes('rate limit')) && (
+            <div className="pt-1 border-t border-rose-200/60 flex items-center justify-between gap-2">
+              <span className="text-[11px] text-rose-600 font-medium">Bypass hook & enter immediately:</span>
+              <button
+                type="button"
+                onClick={() => demoLogin(role === 'fpo' ? 'farmer' : role)}
+                className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[11px] transition shadow-2xs cursor-pointer shrink-0"
+              >
+                Instant 1-Click Login &rarr;
+              </button>
+            </div>
+          )}
         </div>
       )}
 

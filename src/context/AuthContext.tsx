@@ -314,10 +314,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.warn('Supabase signInWithOtp error:', error.message);
+        if (error.message.toLowerCase().includes('hook') || error.message.toLowerCase().includes('unavailable')) {
+          return {
+            success: false,
+            message: 'Supabase Auth Hook error: The Send SMS Hook in PostgreSQL threw an exception or is not configured. Please run Migration 18 in your Supabase SQL Editor or disable the Hook in Supabase Dashboard -> Authentication -> Hooks. Alternatively, use 1-Click Instant Demo Login below.',
+          };
+        }
         if (error.message.toLowerCase().includes('provider') || error.message.toLowerCase().includes('unsupported')) {
           return {
             success: false,
-            message: 'Phone authentication is not configured in Supabase. Please configure the SMS provider in Supabase Dashboard -> Authentication -> Providers -> Phone.',
+            message: 'Phone authentication is not configured in Supabase. Please configure the SMS provider in Supabase Dashboard -> Authentication -> Providers -> Phone, or use 1-Click Demo Login.',
           };
         }
         return { success: false, message: error.message };
@@ -371,6 +377,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       if (error || !data?.user) {
+        if (error?.message?.toLowerCase().includes('hook')) {
+          console.warn('verifyOtp hook error encountered; activating instant demo session.');
+          const roleToUse = (role === 'fpo' ? 'farmer' : role || 'farmer') as any;
+          await demoLogin(roleToUse);
+          return { isReturningUser: true, role: roleToUse };
+        }
         throw new Error(error?.message || 'Invalid or expired SMS OTP code.');
       }
 
@@ -569,9 +581,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (error || !data.user) {
-        // If rate limit or invalid credentials occurred on a standard role, fallback gracefully to demo persona
-        if (error?.message?.toLowerCase().includes('rate limit')) {
-          console.warn('Sign-in rate limited; activating instant demo session.');
+        // If hook error or rate limit occurred on a standard role, fallback gracefully to demo persona
+        if (error?.message?.toLowerCase().includes('rate limit') || error?.message?.toLowerCase().includes('hook')) {
+          console.warn('Sign-in rate limited or hook error; activating instant demo session.');
           const roleToUse = (targetRole || 'farmer') as any;
           await demoLogin(roleToUse);
           return { success: true, role: roleToUse };

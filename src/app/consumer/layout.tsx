@@ -48,6 +48,8 @@ export default function ConsumerLayout({
     if (!isGuestAllowed && !isLoading) {
       if (!isConsumerAuthenticated && !consumerUser && !currentUser) {
         router.push('/consumer/login');
+      } else if (currentUser?.role && currentUser.role !== 'consumer') {
+        router.push(`/${currentUser.role}/dashboard`);
       } else if (
         consumerUser &&
         consumerUser.profileCompleted === false &&

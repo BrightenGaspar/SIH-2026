@@ -81,39 +81,11 @@ export function LiveSimulationGraph({
         {/* Current Big Temp Indicator */}
         <div className="flex items-center gap-4 text-right">
           <div>
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Current IoT Temp</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">Driver-Reported Temp</span>
             <span className={`text-2xl font-black ${isBreached ? 'text-rose-600' : 'text-emerald-700'}`}>
               {currentTemp.toFixed(1)}°C
             </span>
           </div>
-
-          {/* Quick Demo Test Buttons */}
-          {(onTriggerBreach || onReset) && (
-            <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
-              {onTriggerBreach && (
-                <button
-                  type="button"
-                  onClick={onTriggerBreach}
-                  title="Simulate sudden IoT sensor temperature spike above 8.0°C"
-                  className="px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
-                >
-                  <AlertTriangle className="w-3 h-3 text-rose-600" />
-                  <span>Test Breach</span>
-                </button>
-              )}
-              {onReset && (
-                <button
-                  type="button"
-                  onClick={onReset}
-                  title="Reset temperature to safe 5.2°C setpoint"
-                  className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-bold flex items-center gap-1 transition cursor-pointer"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  <span>Reset</span>
-                </button>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

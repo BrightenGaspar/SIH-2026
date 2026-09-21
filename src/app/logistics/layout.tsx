@@ -44,6 +44,8 @@ export default function LogisticsLayout({
     if (!isGuestAllowed && !isLoading) {
       if (!isLogisticsAuthenticated && !logisticsUser && !currentUser) {
         router.push('/logistics/login');
+      } else if (currentUser?.role && currentUser.role !== 'logistics') {
+        router.push(`/${currentUser.role}/dashboard`);
       } else if (
         logisticsUser &&
         logisticsUser.profileCompleted === false &&

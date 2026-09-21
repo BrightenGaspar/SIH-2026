@@ -144,6 +144,13 @@ export default function MandiPricesPage() {
               })}
             </tbody>
           </table>
+          {filtered.length === 0 && (
+            <div className="py-12 text-center">
+              <TrendingUp className="w-8 h-8 text-slate-400 mx-auto mb-2 opacity-50" />
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">No price data yet</p>
+              <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Live Mandi prices and benchmarks will display here once recorded from an official market source.</p>
+            </div>
+          )}
         </div>
       </Card>
 

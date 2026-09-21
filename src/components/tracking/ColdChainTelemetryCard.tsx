@@ -49,12 +49,12 @@ export default function ColdChainTelemetryCard({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {/* Current Temp */}
         <div className={`p-3.5 rounded-2xl border ${isBreached ? 'bg-rose-500/10 border-rose-500/30 text-rose-600' : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'}`}>
-          <span className="text-[11px] text-slate-400 block font-medium">Reefer Temp</span>
+          <span className="text-[11px] text-slate-400 block font-medium">Driver-Reported Cargo Temperature</span>
           <div className="text-2xl font-black mt-0.5">
             {hasTemp ? (
               `${telemetry!.temperatureCelsius}°C`
             ) : (
-              <span className="text-xs font-bold text-slate-400">No live reading</span>
+              <span className="text-xs font-bold text-slate-400">No driver reading reported</span>
             )}
           </div>
           <span className="text-[10px] text-slate-500">

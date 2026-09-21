@@ -158,7 +158,11 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
   const [activeTripId, setActiveTripId] = useState<string>(DEFAULT_TRIP_ID);
   const [activeTrip, setActiveTrip] = useState<DeliveryTracking | null>(null);
   const activeTripRef = useRef<DeliveryTracking | null>(null);
-  activeTripRef.current = activeTrip;
+  
+  useEffect(() => {
+    activeTripRef.current = activeTrip;
+  }, [activeTrip]);
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 

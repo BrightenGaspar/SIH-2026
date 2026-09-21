@@ -46,7 +46,6 @@ async function runLiveDemoFlowTest() {
         asking_price: 32,
         quality_grade: 'A',
         harvest_date: new Date().toISOString().split('T')[0],
-        shelf_life_days: 12,
         status: 'Active',
         location: 'Shadnagar, Telangana',
         created_at: new Date().toISOString(),

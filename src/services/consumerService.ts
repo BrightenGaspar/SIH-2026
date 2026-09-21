@@ -240,9 +240,11 @@ export const consumerService = {
   async listMarketplace(): Promise<MarketplaceProduceItem[]> {
     try {
       // 1. Primary: Query authoritative public.produce_listings table
-      let { data, error } = await supabase
+      const { data: primaryData, error } = await supabase
         .from('produce_listings')
         .select('*');
+
+      let data = primaryData;
 
       // 2. Fallback: If produce_listings returned 0 rows, check legacy produce table
       if (!data || data.length === 0) {

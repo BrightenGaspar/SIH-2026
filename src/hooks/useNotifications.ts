@@ -107,7 +107,7 @@ export function useNotifications(userId?: string): UseNotificationsResult {
 
   useEffect(() => {
     if (!userId) {
-      setItems([]);
+      setItems((prev) => (prev.length > 0 ? [] : prev));
       return;
     }
 

@@ -354,7 +354,7 @@ export const farmerService = {
       updated_at: new Date().toISOString(),
     };
 
-    let { data: listingData, error: listingError } = await supabase
+    const { data: listingData, error: listingError } = await supabase
       .from('produce_listings')
       .insert(canonicalPayload)
       .select()
@@ -447,7 +447,8 @@ export const farmerService = {
     if (targetId) {
       query = query.eq('farmer_id', targetId);
     }
-    let { data, error } = await query.order('created_at', { ascending: false });
+    const { data: primaryData, error } = await query.order('created_at', { ascending: false });
+    let data = primaryData;
 
     // 2. Fallback: if produce_listings has 0 rows, check legacy produce
     if (!data || data.length === 0) {

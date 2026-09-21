@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MarketplaceProduceItem } from '@/services/consumerService';
 import { useCart } from '@/context/CartContext';
+import { useI18n } from '@/context/I18nContext';
 import { 
   MapPin, 
   Calendar, 
@@ -25,8 +26,23 @@ interface ProduceCardProps {
 export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpdated = false }) => {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { language } = useI18n();
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdded, setIsAdded] = useState(false);
+
+  const currentLang = language || 'en';
+  const getLocalizedField = (field: any): string => {
+    if (!field) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field === 'object') {
+      return field[currentLang] || field['en'] || Object.values(field)[0] || '';
+    }
+    return String(field);
+  };
+
+  const displayCropName = getLocalizedField(produce.crop_name);
+  const displayVariety = getLocalizedField(produce.variety);
+  const displayCategory = getLocalizedField(produce.category) || 'Direct Farm Produce';
 
   const isOutOfStock = produce.quantity_kg <= 0;
   const minQty = 1;
@@ -51,8 +67,8 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
   // Adapter to convert MarketplaceProduceItem to ProductItem for CartContext
   const getProductItem = () => ({
     id: produce.id,
-    name: produce.crop_name,
-    category: (produce.category || 'Vegetables') as any,
+    name: displayCropName,
+    category: displayCategory as any,
     image: produce.image_url || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600',
     grade: (produce.quality_grade || 'A') as any,
     gradeDescription: `Grade ${produce.quality_grade || 'A'} Certified Farm Harvest`,
@@ -70,7 +86,7 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
       generalLocation: produce.location || 'Nashik APMC Hub',
       district: produce.location ? produce.location.split(',')[0].trim() : 'Nashik',
       state: 'Maharashtra',
-      mainCrops: [produce.crop_name],
+      mainCrops: [displayCropName],
       harvestDate: produce.harvest_date || 'Harvested Recently',
       soilPractices: 'Sustainable compost & drip irrigation',
       organicPractices: 'Pesticide residue tested',
@@ -89,7 +105,7 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
       conventionalMarketPricePerKg: Math.round(produce.price_per_kg * 1.25),
       farmerRealizationBoostPercent: 25,
     },
-    description: `${produce.crop_name}${produce.variety ? ` (${produce.variety})` : ''} directly sourced from farm hub at ${produce.location || 'Nashik'}.`,
+    description: `${displayCropName}${displayVariety ? ` (${displayVariety})` : ''} directly sourced from farm hub at ${produce.location || 'Nashik'}.`,
     isColdChainEligible: true,
     tags: ['Direct Farmgate', 'Cold Chain Transport'],
   });
@@ -121,7 +137,7 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
       <div className="relative h-48 w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
         <img
           src={produce.image_url || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600'}
-          alt={produce.crop_name}
+          alt={displayCropName}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
         />
@@ -169,17 +185,17 @@ export const ProduceCard: React.FC<ProduceCardProps> = ({ produce, isRecentlyUpd
           <div className="flex items-start justify-between gap-2">
             <div>
               <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                {produce.category || 'Direct Farm Produce'}
+                {displayCategory}
               </span>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-emerald-600 transition-colors">
-                {produce.crop_name}
+                {displayCropName}
               </h3>
             </div>
           </div>
 
-          {produce.variety && (
+          {displayVariety && (
             <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 line-clamp-1">
-              Variety: {produce.variety}
+              Variety: {displayVariety}
             </p>
           )}
 

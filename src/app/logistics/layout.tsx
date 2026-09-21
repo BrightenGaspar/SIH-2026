@@ -44,14 +44,16 @@ export default function LogisticsLayout({
     if (!isGuestAllowed && !isLoading) {
       if (!isLogisticsAuthenticated && !logisticsUser && !currentUser) {
         router.push('/logistics/login');
-      } else if (currentUser?.role && currentUser.role !== 'logistics') {
-        router.push(`/${currentUser.role}/dashboard`);
+      } else if (currentUser?.role === 'admin') {
+        // Admins have universal inspection access across all portals
       } else if (
         logisticsUser &&
         logisticsUser.profileCompleted === false &&
         pathname !== '/logistics/complete-profile'
       ) {
         router.push('/logistics/complete-profile');
+      } else if (currentUser?.role && currentUser.role !== 'logistics') {
+        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isGuestAllowed, isLoading, isLogisticsAuthenticated, logisticsUser, currentUser, pathname, router]);

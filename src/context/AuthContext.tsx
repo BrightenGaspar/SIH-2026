@@ -21,7 +21,7 @@ export interface AuthenticatedUser {
   name: string;
   email: string | null;
   phone: string | null;
-  role: 'farmer' | 'consumer' | 'logistics';
+  role: 'farmer' | 'consumer' | 'logistics' | 'admin';
   username: string | null;
   initials: string;
   place?: string | null;

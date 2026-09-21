@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 
-export type UserRole = 'farmer' | 'consumer' | 'logistics';
+export type UserRole = 'farmer' | 'consumer' | 'logistics' | 'admin';
 
 export interface UserProfile {
   id: string;
@@ -36,7 +36,7 @@ export function fromDbRole(role: string | null | undefined): UserRole {
   if (!role) return 'consumer';
   const clean = role.trim().toLowerCase();
   if (clean === 'buyer' || clean === 'consumer') return 'consumer';
-  if (clean === 'farmer' || clean === 'logistics') return clean as UserRole;
+  if (clean === 'farmer' || clean === 'logistics' || clean === 'admin') return clean as UserRole;
   return 'consumer';
 }
 
@@ -51,6 +51,7 @@ export function fromDbRole(role: string | null | undefined): UserRole {
  */
 export function isProfileComplete(profile: Partial<UserProfile> | null | undefined): boolean {
   if (!profile) return false;
+  if ((profile.role as string) === 'admin') return true;
   const normalizedRole = fromDbRole(profile.role);
   return Boolean(
     profile.full_name &&

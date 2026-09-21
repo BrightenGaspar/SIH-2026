@@ -50,12 +50,24 @@ function AuthCallbackContent() {
         const user = session.user;
 
         // 3. Fetch persistent profile from public.profiles
-        const profile = await getProfileByUserId(user.id);
-        const resolvedRole = fromDbRole(roleParam || profile?.role || 'consumer');
+        let profile = await getProfileByUserId(user.id);
+        const targetRole = validateRole(roleParam);
+
+        // If user logged in through a specific portal (e.g. /farmer/login), ensure profile role reflects that portal
+        if (targetRole && profile && profile.role !== targetRole && profile.role !== 'admin') {
+          await supabase.from('profiles').update({ role: targetRole }).eq('id', user.id);
+          profile.role = targetRole;
+        }
+
+        const resolvedRole = targetRole || fromDbRole(profile?.role || 'consumer');
 
         if (profile && isProfileComplete(profile)) {
           // Returning user with completed profile: direct to role dashboard
-          router.replace(`/${resolvedRole}/dashboard`);
+          if ((profile.role as string) === 'admin' && !targetRole) {
+            router.replace('/admin');
+          } else {
+            router.replace(`/${resolvedRole}/dashboard`);
+          }
         } else {
           // New user or incomplete profile: direct to Complete Profile screen with role context
           router.replace(`/auth/complete-profile?role=${resolvedRole}`);

@@ -48,14 +48,16 @@ export default function ConsumerLayout({
     if (!isGuestAllowed && !isLoading) {
       if (!isConsumerAuthenticated && !consumerUser && !currentUser) {
         router.push('/consumer/login');
-      } else if (currentUser?.role && currentUser.role !== 'consumer') {
-        router.push(`/${currentUser.role}/dashboard`);
+      } else if (currentUser?.role === 'admin') {
+        // Admins have universal inspection access across all portals
       } else if (
         consumerUser &&
         consumerUser.profileCompleted === false &&
         pathname !== '/consumer/complete-profile'
       ) {
         router.push('/consumer/complete-profile');
+      } else if (currentUser?.role && currentUser.role !== 'consumer') {
+        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isGuestAllowed, isLoading, isConsumerAuthenticated, consumerUser, currentUser, pathname, router]);

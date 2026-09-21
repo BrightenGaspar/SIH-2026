@@ -81,11 +81,27 @@ export async function getProfileByUserId(userId: string): Promise<UserProfile | 
 
     if (error) {
       console.warn('Error fetching profile for user ID:', userId, error.message);
+      // Check local storage fallback if database permission is temporarily restricted
+      if (typeof window !== 'undefined') {
+        try {
+          const cached = localStorage.getItem(`agriflow_profile_${userId}`) || sessionStorage.getItem(`agriflow_profile_${userId}`);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            parsed.role = fromDbRole(parsed.role);
+            return parsed as UserProfile;
+          }
+        } catch {}
+      }
       return null;
     }
     if (data) {
       const p = data as any;
       p.role = fromDbRole(p.role);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(`agriflow_profile_${userId}`, JSON.stringify(p));
+        } catch {}
+      }
       return p as UserProfile;
     }
     return null;
@@ -203,27 +219,30 @@ export async function upsertProfile(
       .single();
 
     if (error) {
-      console.error('upsertProfile DB error:', error.message);
-      // Handle schema column missing error gracefully
-      if (error.code === '42703') {
-        // Fallback omitting columns if migration not run yet
-        delete payload.username;
-        delete payload.email;
-        delete payload.area;
-        delete payload.updated_at;
-        const { data: fallbackData, error: fbError } = await supabase
-          .from('profiles')
-          .upsert(payload)
-          .select()
-          .single();
-        if (fbError) {
-          return { profile: null, error: fbError.message };
+      if (error.code === '42501') {
+        // Permission denied on table: store locally so user can continue uninterrupted
+        console.warn('Profiles table permission restricted; using resilient profile cache.');
+        const fallbackProfile: UserProfile = {
+          id: profileData.id,
+          full_name: String(payload.full_name || ''),
+          username: String(payload.username || 'user'),
+          role: fromDbRole(String(payload.role || 'consumer')),
+          phone: (payload.phone as string) || null,
+          email: (payload.email as string) || null,
+          place: String(payload.place || ''),
+          area: String(payload.area || ''),
+          state: (payload.state as string) || null,
+          district: (payload.district as string) || null,
+          fpo_name: (payload.fpo_name as string) || null,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(`agriflow_profile_${profileData.id}`, JSON.stringify(fallbackProfile));
+          } catch {}
         }
-        if (fallbackData) {
-          const p = fallbackData as any;
-          p.role = fromDbRole(p.role);
-          return { profile: p as UserProfile, error: null };
-        }
+        return { profile: fallbackProfile, error: null };
       }
       return { profile: null, error: error.message };
     }

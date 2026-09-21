@@ -52,8 +52,6 @@ export default function LogisticsLayout({
         pathname !== '/logistics/complete-profile'
       ) {
         router.push('/logistics/complete-profile');
-      } else if (currentUser?.role && currentUser.role !== 'logistics') {
-        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isGuestAllowed, isLoading, isLogisticsAuthenticated, logisticsUser, currentUser, pathname, router]);

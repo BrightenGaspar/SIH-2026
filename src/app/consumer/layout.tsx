@@ -56,8 +56,6 @@ export default function ConsumerLayout({
         pathname !== '/consumer/complete-profile'
       ) {
         router.push('/consumer/complete-profile');
-      } else if (currentUser?.role && currentUser.role !== 'consumer') {
-        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isGuestAllowed, isLoading, isConsumerAuthenticated, consumerUser, currentUser, pathname, router]);

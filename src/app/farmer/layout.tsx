@@ -53,8 +53,6 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
         // Admins have universal inspection access across all portals
       } else if (user && user.profileCompleted === false && pathname !== '/farmer/complete-profile') {
         router.push('/farmer/complete-profile');
-      } else if (currentUser?.role && currentUser.role !== 'farmer') {
-        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isPublicRoute, isLoading, isAuthenticated, user, currentUser, pathname, router]);

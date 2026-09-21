@@ -29,7 +29,7 @@ export function assessColdChainRisk(
 
   // Risk Score calculation (0 - 100)
   // Temp deviation is heavily weighted (each degree out of range = ~15 points)
-  let riskScore = Math.min(100, Math.round(
+  const riskScore = Math.min(100, Math.round(
     (tempDeviation * 15) + 
     (humidityDeviation * 1.5) + 
     (Math.max(0, hoursInTransit - profile.maxSafeTransitHours * 0.5) * 1.2)

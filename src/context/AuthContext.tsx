@@ -616,7 +616,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const authPass = profileData.password?.trim() || 'AgriFlow@2026';
         const dbRole = toDbRole(role);
 
-        let { data: authData, error: authError } = await supabase.auth.signUp({
+        const { data: initialAuthData, error: authError } = await supabase.auth.signUp({
           email: authEmail,
           password: authPass,
           options: {
@@ -627,6 +627,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             },
           },
         });
+        let authData = initialAuthData;
 
         if (authError) {
           if (authError.message.toLowerCase().includes('already registered')) {

@@ -271,7 +271,7 @@ export async function generateUniqueUsername(
     .replace(/_+/g, '_')
     .replace(/^_|_$/g, '') || 'user';
 
-  let candidate = sanitized.slice(0, 20);
+  const candidate = sanitized.slice(0, 20);
   if (await checkUsernameAvailable(candidate, currentUserId)) {
     return candidate;
   }

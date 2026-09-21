@@ -217,7 +217,7 @@ export default function ProductReviewsSection({
             {/* Review Content */}
             {rev.review && (
               <p className="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed font-normal">
-                "{rev.review}"
+                &ldquo;{rev.review}&rdquo;
               </p>
             )}
           </div>

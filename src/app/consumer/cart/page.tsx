@@ -200,7 +200,7 @@ export default function ConsumerCartPage() {
                 </span>
               </div>
               <p className="text-[11px] text-emerald-700 dark:text-emerald-400 leading-snug">
-                This transaction bypasses 5 intermediate mandi broker cuts, guaranteeing higher realized revenue directly into the farmer's bank account.
+                This transaction bypasses 5 intermediate mandi broker cuts, guaranteeing higher realized revenue directly into the farmer&apos;s bank account.
               </p>
             </div>
 

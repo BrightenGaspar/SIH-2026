@@ -64,7 +64,7 @@ export default function LiveTrackingMap({ trip, showTelemetryPopup = true }: Liv
     <div className="relative w-full h-full min-h-[380px] rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner z-0">
       {!trip.currentCoordinates && (
         <div className="absolute top-2 left-2 right-2 z-[400] bg-slate-900/90 text-amber-300 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-amber-500/30 flex items-center justify-between">
-          <span>⚠️ Waiting for driver's live GPS</span>
+          <span>⚠️ Waiting for driver&apos;s live GPS</span>
           <span className="text-[10px] text-slate-400 font-normal">Phone beacon inactive</span>
         </div>
       )}

@@ -40,11 +40,13 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. Verify trip exists in public.logistics_trips or public.logistics_assignments
-    let { data: trip, error: fetchErr } = await supabase
+    const { data: initialTrip, error: fetchErr } = await supabase
       .from('logistics_trips')
       .select('*')
       .eq('id', trip_id)
       .maybeSingle();
+
+    let trip = initialTrip;
 
     let matchedAssignment: any = null;
     if (!trip) {
@@ -329,11 +331,13 @@ export async function GET(req: NextRequest) {
     }
 
     // Return single trip telemetry
-    let { data: trip, error } = await supabase
+    const { data: initialTrip, error } = await supabase
       .from('logistics_trips')
       .select('*')
       .eq('id', tripId)
       .maybeSingle();
+
+    let trip = initialTrip;
 
     if (!trip) {
       const { data: la } = await supabase

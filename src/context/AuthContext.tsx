@@ -637,6 +637,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             });
             if (signInError) throw new Error(authError.message);
             authData = signInData;
+          } else if (authError.message.toLowerCase().includes('rate limit')) {
+            // Attempt direct sign-in in case the account was already created
+            const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+              email: authEmail,
+              password: authPass,
+            });
+            if (!signInError && signInData?.user) {
+              authData = signInData;
+            } else {
+              throw new Error(
+                'Supabase Email Rate Limit exceeded. To fix permanently: Open your Supabase Dashboard -> Authentication -> Providers -> Email and turn off "Confirm email".'
+              );
+            }
           } else {
             throw new Error(authError.message);
           }

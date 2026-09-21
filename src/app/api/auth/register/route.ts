@@ -59,17 +59,37 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    if (authError) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: authError.message,
-        },
-        { status: 400 }
-      );
-    }
+    let user = authData?.user;
 
-    const user = authData.user;
+    if (authError) {
+      if (authError.message.toLowerCase().includes('already registered') || authError.message.toLowerCase().includes('rate limit')) {
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (!signInError && signInData?.user) {
+          user = signInData.user;
+        } else {
+          return NextResponse.json(
+            {
+              success: false,
+              error: authError.message.toLowerCase().includes('rate limit')
+                ? 'Supabase Email Rate Limit exceeded. Please turn off "Confirm email" in Supabase Authentication -> Providers -> Email.'
+                : authError.message,
+            },
+            { status: 400 }
+          );
+        }
+      } else {
+        return NextResponse.json(
+          {
+            success: false,
+            error: authError.message,
+          },
+          { status: 400 }
+        );
+      }
+    }
     if (!user) {
       return NextResponse.json(
         {

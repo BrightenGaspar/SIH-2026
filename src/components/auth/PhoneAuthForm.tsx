@@ -38,6 +38,7 @@ export function PhoneAuthForm({
     verifyPhoneOtp,
     loginWithGoogle,
     loginWithUsernamePassword,
+    demoLogin,
     isLoading,
   } = useAuth();
 
@@ -453,8 +454,20 @@ export function PhoneAuthForm({
         </form>
       )}
 
+      {/* 1-Click Instant Demo Login Button */}
+      <div className="pt-2 border-t border-slate-100 space-y-2">
+        <button
+          type="button"
+          onClick={() => demoLogin(role === 'fpo' ? 'farmer' : role)}
+          disabled={submitting || isLoading}
+          className="w-full py-2.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs active:scale-[0.99]"
+        >
+          <span>⚡ Instant 1-Click Demo Login as {role === 'fpo' || role === 'farmer' ? 'Farmer' : role === 'consumer' ? 'Buyer' : 'Transporter'}</span>
+        </button>
+      </div>
+
       {/* Footer Info */}
-      <div className="pt-2 text-center text-[11px] text-slate-400">
+      <div className="pt-1 text-center text-[11px] text-slate-400">
         Permanent user accounts linked through Supabase Auth & PostgreSQL
       </div>
     </div>

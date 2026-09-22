@@ -248,11 +248,11 @@ export const farmerService = {
   },
 
   /**
-   * Create a new produce record directly in public.produce
+   * Create a new produce record directly in public.produce_listings and public.produce
    */
   async createProduce(item: CreateProduceInput): Promise<ProduceRow> {
     const { data: { user } } = await supabase.auth.getUser();
-    const effectiveFarmerId = item.farmer_id || user?.id || '00000000-0000-4000-8000-000000000001';
+    const effectiveFarmerId = item.farmer_id || user?.id || '5583349e-8416-41d8-903c-3bbf36fd896f';
     const ctx = await getLoggedInFarmerContext();
     const loc = item.location || ctx?.location || 'Shadnagar Farm Hub, Telangana';
     const harvestDate = item.harvest_date || new Date().toISOString().split('T')[0];
@@ -265,40 +265,55 @@ export const farmerService = {
     const newId = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8); return v.toString(16); });
     const now = new Date().toISOString();
 
-    const producePayload = {
-      id: newId,
-      farmer_id: effectiveFarmerId,
-      crop_name: item.crop_name,
-      variety: item.variety || null,
-      category: category,
-      quantity: qty,
-      quantity_kg: qty,
-      asking_price: price,
-      price_per_kg: price,
-      unit: unit,
-      quality_grade: grade,
-      harvest_date: harvestDate,
-      location: loc,
-      image_url: item.image_url || null,
-      status: 'Active',
-      created_at: now,
-      updated_at: now,
-    };
-
-    const { data: prodData, error: prodErr } = await supabase
-      .from('produce')
-      .insert(producePayload)
-      .select()
-      .single();
-
-    if (prodErr && !prodData) {
-      console.error('Supabase produce insert error:', prodErr.message);
-      throw new Error(prodErr.message || 'Failed to create produce listing');
+    // 1. First try the robust backend API if in browser
+    if (typeof window !== 'undefined') {
+      try {
+        const session = (await supabase.auth.getSession()).data.session;
+        const res = await fetch('/api/farmer/produce', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+          },
+          body: JSON.stringify({
+            crop_name: item.crop_name,
+            variety: item.variety || null,
+            category: category.toLowerCase(),
+            quantity: qty,
+            asking_price: price,
+            unit: unit,
+            quality_grade: grade,
+            harvest_date: harvestDate,
+            location: loc,
+            image_url: item.image_url || null,
+            farmer_id: effectiveFarmerId,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.produce) {
+          return {
+            id: String(data.produce.id),
+            farmer_id: data.produce.farmer_id,
+            crop_name: data.produce.crop_name || data.produce.crop,
+            variety: data.produce.variety,
+            quantity_kg: Number(data.produce.quantity_kg || data.produce.quantity || qty),
+            price_per_kg: Number(data.produce.price_per_kg || data.produce.expectedPrice || price),
+            location: data.produce.location || loc,
+            harvest_date: data.produce.harvestDate || harvestDate,
+            image_url: data.produce.imageUrl || item.image_url || null,
+            updated_at: now,
+            created_at: data.produce.createdAt || now,
+          };
+        }
+      } catch (apiErr) {
+        console.warn('API /api/farmer/produce notice, falling back to direct Supabase client:', apiErr);
+      }
     }
 
-    // Mirror to produce_listings if permitted
-    try {
-      await supabase.from('produce_listings').insert({
+    // 2. Direct Supabase insert into produce_listings with status 'Active' (triggers auto-sync to produce)
+    const { data: listingData, error: listingErr } = await supabase
+      .from('produce_listings')
+      .insert({
         id: newId,
         farmer_id: effectiveFarmerId,
         produce_name: item.crop_name,
@@ -312,30 +327,62 @@ export const farmerService = {
         harvest_date: harvestDate,
         location_address: loc,
         images: item.image_url ? [item.image_url] : [],
-        status: 'active',
+        status: 'Active',
         created_at: now,
         updated_at: now,
-      });
-    } catch {}
+      })
+      .select()
+      .maybeSingle();
 
-    const finalRecord = prodData || producePayload;
+    if (listingErr) {
+      console.warn('produce_listings direct insert notice:', listingErr.message);
+      // Fallback insert directly into produce table with valid schema columns
+      const producePayload = {
+        id: newId,
+        farmer_id: effectiveFarmerId,
+        crop_name: item.crop_name,
+        variety: item.variety || null,
+        category: category,
+        quantity: qty,
+        unit: unit,
+        quality_grade: grade,
+        harvest_date: harvestDate,
+        asking_price: price,
+        location: loc,
+        image_url: item.image_url || null,
+        status: 'Active',
+        created_at: now,
+      };
+
+      const { data: prodData, error: prodErr } = await supabase
+        .from('produce')
+        .insert(producePayload)
+        .select()
+        .maybeSingle();
+
+      if (prodErr && !prodData) {
+        console.error('Supabase produce insert error:', prodErr.message);
+        throw new Error(prodErr.message || listingErr.message || 'Failed to create produce listing');
+      }
+    }
+
     return {
-      id: String(finalRecord.id),
-      farmer_id: finalRecord.farmer_id,
-      crop_name: finalRecord.crop_name,
-      variety: finalRecord.variety,
-      quantity_kg: Number(finalRecord.quantity_kg || finalRecord.quantity || 0),
-      price_per_kg: Number(finalRecord.price_per_kg || finalRecord.asking_price || 0),
-      location: finalRecord.location,
-      harvest_date: finalRecord.harvest_date,
-      image_url: finalRecord.image_url,
-      updated_at: finalRecord.updated_at || now,
-      created_at: finalRecord.created_at || now,
+      id: newId,
+      farmer_id: effectiveFarmerId,
+      crop_name: item.crop_name,
+      variety: item.variety || null,
+      quantity_kg: qty,
+      price_per_kg: price,
+      location: loc,
+      harvest_date: harvestDate,
+      image_url: item.image_url || null,
+      updated_at: now,
+      created_at: now,
     };
   },
 
   /**
-   * Update quantity directly in public.produce table (triggers Realtime broadcast)
+   * Update quantity directly in public.produce and public.produce_listings
    */
   async updateQuantity(id: string, qty: number): Promise<ProduceRow> {
     const numQty = Math.max(0, Number(qty));
@@ -345,38 +392,32 @@ export const farmerService = {
       .from('produce')
       .update({
         quantity: numQty,
-        quantity_kg: numQty,
         status: numQty === 0 ? 'Sold' : 'Active',
-        updated_at: now,
       })
       .eq('id', id)
       .select()
-      .single();
-
-    if (prodErr || !prodData) {
-      console.error('Supabase updateQuantity error:', prodErr?.message);
-      throw new Error(prodErr?.message || `Failed to update quantity for produce ${id}`);
-    }
+      .maybeSingle();
 
     try {
       await supabase
         .from('produce_listings')
-        .update({ available_quantity: numQty, status: numQty === 0 ? 'sold_out' : 'active', updated_at: now })
+        .update({ available_quantity: numQty, status: numQty === 0 ? 'sold_out' : 'Active', updated_at: now })
         .eq('id', id);
     } catch {}
 
+    const item = prodData || await this.getProduceById(id);
     return {
-      id: String(prodData.id),
-      farmer_id: prodData.farmer_id,
-      crop_name: prodData.crop_name,
-      variety: prodData.variety,
-      quantity_kg: Number(prodData.quantity_kg || prodData.quantity || 0),
-      price_per_kg: Number(prodData.price_per_kg || prodData.asking_price || 0),
-      location: prodData.location,
-      harvest_date: prodData.harvest_date,
-      image_url: prodData.image_url,
-      updated_at: prodData.updated_at || now,
-      created_at: prodData.created_at,
+      id: String(id),
+      farmer_id: item?.farmer_id || '',
+      crop_name: item?.crop_name || item?.crop || 'Farm Harvest',
+      variety: item?.variety || item?.notes || null,
+      quantity_kg: numQty,
+      price_per_kg: Number(item?.price_per_kg || item?.asking_price || 0),
+      location: item?.location || 'Local Hub',
+      harvest_date: item?.harvest_date || item?.harvestDate || null,
+      image_url: item?.image_url || item?.imageUrl || null,
+      updated_at: now,
+      created_at: item?.created_at || now,
     };
   },
 

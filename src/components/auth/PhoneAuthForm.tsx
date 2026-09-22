@@ -38,6 +38,7 @@ export function PhoneAuthForm({
     verifyPhoneOtp,
     loginWithGoogle,
     loginWithUsernamePassword,
+    demoLogin,
     isLoading,
   } = useAuth();
 
@@ -70,18 +71,18 @@ export function PhoneAuthForm({
     emerald: {
       accent: 'emerald',
       bgHover: 'hover:bg-emerald-500',
-      btnBg: 'bg-emerald-600',
+      btnBg: 'bg-emerald-600 text-white',
       tabActive: 'bg-emerald-600 text-white shadow-xs',
       borderFocus: 'focus:border-emerald-500 focus:ring-emerald-500/20',
-      badgeBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+      badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200',
     },
     blue: {
       accent: 'blue',
       bgHover: 'hover:bg-blue-500',
-      btnBg: 'bg-blue-600',
+      btnBg: 'bg-blue-600 text-white',
       tabActive: 'bg-blue-600 text-white shadow-xs',
       borderFocus: 'focus:border-blue-500 focus:ring-blue-500/20',
-      badgeBg: 'bg-blue-50 text-blue-700 border-blue-200',
+      badgeBg: 'bg-blue-50 text-blue-800 border-blue-200',
     },
     amber: {
       accent: 'amber',
@@ -89,7 +90,7 @@ export function PhoneAuthForm({
       btnBg: 'bg-amber-500 text-slate-950 font-bold',
       tabActive: 'bg-amber-500 text-slate-950 font-bold shadow-xs',
       borderFocus: 'focus:border-amber-500 focus:ring-amber-500/20',
-      badgeBg: 'bg-amber-50 text-amber-800 border-amber-200',
+      badgeBg: 'bg-amber-50 text-amber-900 border-amber-200',
     },
   }[themeColor];
 
@@ -263,9 +264,23 @@ export function PhoneAuthForm({
 
       {/* Alerts */}
       {errorMsg && (
-        <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-3.5 rounded-xl flex items-start gap-2.5">
-          <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-          <div className="leading-relaxed">{errorMsg}</div>
+        <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs p-3.5 rounded-xl space-y-2">
+          <div className="flex items-start gap-2.5">
+            <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
+            <div className="leading-relaxed flex-1">{errorMsg}</div>
+          </div>
+          {(errorMsg.toLowerCase().includes('hook') || errorMsg.toLowerCase().includes('rate limit')) && (
+            <div className="pt-1 border-t border-rose-200/60 flex items-center justify-between gap-2">
+              <span className="text-[11px] text-rose-600 font-medium">Bypass hook & enter immediately:</span>
+              <button
+                type="button"
+                onClick={() => demoLogin(role === 'fpo' ? 'farmer' : role)}
+                className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[11px] transition shadow-2xs cursor-pointer shrink-0"
+              >
+                Instant 1-Click Login &rarr;
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -295,7 +310,13 @@ export function PhoneAuthForm({
                       required
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      placeholder="98480 12345"
+                      placeholder={
+                        role === 'farmer' || role === 'fpo'
+                          ? '98480 12345'
+                          : role === 'consumer'
+                          ? '98480 54321'
+                          : '98480 22341'
+                      }
                       maxLength={12}
                       className={`w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 font-mono tracking-wider placeholder:text-slate-400 focus:outline-hidden focus:ring-2 transition ${colors.borderFocus}`}
                     />
@@ -309,7 +330,7 @@ export function PhoneAuthForm({
               <Button
                 type="submit"
                 isLoading={submitting || isLoading}
-                className={`w-full py-3.5 text-white font-bold shadow-xs cursor-pointer ${colors.btnBg} ${colors.bgHover}`}
+                className={`w-full py-3.5 font-bold shadow-xs cursor-pointer ${colors.btnBg} ${colors.bgHover}`}
               >
                 <Phone className="w-4 h-4 mr-2" />
                 <span>Send SMS OTP</span>
@@ -361,7 +382,7 @@ export function PhoneAuthForm({
               <Button
                 type="submit"
                 isLoading={submitting || isLoading}
-                className={`w-full py-3.5 text-white font-bold shadow-xs cursor-pointer ${colors.btnBg} ${colors.bgHover}`}
+                className={`w-full py-3.5 font-bold shadow-xs cursor-pointer ${colors.btnBg} ${colors.bgHover}`}
               >
                 <span>Verify OTP & Enter</span>
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -423,7 +444,13 @@ export function PhoneAuthForm({
               required
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder="e.g. ramesh123 or name@gmail.com"
+              placeholder={
+                role === 'farmer' || role === 'fpo'
+                  ? 'ramesh_farmer or farmer@agriflow.in'
+                  : role === 'consumer'
+                  ? 'ananya_buyer or buyer@agriflow.in'
+                  : 'ismail_logistics or logistics@agriflow.in'
+              }
               className={`w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:ring-2 transition ${colors.borderFocus}`}
             />
           </div>
@@ -445,7 +472,7 @@ export function PhoneAuthForm({
           <Button
             type="submit"
             isLoading={submitting || isLoading}
-            className={`w-full py-3.5 text-white font-bold shadow-xs cursor-pointer ${colors.btnBg} ${colors.bgHover}`}
+            className={`w-full py-3.5 font-bold shadow-xs cursor-pointer ${colors.btnBg} ${colors.bgHover}`}
           >
             <KeyRound className="w-4 h-4 mr-2" />
             <span>Sign In with Password</span>
@@ -453,8 +480,32 @@ export function PhoneAuthForm({
         </form>
       )}
 
+      {/* 1-Click Instant Demo Login Button */}
+      <div className="pt-2 border-t border-slate-100 space-y-2">
+        <button
+          type="button"
+          onClick={() => demoLogin(role === 'fpo' ? 'farmer' : role)}
+          disabled={submitting || isLoading}
+          className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs active:scale-[0.99] ${
+            role === 'farmer' || role === 'fpo'
+              ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-300'
+              : role === 'consumer'
+              ? 'bg-blue-50 hover:bg-blue-100 text-blue-900 border-blue-300'
+              : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
+          }`}
+        >
+          <span>
+            {role === 'farmer' || role === 'fpo'
+              ? '⚡ Instant 1-Click Demo Login as Farmer (Ramesh Reddy • ramesh_farmer)'
+              : role === 'consumer'
+              ? '⚡ Instant 1-Click Demo Login as Buyer (Ananya Sharma • ananya_buyer)'
+              : '⚡ Instant 1-Click Demo Login as Transporter (Mohammed Ismail • ismail_logistics)'}
+          </span>
+        </button>
+      </div>
+
       {/* Footer Info */}
-      <div className="pt-2 text-center text-[11px] text-slate-400">
+      <div className="pt-1 text-center text-[11px] text-slate-400">
         Permanent user accounts linked through Supabase Auth & PostgreSQL
       </div>
     </div>

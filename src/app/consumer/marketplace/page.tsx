@@ -37,7 +37,19 @@ import {
 } from 'lucide-react';
 
 export default function ConsumerMarketplacePage() {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
+  const currentLang = language || 'en';
+
+  // Dynamic helper for JSONB multi-lingual crop, variety, and category values
+  const getLocalizedField = (field: any): string => {
+    if (!field) return '';
+    if (typeof field === 'string') return field;
+    if (typeof field === 'object') {
+      return field[currentLang] || field['en'] || Object.values(field)[0] || '';
+    }
+    return String(field);
+  };
+
   // Authoritative Supabase Realtime hook (<1s synchronization from farmer inventory)
   const { 
     items: liveProduce, 
@@ -67,13 +79,15 @@ export default function ConsumerMarketplacePage() {
       Spices: 0,
     };
     liveProduce.forEach((item) => {
-      const cat = item.category || normalizeCategory(undefined, item.crop_name, item.variety);
+      const localizedCrop = getLocalizedField(item.crop_name);
+      const localizedVariety = getLocalizedField(item.variety);
+      const cat = getLocalizedField(item.category) || normalizeCategory(undefined, localizedCrop, localizedVariety);
       if (counts[cat] !== undefined) {
         counts[cat]++;
       }
     });
     return counts;
-  }, [liveProduce]);
+  }, [liveProduce, currentLang]);
 
   // Subcategories available for currently selected category with item counts
   const subCategories = useMemo(() => {
@@ -111,21 +125,27 @@ export default function ConsumerMarketplacePage() {
   const filteredProduce = useMemo(() => {
     return liveProduce
       .filter((item) => {
-        // 1. Search query across crop name, variety, location, farmer name, and category
+        const localizedCrop = getLocalizedField(item.crop_name).toLowerCase();
+        const localizedVariety = getLocalizedField(item.variety).toLowerCase();
+        const localizedCategory = getLocalizedField(item.category).toLowerCase();
+        const loc = (item.location || '').toLowerCase();
+        const farmer = (item.farmer_name || '').toLowerCase();
+
+        // 1. Search query across dynamic localized crop name, variety, location, farmer name, and category
         const query = searchQuery.toLowerCase().trim();
         if (query) {
           const matchesSearch =
-            item.crop_name.toLowerCase().includes(query) ||
-            (item.variety && item.variety.toLowerCase().includes(query)) ||
-            (item.location && item.location.toLowerCase().includes(query)) ||
-            (item.farmer_name && item.farmer_name.toLowerCase().includes(query)) ||
-            (item.category && item.category.toLowerCase().includes(query));
+            localizedCrop.includes(query) ||
+            localizedVariety.includes(query) ||
+            localizedCategory.includes(query) ||
+            loc.includes(query) ||
+            farmer.includes(query);
 
           if (!matchesSearch) return false;
         }
 
         // 2. Category filter
-        const itemCat = item.category || normalizeCategory(undefined, item.crop_name, item.variety);
+        const itemCat = getLocalizedField(item.category) || normalizeCategory(undefined, localizedCrop, localizedVariety);
         if (selectedCategory !== 'All' && itemCat !== selectedCategory) {
           return false;
         }

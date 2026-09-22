@@ -46,7 +46,7 @@ export default function ConsumerLayout({
 
   useEffect(() => {
     if (!isGuestAllowed && !isLoading) {
-      if (!isConsumerAuthenticated && !consumerUser && !currentUser) {
+      if (!isConsumerAuthenticated) {
         router.push('/consumer/login');
       } else if (currentUser?.role === 'admin') {
         // Admins have universal inspection access across all portals
@@ -56,8 +56,6 @@ export default function ConsumerLayout({
         pathname !== '/consumer/complete-profile'
       ) {
         router.push('/consumer/complete-profile');
-      } else if (currentUser?.role && currentUser.role !== 'consumer') {
-        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isGuestAllowed, isLoading, isConsumerAuthenticated, consumerUser, currentUser, pathname, router]);
@@ -76,7 +74,7 @@ export default function ConsumerLayout({
     );
   }
 
-  if (!isGuestAllowed && !isConsumerAuthenticated && !consumerUser && !currentUser) {
+  if (!isGuestAllowed && !isConsumerAuthenticated) {
     return null;
   }
 

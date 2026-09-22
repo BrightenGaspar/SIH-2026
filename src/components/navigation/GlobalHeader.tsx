@@ -102,21 +102,21 @@ export function GlobalHeader() {
         </Link>
       </div>
 
-      {/* 2. DUAL-MODE PILL TOGGLE (Exact reference match) */}
+      {/* 2. DUAL-MODE PILL TOGGLE */}
       <div className="flex items-center">
-        <div className="bg-slate-100 p-1 rounded-full border border-slate-200 flex items-center shadow-xs">
+        <div className="bg-slate-100 dark:bg-slate-800 p-1 rounded-full border border-slate-200 dark:border-slate-700 flex items-center shadow-xs">
           <button
             type="button"
             onClick={() => setLowBandwidth(false)}
             className={cn(
-              'px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5',
+              'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5',
               !isLowBandwidth
                 ? isFarmer
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : isConsumer
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-amber-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 bg-transparent'
+                  : 'bg-amber-600 text-slate-950 font-black shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
             )}
             title="Switch to Normal Mode (Full visuals, images & interactive maps)"
           >
@@ -127,19 +127,19 @@ export function GlobalHeader() {
             type="button"
             onClick={() => setLowBandwidth(true)}
             className={cn(
-              'px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5',
+              'px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5',
               isLowBandwidth
                 ? isFarmer
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : isConsumer
                   ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-amber-600 text-white shadow-sm'
-                : 'text-slate-600 hover:text-slate-900 bg-transparent'
+                  : 'bg-amber-600 text-slate-950 font-black shadow-sm'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-transparent'
             )}
-            title="Switch to Low Bandwidth Mode (Text-first, no auto-loaded maps or heavy images)"
+            title="Switch to Low Bandwidth Mode (Text-first tables, saves mobile data)"
           >
             <Radio className={cn('w-3.5 h-3.5', isLowBandwidth && 'animate-pulse')} />
-            <span>Low Bandwidth Mode</span>
+            <span>Low Bandwidth</span>
           </button>
         </div>
       </div>

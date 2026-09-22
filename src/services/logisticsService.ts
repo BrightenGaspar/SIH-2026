@@ -778,6 +778,106 @@ export const logisticsService = {
   },
 
   /**
+   * Directly update current_lat, current_lng and updated_at on public.logistics_trips
+   */
+  async updateTripLocation(
+    tripId: string,
+    lat: number,
+    lng: number,
+    accuracy?: number
+  ): Promise<boolean> {
+    try {
+      const updateData: any = {
+        current_lat: lat,
+        current_lng: lng,
+        updated_at: new Date().toISOString(),
+      };
+
+      await supabase
+        .from('logistics_trips')
+        .update(updateData)
+        .or(`id.eq.${tripId},order_id.eq.${tripId}`);
+
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(tripId);
+      if (isUuid) {
+        await supabase
+          .from('logistics_assignments')
+          .update(updateData)
+          .eq('id', tripId);
+      }
+
+      // Record to logistics_telemetry_logs for real-time trace broadcast
+      try {
+        await supabase
+          .from('logistics_telemetry_logs')
+          .insert({
+            trip_id: tripId,
+            lat,
+            lng,
+            accuracy: accuracy || null,
+            recorded_at: new Date().toISOString(),
+          });
+      } catch {
+        // Non-fatal telemetry log insert
+      }
+
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
+  /**
+   * Hardware GPS Tracker utilizing navigator.geolocation.watchPosition
+   * Continuously pushes live coordinates from phone hardware to Supabase logistics_trips table
+   */
+  startHardwareGpsTracker(
+    tripId: string,
+    options?: {
+      onUpdate?: (lat: number, lng: number, accuracy: number) => void;
+      onError?: (err: GeolocationPositionError) => void;
+      throttleMs?: number;
+    }
+  ): () => void {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      console.warn('Geolocation API is not supported by this browser/device.');
+      return () => {};
+    }
+
+    let lastSentTime = 0;
+    const throttleMs = options?.throttleMs || 3000;
+
+    const watchId = navigator.geolocation.watchPosition(
+      async (pos) => {
+        const now = Date.now();
+        if (now - lastSentTime < throttleMs) return;
+        lastSentTime = now;
+
+        const { latitude, longitude, accuracy } = pos.coords;
+        await logisticsService.updateTripLocation(tripId, latitude, longitude, accuracy);
+        if (options?.onUpdate) {
+          options.onUpdate(latitude, longitude, accuracy);
+        }
+      },
+      (err) => {
+        console.warn('GPS hardware watchPosition error:', err.message);
+        if (options?.onError) {
+          options.onError(err);
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 2000,
+      }
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  },
+
+  /**
    * Create a new consolidated logistics trip
    */
   async createTrip(tripData: {

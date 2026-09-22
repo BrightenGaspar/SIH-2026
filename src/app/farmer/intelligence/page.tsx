@@ -175,6 +175,42 @@ export default function FarmerIntelligencePage() {
         </button>
       </div>
 
+      {/* Simple Farmer Decision Guide */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-xs">
+        <div className="flex items-center gap-2 mb-3">
+          <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+            How AgriFlow AI Works For You (Simple Farmer Guide)
+          </h3>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div className="p-3 bg-emerald-50/60 dark:bg-emerald-950/30 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/40">
+            <span className="font-extrabold text-emerald-900 dark:text-emerald-300 block mb-1">1. 💰 Fair Price Guarantee</span>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Analyzes regional mandi demand and supply deficits so you never undersell your harvest below true market value.
+            </p>
+          </div>
+          <div className="p-3 bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl border border-blue-200/60 dark:border-blue-800/40">
+            <span className="font-extrabold text-blue-900 dark:text-blue-300 block mb-1">2. 👥 5 km Auto-Clustering</span>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Automatically pools small harvests with nearby farms to fulfill 1-Tonne bulk orders at higher institutional rates.
+            </p>
+          </div>
+          <div className="p-3 bg-amber-50/60 dark:bg-amber-950/30 rounded-2xl border border-amber-200/60 dark:border-amber-800/40">
+            <span className="font-extrabold text-amber-900 dark:text-amber-300 block mb-1">3. 🚚 GPS Cold-Chain Safety</span>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Monitors road temperatures using driver GPS and Open-Meteo weather data to prevent perishable harvest decay.
+            </p>
+          </div>
+          <div className="p-3 bg-purple-50/60 dark:bg-purple-950/30 rounded-2xl border border-purple-200/60 dark:border-purple-800/40">
+            <span className="font-extrabold text-purple-900 dark:text-purple-300 block mb-1">4. 🎯 Direct Buyer Orders</span>
+            <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+              Bypasses exploitative middleman commission cuts, depositing 100% of the sale directly to your bank account.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Primary Section 34 Decision Card Hero */}
       <DecisionSummaryHero 
         data={pipelineData} 

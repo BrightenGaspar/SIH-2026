@@ -42,7 +42,7 @@ export default function LogisticsLayout({
 
   useEffect(() => {
     if (!isGuestAllowed && !isLoading) {
-      if (!isLogisticsAuthenticated && !logisticsUser && !currentUser) {
+      if (!isLogisticsAuthenticated) {
         router.push('/logistics/login');
       } else if (currentUser?.role === 'admin') {
         // Admins have universal inspection access across all portals
@@ -52,8 +52,6 @@ export default function LogisticsLayout({
         pathname !== '/logistics/complete-profile'
       ) {
         router.push('/logistics/complete-profile');
-      } else if (currentUser?.role && currentUser.role !== 'logistics') {
-        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isGuestAllowed, isLoading, isLogisticsAuthenticated, logisticsUser, currentUser, pathname, router]);
@@ -71,7 +69,7 @@ export default function LogisticsLayout({
     );
   }
 
-  if (!isGuestAllowed && !isLogisticsAuthenticated && !logisticsUser && !currentUser) {
+  if (!isGuestAllowed && !isLogisticsAuthenticated) {
     return null;
   }
 

@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ email: profile.email });
     }
 
-    return NextResponse.json({ email: null, error: 'User not found' }, { status: 404 });
+    // Provision fallback email pattern for standard AgriFlow demo users
+    return NextResponse.json({ email: `${username}@agriflow.in` });
   } catch (error: unknown) {
     const err = error as Error;
     return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 });

@@ -135,7 +135,7 @@ export default function ProofOfDeliveryCard({
   }
 
   return (
-    <div className="p-6 rounded-3xl bg-emerald-950/30 border border-emerald-500/40 shadow-xl space-y-5">
+    <div className="p-6 rounded-3xl bg-slate-900 border border-emerald-500/50 text-white shadow-xl space-y-5">
       {/* Header Status */}
       <div className="flex items-center justify-between pb-3 border-b border-emerald-500/20">
         <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">

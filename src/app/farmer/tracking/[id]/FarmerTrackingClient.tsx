@@ -30,8 +30,8 @@ export default function FarmerTrackingClient() {
   if (!tracking) {
     return (
       <div className="py-16 text-center space-y-4">
-        <Truck className="w-12 h-12 mx-auto text-slate-400 animate-pulse" />
-        <h2 className="text-xl font-bold text-white">Loading Road Logistics Telemetry...</h2>
+        <Truck className="w-12 h-12 mx-auto text-emerald-600 dark:text-emerald-400 animate-pulse" />
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Loading Road Logistics Telemetry...</h2>
       </div>
     );
   }
@@ -41,13 +41,13 @@ export default function FarmerTrackingClient() {
       
       {/* Back button */}
       <div>
-        <Link href="/farmer/orders" className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-400 transition font-medium">
+        <Link href="/farmer/orders" className="inline-flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition font-medium">
           <ArrowLeft className="w-4 h-4" /> Back to Orders
         </Link>
       </div>
 
       {/* Main Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl text-white">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono text-xs text-slate-400 font-bold">{tracking.id}</span>
@@ -57,7 +57,7 @@ export default function FarmerTrackingClient() {
             <StatusBadge status={tracking.status} />
           </div>
           <h1 className="text-2xl font-black text-white">{tracking.pickupLocation} &rarr; {tracking.destinationLocation}</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
+          <p className="text-xs text-slate-300 mt-0.5">
             Carrier: <strong className="text-white">{tracking.vehicleType} ({tracking.vehicleNumber})</strong> &bull; Driver: {tracking.driverName}
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function FarmerTrackingClient() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         
         {/* Cold chain card */}
-        <Card className="bg-slate-900 border-slate-800 p-5">
+        <Card className="bg-slate-900 text-white border-slate-800 p-5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
               <Thermometer className="w-4 h-4 text-emerald-400" /> Cold-Chain Telemetry
@@ -141,7 +141,7 @@ export default function FarmerTrackingClient() {
 
       {/* Return Load Matching Demo Opportunity */}
       {tracking.returnLoad && (
-        <Card variant="emerald" className="p-6">
+        <Card className="bg-slate-900 text-white border border-emerald-500/50 p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-xl flex-shrink-0">

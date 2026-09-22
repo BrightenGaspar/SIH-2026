@@ -40,7 +40,7 @@ export default function DriverCard({
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs text-slate-400 block">Vehicle Specification</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block font-medium">Vehicle Specification</span>
             <strong className="text-sm font-black text-slate-900 dark:text-white">
               {vehicleType}
             </strong>
@@ -52,7 +52,7 @@ export default function DriverCard({
 
         <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
           <div>
-            <span className="text-xs text-slate-400 block">Assigned Road Driver</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 block font-medium">Assigned Road Driver</span>
             <strong className="text-sm font-bold text-slate-900 dark:text-white">
               {driverName}
             </strong>

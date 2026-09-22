@@ -47,14 +47,12 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 
   React.useEffect(() => {
     if (!isPublicRoute && !isLoading) {
-      if (!isAuthenticated && !user && !currentUser) {
+      if (!isAuthenticated) {
         router.push('/farmer/login');
       } else if (currentUser?.role === 'admin') {
         // Admins have universal inspection access across all portals
       } else if (user && user.profileCompleted === false && pathname !== '/farmer/complete-profile') {
         router.push('/farmer/complete-profile');
-      } else if (currentUser?.role && currentUser.role !== 'farmer') {
-        router.push(`/${currentUser.role}/dashboard`);
       }
     }
   }, [isPublicRoute, isLoading, isAuthenticated, user, currentUser, pathname, router]);
@@ -72,7 +70,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  if (!isAuthenticated && !user && !currentUser) {
+  if (!isAuthenticated) {
     return null;
   }
 

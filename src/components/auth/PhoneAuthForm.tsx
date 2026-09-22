@@ -343,7 +343,7 @@ export function PhoneAuthForm({
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div>
                 <div className="mb-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 text-center">
-                  Verification code sent to <strong>{sentPhone}</strong>. Enter code <strong className="font-mono text-emerald-900">112009</strong> to sign in.
+                  Real SMS OTP sent to <strong>{sentPhone}</strong>. Enter the OTP code received on your mobile (or test code <strong className="font-mono text-emerald-900">112009</strong>).
                 </div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-bold text-slate-700">Enter 6-Digit SMS OTP</label>

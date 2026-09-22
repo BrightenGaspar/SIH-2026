@@ -1,0 +1,2272 @@
+[
+  {
+    "slide": 1,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "Rounded Rectangle 2",
+        "id": 3,
+        "type": "AUTO_SHAPE (1)",
+        "left": 1.0,
+        "top": 0.9,
+        "width": 11.333,
+        "height": 5.7,
+        "text": []
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 1.5,
+        "top": 1.3,
+        "width": 10.333,
+        "height": 4.8,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 — PROBLEM STATEMENT 33",
+            "font_size": 12.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "AgriFlow AI",
+            "font_size": 44.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Decentralized Smart Agri-Logistics & Direct Procurement Protocol",
+            "font_size": 20.0,
+            "bold": true,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "Empowering 140M+ Indian Farmers with AI Cold-Chain IoT Telematics, Direct Institutional Sourcing, and Guaranteed Above-MSP T+0 Bank Payouts.",
+            "font_size": 14.0,
+            "bold": null,
+            "color": "94A3B8"
+          },
+          {
+            "text": "🌾 Multi-Stakeholder Ecosystem • 11 Indian Languages • 0-4°C Active Cold Chain • T+0 RBI Escrow",
+            "font_size": 12.0,
+            "bold": true,
+            "color": "10B981"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 2,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "The Ground Reality: Critical Challenges in Indian Perishable Supply Chain",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 3.64,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.05,
+        "top": 2.0,
+        "width": 3.14,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "35% - 40% Post-Harvest Loss",
+            "font_size": 18.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Critical Cold-Chain Deficit",
+            "font_size": 12.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Lack of temperature-controlled logistics causes severe rotting of tomatoes, onions, and greens before reaching urban retail markets.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 4.79,
+        "top": 1.8,
+        "width": 3.64,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 5.04,
+        "top": 2.0,
+        "width": 3.14,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "4 - 6 Middlemen Intermediaries",
+            "font_size": 18.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Exploitative APMC Value Leakage",
+            "font_size": 12.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Farmers realize only 25-30% of the consumer rupee. Commission agents and distress auctions force sales below cost of cultivation.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 8.78,
+        "top": 1.8,
+        "width": 3.64,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 9.03,
+        "top": 2.0,
+        "width": 3.14,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "Distress Sales Below Govt MSP",
+            "font_size": 18.0,
+            "bold": true,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "Financial Vulnerability",
+            "font_size": 12.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Absence of transparent benchmark data leaves rural farmers without price discovery, forcing sales at heavy distress discounts during bumper harvests.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 3,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "AgriFlow AI Solution: End-to-End Agri-Logistics Innovation",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "🌾 Direct Farmgate Aggregation",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Eliminates APMC Middlemen",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Connects FPOs directly to BigBasket, Zepto, and Reliance Retail with smart batch quality grading and 0% commission fees.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "❄️ 0-4°C IoT Cold Chain",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Active Telematics & Routing",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Live Sugar Brix, ethylene, humidity & temperature sensors with automated rerouting to maximize shelf-life retention.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "🛡️ Guaranteed Govt MSP Floor",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "3-Tier Dynamic Pricing",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Automated price protection model ensuring farmer payouts always exceed Mandi distress rates and Govt MSP floors.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "⚡ T+0 Instant Escrow Payouts",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "RBI-Verified Bank Settlement",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Smart contract escrow automatically credits farmer bank accounts via UPI/NEFT upon QC waybill scan.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 4,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "Unified 5-Stakeholder Digital Ecosystem",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 2.2,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 0.95,
+        "top": 1.95,
+        "width": 1.9,
+        "height": 4.5,
+        "text": [
+          {
+            "text": "🌾 Kisan Farmer",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Ramesh Patil (Nashik)",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "1-tap avatar login, spoken voice OTP, farmgate dispatch scheduler, live bank payout ledger.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 3.18,
+        "top": 1.8,
+        "width": 2.2,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 3.33,
+        "top": 1.95,
+        "width": 1.9,
+        "height": 4.5,
+        "text": [
+          {
+            "text": "🏢 Institutional Buyer",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Priya Sharma (BigBasket)",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Direct 40+ vegetable sourcing catalog, escrow procurement basket, batch Brix quality certification.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 5.56,
+        "top": 1.8,
+        "width": 2.2,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 5.71,
+        "top": 1.95,
+        "width": 1.9,
+        "height": 4.5,
+        "text": [
+          {
+            "text": "🚚 Reefer Driver",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Suresh Mane (Fleet)",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "IoT telematics dashboard, ambient vs cold degradation tracker, digital waybill QR verification.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 7.94,
+        "top": 1.8,
+        "width": 2.2,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 8.09,
+        "top": 1.95,
+        "width": 1.9,
+        "height": 4.5,
+        "text": [
+          {
+            "text": "🔬 QC Inspector",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Dr. Swaminathan (Agronomist)",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "AI freshness computer vision, digital Sugar Brix grading, automated lot clearance.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 12",
+        "id": 13,
+        "type": "AUTO_SHAPE (1)",
+        "left": 10.32,
+        "top": 1.8,
+        "width": 2.2,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 13",
+        "id": 14,
+        "type": "TEXT_BOX (17)",
+        "left": 10.47,
+        "top": 1.95,
+        "width": 1.9,
+        "height": 4.5,
+        "text": [
+          {
+            "text": "👔 Boss & Staff Executive",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Admin / Audit Officer",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "MPIN-secured confidential farmer earnings ledger, UTR bank settlement audit, system health.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 5,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "Built for Rural India: Zero-Friction Farmer Accessibility Suite",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "🎙️ 11 Indian Languages + Voice Output",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Spoken Accessibility",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Real-time speech synthesis and interface localization across Tamil, Hindi, Malayalam, Telugu, Kannada, Bengali, Marathi, Gujarati, Punjabi, Odia, and English.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "⚡ 1-Tap Biometric & Avatar Login",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Dead-Simple UX",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "No complicated passwords required for rural farmers. High-visibility photo avatars and 1-click instant login launchpad.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "📞 24x7 Toll-Free Kisan Call Center",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "1800-180-1551 Integration",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Direct 1-tap dialer for immediate agricultural advisory and logistics coordination in regional dialects.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "📲 Credential Recovery & OTP System",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Self-Service Security",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Simple SMS OTP verification to retrieve lost User IDs, reset passwords, and edit farmer profile handles.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 6,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "Government MSP Protection & 3-Tier Dynamic Price Architecture",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 5.7,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 2.0,
+        "width": 5.3,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "The 3-Tier Price Engine",
+            "font_size": 18.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "🏛️ Govt MSP Floor: Legal benchmark set by CACP (Ministry of Agriculture). Platform never allows farmgate transactions below this threshold.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          },
+          {
+            "text": "📉 APMC Distress Rate: Local mandi auction price dragged down by middleman cartels, delays, and spoilage risks.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          },
+          {
+            "text": "⚡ AgriFlow Direct Price: Guaranteed farmgate rate offering +32% average revenue uplift directly to farmers.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          },
+          {
+            "text": "📈 Real-Time Gain Transparency: Farmers see exact ₹/kg gain over both Mandi Distress and Govt MSP.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.8,
+        "top": 1.8,
+        "width": 5.7,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 7.0,
+        "top": 2.0,
+        "width": 5.3,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "Real Produce Price Comparison (Sample)",
+            "font_size": 18.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "• Nashik Red Onion: AgriFlow: ₹38.50 (+60% Gain) [MSP: ₹24.00 | Mandi: ₹22.00]",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "• Ratnagiri Alphonso: AgriFlow: ₹210.00 (+50% Gain) [MSP: ₹140.00 | Mandi: ₹135.00]",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "• Pusa Ruby Tomato: AgriFlow: ₹28.00 (+55% Gain) [MSP: ₹18.00 | Mandi: ₹14.00]",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "• Jalgaon Banana: AgriFlow: ₹24.00 (+50% Gain) [MSP: ₹16.00 | Mandi: ₹15.00]",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "• Average across 40+ Veggies: +32.4% Net Income [Guaranteed Floor | Zero Commission]",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 7,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "Confidential Staff Audit & Secure Bank Ledger",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "🔐 4-Digit MPIN Security Gate",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Executive Boss Authentication",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Guards sensitive financial data. Only authorized staff and executives with valid MPIN can view cluster payout aggregates and bank accounts.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "🛡️ DPDP Act 2023 Bank Masking",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Farmer Data Confidentiality",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Sensitive bank account numbers and IFSC codes are dynamically masked (•••• •••• 4412) with a secure 1-tap unmask toggle for audits.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "💸 T+0 Direct Settlement Ledger",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Instant UPI / NEFT UTR",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Individual farmer ledger records with real-time disbursement status, bank transaction UTR numbers, and zero-commission confirmation.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "📊 Cluster Savings Analytics",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "FPO Realization Metrics",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Live dashboard tracking ₹4.82+ Crores disbursed, ₹1.48+ Crores saved in middleman commission cuts, and 99.4% freshness retention.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 8,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "AI Cold-Chain Telematics & Active Perishable Preservation",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "❄️ 0-4°C Multi-Sensor IoT",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Real-Time Telemetry",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Continuous tracking of temperature, relative humidity (85-90%), and ethylene gas ppm inside active reefer vans.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 1.95,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "📉 Arrhenius Decay Modeling",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "AI Shelf-Life Prediction",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Predicts shelf-life decay comparing ambient storage (4-5 days) vs active cold-chain (18-21 days) in real time.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "🗺️ Dynamic GPS Cold Routing",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Traffic & Heat Avoidance",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Automatically reroutes refrigerated trucks away from extreme heat corridors and congestion to preserve cargo quality.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 4.35,
+        "width": 5.65,
+        "height": 2.3,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 6.95,
+        "top": 4.5,
+        "width": 5.25,
+        "height": 2.0,
+        "text": [
+          {
+            "text": "📱 QR Digital Cold Waybill",
+            "font_size": 15.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Tamper-Proof QC Proof",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Generates cryptographic QR waybills recording temperature compliance history from farmgate loading to buyer delivery.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 9,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "Comprehensive 40+ Indian Vegetables Database & Sourcing Matrix",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 1.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 0.95,
+        "top": 1.9,
+        "width": 5.35,
+        "height": 1.3,
+        "text": [
+          {
+            "text": "🥔 Roots & Tubers",
+            "font_size": 13.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Potato, Onion, Carrot, Beetroot, Radish, Ginger, Garlic, Sweet Potato, Colocasia (Arbi), Yam (Jimikand).",
+            "font_size": 9.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 1.8,
+        "width": 5.65,
+        "height": 1.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 6.9,
+        "top": 1.9,
+        "width": 5.35,
+        "height": 1.3,
+        "text": [
+          {
+            "text": "🥬 Leafy Greens",
+            "font_size": 13.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Palak (Spinach), Methi (Fenugreek), Coriander, Curry Leaves, Mustard Greens (Sarson), Amaranth (Chaulai).",
+            "font_size": 9.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 3.48,
+        "width": 5.65,
+        "height": 1.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 0.95,
+        "top": 3.58,
+        "width": 5.35,
+        "height": 1.3,
+        "text": [
+          {
+            "text": "🥒 Gourds & Squashes",
+            "font_size": 13.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Bottle Gourd (Lauki), Bitter Gourd (Karela), Ridge Gourd (Turai), Sponge Gourd, Ivy Gourd (Tindora), Pumpkin.",
+            "font_size": 9.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 3.48,
+        "width": 5.65,
+        "height": 1.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 6.9,
+        "top": 3.58,
+        "width": 5.35,
+        "height": 1.3,
+        "text": [
+          {
+            "text": "🥦 Brassicas & Cruciferous",
+            "font_size": 13.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Cauliflower (Gobi), Green Cabbage, Broccoli, Knol Khol (Ganth Gobi).",
+            "font_size": 9.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 12",
+        "id": 13,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 5.16,
+        "width": 5.65,
+        "height": 1.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 13",
+        "id": 14,
+        "type": "TEXT_BOX (17)",
+        "left": 0.95,
+        "top": 5.26,
+        "width": 5.35,
+        "height": 1.3,
+        "text": [
+          {
+            "text": "🍅 Solanaceous Nightshades",
+            "font_size": 13.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Tomato (Hybrid & Desi), Green Chilli (G-4), Red Capsicum, Yellow Capsicum, Green Bell Pepper, Brinjal / Eggplant.",
+            "font_size": 9.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 14",
+        "id": 15,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.75,
+        "top": 5.16,
+        "width": 5.65,
+        "height": 1.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 15",
+        "id": 16,
+        "type": "TEXT_BOX (17)",
+        "left": 6.9,
+        "top": 5.26,
+        "width": 5.35,
+        "height": 1.3,
+        "text": [
+          {
+            "text": "🫛 Pods, Legumes & Alliums",
+            "font_size": 13.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Green Peas (Matar), Okra / Ladyfinger (Bhindi), Cluster Beans (Gawar), French Beans, Drumstick (Moringa).",
+            "font_size": 9.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 10,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "System Architecture & Production-Grade Technology Stack",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 11.7,
+        "height": 0.85,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 1.9,
+        "width": 11.3,
+        "height": 0.65,
+        "text": [
+          {
+            "text": "🖥️ Frontend Architecture — Tailwind CSS CDN, Modern Glassmorphic UI, Responsive Split-Screen Auth, Leaflet GIS Mapping, Chart.js Telematics.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 2.8,
+        "width": 11.7,
+        "height": 0.85,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 2.9,
+        "width": 11.3,
+        "height": 0.65,
+        "text": [
+          {
+            "text": "🎵 Naturistic SoundEngine — Web Audio API 528Hz acoustic bamboo leaf feedback for organic tactile user experience on all actions.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 3.8,
+        "width": 11.7,
+        "height": 0.85,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 3.9,
+        "width": 11.3,
+        "height": 0.65,
+        "text": [
+          {
+            "text": "🗄️ Relational SQLite3 Database — Local binary database (agriflow.db) storing crops, staff MPIN credentials, farmer earnings, orders, and telematics logs.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 4.8,
+        "width": 11.7,
+        "height": 0.85,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 4.9,
+        "width": 11.3,
+        "height": 0.65,
+        "text": [
+          {
+            "text": "⚙️ 3 Node.js Microservices — Farmer Server (:5001), Buyer Server (:5002), and Logistics Server (:5003) for decentralized scalability.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 12",
+        "id": 13,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 5.8,
+        "width": 11.7,
+        "height": 0.85,
+        "text": []
+      },
+      {
+        "name": "TextBox 13",
+        "id": 14,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 5.9,
+        "width": 11.3,
+        "height": 0.65,
+        "text": [
+          {
+            "text": "🔒 Security & Data Privacy — DPDP Act 2023 bank masking, 4-digit MPIN authorization, SMS OTP verification, and smart contract escrow locking.",
+            "font_size": 12.0,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 11,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "Quantifiable Economic Impact & Stakeholder ROI",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 2.78,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 0.95,
+        "top": 2.0,
+        "width": 2.48,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "35% Spoilage Elimination",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Post-Harvest Waste Reduction",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "AI cold routing and 0-4°C active reefers preserve perishable grade quality from farmgate to retail shelves.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 3.78,
+        "top": 1.8,
+        "width": 2.78,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 3.93,
+        "top": 2.0,
+        "width": 2.48,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "+32.4% Net Farmer Uplift",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Direct Income Enhancement",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Zero intermediary commission cuts + MSP floor protection delivers immediate higher realization per kg.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 6.76,
+        "top": 1.8,
+        "width": 2.78,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 6.91,
+        "top": 2.0,
+        "width": 2.48,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "28% Sourcing Savings",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "FFFFFF"
+          },
+          {
+            "text": "Institutional Buyer Advantage",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Direct procurement from verified FPOs cuts APMC mandi cess, transit waste, and landing costs.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 9.74,
+        "top": 1.8,
+        "width": 2.78,
+        "height": 4.8,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 9.89,
+        "top": 2.0,
+        "width": 2.48,
+        "height": 4.4,
+        "text": [
+          {
+            "text": "T+0 Same-Day Cashflow",
+            "font_size": 16.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Rural Liquidity Guarantee",
+            "font_size": 11.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Automated escrow settlement solves chronic 45-day buyer credit cycles for smallholder farmers.",
+            "font_size": 11.0,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "slide": 12,
+    "shapes": [
+      {
+        "name": "Rectangle 1",
+        "id": 2,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.0,
+        "top": 0.0,
+        "width": 13.333,
+        "height": 7.5,
+        "text": []
+      },
+      {
+        "name": "TextBox 2",
+        "id": 3,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.45,
+        "width": 11.7,
+        "height": 0.4,
+        "text": [
+          {
+            "text": "SMART INDIA HACKATHON 2026 • PROBLEM STATEMENT 33",
+            "font_size": 10.0,
+            "bold": true,
+            "color": "FBBF24"
+          }
+        ]
+      },
+      {
+        "name": "TextBox 3",
+        "id": 4,
+        "type": "TEXT_BOX (17)",
+        "left": 0.8,
+        "top": 0.8,
+        "width": 11.7,
+        "height": 0.8,
+        "text": [
+          {
+            "text": "National Scale, Future Roadmap & SIH 2026 Conclusion",
+            "font_size": 24.0,
+            "bold": true,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 4",
+        "id": 5,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 1.8,
+        "width": 11.7,
+        "height": 0.95,
+        "text": []
+      },
+      {
+        "name": "TextBox 5",
+        "id": 6,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 1.92,
+        "width": 11.3,
+        "height": 0.75,
+        "text": [
+          {
+            "text": "Phase 1: SIH 2026 Prototype (Current)",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "FBBF24"
+          },
+          {
+            "text": "Full 5-stakeholder protocol, SQLite database, 11 languages, 40+ veggies, MSP price model, and active telematics live.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "FFFFFF"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 6",
+        "id": 7,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 2.95,
+        "width": 11.7,
+        "height": 0.95,
+        "text": []
+      },
+      {
+        "name": "TextBox 7",
+        "id": 8,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 3.07,
+        "width": 11.3,
+        "height": 0.75,
+        "text": [
+          {
+            "text": "Phase 2: ONDC Agri & e-NAM Integration",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Direct integration with National Agriculture Market and ONDC open network for nationwide buyer discovery.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 8",
+        "id": 9,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 4.1,
+        "width": 11.7,
+        "height": 0.95,
+        "text": []
+      },
+      {
+        "name": "TextBox 9",
+        "id": 10,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 4.22,
+        "width": 11.3,
+        "height": 0.75,
+        "text": [
+          {
+            "text": "Phase 3: 500+ APMC Mandi Cold Corridors",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Deploying solar-powered mobile cold hubs across Maharashtra, Punjab, Karnataka, and Tamil Nadu farm clusters.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      },
+      {
+        "name": "Rounded Rectangle 10",
+        "id": 11,
+        "type": "AUTO_SHAPE (1)",
+        "left": 0.8,
+        "top": 5.25,
+        "width": 11.7,
+        "height": 0.95,
+        "text": []
+      },
+      {
+        "name": "TextBox 11",
+        "id": 12,
+        "type": "TEXT_BOX (17)",
+        "left": 1.0,
+        "top": 5.37,
+        "width": 11.3,
+        "height": 0.75,
+        "text": [
+          {
+            "text": "Phase 4: Carbon Credit Monetization",
+            "font_size": 14.0,
+            "bold": true,
+            "color": "34D399"
+          },
+          {
+            "text": "Incentivizing zero-emission electric reefer fleets with tradable carbon credits for FPOs.",
+            "font_size": 10.5,
+            "bold": null,
+            "color": "94A3B8"
+          }
+        ]
+      }
+    ]
+  }
+]

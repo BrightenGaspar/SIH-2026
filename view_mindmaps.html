@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriFlow AI — 8 Technical Approach Mindmaps (SIH 2026)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; min-height: 100vh; padding: 20px; }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 { font-size: 28px; color: #38bdf8; margin-bottom: 6px; }
+        .header p { font-size: 15px; color: #94a3b8; }
+        .controls { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .btn { background: #1e293b; color: #cbd5e1; border: 1px solid #475569; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .btn:hover { background: #334155; color: #fff; }
+        .btn.active { background: #0284c7; color: #fff; border-color: #38bdf8; }
+        .slide-container { max-width: 1400px; margin: 0 auto; background: #1e293b; border-radius: 16px; padding: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        .image-wrapper { position: relative; width: 100%; border-radius: 12px; overflow: hidden; background: #000; }
+        .image-wrapper img { width: 100%; height: auto; display: block; border-radius: 12px; }
+        .slide-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding: 0 8px; }
+        .slide-title { font-size: 18px; font-weight: bold; color: #38bdf8; }
+        .nav-btn { background: #0284c7; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 15px; cursor: pointer; font-weight: bold; }
+        .nav-btn:hover { background: #0369a1; }
+        .grid-view { max-width: 1400px; margin: 40px auto 0; }
+        .grid-view h2 { font-size: 22px; color: #e2e8f0; margin-bottom: 16px; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .gallery-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 12px; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
+        .gallery-card:hover { transform: translateY(-4px); border-color: #38bdf8; }
+        .gallery-card img { width: 100%; height: auto; border-radius: 8px; }
+        .gallery-card p { margin-top: 10px; font-weight: bold; font-size: 14px; text-align: center; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌾 AgriFlow AI — 8 Technical Approach Mindmaps</h1>
+        <p>Smart India Hackathon 2026 • Problem Statement 33 • Select your preferred mindmap style below</p>
+    </div>
+
+    <div class="controls" id="btn-container">
+        <button class="btn active" onclick="showSlide(0)">Slide 1</button>
+        <button class="btn " onclick="showSlide(1)">Slide 2</button>
+        <button class="btn " onclick="showSlide(2)">Slide 3</button>
+        <button class="btn " onclick="showSlide(3)">Slide 4</button>
+        <button class="btn " onclick="showSlide(4)">Slide 5</button>
+        <button class="btn " onclick="showSlide(5)">Slide 6</button>
+        <button class="btn " onclick="showSlide(6)">Slide 7</button>
+        <button class="btn " onclick="showSlide(7)">Slide 8</button>
+    </div>
+
+    <div class="slide-container">
+        <div class="image-wrapper">
+            <img id="main-slide" src="simple_mindmap_1.png" alt="Mindmap Slide">
+        </div>
+        <div class="slide-footer">
+            <button class="nav-btn" onclick="prevSlide()">◀ Previous</button>
+            <div class="slide-title" id="slide-title">Option 1: Executive 4-Branch Cross</div>
+            <button class="nav-btn" onclick="nextSlide()">Next ▶</button>
+        </div>
+    </div>
+
+    <div class="grid-view">
+        <h2>📑 All 8 Options Side-by-Side (Click to Enlarge)</h2>
+        <div class="gallery-grid">
+            <div class="gallery-card" onclick="showSlide(0); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_1.png" alt="Option 1: Executive 4-Branch Cross">
+                <p>Slide 1: Option 1: Executive 4-Branch Cross</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(1); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_2.png" alt="Option 2: 5-Stage Linear Pipeline">
+                <p>Slide 2: Option 2: 5-Stage Linear Pipeline</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(2); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_3.png" alt="Option 3: Circular Radial Hub">
+                <p>Slide 3: Option 3: Circular Radial Hub</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(3); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_4.png" alt="Option 4: 2x2 Clean Quadrant Matrix">
+                <p>Slide 4: Option 4: 2x2 Clean Quadrant Matrix</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(4); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_5.png" alt="Option 5: Dark Sleek High-Contrast Theme">
+                <p>Slide 5: Option 5: Dark Sleek High-Contrast Theme</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(5); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_6.png" alt="Option 6: Emerald Agri-Tech Theme">
+                <p>Slide 6: Option 6: Emerald Agri-Tech Theme</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(6); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_7.png" alt="Option 7: Top-to-Bottom Hierarchy Tree">
+                <p>Slide 7: Option 7: Top-to-Bottom Hierarchy Tree</p>
+            </div>
+            <div class="gallery-card" onclick="showSlide(7); window.scrollTo({top: 0, behavior: 'smooth'});">
+                <img src="simple_mindmap_8.png" alt="Option 8: Pill Badge Grid">
+                <p>Slide 8: Option 8: Pill Badge Grid</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const slides = [
+            { src: "simple_mindmap_1.png", title: "Option 1: Executive 4-Branch Cross" },
+            { src: "simple_mindmap_2.png", title: "Option 2: 5-Stage Linear Pipeline" },
+            { src: "simple_mindmap_3.png", title: "Option 3: Circular Radial Hub" },
+            { src: "simple_mindmap_4.png", title: "Option 4: 2x2 Clean Quadrant Matrix" },
+            { src: "simple_mindmap_5.png", title: "Option 5: Dark Sleek High-Contrast Theme" },
+            { src: "simple_mindmap_6.png", title: "Option 6: Emerald Agri-Tech Theme" },
+            { src: "simple_mindmap_7.png", title: "Option 7: Top-to-Bottom Hierarchy Tree" },
+            { src: "simple_mindmap_8.png", title: "Option 8: Pill Badge Grid" },
+        ];
+        let currentIndex = 0;
+
+        function showSlide(index) {
+            currentIndex = index;
+            document.getElementById('main-slide').src = slides[currentIndex].src;
+            document.getElementById('slide-title').innerText = `Slide ${currentIndex + 1}: ${slides[currentIndex].title}`;
+            
+            const buttons = document.querySelectorAll('#btn-container .btn');
+            buttons.forEach((btn, i) => {
+                if (i === currentIndex) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+            showSlide(currentIndex);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+    </script>
+</body>
+</html>

@@ -424,18 +424,13 @@ export const consumerService = {
   async getOrders(): Promise<ConsumerOrder[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      let targetUserId = user?.id;
-      if (!targetUserId && typeof window !== 'undefined') {
-        const demoRole = localStorage.getItem('agriflow_active_demo_role');
-        if (demoRole === 'consumer' || demoRole === 'buyer') {
-          targetUserId = '00000000-0000-4000-8000-000000000002';
-        }
+      const targetUserId = user?.id;
+      if (!targetUserId) {
+        return [];
       }
 
       let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
-      if (targetUserId) {
-        query = query.or(`customer_id.eq.${targetUserId},buyer_id.eq.${targetUserId}`);
-      }
+      query = query.or(`customer_id.eq.${targetUserId},buyer_id.eq.${targetUserId}`);
 
       const { data, error } = await query;
 
@@ -481,12 +476,9 @@ export const consumerService = {
    */
   async createOrder(orderData: Omit<ConsumerOrder, 'id' | 'orderDate' | 'status'>): Promise<ConsumerOrder> {
     const { data: { user } } = await supabase.auth.getUser();
-    let effectiveUserId = user?.id;
-    if (!effectiveUserId && typeof window !== 'undefined') {
-      const demoRole = localStorage.getItem('agriflow_active_demo_role');
-      if (demoRole === 'consumer' || demoRole === 'buyer' || !demoRole) {
-        effectiveUserId = '00000000-0000-4000-8000-000000000002';
-      }
+    const effectiveUserId = user?.id;
+    if (!effectiveUserId) {
+      throw new Error('Please sign in to place an order.');
     }
 
     const firstItem = orderData.items?.[0];
@@ -524,7 +516,7 @@ export const consumerService = {
           const price = prodRow.price_per_kg != null ? Number(prodRow.price_per_kg) : Number(prodRow.asking_price || 0);
           await supabase.from('produce_listings').insert({
             id: prodRow.id,
-            farmer_id: prodRow.farmer_id || '00000000-0000-4000-8000-000000000001',
+            farmer_id: prodRow.farmer_id || null,
             produce_name: prodRow.crop_name,
             variety: prodRow.variety,
             category: prodRow.category || 'vegetables',
@@ -624,7 +616,7 @@ export const consumerService = {
 
     const unitPrice = listingData?.price_per_unit != null ? Number(listingData.price_per_unit) : 32;
     const cropName = listingData?.produce_name || 'Hybrid Tomatoes';
-    const farmerId = listingData?.farmer_id || '00000000-0000-4000-8000-000000000001';
+    const farmerId = listingData?.farmer_id || null;
     const totalAmount = quantity * unitPrice;
     const farmerRealization = totalAmount * 0.87;
     const logisticsFee = totalAmount * 0.08;
@@ -657,8 +649,8 @@ export const consumerService = {
     const orderPayload = {
       id: generatedOrderId,
       order_number: generatedOrderId,
-      customer_id: effectiveUserId || '00000000-0000-4000-8000-000000000002',
-      buyer_id: effectiveUserId || '00000000-0000-4000-8000-000000000002',
+      customer_id: effectiveUserId,
+      buyer_id: effectiveUserId,
       farmer_id: farmerId,
       listing_id: listingId,
       commodity: cropName,

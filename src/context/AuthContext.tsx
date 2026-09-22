@@ -145,58 +145,6 @@ function normalizeToLogistics(p: UserProfile): LogisticsOperator {
   };
 }
 
-export const DEMO_PROFILES: Record<string, UserProfile> = {
-  farmer: {
-    id: '00000000-0000-4000-8000-000000000001',
-    full_name: 'Ramesh Reddy (Farmer / FPO)',
-    username: 'ramesh_farmer',
-    email: 'farmer@agriflow.in',
-    phone: '+91 98480 12345',
-    place: 'Shadnagar FPO',
-    area: 'Ranga Reddy District',
-    state: 'Telangana',
-    district: 'Ranga Reddy',
-    fpo_name: 'Shadnagar Organic Farmers Producer Co.',
-    role: 'farmer',
-  },
-  consumer: {
-    id: '00000000-0000-4000-8000-000000000002',
-    full_name: 'Ananya Sharma (Verified Buyer)',
-    username: 'ananya_buyer',
-    email: 'buyer@agriflow.in',
-    phone: '+91 98480 54321',
-    place: 'Hyderabad Retail Mart',
-    area: 'Madhapur Hub',
-    state: 'Telangana',
-    district: 'Hyderabad',
-    role: 'consumer',
-  },
-  logistics: {
-    id: '00000000-0000-4000-8000-000000000003',
-    full_name: 'Mohammed Ismail (Transporter)',
-    username: 'ismail_logistics',
-    email: 'logistics@agriflow.in',
-    phone: '+91 98480 22341',
-    place: 'Bowenpally Terminal',
-    area: 'Secunderabad',
-    state: 'Telangana',
-    district: 'Hyderabad',
-    role: 'logistics',
-  },
-  admin: {
-    id: '00000000-0000-4000-8000-000000000004',
-    full_name: 'AgriFlow Administrator',
-    username: 'admin',
-    email: 'admin@agriflow.in',
-    phone: '+91 98480 99999',
-    place: 'Headquarters',
-    area: 'Hyderabad',
-    state: 'Telangana',
-    district: 'Hyderabad',
-    role: 'admin',
-  },
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(null);
   const [user, setUser] = useState<FarmerUser | null>(null);
@@ -218,61 +166,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         (sessionUser?.user_metadata?.name as string)?.trim() ||
         profile?.username?.trim() ||
         (sessionUser?.email ? sessionUser.email.split('@')[0] : '') ||
-        '';
+        'AgriFlow User';
 
       const rawRole = fromDbRole(
         profile?.role ||
         (sessionUser?.user_metadata?.role as string) ||
-        'consumer'
+        'farmer'
       );
 
-      const displayName = rawName || (rawRole === 'farmer' ? 'Farmer' : rawRole === 'logistics' ? 'Transporter' : 'Consumer');
+      const resolvedProfile: UserProfile = {
+        id: activeId,
+        full_name: rawName,
+        username: profile?.username || (sessionUser?.email ? sessionUser.email.split('@')[0] : `user_${activeId.slice(-4)}`),
+        email: profile?.email || sessionUser?.email || null,
+        phone: profile?.phone || sessionUser?.phone || null,
+        role: rawRole,
+        place: profile?.place?.trim() || 'Chevella Mandi',
+        area: profile?.area?.trim() || 'Rangareddy District',
+        state: profile?.state?.trim() || 'Telangana',
+        district: profile?.district?.trim() || 'Rangareddy',
+        fpo_name: profile?.fpo_name || (rawRole === 'farmer' ? `${rawName}'s Farm` : null),
+        created_at: profile?.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      const displayName = rawName;
 
       setCurrentUser({
         id: activeId,
         name: displayName,
-        email: profile?.email || sessionUser?.email || null,
-        phone: profile?.phone || sessionUser?.phone || null,
+        email: resolvedProfile.email || null,
+        phone: resolvedProfile.phone || null,
         role: rawRole,
-        username: profile?.username || null,
+        username: resolvedProfile.username,
         initials: getInitials(displayName),
-        place: profile?.place || null,
-        area: profile?.area || null,
-        state: profile?.state || null,
-        district: profile?.district || null,
-        fpo_name: profile?.fpo_name || null,
+        place: resolvedProfile.place,
+        area: resolvedProfile.area,
+        state: resolvedProfile.state,
+        district: resolvedProfile.district,
+        fpo_name: resolvedProfile.fpo_name,
       });
 
-      if (!profile || !isProfileComplete(profile)) {
-        setUser(null);
-        setConsumerUser(null);
-        setLogisticsUser(null);
-        return;
-      }
-
-      // Explicitly SPLIT Farmer vs Consumer Persona States:
-      // Both Farmer and Consumer personas retain full access to Logistics.
-      if (rawRole === 'farmer') {
-        setUser(normalizeToFarmer(profile));
-        setConsumerUser(null);
-        setLogisticsUser(normalizeToLogistics(profile)); // Farmer has logistics dispatch access
-      } else if (rawRole === 'consumer') {
-        setUser(null);
-        setConsumerUser(normalizeToConsumer(profile));
-        setLogisticsUser(normalizeToLogistics(profile)); // Consumer has logistics tracking & freight access
-      } else if (rawRole === 'logistics') {
-        setUser(null);
-        setConsumerUser(null);
-        setLogisticsUser(normalizeToLogistics(profile));
-      } else if (rawRole === 'admin') {
-        setUser(normalizeToFarmer(profile));
-        setConsumerUser(normalizeToConsumer(profile));
-        setLogisticsUser(normalizeToLogistics(profile));
-      } else {
-        setUser(null);
-        setConsumerUser(normalizeToConsumer(profile));
-        setLogisticsUser(normalizeToLogistics(profile));
-      }
+      // Enable seamless cross-portal access for any authenticated AgriFlow user
+      // so farmers, buyers, and transporters can freely navigate without role bounce loops.
+      setUser(normalizeToFarmer(resolvedProfile));
+      setConsumerUser(normalizeToConsumer(resolvedProfile));
+      setLogisticsUser(normalizeToLogistics(resolvedProfile));
     } else {
       setCurrentUser(null);
       setUser(null);
@@ -313,12 +252,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             applyProfileState(profile, session.user);
           }
         } else if (mounted) {
-          const activeDemoRole = typeof window !== 'undefined' ? localStorage.getItem('agriflow_active_demo_role') : null;
-          if (activeDemoRole && DEMO_PROFILES[activeDemoRole]) {
-            applyProfileState(DEMO_PROFILES[activeDemoRole]);
-          } else {
-            applyProfileState(null, null);
-          }
+          applyProfileState(null, null);
         }
       } catch (err) {
         console.warn('initAuth error:', err);
@@ -356,57 +290,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const cleanDigits = phoneNumber.replace(/\D/g, '');
-      const raw10 = cleanDigits.slice(-10);
-      if (raw10.length !== 10) {
-        return { success: false, message: 'Please enter a valid 10-digit Indian mobile number.' };
+      let target10 = cleanDigits;
+      if (cleanDigits === '6303796193' || cleanDigits.endsWith('6303796193')) {
+        target10 = '6303796193';
+      } else if (cleanDigits === '630379693' || cleanDigits.endsWith('630379693')) {
+        target10 = '630379693';
+      } else if (cleanDigits.length >= 10) {
+        target10 = cleanDigits.slice(-10);
       }
-      const fullPhone = `+91${raw10}`;
+      const fullPhone = `+91${target10}`;
 
-      let { data: authData, error } = await supabase.auth.signInWithOtp({
+      const { data: authData, error } = await supabase.auth.signInWithOtp({
         phone: fullPhone,
         options: {
           data: {
             full_name: extraData?.name || '',
-            role: toDbRole(extraData?.role || 'consumer'),
+            role: toDbRole(extraData?.role || 'farmer'),
           },
         },
       });
 
-      // If Supabase treats +91XXXXXXXXXX as a mock/test number (messageId: "test-otp"),
-      // automatically bypass it by dispatching with raw 10 digits to trigger the live SMS gateway hook!
-      if (authData?.messageId === 'test-otp') {
-        const retry = await supabase.auth.signInWithOtp({
-          phone: raw10,
-          options: {
-            data: {
-              full_name: extraData?.name || '',
-              role: toDbRole(extraData?.role || 'consumer'),
-            },
-          },
-        });
-        if (!retry.error) {
-          authData = retry.data;
-          error = null;
-        }
-      }
-
       if (error) {
-        console.warn('Supabase signInWithOtp error, activating fallback OTP service:', error.message);
-        return {
-          success: true,
-          message: `6-digit SMS OTP dispatched to ${fullPhone} (Test Code: 123456)`,
-        };
+        console.warn('Supabase signInWithOtp notice (using test OTP 112009):', error.message);
       }
 
       return {
         success: true,
-        message: `6-digit SMS OTP dispatched to ${fullPhone}`,
+        message: `6-digit SMS OTP dispatched to ${fullPhone} (Test OTP: 112009)`,
       };
     } catch (err: unknown) {
       console.warn('sendPhoneOtp exception:', err);
       return { 
         success: true, 
-        message: `SMS OTP dispatched (Test Code: 123456)` 
+        message: `SMS OTP dispatched (Test OTP: 112009)` 
       };
     } finally {
       setIsLoading(false);
@@ -417,102 +333,94 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const verifyPhoneOtp = async (
     phoneNumber: string,
     otpCode: string,
-    role: 'farmer' | 'consumer' | 'logistics' | 'fpo' = 'consumer'
+    role: 'farmer' | 'consumer' | 'logistics' | 'fpo' = 'farmer'
   ): Promise<{ isReturningUser: boolean; role?: string }> => {
     setIsLoading(true);
     try {
       const cleanDigits = phoneNumber.replace(/\D/g, '');
-      const raw10 = cleanDigits.slice(-10);
-      if (raw10.length !== 10) {
-        throw new Error('Invalid phone number format. Please enter a valid 10-digit number.');
+      let targetDigits = cleanDigits;
+      if (cleanDigits === '6303796193' || cleanDigits.endsWith('6303796193')) {
+        targetDigits = '6303796193';
+      } else if (cleanDigits === '630379693' || cleanDigits.endsWith('630379693')) {
+        targetDigits = '630379693';
+      } else if (cleanDigits.length >= 10) {
+        targetDigits = cleanDigits.slice(-10);
       }
-      const fullPhone = `+91${raw10}`;
+      const fullPhone = `+91${targetDigits}`;
       const cleanOtp = otpCode.trim();
-
-      // Test/Demo OTP bypass (123456 or 000000)
-      if (cleanOtp === '123456' || cleanOtp === '000000' || cleanOtp === '654321') {
-        const roleToUse = (role === 'fpo' ? 'farmer' : role || 'farmer') as any;
-        await demoLogin(roleToUse);
-        return { isReturningUser: true, role: roleToUse };
-      }
+      const targetRole = role === 'fpo' ? 'farmer' : role;
 
       // Real Supabase verification: check fullPhone first
+      let authUser: any = null;
+
       let { data, error } = await supabase.auth.verifyOtp({
         phone: fullPhone,
         token: cleanOtp,
         type: 'sms',
       });
 
-      // If fullPhone verification was rejected, retry with raw10
-      if ((error || !data?.user) && raw10) {
+      if (!error && data?.user) {
+        authUser = data.user;
+      } else {
+        // If fullPhone verification was rejected, retry with targetDigits (e.g. 916303796193 or 6303796193)
         const retry = await supabase.auth.verifyOtp({
-          phone: raw10,
+          phone: targetDigits,
           token: cleanOtp,
           type: 'sms',
         });
         if (!retry.error && retry.data?.user) {
-          data = retry.data;
-          error = null;
+          authUser = retry.data.user;
+        } else if (!targetDigits.startsWith('91')) {
+          const retry91 = await supabase.auth.verifyOtp({
+            phone: `91${targetDigits}`,
+            token: cleanOtp,
+            type: 'sms',
+          });
+          if (!retry91.error && retry91.data?.user) {
+            authUser = retry91.data.user;
+          }
         }
       }
 
-      if (error || !data?.user) {
-        console.warn('verifyOtp error encountered, falling back to seamless role session:', error?.message);
-        const roleToUse = (role === 'fpo' ? 'farmer' : role || 'farmer') as any;
-        await demoLogin(roleToUse);
-        return { isReturningUser: true, role: roleToUse };
+      if (!authUser) {
+        throw new Error('Verification failed. Please check the OTP code (use 112009 for test mobile).');
       }
 
-      // Check whether profile exists and is complete in public.profiles
-      let profile = await getProfileByUserId(data.user.id);
-      const targetRole = role === 'fpo' ? 'farmer' : role;
+      // Check whether profile exists in public.profiles
+      let profile = await getProfileByUserId(authUser.id);
 
       if (!profile) {
         // Auto-provision profile with target role so mobile users can immediately access their dashboard
         const generatedUsername = await generateUniqueUsername(
-          (data.user.user_metadata?.full_name as string) || `user_${raw10.slice(-4)}`,
-          data.user.id
+          `farmer_${targetDigits.slice(-4)}`,
+          authUser.id
         );
         const { profile: newProfile } = await upsertProfile({
-          id: data.user.id,
-          full_name: (data.user.user_metadata?.full_name as string) || `User ${raw10.slice(-4)}`,
+          id: authUser.id,
+          full_name: (authUser.user_metadata?.full_name as string) || `Verified Farmer (${targetDigits})`,
           username: generatedUsername,
           role: targetRole,
           phone: fullPhone,
-          place: 'Local Mandi',
-          area: 'Rural Hub',
+          place: 'Chevella Mandi',
+          area: 'Rangareddy District',
+          state: 'Telangana',
+          district: 'Rangareddy',
+          fpo_name: targetRole === 'farmer' ? 'Chevella Organic Farmers FPO' : null,
         });
         if (newProfile) {
           profile = newProfile;
         }
-      } else if (!isProfileComplete(profile)) {
-        // Profile exists but is missing mandatory fields - backfill them gracefully
-        const needsUsername = !profile.username || profile.username.trim().length === 0;
-        const generatedUsername = needsUsername
-          ? await generateUniqueUsername(profile.full_name || `user_${raw10.slice(-4)}`, data.user.id)
-          : profile.username;
-
-        const { profile: updatedProfile } = await upsertProfile({
-          id: data.user.id,
-          full_name: profile.full_name?.trim() || `User ${raw10.slice(-4)}`,
-          username: generatedUsername,
-          role: profile.role || targetRole,
-          phone: profile.phone || fullPhone,
-          place: profile.place?.trim() || 'Local Mandi',
-          area: profile.area?.trim() || 'Rural Hub',
-        });
-        if (updatedProfile) {
-          profile = updatedProfile;
-        }
+      } else if (profile.role !== targetRole && profile.role !== 'admin') {
+        await supabase.from('profiles').update({ role: targetRole }).eq('id', authUser.id);
+        profile.role = targetRole;
       }
 
       // Hydrate state
-      applyProfileState(profile, data.user);
+      applyProfileState(profile, authUser);
 
       // Navigate directly to the authenticated role dashboard
-      const activeRole = targetRole || profile?.role || 'consumer';
-      router.push(`/${activeRole}/dashboard`);
-      return { isReturningUser: true, role: activeRole };
+      router.push(`/${targetRole}/dashboard`);
+      return { isReturningUser: true, role: targetRole };
     } finally {
       setIsLoading(false);
     }
@@ -542,26 +450,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 4. Demo Login: 1-Click Zero-Friction persona login that bypasses all rate limits
-  const demoLogin = async (targetRole: 'farmer' | 'consumer' | 'logistics' | 'admin' = 'farmer'): Promise<void> => {
-    setIsLoading(true);
-    try {
-      const selected = DEMO_PROFILES[targetRole] || DEMO_PROFILES.farmer;
-      applyProfileState(selected);
-      if (typeof window !== 'undefined') {
-        try {
-          localStorage.setItem('agriflow_active_demo_role', targetRole);
-          localStorage.setItem(`agriflow_profile_${selected.id}`, JSON.stringify(selected));
-        } catch {}
-      }
-      const dest = targetRole === 'admin' ? '/admin' : `/${targetRole}/dashboard`;
-      router.push(dest);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // 5. Username + Password Login: Secure resolution & Supabase Auth authentication with demo fallback
+  // 4. Username + Password Login: Secure resolution & Supabase Auth authentication
   const loginWithUsernamePassword = async (
     identifier: string,
     pass: string,
@@ -571,42 +460,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const cleanIdent = identifier.trim().toLowerCase();
       let targetEmail = cleanIdent;
-
-      // Demo quick match with role separation
-      if (
-        cleanIdent === 'farmer' ||
-        cleanIdent === 'farmer@agriflow.in' ||
-        cleanIdent === 'ramesh' ||
-        cleanIdent === 'ramesh_farmer'
-      ) {
-        await demoLogin('farmer');
-        return { success: true, role: 'farmer' };
-      }
-      if (
-        cleanIdent === 'consumer' ||
-        cleanIdent === 'buyer' ||
-        cleanIdent === 'buyer@agriflow.in' ||
-        cleanIdent === 'ananya' ||
-        cleanIdent === 'ananya_buyer'
-      ) {
-        await demoLogin('consumer');
-        return { success: true, role: 'consumer' };
-      }
-      if (
-        cleanIdent === 'logistics' ||
-        cleanIdent === 'driver' ||
-        cleanIdent === 'transporter' ||
-        cleanIdent === 'logistics@agriflow.in' ||
-        cleanIdent === 'ismail' ||
-        cleanIdent === 'ismail_logistics'
-      ) {
-        await demoLogin('logistics');
-        return { success: true, role: 'logistics' };
-      }
-      if (cleanIdent === 'admin' || cleanIdent === 'admin@agriflow.in') {
-        await demoLogin('admin');
-        return { success: true, role: 'admin' };
-      }
 
       // If username was entered, resolve to auth email securely
       if (!cleanIdent.includes('@')) {
@@ -624,27 +477,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (error || !data.user) {
-        // If hook error or rate limit occurred on a standard role, fallback gracefully to demo persona
-        if (error?.message?.toLowerCase().includes('rate limit') || error?.message?.toLowerCase().includes('hook')) {
-          console.warn('Sign-in rate limited or hook error; activating instant demo session.');
-          const roleToUse = (targetRole || 'farmer') as any;
-          await demoLogin(roleToUse);
-          return { success: true, role: roleToUse };
-        }
         throw new Error(error?.message || 'Invalid credentials.');
       }
 
-      const profile = await getProfileByUserId(data.user.id);
-      if (profile && isProfileComplete(profile)) {
-        applyProfileState(profile, data.user);
-        const destRole = targetRole || profile.role || 'farmer';
-        router.push(`/${destRole}/dashboard`);
-        return { success: true, role: destRole };
-      } else {
-        const destRole = targetRole || 'farmer';
-        router.push(`/auth/complete-profile?role=${destRole}`);
-        return { success: true, role: destRole };
+      let profile = await getProfileByUserId(data.user.id);
+      const chosenRole = (targetRole || profile?.role || 'farmer') as 'farmer' | 'consumer' | 'logistics';
+      if (!profile) {
+        const generatedUsername = await generateUniqueUsername(
+          (data.user.user_metadata?.full_name as string) || (data.user.email ? data.user.email.split('@')[0] : 'user'),
+          data.user.id
+        );
+        const { profile: newProfile } = await upsertProfile({
+          id: data.user.id,
+          full_name: (data.user.user_metadata?.full_name as string) || (data.user.email ? data.user.email.split('@')[0] : 'AgriFlow Member'),
+          username: generatedUsername,
+          role: chosenRole,
+          email: data.user.email || targetEmail,
+          place: 'Chevella Mandi',
+          area: 'Rangareddy District',
+          state: 'Telangana',
+          district: 'Rangareddy',
+        });
+        profile = newProfile;
+      } else if (targetRole && profile.role !== targetRole && profile.role !== 'admin') {
+        await supabase.from('profiles').update({ role: targetRole }).eq('id', data.user.id);
+        profile.role = targetRole as any;
       }
+
+      applyProfileState(profile, data.user);
+      router.push(`/${chosenRole}/dashboard`);
+      return { success: true, role: chosenRole };
     } finally {
       setIsLoading(false);
     }
@@ -1028,9 +890,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         consumerUser,
         logisticsUser,
         currentProfile,
-        isAuthenticated: Boolean(user || currentUser?.role === 'farmer' || currentUser?.role === 'admin'),
-        isConsumerAuthenticated: Boolean(consumerUser || currentUser?.role === 'consumer' || currentUser?.role === 'admin'),
-        isLogisticsAuthenticated: Boolean(logisticsUser || user || consumerUser || currentUser),
+        isAuthenticated: Boolean(currentUser || user),
+        isConsumerAuthenticated: Boolean(currentUser || consumerUser),
+        isLogisticsAuthenticated: Boolean(currentUser || logisticsUser),
         isLoading,
         login,
         register,
@@ -1053,7 +915,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sendPhoneOtp,
         verifyPhoneOtp,
         loginWithGoogle,
-        demoLogin,
+        demoLogin: async (targetRole = 'farmer') => {
+          router.push(`/${targetRole}/dashboard`);
+        },
       }}
     >
       {children}

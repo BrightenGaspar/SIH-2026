@@ -373,9 +373,12 @@ export const logisticsService = {
         return { success: false, error: 'Another logistics operator already accepted this pickup.' };
       }
 
-      // Fallback: Direct table update for demo sessions
+      // Fallback: Direct table update
       const { data: { user } } = await supabase.auth.getUser();
-      const operatorId = user?.id || '00000000-0000-4000-8000-000000000003';
+      if (!user?.id) {
+        return { success: false, error: 'Please log in as a logistics operator to accept this pickup.' };
+      }
+      const operatorId = user.id;
       const now = new Date().toISOString();
 
       const { data: directUpdated, error: directErr } = await supabase

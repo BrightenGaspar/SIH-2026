@@ -38,7 +38,6 @@ export function PhoneAuthForm({
     verifyPhoneOtp,
     loginWithGoogle,
     loginWithUsernamePassword,
-    demoLogin,
     isLoading,
   } = useAuth();
 
@@ -100,17 +99,25 @@ export function PhoneAuthForm({
     setErrorMsg('');
     setStatusMsg('');
 
-    const cleanPhone = phoneNumber.replace(/\D/g, '');
-    const raw10 = cleanPhone.slice(-10);
-    if (raw10.length !== 10) {
-      setErrorMsg('Please enter a valid 10-digit mobile number.');
+    const cleanDigits = phoneNumber.replace(/\D/g, '');
+    let targetDigits = cleanDigits;
+    if (cleanDigits === '6303796193' || cleanDigits.endsWith('6303796193')) {
+      targetDigits = '6303796193';
+    } else if (cleanDigits === '630379693' || cleanDigits.endsWith('630379693')) {
+      targetDigits = '630379693';
+    } else if (cleanDigits.length >= 10) {
+      targetDigits = cleanDigits.slice(-10);
+    } else if (cleanDigits.length === 9) {
+      targetDigits = cleanDigits;
+    } else {
+      setErrorMsg('Please enter a valid mobile number (e.g. 6303796193).');
       return;
     }
 
     setSubmitting(true);
     setStatusMsg('Sending SMS verification code...');
     try {
-      const fullNumber = `+91${raw10}`;
+      const fullNumber = `+91${targetDigits}`;
 
       const result = await sendPhoneOtp(fullNumber, { role });
       if (!result.success) {
@@ -139,7 +146,7 @@ export function PhoneAuthForm({
 
     const cleanOtp = otp.trim();
     if (cleanOtp.length !== 6) {
-      setErrorMsg('Please enter the full 6-digit OTP code.');
+      setErrorMsg('Please enter the full 6-digit OTP code (e.g. 112009).');
       return;
     }
 
@@ -269,18 +276,6 @@ export function PhoneAuthForm({
             <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
             <div className="leading-relaxed flex-1">{errorMsg}</div>
           </div>
-          {(errorMsg.toLowerCase().includes('hook') || errorMsg.toLowerCase().includes('rate limit')) && (
-            <div className="pt-1 border-t border-rose-200/60 flex items-center justify-between gap-2">
-              <span className="text-[11px] text-rose-600 font-medium">Bypass hook & enter immediately:</span>
-              <button
-                type="button"
-                onClick={() => demoLogin(role === 'fpo' ? 'farmer' : role)}
-                className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg text-[11px] transition shadow-2xs cursor-pointer shrink-0"
-              >
-                Instant 1-Click Login &rarr;
-              </button>
-            </div>
-          )}
         </div>
       )}
 
@@ -322,8 +317,16 @@ export function PhoneAuthForm({
                     />
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  We will send a 6-digit SMS verification code to this number.
+                <div className="mt-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold">Test Mobile:</span> <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold text-emerald-800">6303796193</code>
+                  </div>
+                  <div>
+                    <span className="font-semibold">Test OTP:</span> <code className="bg-white px-1.5 py-0.5 rounded font-mono font-bold text-emerald-800">112009</code>
+                  </div>
+                </div>
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Enter your mobile number or use the verified test mobile <strong className="text-slate-800 font-mono">6303796193</strong>.
                 </p>
               </div>
 
@@ -339,6 +342,9 @@ export function PhoneAuthForm({
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-4">
               <div>
+                <div className="mb-2 p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 text-center">
+                  Verification code sent to <strong>{sentPhone}</strong>. Enter code <strong className="font-mono text-emerald-900">112009</strong> to sign in.
+                </div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-bold text-slate-700">Enter 6-Digit SMS OTP</label>
                   <button
@@ -358,7 +364,7 @@ export function PhoneAuthForm({
                   maxLength={6}
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  placeholder="000000"
+                  placeholder="112009"
                   autoFocus
                   className={`w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-center text-2xl font-mono tracking-[0.3em] text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 transition ${colors.borderFocus}`}
                 />
@@ -480,32 +486,8 @@ export function PhoneAuthForm({
         </form>
       )}
 
-      {/* 1-Click Instant Demo Login Button */}
-      <div className="pt-2 border-t border-slate-100 space-y-2">
-        <button
-          type="button"
-          onClick={() => demoLogin(role === 'fpo' ? 'farmer' : role)}
-          disabled={submitting || isLoading}
-          className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-1.5 transition cursor-pointer shadow-xs active:scale-[0.99] ${
-            role === 'farmer' || role === 'fpo'
-              ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border-emerald-300'
-              : role === 'consumer'
-              ? 'bg-blue-50 hover:bg-blue-100 text-blue-900 border-blue-300'
-              : 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300'
-          }`}
-        >
-          <span>
-            {role === 'farmer' || role === 'fpo'
-              ? '⚡ Instant 1-Click Demo Login as Farmer (Ramesh Reddy • ramesh_farmer)'
-              : role === 'consumer'
-              ? '⚡ Instant 1-Click Demo Login as Buyer (Ananya Sharma • ananya_buyer)'
-              : '⚡ Instant 1-Click Demo Login as Transporter (Mohammed Ismail • ismail_logistics)'}
-          </span>
-        </button>
-      </div>
-
       {/* Footer Info */}
-      <div className="pt-1 text-center text-[11px] text-slate-400">
+      <div className="pt-3 border-t border-slate-100 text-center text-[11px] text-slate-400">
         Permanent user accounts linked through Supabase Auth & PostgreSQL
       </div>
     </div>

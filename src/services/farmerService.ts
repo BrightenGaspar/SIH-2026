@@ -77,23 +77,6 @@ export async function getLoggedInFarmerContext(): Promise<FarmerProfileContext |
         longitude: profile?.longitude != null ? Number(profile.longitude) : undefined,
       };
     }
-
-    if (typeof window !== 'undefined') {
-      const demoRole = localStorage.getItem('agriflow_active_demo_role');
-      if (demoRole === 'farmer' || demoRole === 'fpo' || !demoRole) {
-        return {
-          userId: '00000000-0000-4000-8000-000000000001',
-          fullName: 'Ramesh Reddy (Farmer / FPO)',
-          location: 'Shadnagar FPO Hub, Ranga Reddy, Telangana',
-          phone: '+91 98480 12345',
-          fpoName: 'Shadnagar Organic Farmers Producer Co.',
-          district: 'Ranga Reddy',
-          state: 'Telangana',
-          latitude: 17.0689,
-          longitude: 78.2045,
-        };
-      }
-    }
   } catch (err) {
     console.warn('Error resolving logged-in farmer context:', err);
   }
@@ -518,12 +501,9 @@ export const farmerService = {
    */
   async getFarmerOrders(): Promise<Order[]> {
     const { data: { user } } = await supabase.auth.getUser();
-    let farmerId = user?.id;
-    if (!farmerId && typeof window !== 'undefined') {
-      const demoRole = localStorage.getItem('agriflow_active_demo_role');
-      if (demoRole === 'farmer' || demoRole === 'fpo' || !demoRole) {
-        farmerId = '00000000-0000-4000-8000-000000000001';
-      }
+    const farmerId = user?.id;
+    if (!farmerId) {
+      return [];
     }
 
     let query = supabase

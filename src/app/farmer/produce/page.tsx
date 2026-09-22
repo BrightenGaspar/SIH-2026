@@ -13,7 +13,7 @@ import { Modal } from '@/components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { produceSchema, ProduceFormData } from '@/lib/validators';
-import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud, AlertCircle } from 'lucide-react';
+import { Sprout, Plus, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud, AlertCircle, Trash2 } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 
 export default function FarmerProducePage() {
@@ -25,6 +25,8 @@ export default function FarmerProducePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
 
@@ -159,6 +161,24 @@ export default function FarmerProducePage() {
     }
   };
 
+  const onDeleteProduce = async (item: Produce) => {
+    if (!window.confirm(`Delete the listing for ${item.crop}? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingId(item.id);
+      setDeleteError(null);
+      await farmerService.deleteProduce(item.id);
+      setProduceList(current => current.filter(produce => produce.id !== item.id));
+    } catch (err: any) {
+      console.error('Failed to delete produce listing:', err);
+      setDeleteError(err?.message || 'Could not delete this listing.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   const filtered = filterStatus === 'All'
     ? produceList
     : produceList.filter(p => p.status.toLowerCase() === filterStatus.toLowerCase());
@@ -198,6 +218,13 @@ export default function FarmerProducePage() {
       </div>
 
       {/* Produce Grid */}
+      {deleteError && (
+        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{deleteError}</span>
+        </div>
+      )}
+
       {filtered.length === 0 ? (
         <Card className="text-center py-16">
           <Sprout className="w-12 h-12 mx-auto text-slate-400 mb-3" />
@@ -319,9 +346,22 @@ export default function FarmerProducePage() {
 
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                 <span className="text-slate-400">Total Lot Value:</span>
-                <span className="font-black text-slate-900 dark:text-white text-sm">
-                  {formatINR(item.quantity * item.expectedPrice)}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="font-black text-slate-900 dark:text-white text-sm">
+                    {formatINR(item.quantity * item.expectedPrice)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteProduce(item)}
+                    disabled={deletingId === item.id}
+                    title="Delete this listing"
+                    aria-label={`Delete ${item.crop} listing`}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 px-2.5 py-1.5 text-xs font-bold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-rose-900/60 dark:text-rose-400 dark:hover:bg-rose-950/30"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
               </div>
             </Card>
           ))}

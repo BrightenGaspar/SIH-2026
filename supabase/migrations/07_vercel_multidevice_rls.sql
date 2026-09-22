@@ -159,13 +159,3 @@ BEGIN
   EXCEPTION WHEN duplicate_object THEN NULL; END;
 END $$;
 
--- 5. Seed Initial Produce Listings (including 1000kg Onion)
-INSERT INTO public.produce (
-  crop_name, variety, category, quantity, unit, quality_grade, asking_price, location, status
-)
-VALUES
-  ('Onion (Nashik Red)', 'Garwa Selection', 'Vegetables', 1000, 'kg', 'A', 28, 'Nashik APMC Hub, Maharashtra', 'Active'),
-  ('Tomato (Hybrid Desi)', 'US-440 Desi Selection', 'Vegetables', 2500, 'kg', 'A', 35, 'Shadnagar Farm Hub, Telangana', 'Active'),
-  ('Green Chilli (G4 Teja)', 'Guntur Special G4', 'Spices', 800, 'kg', 'A', 65, 'Guntur Mirchi Yard, Andhra Pradesh', 'Active'),
-  ('Potato (Kufri Jyoti)', 'Table Premium', 'Vegetables', 3000, 'kg', 'A', 22, 'Hassan Cold Hub, Karnataka', 'Active')
-ON CONFLICT DO NOTHING;

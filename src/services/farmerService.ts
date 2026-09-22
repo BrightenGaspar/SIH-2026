@@ -422,17 +422,22 @@ export const farmerService = {
   /**
    * Delete a produce item directly from authoritative public.produce_listings table
    */
-  async deleteProduce(id: string): Promise<boolean> {
+  async deleteProduce(id: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.id) {
+      throw new Error('Authentication required to delete a produce listing.');
+    }
+
     const { error: listingErr } = await supabase
       .from('produce_listings')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('farmer_id', user.id);
 
     if (listingErr) {
       console.error('Supabase produce_listings delete error:', listingErr.message);
-      return false;
+      throw new Error(listingErr.message || 'Failed to delete produce listing.');
     }
-    return true;
   },
 
   /**

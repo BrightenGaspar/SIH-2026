@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+import { supabase as supabaseAuth } from '@/lib/supabase';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ybtncqqphsnbazmwvuvi.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_ILuR9zf-nqBUli4eBMDZug_xZEHreRg';
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 interface IngestTelemetryPayload {
   trip_id: string;
@@ -39,8 +44,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Authentication required for GPS telemetry.' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '').trim();
+    const { data: userData, error: authError } = await supabaseAuth.auth.getUser(token);
+    if (authError || !userData.user) {
+      return NextResponse.json({ error: 'Invalid or expired telemetry session.' }, { status: 401 });
+    }
+
+    const database = createClient(
+      supabaseUrl,
+      serviceRoleKey || supabaseAnonKey,
+      serviceRoleKey
+        ? { auth: { persistSession: false } }
+        : {
+            auth: { persistSession: false },
+            global: { headers: { Authorization: `Bearer ${token}` } },
+          }
+    );
+
     // 1. Verify trip exists in public.logistics_trips or public.logistics_assignments
-    const { data: initialTrip, error: fetchErr } = await supabase
+    const { data: initialTrip, error: fetchErr } = await database
       .from('logistics_trips')
       .select('*')
       .eq('id', trip_id)
@@ -50,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     let matchedAssignment: any = null;
     if (!trip) {
-      const { data: la } = await supabase
+      const { data: la } = await database
         .from('logistics_assignments')
         .select('*')
         .or(`id.eq.${trip_id},order_id.eq.${trip_id}`)
@@ -87,20 +114,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Driver Authorization & Assignment Validation
-    const authHeader = req.headers.get('authorization');
-    let callerDriverId: string | null = driver_id || null;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '').trim();
-      try {
-        const { data: userData } = await supabase.auth.getUser(token);
-        if (userData?.user?.id) {
-          callerDriverId = userData.user.id;
-        }
-      } catch {
-        // Fall back to callerDriverId if token validation fails in dev/test
-      }
-    }
+    const callerDriverId: string = userData.user.id;
 
     // Prevent Driver A from updating Driver B's shipment
     if (trip.driver_id && callerDriverId && trip.driver_id !== callerDriverId) {
@@ -180,7 +194,7 @@ export async function POST(req: NextRequest) {
       updatePayload.humidity = cleanHum;
     }
 
-    let { error: updateErr } = await supabase
+    let { error: updateErr } = await database
       .from('logistics_trips')
       .update(updatePayload)
       .eq('id', trip_id);
@@ -205,7 +219,7 @@ export async function POST(req: NextRequest) {
         basePayload.humidity = cleanHum;
       }
 
-      const retryResult = await supabase
+      const retryResult = await database
         .from('logistics_trips')
         .update(basePayload)
         .eq('id', trip_id);
@@ -222,7 +236,7 @@ export async function POST(req: NextRequest) {
         };
         if (cleanTemp !== null) assignUpdate.current_temp = cleanTemp;
         if (cleanHum !== null) assignUpdate.humidity = cleanHum;
-        await supabase
+        await database
           .from('logistics_assignments')
           .update(assignUpdate)
           .or(`id.eq.${trip_id},order_id.eq.${trip_id}`);
@@ -240,7 +254,7 @@ export async function POST(req: NextRequest) {
 
     // 5. Log immutable time-series record into public.shipment_telemetry_logs
     try {
-      await supabase.from('shipment_telemetry_logs').insert({
+      await database.from('shipment_telemetry_logs').insert({
         trip_id,
         temperature: cleanTemp,
         humidity: cleanHum,
@@ -260,7 +274,7 @@ export async function POST(req: NextRequest) {
     if (isTempBreached && cleanTemp !== null) {
       try {
         const severity = cleanTemp > 12.0 ? 'CRITICAL' : 'HIGH';
-        await supabase.from('temperature_alerts').insert({
+        await database.from('temperature_alerts').insert({
           trip_id,
           crop: trip.commodity || 'Perishable Cargo',
           actual_temperature: cleanTemp,
@@ -314,7 +328,7 @@ export async function GET(req: NextRequest) {
 
     if (!tripId) {
       // Return fleet telemetry summary
-      const { data: trips, error } = await supabase
+      const { data: trips, error } = await supabaseAuth
         .from('logistics_trips')
         .select('*')
         .order('updated_at', { ascending: false });
@@ -331,7 +345,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Return single trip telemetry
-    const { data: initialTrip, error } = await supabase
+    const { data: initialTrip, error } = await supabaseAuth
       .from('logistics_trips')
       .select('*')
       .eq('id', tripId)
@@ -340,7 +354,7 @@ export async function GET(req: NextRequest) {
     let trip = initialTrip;
 
     if (!trip) {
-      const { data: la } = await supabase
+      const { data: la } = await supabaseAuth
         .from('logistics_assignments')
         .select('*')
         .or(`id.eq.${tripId},order_id.eq.${tripId}`)

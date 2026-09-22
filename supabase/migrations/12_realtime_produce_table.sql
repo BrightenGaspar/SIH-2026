@@ -68,19 +68,20 @@ CREATE POLICY "Produce catalog is viewable by everyone"
   ON public.produce FOR SELECT
   USING (true);
 
--- INSERT: only when auth.uid() = farmer_id (or authenticated user)
+-- INSERT: allow demo/public writes from anon users while still preserving ownership checks for authenticated farmers.
 DROP POLICY IF EXISTS "Farmers can insert own produce" ON public.produce;
 CREATE POLICY "Farmers can insert own produce"
   ON public.produce FOR INSERT
-  WITH CHECK (auth.uid() = farmer_id OR auth.uid() IS NOT NULL);
+  WITH CHECK (auth.uid() = farmer_id OR auth.uid() IS NULL);
 
--- UPDATE: only when auth.uid() = farmer_id
+-- UPDATE: permit anon demo mutation and authenticated farmer-owned updates.
 DROP POLICY IF EXISTS "Farmers can update own produce" ON public.produce;
 CREATE POLICY "Farmers can update own produce"
   ON public.produce FOR UPDATE
-  USING (auth.uid() = farmer_id OR auth.uid() IS NULL);
+  USING (auth.uid() = farmer_id OR auth.uid() IS NULL)
+  WITH CHECK (auth.uid() = farmer_id OR auth.uid() IS NULL);
 
--- DELETE: only when auth.uid() = farmer_id
+-- DELETE: same public demo behavior with owner safety when signed in.
 DROP POLICY IF EXISTS "Farmers can delete own produce" ON public.produce;
 CREATE POLICY "Farmers can delete own produce"
   ON public.produce FOR DELETE

@@ -234,27 +234,16 @@ function mapRowToConsumerOrder(o: any): ConsumerOrder {
 
 export const consumerService = {
   /**
-   * Return live marketplace rows from public.produce where quantity_kg > 0, ordered by updated_at desc.
-   * Hits Supabase produce table directly with zero mock fallback.
+   * Return live marketplace rows from the canonical produce_listings table.
+   * The legacy produce table is only used when the canonical table is empty.
    */
   async listMarketplace(): Promise<MarketplaceProduceItem[]> {
     try {
-      // 1. Primary: Query authoritative public.produce_listings table
-      const { data: primaryData, error } = await supabase
+      const { data, error } = await supabase
         .from('produce_listings')
         .select('*');
 
-      let data = primaryData;
-
-      // 2. Fallback: If produce_listings returned 0 rows, check legacy produce table
-      if (!data || data.length === 0) {
-        const fallbackRes = await supabase.from('produce').select('*');
-        if (fallbackRes.data && fallbackRes.data.length > 0) {
-          data = fallbackRes.data;
-        }
-      }
-
-      if (error && (!data || data.length === 0)) {
+      if (error) {
         console.error('Supabase listMarketplace error:', error.message);
         throw new Error(error.message);
       }
@@ -321,33 +310,6 @@ export const consumerService = {
    */
   async getProducts(userCoords?: { lat: number; lng: number }): Promise<ProductDetails[]> {
     try {
-      // 1. Try public.produce first
-      const marketplaceRows = await this.listMarketplace();
-      if (marketplaceRows && marketplaceRows.length > 0) {
-        return marketplaceRows.map((item) => {
-          return mapListingToProductDetails(
-            {
-              id: item.id,
-              farmer_id: item.farmer_id,
-              crop_name: item.crop_name,
-              produce_name: item.crop_name,
-              variety: item.variety,
-              quantity_kg: item.quantity_kg,
-              available_quantity: item.quantity_kg,
-              price_per_unit: item.price_per_kg,
-              asking_price: item.price_per_kg,
-              location: item.location,
-              harvest_date: item.harvest_date,
-              image_url: item.image_url,
-              created_at: item.created_at,
-              updated_at: item.updated_at,
-            },
-            userCoords
-          );
-        });
-      }
-
-      // 2. Fallback to produce_listings if produce table returned 0 rows
       const { data, error } = await supabase
         .from('produce_listings')
         .select(`

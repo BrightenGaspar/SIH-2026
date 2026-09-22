@@ -50,7 +50,7 @@ function AuthCallbackContent() {
         const user = session.user;
 
         // 3. Fetch persistent profile from public.profiles
-        let profile = await getProfileByUserId(user.id);
+        const profile = await getProfileByUserId(user.id);
         const targetRole = validateRole(roleParam);
 
         // If user logged in through a specific portal (e.g. /farmer/login), ensure profile role reflects that portal

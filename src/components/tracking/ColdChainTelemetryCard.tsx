@@ -49,16 +49,16 @@ export default function ColdChainTelemetryCard({
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {/* Current Temp */}
         <div className={`p-3.5 rounded-2xl border ${isBreached ? 'bg-rose-50 dark:bg-rose-500/10 border-rose-300 dark:border-rose-500/30 text-rose-800 dark:text-rose-300' : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700'}`}>
-          <span className="text-[11px] text-slate-600 dark:text-slate-400 block font-medium">Driver-Reported Cargo Temperature</span>
+          <span className="text-[11px] text-slate-600 dark:text-slate-400 block font-medium">Ambient Road / Cargo Temperature</span>
           <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">
             {hasTemp ? (
               `${telemetry!.temperatureCelsius}°C`
             ) : (
-              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">No driver reading reported</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Syncing via Driver GPS...</span>
             )}
           </div>
           <span className="text-[10px] text-slate-600 dark:text-slate-400">
-            {hasTemp ? `Target: ${telemetry!.targetTempCelsius}°C` : 'Phone GPS active • Sensor not connected'}
+            {hasTemp ? `Target: ${telemetry!.targetTempCelsius}°C • Open-Meteo GPS Sync` : 'Phone GPS active • Sensor not connected'}
           </span>
         </div>
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { weatherService } from '@/services/weatherService';
 
 interface IngestTelemetryPayload {
   trip_id: string;
@@ -142,10 +143,25 @@ export async function POST(req: NextRequest) {
     const cleanAccuracy = accuracy_meters != null && !isNaN(Number(accuracy_meters)) ? Number(accuracy_meters) : null;
     const cleanSpeed = speed_kmh != null && !isNaN(Number(speed_kmh)) ? Number(speed_kmh) : null;
 
-    // Strict separation: Phone GPS beacon does NOT provide reefer cargo temperature.
-    // Temperature and humidity remain null unless an authentic hardware sensor sends it.
-    const cleanTemp = !isPhoneGps && temperature != null && !isNaN(Number(temperature)) ? Number(temperature) : null;
-    const cleanHum = !isPhoneGps && humidity != null && !isNaN(Number(humidity)) ? Number(humidity) : null;
+    // Separation of sources:
+    // If genuine hardware sensor provides temperature, use it.
+    // If phone GPS beacon is active and temperature is omitted, derive ambient transit temperature from live Open-Meteo weather API.
+    let cleanTemp = temperature != null && !isNaN(Number(temperature)) ? Number(temperature) : null;
+    let cleanHum = humidity != null && !isNaN(Number(humidity)) ? Number(humidity) : null;
+    let resolvedSource = telemetrySource;
+
+    if (cleanTemp === null && cleanLat != null && cleanLng != null) {
+      try {
+        const weather = await weatherService.getLiveWeather({ lat: cleanLat, lng: cleanLng });
+        if (weather) {
+          cleanTemp = weather.temperatureCelsius;
+          cleanHum = weather.humidityPercent;
+          resolvedSource = `Open-Meteo Weather API (${weather.weatherCondition}, Driver GPS Sync)`;
+        }
+      } catch (wErr) {
+        console.warn('Weather sync error during telemetry ingestion:', wErr);
+      }
+    }
 
     const safeThreshold = Number(trip.safe_temp_threshold) || 8.0;
     const isTempBreached = cleanTemp !== null && cleanTemp > safeThreshold;
@@ -156,7 +172,7 @@ export async function POST(req: NextRequest) {
       current_lng: cleanLng,
       updated_at: recordedAt,
       last_telemetry_at: recordedAt,
-      telemetry_source: telemetrySource,
+      telemetry_source: resolvedSource,
     };
 
     // Bind driver assignment if not yet bound
@@ -164,7 +180,7 @@ export async function POST(req: NextRequest) {
       updatePayload.driver_id = callerDriverId;
     }
 
-    // Only update temperature fields if an actual temperature sensor was provided
+    // Update temperature fields with sensor or weather-synced value
     if (cleanTemp !== null) {
       updatePayload.current_temp = cleanTemp;
       updatePayload.has_temperature_breach = isTempBreached;
@@ -289,8 +305,8 @@ export async function POST(req: NextRequest) {
         speed_kmh: cleanSpeed,
         temperature: cleanTemp,
         humidity: cleanHum,
-        temperature_status: isPhoneGps ? 'No live reading — phone GPS beacon active' : cleanTemp != null ? 'CONNECTED' : 'DISCONNECTED',
-        source: telemetrySource,
+        temperature_status: cleanTemp != null ? (resolvedSource.includes('Weather') ? 'WEATHER_SYNCED' : 'SENSOR_CONNECTED') : 'GPS_BEACON_ACTIVE',
+        source: resolvedSource,
         timestamp: recordedAt,
       },
       assigned_driver_id: trip.driver_id || callerDriverId,

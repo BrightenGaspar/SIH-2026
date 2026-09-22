@@ -39,8 +39,8 @@ export default function LogisticsLandingPage() {
   const logisticsPillars = [
     {
       icon: ThermometerSnowflake,
-      title: 'IoT Cold-Chain Surveillance',
-      desc: 'Automated 4-8°C reefer temperature monitoring with real-time breach detection and instant IoT alert notifications.',
+      title: 'Weather-Synced GPS Fleet Tracking',
+      desc: 'Real-time GPS route monitoring combined with Open-Meteo meteorological weather synchronization to protect perishable harvest freshness.',
       color: 'text-amber-600 bg-amber-500/10 border-amber-500/20',
     },
     {
@@ -153,7 +153,7 @@ export default function LogisticsLandingPage() {
                 </Button>
               </Link>
               <Link href="/logistics/login" className="w-full sm:w-auto">
-                <Button variant="secondary" size="lg" className="w-full text-base px-8 py-4 border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold shadow-xs">
+                <Button size="lg" className="w-full text-base px-8 py-4 border-2 border-slate-300 bg-white hover:bg-slate-100 text-slate-900 font-extrabold shadow-sm">
                   <span>Operator Login</span>
                 </Button>
               </Link>
@@ -300,7 +300,7 @@ export default function LogisticsLandingPage() {
               </Button>
             </Link>
             <Link href="/logistics/login">
-              <Button variant="secondary" size="lg" className="bg-slate-800 hover:bg-slate-700 text-white border-slate-700 font-bold px-8">
+              <Button size="lg" className="bg-slate-800 hover:bg-slate-700 text-white border-2 border-slate-600 font-extrabold px-8 shadow-md">
                 Operator Login
               </Button>
             </Link>

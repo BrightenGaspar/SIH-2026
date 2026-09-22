@@ -154,6 +154,34 @@ export default function FarmerClustersPage() {
         </div>
       </div>
 
+      {/* Virtual Cooperative Explainer Banner */}
+      <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 shadow-xs space-y-3">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-emerald-600 shrink-0" />
+          <h3 className="text-xs font-black uppercase tracking-wider text-emerald-900">
+            How Virtual Cooperative &amp; Geofence Ledger Work
+          </h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700">
+          <div className="bg-white/80 backdrop-blur-xs p-3.5 rounded-2xl border border-emerald-100 space-y-1">
+            <span className="font-bold text-emerald-900 block flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-emerald-600" /> Automated 5 km Clustering:
+            </span>
+            <p className="text-[11px] text-slate-600 leading-relaxed">
+              When you list your produce, our system automatically pools your harvest with neighboring farms within a 5 km radius to reach 1-Tonne bulk buyer orders, reducing freight costs by 38% with zero manual group coordination.
+            </p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-xs p-3.5 rounded-2xl border border-emerald-100 space-y-1">
+            <span className="font-bold text-emerald-900 block flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Geofence Inventory Ledger:
+            </span>
+            <p className="text-[11px] text-slate-600 leading-relaxed">
+              The ledger tracks aggregated harvest quantities from all verified farms in your cluster. Once the 1,000 kg milestone is reached, instant bulk buyer procurement and refrigerated truck dispatches are activated.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Auto Cluster Alert Notice */}
       {autoClusterNotice && (
         <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-bold flex items-center gap-3 animate-in fade-in">

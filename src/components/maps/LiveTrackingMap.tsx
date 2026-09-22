@@ -64,17 +64,18 @@ export default function LiveTrackingMap({ trip, showTelemetryPopup = true }: Liv
 
   // Over-the-air Supabase Realtime channel subscription for live phone telemetry & GPS updates
   useEffect(() => {
-    if (!trip.id) return;
+    const targetId = trip.id || trip.tripId || trip.orderId;
+    if (!targetId) return;
 
     const channel = supabase
-      .channel(`live-tracking-map-${trip.id}`)
+      .channel(`live-tracking-map-${targetId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'logistics_telemetry_logs',
-          filter: `trip_id=eq.${trip.id}`,
+          filter: `trip_id=eq.${targetId}`,
         },
         (payload: any) => {
           const row = payload.new;
@@ -95,24 +96,25 @@ export default function LiveTrackingMap({ trip, showTelemetryPopup = true }: Liv
           event: 'UPDATE',
           schema: 'public',
           table: 'logistics_trips',
-          filter: `id=eq.${trip.id}`,
         },
         (payload: any) => {
           const row = payload.new;
-          if (row && row.current_lat != null && row.current_lng != null) {
-            const newPos: [number, number] = [Number(row.current_lat), Number(row.current_lng)];
-            setVehiclePosition(newPos);
-            setRouteCoordinates((prev) => {
-              const last = prev[prev.length - 1];
-              if (last && Math.abs(last[0] - newPos[0]) < 0.0001 && Math.abs(last[1] - newPos[1]) < 0.0001) {
-                return prev;
+          if (row && (row.id === targetId || row.order_id === targetId || row.id === trip.id || row.order_id === trip.orderId)) {
+            if (row.current_lat != null && row.current_lng != null) {
+              const newPos: [number, number] = [Number(row.current_lat), Number(row.current_lng)];
+              setVehiclePosition(newPos);
+              setRouteCoordinates((prev) => {
+                const last = prev[prev.length - 1];
+                if (last && Math.abs(last[0] - newPos[0]) < 0.0001 && Math.abs(last[1] - newPos[1]) < 0.0001) {
+                  return prev;
+                }
+                return [...prev, newPos];
+              });
+              if (row.current_temp != null) {
+                setTelemetryTemp(Number(row.current_temp));
               }
-              return [...prev, newPos];
-            });
-            if (row.current_temp != null) {
-              setTelemetryTemp(Number(row.current_temp));
+              setIsLiveStreaming(true);
             }
-            setIsLiveStreaming(true);
           }
         }
       )
@@ -121,7 +123,7 @@ export default function LiveTrackingMap({ trip, showTelemetryPopup = true }: Liv
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [trip.id]);
+  }, [trip.id, trip.tripId, trip.orderId]);
 
   const vehicleSvg = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18.5" r="2.5"/><circle cx="7" cy="18.5" r="2.5"/></svg>`;
   const vehicleIcon = createCustomIcon('#10b981', vehicleSvg, true);

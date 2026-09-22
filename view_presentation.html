@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriFlow AI — SIH 2026 Presentation Slides & Master Architecture</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0a0f1d; color: #f8fafc; min-height: 100vh; padding: 24px; }
+        .header { text-align: center; margin-bottom: 28px; }
+        .badge { display: inline-block; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 700; margin-bottom: 8px; letter-spacing: 0.05em; text-transform: uppercase; }
+        .header h1 { font-size: 32px; color: #ffffff; margin-bottom: 8px; font-weight: 800; }
+        .header p { font-size: 15px; color: #94a3b8; max-width: 800px; margin: 0 auto; }
+        
+        .download-bar { display: flex; justify-content: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .btn-download { background: #059669; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; }
+        .btn-download:hover { background: #10b981; transform: translateY(-2px); }
+        .btn-secondary { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+        .btn-secondary:hover { background: #334155; color: white; }
+
+        .slides-container { max-width: 1300px; margin: 30px auto; display: flex; flex-direction: column; gap: 32px; }
+        .slide-card { background: #111827; border: 1px solid #1e293b; border-radius: 20px; padding: 28px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6); }
+        .slide-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1f293d; padding-bottom: 16px; margin-bottom: 24px; }
+        .slide-num { font-size: 12px; font-weight: 800; color: #34d399; letter-spacing: 0.05em; text-transform: uppercase; }
+        .slide-title { font-size: 22px; font-weight: 800; color: #ffffff; margin-top: 4px; }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(440px, 1fr)); gap: 20px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+        .grid-rows { display: flex; flex-direction: column; gap: 16px; }
+
+        .box { background: #0e1526; border-radius: 16px; padding: 20px; border: 1.5px solid #1e293b; transition: transform 0.2s; }
+        .box:hover { transform: translateY(-2px); }
+        .box.emerald { border-color: #10b981; }
+        .box.cyan { border-color: #06b6d4; }
+        .box.amber { border-color: #f59e0b; }
+        .box.rose { border-color: #f43f5e; }
+        .box.purple { border-color: #a855f7; }
+
+        .box-tag { font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+        .box-title { font-size: 16px; font-weight: 800; color: #ffffff; margin-bottom: 4px; }
+        .box-subtitle { font-size: 12px; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
+        .box-desc { font-size: 13px; color: #cbd5e1; line-height: 1.5; }
+        .box-stat { font-size: 28px; font-weight: 900; color: #34d399; margin-bottom: 6px; }
+
+        ul.feat-list { list-style: none; padding: 0; margin-top: 8px; }
+        ul.feat-list li { font-size: 12px; color: #cbd5e1; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        ul.feat-list li::before { content: "•"; color: #34d399; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="badge">Smart India Hackathon 2026 • Problem Statement 33</div>
+        <h1>🌾 AgriFlow AI — Master Presentation Deck</h1>
+        <p>12 Clean, Mathematically Aligned Slides with Complete Cold-Chain IoT Architecture, 3-Tier Dynamic MSP Pricing, and T+0 Escrow Settlement.</p>
+        <div class="download-bar">
+            <a href="AgriFlow_AI_SIH_2026_Presentation.pptx" download class="btn-download">
+                📥 Download Presentation (.pptx)
+            </a>
+            <a href="agriflow_flowchart.html" class="btn-download btn-secondary">
+                🌐 View Master Flowchart
+            </a>
+        </div>
+    </div>
+
+    <div class="slides-container">
+        <!-- Slide 1 -->
+        <div class="slide-card">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-num">Slide 1 • Title Slide</div>
+                    <div class="slide-title">AgriFlow AI — Decentralized Smart Agri-Logistics & Direct Procurement Protocol</div>
+                </div>
+            </div>
+            <div class="box emerald" style="text-align: center; padding: 36px;">
+                <h2 style="font-size: 36px; font-weight: 900; color: #ffffff; margin-bottom: 12px;">AgriFlow AI</h2>
+                <p style="font-size: 18px; font-weight: 700; color: #38bdf8; margin-bottom: 16px;">Decentralized Smart Agri-Logistics & Direct Procurement Protocol</p>
+                <p style="font-size: 14px; color: #cbd5e1; max-width: 800px; margin: 0 auto 20px;">Empowering 140M+ Indian Farmers with AI Cold-Chain IoT Telematics, Direct Institutional Sourcing, and Guaranteed Above-MSP T+0 Bank Payouts.</p>
+                <div style="font-size: 13px; font-weight: 800; color: #f59e0b;">🌾 Multi-Stakeholder Ecosystem • 🌐 11 Indian Languages • ❄️ 0-4°C Active Cold Chain • ⚡ T+0 RBI Escrow</div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Completed IoT -->
+        <div class="slide-card">
+            <div class="slide-header">
+                <div>
+                    <div class="slide-num">Slide 8 • IoT Telematics & Perishable Preservation</div>
+                    <div class="slide-title">AI Cold-Chain Telematics & Active Perishable Preservation</div>
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="box cyan">
+                    <div class="box-tag">Hardware Sensors</div>
+                    <div class="box-title">❄️ 0-4°C Multi-Sensor IoT Telematics</div>
+                    <div class="box-subtitle">Microcontroller Hardware Telemetry Pipeline</div>
+                    <div class="box-desc">Continuous sampling via ESP32 / Teltonika FMB920 gateways: DS18B20 digital temperature probe (±0.1°C), DHT22 relative humidity sensor (85-90% RH), and MQ-4 ethylene gas ppm sensor.</div>
+                </div>
+                <div class="box emerald">
+                    <div class="box-tag">Predictive AI</div>
+                    <div class="box-title">📉 Arrhenius Kinetic Decay Modeling</div>
+                    <div class="box-subtitle">AI Spoilage Risk & Shelf-Life Calculation</div>
+                    <div class="box-desc">Real-time shelf-life loss computation (k = A·e^(-Ea/RT)) comparing ambient storage degradation (3-4 days) vs active cold-chain stabilization (18-21 days) with automatic quality alerts.</div>
+                </div>
+                <div class="box amber">
+                    <div class="box-tag">Smart Routing</div>
+                    <div class="box-title">🗺️ Dynamic Cold-Corridor GPS Routing</div>
+                    <div class="box-subtitle">Autonomous Heat & Congestion Avoidance</div>
+                    <div class="box-desc">Live PostGIS GPS telemetry streams trigger automatic re-routing away from urban heat islands and road gridlocks, preserving cooling compressor battery cycles and cargo integrity.</div>
+                </div>
+                <div class="box purple">
+                    <div class="box-tag">QC Provenance</div>
+                    <div class="box-title">📱 Cryptographic QR Cold Waybill</div>
+                    <div class="box-subtitle">Tamper-Proof Farm-to-Fork Provenance</div>
+                    <div class="box-desc">Generates immutable SHA-256 digital waybills encoding farm origin, continuous reefer temperature compliance, and driver GPS timestamps for buyer receipt sign-off.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

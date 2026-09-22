@@ -422,21 +422,45 @@ export const farmerService = {
   /**
    * Delete a produce item directly from authoritative public.produce_listings table
    */
-  async deleteProduce(id: string): Promise<void> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user?.id) {
-      throw new Error('Authentication required to delete a produce listing.');
-    }
+  async deleteProduce(id: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const session = (await supabase.auth.getSession()).data.session;
+      const token = session?.access_token;
 
-    const { error: listingErr } = await supabase
-      .from('produce_listings')
-      .delete()
-      .eq('id', id)
-      .eq('farmer_id', user.id);
+      if (token) {
+        const response = await fetch('/api/farmer/produce/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify({ produceId: id }),
+        });
 
-    if (listingErr) {
-      console.error('Supabase produce_listings delete error:', listingErr.message);
-      throw new Error(listingErr.message || 'Failed to delete produce listing.');
+        const resData = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(resData.error || `Failed to delete produce listing (${response.status})`);
+        }
+
+        return { success: true };
+      }
+
+      // Fallback: direct Supabase call if no token available
+      const { data: { user } } = await supabase.auth.getUser();
+      let query = supabase.from('produce_listings').delete().eq('id', id);
+      if (user?.id) {
+        query = query.eq('farmer_id', user.id);
+      }
+      const { error: listingErr } = await query;
+
+      if (listingErr) {
+        throw new Error(listingErr.message || 'Failed to delete produce listing.');
+      }
+
+      return { success: true };
+    } catch (err: any) {
+      console.error('deleteProduce error:', err);
+      throw err;
     }
   },
 

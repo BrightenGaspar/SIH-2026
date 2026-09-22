@@ -315,23 +315,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn('Supabase signInWithOtp warning:', sbErr);
       }
 
-      // 2. Dispatch real SMS to mobile device via Fast2SMS gateway API route
-      try {
-        await fetch('/api/auth/send-sms', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            phone: target10,
-            otp: '112009',
-          }),
-        });
-      } catch (smsErr) {
-        console.warn('Direct SMS dispatch notification:', smsErr);
+      // 2. If test mobile number, also dispatch direct Fast2SMS backup with test OTP 112009
+      if (target10 === '6303796193' || target10 === '630379693') {
+        try {
+          await fetch('/api/auth/send-sms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              phone: target10,
+              otp: '112009',
+            }),
+          });
+        } catch (smsErr) {
+          console.warn('Direct SMS dispatch notification:', smsErr);
+        }
       }
 
+      const isTestNumber = target10 === '6303796193' || target10 === '630379693';
       return {
         success: true,
-        message: `Real SMS OTP dispatched to ${fullPhone}. (Enter received SMS OTP or code 112009)`,
+        message: isTestNumber
+          ? `Real SMS OTP sent to ${fullPhone}. (Enter received SMS OTP or code 112009)`
+          : `SMS verification code dispatched to ${fullPhone}. Enter the OTP received on your mobile.`,
       };
     } catch (err: unknown) {
       console.warn('sendPhoneOtp exception:', err);
@@ -406,17 +411,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!profile) {
         // Auto-provision profile with target role so mobile users can immediately access their dashboard
+        const roleTitle = targetRole === 'farmer' ? 'Farmer' : targetRole === 'consumer' ? 'Buyer' : 'Transporter';
         const generatedUsername = await generateUniqueUsername(
-          `farmer_${targetDigits.slice(-4)}`,
+          `${targetRole}_${targetDigits.slice(-4)}`,
           authUser.id
         );
         const { profile: newProfile } = await upsertProfile({
           id: authUser.id,
-          full_name: (authUser.user_metadata?.full_name as string) || `Verified Farmer (${targetDigits})`,
+          full_name: (authUser.user_metadata?.full_name as string) || `Verified ${roleTitle} (${targetDigits.slice(-4)})`,
           username: generatedUsername,
           role: targetRole,
           phone: fullPhone,
-          place: 'Chevella Mandi',
+          place: targetRole === 'farmer' ? 'Chevella Mandi' : targetRole === 'consumer' ? 'Hyderabad Market' : 'Transport Depot',
           area: 'Rangareddy District',
           state: 'Telangana',
           district: 'Rangareddy',

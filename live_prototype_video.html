@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriFlow AI — Live Prototype Demonstration Video</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body {
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+    .container {
+      width: 100%;
+      max-width: 1280px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e293b;
+      padding: 18px 24px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+    }
+    .brand-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-subtitle {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .badge {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #020617;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      border: 2px solid #334155;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .controls {
+      background: #1e293b;
+      padding: 16px 24px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    button {
+      background: #334155;
+      color: #f8fafc;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #475569;
+      transform: translateY(-1px);
+    }
+    button.primary {
+      background: #10b981;
+      color: #022c22;
+    }
+    button.primary:hover {
+      background: #34d399;
+    }
+    button.record-btn {
+      background: #ef4444;
+      color: #ffffff;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.85; }
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #334155;
+      border-radius: 9999px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #38bdf8, #f59e0b, #10b981);
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+    .step-pill {
+      background: #0f172a;
+      border: 1px solid #334155;
+      color: #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .step-pill.active {
+      background: #10b981;
+      color: #022c22;
+      border-color: #34d399;
+    }
+    .narration-box {
+      background: #1e293b;
+      border-left: 4px solid #10b981;
+      padding: 16px 20px;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
+    .narration-quote {
+      font-weight: 700;
+      color: #34d399;
+      margin-bottom: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <div class="brand-title">
+          <span>🌱 AgriFlow AI</span>
+          <span style="font-size:16px; color:#cbd5e1; font-weight:400;">|</span>
+          <span style="font-size:18px; color:#f8fafc;">Live Prototype Video Demonstration</span>
+        </div>
+        <div class="brand-subtitle">
+          5-Stage Autonomous Perishable Supply Chain & Smart Escrow Flow
+        </div>
+      </div>
+      <div class="badge">60 FPS 1080p Full-HD Video</div>
+    </header>
+
+    <div class="video-wrapper">
+      <canvas id="videoCanvas" width="1920" height="1080"></canvas>
+    </div>
+
+    <div class="controls">
+      <div class="progress-bar-container" id="progressContainer">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+
+      <div class="controls-row">
+        <div class="btn-group">
+          <button class="primary" id="playPauseBtn">▶ Play Demonstration</button>
+          <button id="restartBtn">↺ Restart</button>
+          <button class="record-btn" id="recordBtn">⏺ Record &amp; Download Video (.webm / .mp4)</button>
+        </div>
+
+        <div class="btn-group">
+          <button class="step-pill active" onclick="jumpToStage(1)">1. Farmer Listing</button>
+          <button class="step-pill" onclick="jumpToStage(2)">2. Atomic Lock</button>
+          <button class="step-pill" onclick="jumpToStage(3)">3. Carrier Accept</button>
+          <button class="step-pill" onclick="jumpToStage(4)">4. GPS Live Map</button>
+          <button class="step-pill" onclick="jumpToStage(5)">5. Escrow Release</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="narration-box">
+      <div class="narration-quote">🗣️ Live Pitch & Demonstration Narration:</div>
+      <p id="narrationText">
+        &ldquo;Let’s demonstrate the live prototype. Here, a Farmer lists 1,000 kilograms of tomatoes. Immediately, a Buyer sees this on the marketplace and places an order. Notice how the system performs an Atomic Stock Lock in the database to reserve that stock. Then, the Logistics Partner accepts the trip. The driver starts their phone’s GPS, and you can see the Live Map updating in real-time. Finally, upon delivery, the buyer verifies with an OTP, and the Escrow payment is instantly released to the farmer.&rdquo;
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('videoCanvas');
+    const ctx = canvas.getContext('2d');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const progressBar = document.getElementById('progressBar');
+    const progressContainer = document.getElementById('progressContainer');
+    const narrationText = document.getElementById('narrationText');
+    const stepPills = document.querySelectorAll('.step-pill');
+
+    const TOTAL_DURATION_MS = 25000; // 25 seconds total demo duration
+    let currentTimeMs = 0;
+    let isPlaying = true;
+    let lastTimestamp = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+
+    // 5 Stages timestamps (in ms)
+    const STAGES = [
+      {
+        id: 1,
+        start: 0,
+        end: 5000,
+        title: "STAGE 1: FARMER LISTS 1,000 KG TOMATOES",
+        subtitle: "Farmer Ramesh Reddy posts 1,000 kg Grade-A Hybrid Tomatoes from Shadnagar Hub",
+        portal: "FARMER PORTAL (/farmer/produce)",
+        theme: "#10b981",
+        narration: "Here, a Farmer lists 1,000 kilograms of freshly harvested tomatoes at ₹32/kg on the AgriFlow platform."
+      },
+      {
+        id: 2,
+        start: 5000,
+        end: 10000,
+        title: "STAGE 2: BUYER PLACES ORDER & ATOMIC STOCK LOCK",
+        subtitle: "Buyer Ananya Sharma (FreshMart) orders full lot -> Concurrency Lock reserves stock",
+        portal: "BUYER MARKETPLACE (/consumer/marketplace)",
+        theme: "#2563eb",
+        narration: "Immediately, a Buyer sees this on the marketplace and places an order. Notice how the system performs an Atomic Stock Lock in the database to reserve that stock."
+      },
+      {
+        id: 3,
+        start: 10000,
+        end: 14000,
+        title: "STAGE 3: LOGISTICS PARTNER ACCEPTS TRIP",
+        subtitle: "Mohammed Ismail (Tata 407 Reefer • TS 08 UB 4192) accepts 74 km perishable dispatch",
+        portal: "LOGISTICS FLEET (/logistics/dashboard)",
+        theme: "#f59e0b",
+        narration: "Then, the Logistics Partner accepts the trip on the fleet command dashboard."
+      },
+      {
+        id: 4,
+        start: 14000,
+        end: 20000,
+        title: "STAGE 4: DRIVER SMARTPHONE GPS BEACON & LIVE MAP",
+        subtitle: "Encrypted telematics streaming highway coordinates + Open-Meteo weather sync",
+        portal: "LIVE HIGHWAY MAP (/consumer/tracking)",
+        theme: "#06b6d4",
+        narration: "The driver starts their phone’s GPS, and you can see the Live Map updating in real-time."
+      },
+      {
+        id: 5,
+        start: 20000,
+        end: 25000,
+        title: "STAGE 5: DELIVERY OTP VERIFIED & INSTANT ESCROW RELEASE",
+        subtitle: "Buyer confirms cargo with OTP POD-TOMATO-842 -> ₹28,800 credited to Farmer UPI in <1s",
+        portal: "INSTANT SETTLEMENT (T+0)",
+        theme: "#10b981",
+        narration: "Finally, upon delivery, the buyer verifies with an OTP, and the Escrow payment is instantly released to the farmer."
+      }
+    ];
+
+    function getCurrentStage() {
+      for (const s of STAGES) {
+        if (currentTimeMs >= s.start && currentTimeMs < s.end) return s;
+      }
+      return STAGES[STAGES.length - 1];
+    }
+
+    function renderFrame() {
+      const stage = getCurrentStage();
+      const stageProgress = (currentTimeMs - stage.start) / (stage.end - stage.start);
+      const totalProgress = currentTimeMs / TOTAL_DURATION_MS;
+
+      // Update UI Progress bar
+      progressBar.style.width = `${totalProgress * 100}%`;
+      stepPills.forEach((p, idx) => {
+        if (idx === stage.id - 1) p.classList.add('active');
+        else p.classList.remove('active');
+      });
+
+      // Clear Canvas & Background
+      ctx.fillStyle = "#090d16";
+      ctx.fillRect(0, 0, 1920, 1080);
+
+      // Top Glass Navbar
+      ctx.fillStyle = "#111827";
+      ctx.fillRect(60, 40, 1800, 100);
+      ctx.strokeStyle = stage.theme;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(60, 40, 1800, 100);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 32px -apple-system, sans-serif";
+      ctx.fillText("AGRIFLOW AI — LIVE PROTOTYPE DEMONSTRATION", 100, 100);
+
+      // Portal Badge
+      ctx.fillStyle = stage.theme;
+      ctx.fillRect(1460, 60, 360, 60);
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 22px -apple-system, sans-serif";
+      ctx.fillText(stage.portal, 1480, 98);
+
+      // Main Card Container
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(60, 170, 1800, 850);
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(60, 170, 1800, 850);
+
+      // Stage Header Title
+      ctx.fillStyle = stage.theme;
+      ctx.font = "bold 44px -apple-system, sans-serif";
+      ctx.fillText(stage.title, 100, 240);
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "24px -apple-system, sans-serif";
+      ctx.fillText(stage.subtitle, 100, 285);
+
+      // Divider
+      ctx.strokeStyle = "#1e293b";
+      ctx.beginPath();
+      ctx.moveTo(100, 315);
+      ctx.lineTo(1820, 315);
+      ctx.stroke();
+
+      // ================= STAGE SPECIFIC RENDERING =================
+      if (stage.id === 1) {
+        // --- STAGE 1: Farmer Listing 1,000 kg Tomatoes ---
+        drawCard(100, 350, 520, 600, "1. Harvest Specification", stage.theme, [
+          "Crop: Red Tomato (Hybrid Desi)",
+          "Listing Quantity: 1,000 kg",
+          "Unit Price: ₹32.00 / kg",
+          "Grade: Grade A (Optical CV Verified)",
+          "Location: Shadnagar FPO Cluster Hub",
+          "Shelf Life: 5 Days Safe Window"
+        ]);
+
+        drawCard(660, 350, 560, 600, "2. AI Pricing Engine", "#10b981", [
+          "Mumbai Vashi Deficit: 34 Tonnes Shortage",
+          "AI Recommended Price: ₹52.92 / kg",
+          "Govt MSP Floor: ₹24.00 / kg",
+          "Mandi Distress Baseline: ₹22.00 / kg",
+          "Farmer Uplift: +60.5% Net Profit",
+          "Zero Middleman Cuts: 100% Direct Sale"
+        ]);
+
+        drawCard(1260, 350, 560, 600, "3. Database Synchronization", "#38bdf8", [
+          "Supabase Table: public.produce",
+          "Status: Active & Available on Marketplace",
+          "Multilingual JSONB: {en, hi, te, ta}",
+          "Realtime WebSocket Sync: <1s Latency",
+          "Audit Trail: Lot #LOT-2026-TOMATO-842",
+          "State: READY_FOR_BUYER_ORDER"
+        ]);
+
+      } else if (stage.id === 2) {
+        // --- STAGE 2: Buyer Purchase & Atomic Stock Lock ---
+        drawCard(100, 350, 520, 600, "1. Buyer Order Placed", "#2563eb", [
+          "Buyer: Ananya Sharma (FreshMart)",
+          "Order ID: ORD-LIVE-TOMATO-842",
+          "Ordered Volume: 1,000 kg",
+          "Total Amount: ₹32,000.00",
+          "Destination: Bowenpally APMC Terminal",
+          "Status: Order Placed & Escrow Locked"
+        ]);
+
+        // Animated Atomic Lock Graphic
+        drawCard(660, 350, 560, 600, "2. ⚡ ATOMIC STOCK LOCK (DATABASE)", "#ef4444", [
+          "Concurrency Lock: Row-Level Database Lock",
+          "Stock Deduction: 1,000 kg -> 0 kg (RESERVED)",
+          "Isolation Level: Serializable Transaction",
+          "Double-Selling Prevention: 100% Guaranteed",
+          "Race Condition Avoidance: Verified in PostgreSQL",
+          "Result: Stock locked exclusively for Ananya"
+        ]);
+
+        drawCard(1260, 350, 560, 600, "3. Smart Escrow Vault", "#10b981", [
+          "Escrow Amount: ₹28,800.00 (Farmer Share)",
+          "Logistics Escrow: ₹2,400.00 (Freight Share)",
+          "Platform Fee: ₹800.00",
+          "Vault Status: SECURE_LOCKED IN ESCROW",
+          "Release Trigger: Validated Buyer Delivery OTP",
+          "Payment Security: Zero Default Risk for Farmer"
+        ]);
+
+      } else if (stage.id === 3) {
+        // --- STAGE 3: Logistics Partner Accepts Trip ---
+        drawCard(100, 350, 520, 600, "1. Assigned Fleet Carrier", "#f59e0b", [
+          "Driver: Mohammed Ismail",
+          "Mobile: +91 98480 22341",
+          "Vehicle: Tata 407 Reefer",
+          "Vehicle Number: TS 08 UB 4192",
+          "Payload Weight: 1,000 kg / 2,500 kg",
+          "Driver Escrow Pay: ₹2,400.00 Guaranteed"
+        ]);
+
+        drawCard(660, 350, 560, 600, "2. Reefer Cold-Chain Route", "#06b6d4", [
+          "Trip Code: TRIP-HYD-TOMATO-842",
+          "Pickup: Shadnagar Farmgate Hub (0 km)",
+          "Destination: Bowenpally APMC (74 km)",
+          "Reefer Setpoint: 4.0°C - 8.0°C",
+          "Estimated Transit: 2.5 Hours on NH 44",
+          "Status: Haul Accepted & Trip In-Transit"
+        ]);
+
+        drawCard(1260, 350, 560, 600, "3. Return Load AI Match", "#10b981", [
+          "Backhaul Cargo: Organic Seedlings & Compost",
+          "Return Route: Bowenpally -> Shadnagar",
+          "Extra Driver Earnings: +₹2,800.00",
+          "Empty Miles Avoided: 68 km",
+          "CO2 Emission Reduction: 42 kg Carbon",
+          "Zero Deadhead Highway Runs"
+        ]);
+
+      } else if (stage.id === 4) {
+        // --- STAGE 4: Driver Smartphone GPS & Live Map ---
+        const mapProgress = stageProgress;
+        const currentKm = Math.round(mapProgress * 74);
+        const currentTemp = (5.0 + mapProgress * 1.5).toFixed(1);
+
+        // Highway Simulation Map Box
+        ctx.fillStyle = "#020617";
+        ctx.fillRect(100, 350, 1080, 600);
+        ctx.strokeStyle = "#06b6d4";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(100, 350, 1080, 600);
+
+        // Map Header
+        ctx.fillStyle = "#06b6d4";
+        ctx.font = "bold 28px -apple-system, sans-serif";
+        ctx.fillText("🛰️ LIVE HIGHWAY GPS ROUTE (NH 44 CORRIDOR)", 130, 400);
+
+        // Draw Highway Line
+        const startX = 160, startY = 650;
+        const endX = 1100, endY = 480;
+        ctx.strokeStyle = "#334155";
+        ctx.lineWidth = 14;
+        ctx.lineCap = "round";
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+
+        // Completed Highway Line
+        const truckX = startX + (endX - startX) * mapProgress;
+        const truckY = startY + (endY - startY) * mapProgress;
+
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 14;
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(truckX, truckY);
+        ctx.stroke();
+
+        // Waypoint Markers
+        drawWaypoint(startX, startY, "Shadnagar (KM 0)");
+        drawWaypoint(startX + (endX - startX) * 0.35, startY + (endY - startY) * 0.35, "Shamshabad Toll (KM 36)");
+        drawWaypoint(startX + (endX - startX) * 0.70, startY + (endY - startY) * 0.70, "Mehdipatnam (KM 60)");
+        drawWaypoint(endX, endY, "Bowenpally Terminal (KM 74)");
+
+        // Moving Truck Icon
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(truckX, truckY, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 4;
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 18px -apple-system, sans-serif";
+        ctx.fillText("🚚 TATA 407 REEFER", truckX - 70, truckY - 30);
+
+        // Right Telemetry Cards
+        drawCard(1220, 350, 600, 600, "Real-Time Telemetry & Weather", "#06b6d4", [
+          `Highway Position: ${currentKm} / 74 km completed`,
+          `Live GPS Lat/Lng: [${(17.0689 + mapProgress * 0.3161).toFixed(4)}, ${(78.2045 + mapProgress * 0.2822).toFixed(4)}]`,
+          `Ambient Road Temp: ${currentTemp}°C (Open-Meteo Synced)`,
+          "Chamber Temperature: 5.4°C (Optimal 4-8°C)",
+          "Relative Humidity: 88% RH (Freshness Safe)",
+          "Hardware Requirement: Phone GPS (Zero Extra Cost)",
+          "Spoilage Risk: LOW (Zero Thermal Drift)"
+        ]);
+
+      } else if (stage.id === 5) {
+        // --- STAGE 5: Delivery OTP Verified & Instant Escrow Release ---
+        drawCard(100, 350, 520, 600, "1. Delivery Verification", "#10b981", [
+          "Destination APMC: Bowenpally, Hyderabad",
+          "Verification OTP: POD-TOMATO-842",
+          "Cargo Quality: 100% Intact & Fresh",
+          "Arrival Timestamp: 11:42 AM Verified",
+          "Digital Proof of Delivery: Signed by Ananya",
+          "Consignment Status: DELIVERED & CLOSED"
+        ]);
+
+        drawCard(660, 350, 560, 600, "2. 💸 INSTANT SMART ESCROW PAYOUT", "#10b981", [
+          "Farmer Payout: ₹28,800.00 Released Instantly",
+          "Settlement Speed: <1 Second (T+0 Same-Day)",
+          "Payment Channel: Direct UPI / Bank Transfer",
+          "Transporter Freight: ₹2,400.00 Credited",
+          "Escrow Contract Status: EXECUTED & CLOSED",
+          "Zero Payment Disputes or Broker Deductions"
+        ]);
+
+        drawCard(1260, 350, 560, 600, "3. Final Impact Summary", "#8b5cf6", [
+          "Traditional Mandi Return: ₹22,000.00",
+          "AgriFlow Direct Realization: ₹32,000.00",
+          "Net Farmer Gain: +₹10,000.00 Extra Income",
+          "Buyer Savings: -18% Below Retail Broker",
+          "Food Loss Mitigated: 0 kg (100% Preserved)",
+          "Outcome: Farmer, Buyer & Transporter WIN"
+        ]);
+      }
+
+      // Bottom Progress Banner
+      ctx.fillStyle = "#1e293b";
+      ctx.fillRect(100, 960, 1720, 40);
+      ctx.fillStyle = "#34d399";
+      ctx.font = "bold 20px -apple-system, sans-serif";
+      ctx.fillText(`✓ Live Demonstration Stage ${stage.id}/5 Active • Realtime PostgreSQL & Open-Meteo Telemetry Engine`, 120, 988);
+    }
+
+    function drawCard(x, y, w, h, title, headerColor, points) {
+      // Card background
+      ctx.fillStyle = "#111827";
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeStyle = "#334155";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(x, y, w, h);
+
+      // Card Header
+      ctx.fillStyle = headerColor;
+      ctx.fillRect(x, y, w, 70);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 24px -apple-system, sans-serif";
+      ctx.fillText(title, x + 24, y + 44);
+
+      // Card Content Points
+      ctx.font = "20px -apple-system, sans-serif";
+      let py = y + 120;
+      points.forEach(pt => {
+        ctx.fillStyle = "#38bdf8";
+        ctx.fillText("✓", x + 24, py);
+        ctx.fillStyle = "#f1f5f9";
+        ctx.fillText(pt, x + 54, py);
+        py += 64;
+      });
+    }
+
+    function drawWaypoint(x, y, label) {
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "14px -apple-system, sans-serif";
+      ctx.fillText(label, x - 50, y + 30);
+    }
+
+    // Animation Loop (60 FPS)
+    function animate(timestamp) {
+      if (!lastTimestamp) lastTimestamp = timestamp;
+      const deltaTime = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+
+      if (isPlaying) {
+        currentTimeMs += deltaTime;
+        if (currentTimeMs >= TOTAL_DURATION_MS) {
+          currentTimeMs = 0; // Loop or end
+          if (isRecording) stopRecording();
+        }
+      }
+
+      renderFrame();
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+
+    // Controls Handlers
+    playPauseBtn.onclick = () => {
+      isPlaying = !isPlaying;
+      playPauseBtn.textContent = isPlaying ? "⏸ Pause Demonstration" : "▶ Resume Demonstration";
+    };
+
+    restartBtn.onclick = () => {
+      currentTimeMs = 0;
+      isPlaying = true;
+      playPauseBtn.textContent = "⏸ Pause Demonstration";
+    };
+
+    function jumpToStage(num) {
+      const stage = STAGES.find(s => s.id === num);
+      if (stage) {
+        currentTimeMs = stage.start;
+        isPlaying = true;
+        playPauseBtn.textContent = "⏸ Pause Demonstration";
+      }
+    }
+
+    progressContainer.onclick = (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percent = clickX / rect.width;
+      currentTimeMs = percent * TOTAL_DURATION_MS;
+    };
+
+    // Video Recording Implementation via MediaRecorder
+    recordBtn.onclick = () => {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    };
+
+    function startRecording() {
+      recordedChunks = [];
+      currentTimeMs = 0;
+      isPlaying = true;
+      isRecording = true;
+      recordBtn.textContent = "⏹ Stop & Save Video File";
+      recordBtn.style.background = "#dc2626";
+
+      const stream = canvas.captureStream(60); // 60 FPS Stream
+      const options = { mimeType: 'video/webm;codecs=vp9' };
+
+      try {
+        mediaRecorder = new MediaRecorder(stream, options);
+      } catch (e) {
+        mediaRecorder = new MediaRecorder(stream);
+      }
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = saveVideoFile;
+      mediaRecorder.start(100);
+    }
+
+    function stopRecording() {
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+      isRecording = false;
+      recordBtn.textContent = "⏺ Record & Download Video (.webm / .mp4)";
+      recordBtn.style.background = "#ef4444";
+    }
+
+    function saveVideoFile() {
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'AgriFlow_AI_Live_Prototype_Demonstration_1080p.webm';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 100);
+    }
+  </script>
+</body>
+</html>

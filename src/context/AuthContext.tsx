@@ -519,18 +519,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // 3. Google OAuth: Real Supabase OAuth flow
-  const loginWithGoogle = async (role: 'farmer' | 'consumer' | 'logistics' | 'fpo'): Promise<void> => {
+  const loginWithGoogle = async (role: 'farmer' | 'consumer' | 'logistics' | 'fpo' | 'buyer' = 'consumer'): Promise<void> => {
     setIsLoading(true);
     try {
-      const targetRole = role === 'fpo' ? 'farmer' : role;
+      const nextPath = (role === 'farmer' || role === 'fpo')
+        ? '/farmer/dashboard'
+        : (role === 'logistics' ? '/logistics/dashboard' : '/buyer/dashboard');
+
       const redirectTo = typeof window !== 'undefined'
-        ? `${window.location.origin}/auth/callback?role=${targetRole}`
+        ? `${window.location.origin}/auth/callback?next=${nextPath}`
         : undefined;
 
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo,
+          redirectTo: redirectTo || `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback?next=/buyer/dashboard`,
         },
       });
 

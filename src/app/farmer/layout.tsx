@@ -47,7 +47,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 
   React.useEffect(() => {
     if (!isPublicRoute && !isLoading) {
-      if (!isAuthenticated && !user && !currentUser) {
+      if (!isAuthenticated) {
         router.push('/farmer/login');
       } else if (currentUser?.role === 'admin') {
         // Admins have universal inspection access across all portals
@@ -70,7 +70,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
     );
   }
 
-  if (!isAuthenticated && !user && !currentUser) {
+  if (!isAuthenticated) {
     return null;
   }
 

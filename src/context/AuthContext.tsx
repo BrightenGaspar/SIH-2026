@@ -145,6 +145,58 @@ function normalizeToLogistics(p: UserProfile): LogisticsOperator {
   };
 }
 
+export const DEMO_PROFILES: Record<string, UserProfile> = {
+  farmer: {
+    id: '00000000-0000-4000-8000-000000000001',
+    full_name: 'Ramesh Reddy (Farmer / FPO)',
+    username: 'ramesh_farmer',
+    email: 'farmer@agriflow.in',
+    phone: '+91 98480 12345',
+    place: 'Shadnagar FPO',
+    area: 'Ranga Reddy District',
+    state: 'Telangana',
+    district: 'Ranga Reddy',
+    fpo_name: 'Shadnagar Organic Farmers Producer Co.',
+    role: 'farmer',
+  },
+  consumer: {
+    id: '00000000-0000-4000-8000-000000000002',
+    full_name: 'Ananya Sharma (Verified Buyer)',
+    username: 'ananya_buyer',
+    email: 'buyer@agriflow.in',
+    phone: '+91 98480 54321',
+    place: 'Hyderabad Retail Mart',
+    area: 'Madhapur Hub',
+    state: 'Telangana',
+    district: 'Hyderabad',
+    role: 'consumer',
+  },
+  logistics: {
+    id: '00000000-0000-4000-8000-000000000003',
+    full_name: 'Mohammed Ismail (Transporter)',
+    username: 'ismail_logistics',
+    email: 'logistics@agriflow.in',
+    phone: '+91 98480 22341',
+    place: 'Bowenpally Terminal',
+    area: 'Secunderabad',
+    state: 'Telangana',
+    district: 'Hyderabad',
+    role: 'logistics',
+  },
+  admin: {
+    id: '00000000-0000-4000-8000-000000000004',
+    full_name: 'AgriFlow Administrator',
+    username: 'admin',
+    email: 'admin@agriflow.in',
+    phone: '+91 98480 99999',
+    place: 'Headquarters',
+    area: 'Hyderabad',
+    state: 'Telangana',
+    district: 'Hyderabad',
+    role: 'admin',
+  },
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null>(null);
   const [user, setUser] = useState<FarmerUser | null>(null);
@@ -190,22 +242,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         district: profile?.district || null,
         fpo_name: profile?.fpo_name || null,
       });
+
+      if (!profile || !isProfileComplete(profile)) {
+        setUser(null);
+        setConsumerUser(null);
+        setLogisticsUser(null);
+        return;
+      }
+
+      // Explicitly SPLIT Farmer vs Consumer Persona States:
+      // Both Farmer and Consumer personas retain full access to Logistics.
+      if (rawRole === 'farmer') {
+        setUser(normalizeToFarmer(profile));
+        setConsumerUser(null);
+        setLogisticsUser(normalizeToLogistics(profile)); // Farmer has logistics dispatch access
+      } else if (rawRole === 'consumer') {
+        setUser(null);
+        setConsumerUser(normalizeToConsumer(profile));
+        setLogisticsUser(normalizeToLogistics(profile)); // Consumer has logistics tracking & freight access
+      } else if (rawRole === 'logistics') {
+        setUser(null);
+        setConsumerUser(null);
+        setLogisticsUser(normalizeToLogistics(profile));
+      } else if (rawRole === 'admin') {
+        setUser(normalizeToFarmer(profile));
+        setConsumerUser(normalizeToConsumer(profile));
+        setLogisticsUser(normalizeToLogistics(profile));
+      } else {
+        setUser(null);
+        setConsumerUser(normalizeToConsumer(profile));
+        setLogisticsUser(normalizeToLogistics(profile));
+      }
     } else {
       setCurrentUser(null);
-    }
-
-    if (!profile || !isProfileComplete(profile)) {
       setUser(null);
       setConsumerUser(null);
       setLogisticsUser(null);
-      return;
     }
-
-    // Populate all role personas from the user's verified profile so that
-    // the user can navigate to /farmer, /consumer, or /logistics seamlessly
-    setUser(normalizeToFarmer(profile));
-    setConsumerUser(normalizeToConsumer(profile));
-    setLogisticsUser(normalizeToLogistics(profile));
   }, []);
 
   // Fetch real persistent profile from Supabase Database (Source of Truth)
@@ -240,7 +313,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             applyProfileState(profile, session.user);
           }
         } else if (mounted) {
-          applyProfileState(null, null);
+          const activeDemoRole = typeof window !== 'undefined' ? localStorage.getItem('agriflow_active_demo_role') : null;
+          if (activeDemoRole && DEMO_PROFILES[activeDemoRole]) {
+            applyProfileState(DEMO_PROFILES[activeDemoRole]);
+          } else {
+            applyProfileState(null, null);
+          }
         }
       } catch (err) {
         console.warn('initAuth error:', err);
@@ -469,59 +547,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const demoLogin = async (targetRole: 'farmer' | 'consumer' | 'logistics' | 'admin' = 'farmer'): Promise<void> => {
     setIsLoading(true);
     try {
-      const demoUsers: Record<string, UserProfile> = {
-        farmer: {
-          id: '00000000-0000-4000-8000-000000000001',
-          full_name: 'Ramesh Reddy (Farmer / FPO)',
-          username: 'ramesh_farmer',
-          email: 'farmer@agriflow.in',
-          phone: '+91 98480 12345',
-          place: 'Shadnagar FPO',
-          area: 'Ranga Reddy District',
-          state: 'Telangana',
-          district: 'Ranga Reddy',
-          fpo_name: 'Shadnagar Organic Farmers Producer Co.',
-          role: 'farmer',
-        },
-        consumer: {
-          id: '00000000-0000-4000-8000-000000000002',
-          full_name: 'Ananya Sharma (Verified Buyer)',
-          username: 'ananya_buyer',
-          email: 'buyer@agriflow.in',
-          phone: '+91 98480 54321',
-          place: 'Hyderabad Retail Mart',
-          area: 'Madhapur Hub',
-          state: 'Telangana',
-          district: 'Hyderabad',
-          role: 'consumer',
-        },
-        logistics: {
-          id: '00000000-0000-4000-8000-000000000003',
-          full_name: 'Mohammed Ismail (Transporter)',
-          username: 'ismail_logistics',
-          email: 'logistics@agriflow.in',
-          phone: '+91 98480 22341',
-          place: 'Bowenpally Terminal',
-          area: 'Secunderabad',
-          state: 'Telangana',
-          district: 'Hyderabad',
-          role: 'logistics',
-        },
-        admin: {
-          id: '00000000-0000-4000-8000-000000000004',
-          full_name: 'AgriFlow Administrator',
-          username: 'admin',
-          email: 'admin@agriflow.in',
-          phone: '+91 98480 99999',
-          place: 'Headquarters',
-          area: 'Hyderabad',
-          state: 'Telangana',
-          district: 'Hyderabad',
-          role: 'admin',
-        },
-      };
-
-      const selected = demoUsers[targetRole] || demoUsers.farmer;
+      const selected = DEMO_PROFILES[targetRole] || DEMO_PROFILES.farmer;
       applyProfileState(selected);
       if (typeof window !== 'undefined') {
         try {
@@ -547,16 +573,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const cleanIdent = identifier.trim().toLowerCase();
       let targetEmail = cleanIdent;
 
-      // Demo quick match
-      if (cleanIdent === 'farmer' || cleanIdent === 'farmer@agriflow.in' || cleanIdent === 'ramesh') {
+      // Demo quick match with role separation
+      if (
+        cleanIdent === 'farmer' ||
+        cleanIdent === 'farmer@agriflow.in' ||
+        cleanIdent === 'ramesh' ||
+        cleanIdent === 'ramesh_farmer'
+      ) {
         await demoLogin('farmer');
         return { success: true, role: 'farmer' };
       }
-      if (cleanIdent === 'consumer' || cleanIdent === 'buyer' || cleanIdent === 'buyer@agriflow.in' || cleanIdent === 'ananya') {
+      if (
+        cleanIdent === 'consumer' ||
+        cleanIdent === 'buyer' ||
+        cleanIdent === 'buyer@agriflow.in' ||
+        cleanIdent === 'ananya' ||
+        cleanIdent === 'ananya_buyer'
+      ) {
         await demoLogin('consumer');
         return { success: true, role: 'consumer' };
       }
-      if (cleanIdent === 'logistics' || cleanIdent === 'driver' || cleanIdent === 'logistics@agriflow.in' || cleanIdent === 'ismail') {
+      if (
+        cleanIdent === 'logistics' ||
+        cleanIdent === 'driver' ||
+        cleanIdent === 'transporter' ||
+        cleanIdent === 'logistics@agriflow.in' ||
+        cleanIdent === 'ismail' ||
+        cleanIdent === 'ismail_logistics'
+      ) {
         await demoLogin('logistics');
         return { success: true, role: 'logistics' };
       }
@@ -879,6 +923,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('agriflow_active_demo_role');
+      localStorage.removeItem('agriflow_farmer_auth');
+    }
     applyProfileState(null, null);
     router.push('/farmer/login');
   };
@@ -889,6 +937,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       // ignore
     }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('agriflow_active_demo_role');
+      localStorage.removeItem('agriflow_consumer_auth');
+    }
     applyProfileState(null, null);
     router.push('/consumer/login');
   };
@@ -898,6 +950,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
     } catch {
       // ignore
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('agriflow_active_demo_role');
+      localStorage.removeItem('agriflow_logistics_auth');
     }
     applyProfileState(null, null);
     router.push('/logistics/login');
@@ -937,6 +993,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Evict client storage
       if (typeof window !== 'undefined') {
+        localStorage.removeItem('agriflow_active_demo_role');
         localStorage.removeItem('agriflow_cart');
         localStorage.removeItem('agriflow_consumer_auth');
         localStorage.removeItem('agriflow_farmer_auth');
@@ -959,9 +1016,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         consumerUser,
         logisticsUser,
         currentProfile,
-        isAuthenticated: !!user || !!currentUser,
-        isConsumerAuthenticated: !!consumerUser || !!currentUser,
-        isLogisticsAuthenticated: !!logisticsUser || !!currentUser,
+        isAuthenticated: Boolean(user || currentUser?.role === 'farmer' || currentUser?.role === 'admin'),
+        isConsumerAuthenticated: Boolean(consumerUser || currentUser?.role === 'consumer' || currentUser?.role === 'admin'),
+        isLogisticsAuthenticated: Boolean(logisticsUser || user || consumerUser || currentUser),
         isLoading,
         login,
         register,

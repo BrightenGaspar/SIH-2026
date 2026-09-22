@@ -13,7 +13,7 @@ export default function ReturnLoadCard({ returnLoad }: ReturnLoadCardProps) {
   if (!returnLoad) return null;
 
   return (
-    <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-950/50 to-slate-900 border border-emerald-500/40 shadow-lg space-y-4">
+    <div className="p-6 rounded-3xl bg-slate-900 text-white border border-emerald-500/50 shadow-xl space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center text-xl flex-shrink-0">

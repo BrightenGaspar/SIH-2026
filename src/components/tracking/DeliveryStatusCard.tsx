@@ -45,16 +45,16 @@ export default function DeliveryStatusCard({
   const getBadgeColor = () => {
     switch (status) {
       case 'DELIVERED':
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+        return 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/40';
       case 'IN TRANSIT':
       case 'APPROACHING DESTINATION':
-        return 'bg-cyan-500/20 text-cyan-400 border-cyan-500/40';
+        return 'bg-cyan-100 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 border-cyan-300 dark:border-cyan-500/40';
       case 'ORDER CONFIRMED':
       case 'PICKUP SCHEDULED':
       case 'DRIVER ASSIGNED':
-        return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+        return 'bg-amber-100 dark:bg-amber-500/20 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-500/40';
       default:
-        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+        return 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/40';
     }
   };
 

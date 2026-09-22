@@ -780,6 +780,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               full_name: profileData.fullName,
               role: dbRole,
               phone: profileData.phone || '',
+              place: profileData.place || '',
+              area: profileData.area || '',
+              state: profileData.state || '',
+              district: profileData.district || '',
+              fpo_name: profileData.fpoName || '',
             },
           },
         });
@@ -837,6 +842,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (!authData.user) {
           throw new Error('Registration failed: No authenticated user created.');
+        }
+
+        // Supabase returns no session when email confirmation is enabled. The
+        // user exists, but profile writes are RLS-protected until they verify.
+        if (!authData.session) {
+          throw new Error(
+            'Account created. Please verify your email, then sign in to finish setup.'
+          );
         }
 
         targetUserId = authData.user.id;

@@ -82,76 +82,11 @@ export function useLiveProduce(): UseLiveProduceReturn {
     }
     fetchInitial();
 
-    // 2. Realtime WebSocket channel on public.produce
+    // 2. Realtime WebSocket channel on the canonical live table only.
+    // We intentionally do not subscribe to legacy public.produce because that can mix
+    // a second source of data into the buyer marketplace and show duplicate or stale entries.
     const channel = supabase
       .channel(`produce-live-${reconnectKey}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'produce' },
-        (payload: any) => {
-          if (!isMounted) return;
-
-          const eventType = payload.eventType;
-
-          if (eventType === 'DELETE') {
-            const deletedId = String(payload.old?.id);
-            setItems((prev) => prev.filter((p) => p.id !== deletedId));
-          } else {
-            const row = payload.new;
-            if (!row || !row.id) return;
-
-            const id = String(row.id);
-            const qty = row.quantity_kg != null ? Number(row.quantity_kg) : Number(row.quantity || 0);
-            const price = row.price_per_kg != null ? Number(row.price_per_kg) : Number(row.asking_price || 0);
-            const updatedAt = row.updated_at || row.created_at || new Date().toISOString();
-
-            const category = normalizeCategory(row.category, row.crop_name, row.variety);
-            const qualityGrade = (row.quality_grade || 'A').toUpperCase();
-
-            const updatedItem: MarketplaceProduceItem = {
-              id,
-              farmer_id: row.farmer_id,
-              crop_name: row.crop_name || 'Farm Harvest',
-              variety: row.variety || null,
-              category,
-              quality_grade: qualityGrade,
-              quantity_kg: qty,
-              price_per_kg: price,
-              location: row.location || 'Local FPO Hub',
-              harvest_date: row.harvest_date || null,
-              image_url: row.image_url || null,
-              updated_at: updatedAt,
-              created_at: row.created_at,
-              farmer_name: 'Verified Kisan Partner',
-              shelf_life_days: row.shelf_life_days ?? 7,
-              is_cold_chain: Boolean(
-                row.is_cold_chain ||
-                row.cold_chain_eligible ||
-                ['Vegetables', 'Fruits'].includes(category)
-              ),
-            };
-
-            // Trigger 1s "LIVE" pulse badge
-            pulseUpdatedId(id);
-
-            setItems((prev) => {
-              const existingIndex = prev.findIndex((p) => p.id === id);
-              let nextList: MarketplaceProduceItem[];
-
-              if (existingIndex >= 0) {
-                nextList = [...prev];
-                nextList[existingIndex] = updatedItem;
-              } else {
-                nextList = [updatedItem, ...prev];
-              }
-
-              return nextList
-                .filter((p) => p.quantity_kg > 0)
-                .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
-            });
-          }
-        }
-      )
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'produce_listings' },

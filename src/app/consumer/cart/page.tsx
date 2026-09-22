@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { MIN_BULK_ORDER_KG } from '@/types/consumer';
 import { useI18n } from '@/context/I18nContext';
 import { 
   ShoppingBag, 
@@ -55,6 +56,8 @@ export default function ConsumerCartPage() {
   }
 
   const farmerPercentage = total > 0 ? Math.round((estimatedFarmerRealization / total) * 100) : 0;
+  const meetsMinimumOrder = items.every(item => item.quantityKg >= MIN_BULK_ORDER_KG);
+  const belowMinimumItem = items.find(item => item.quantityKg < MIN_BULK_ORDER_KG);
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
@@ -169,6 +172,11 @@ export default function ConsumerCartPage() {
                 <span>Produce Sourcing Subtotal:</span>
                 <span className="font-bold text-zinc-900 dark:text-white">₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
+              {!meetsMinimumOrder && belowMinimumItem && (
+                <p className="text-rose-600 dark:text-rose-400 font-semibold">
+                  {belowMinimumItem.product.name} requires a minimum bulk quantity of {MIN_BULK_ORDER_KG} kg. Add {MIN_BULK_ORDER_KG - belowMinimumItem.quantityKg} kg more to continue.
+                </p>
+              )}
               <div className="flex justify-between items-center">
                 <span className="flex items-center gap-1">
                   <Truck className="w-3.5 h-3.5 text-cyan-500" />
@@ -207,7 +215,8 @@ export default function ConsumerCartPage() {
             <button
               type="button"
               onClick={() => router.push('/consumer/checkout')}
-              className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all duration-200"
+              disabled={!meetsMinimumOrder}
+              className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all duration-200 disabled:cursor-not-allowed disabled:bg-zinc-400 disabled:shadow-none"
             >
               Proceed to Delivery Checkout <ArrowRight className="w-4 h-4" />
             </button>

@@ -13,7 +13,7 @@ import { Modal } from '@/components/common/Modal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { produceSchema, ProduceFormData } from '@/lib/validators';
-import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud, AlertCircle } from 'lucide-react';
+import { Sprout, Plus, Filter, CheckCircle2, ShieldCheck, Image as ImageIcon, UploadCloud, AlertCircle, Trash2, Loader2 } from 'lucide-react';
 import { formatINR } from '@/lib/utils';
 
 export default function FarmerProducePage() {
@@ -27,6 +27,10 @@ export default function FarmerProducePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [produceToDelete, setProduceToDelete] = useState<Produce | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<ProduceFormData>({
     resolver: zodResolver(produceSchema),
@@ -159,6 +163,34 @@ export default function FarmerProducePage() {
     }
   };
 
+  const handleConfirmDelete = async () => {
+    if (!produceToDelete) return;
+    try {
+      setIsDeleting(true);
+      setDeleteError(null);
+
+      const result = await farmerService.deleteProduce(produceToDelete.id);
+      if (result && !result.success) {
+        throw new Error(result.error || 'Failed to delete produce listing');
+      }
+
+      setDeleteSuccess(`Listing "${produceToDelete.crop}" deleted successfully.`);
+      setProduceToDelete(null);
+
+      const refreshed = await farmerService.getProduceList();
+      setProduceList(refreshed || []);
+
+      setTimeout(() => {
+        setDeleteSuccess(null);
+      }, 4000);
+    } catch (err: any) {
+      console.error('Delete produce error:', err);
+      setDeleteError(err?.message || 'Could not delete produce listing. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const filtered = filterStatus === 'All'
     ? produceList
     : produceList.filter(p => p.status.toLowerCase() === filterStatus.toLowerCase());
@@ -180,6 +212,21 @@ export default function FarmerProducePage() {
         </Button>
       </div>
 
+      {/* Delete Success Alert Banner */}
+      {deleteSuccess && (
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+          <span className="font-semibold flex-1">{deleteSuccess}</span>
+          <button
+            type="button"
+            onClick={() => setDeleteSuccess(null)}
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs font-bold px-2 py-0.5 cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
         {['All', 'Active', 'Reserved', 'Sold', 'Expired'].map((status) => (
@@ -198,6 +245,13 @@ export default function FarmerProducePage() {
       </div>
 
       {/* Produce Grid */}
+      {deleteError && (
+        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          <span>{deleteError}</span>
+        </div>
+      )}
+
       {filtered.length === 0 ? (
         <Card className="text-center py-16">
           <Sprout className="w-12 h-12 mx-auto text-slate-400 mb-3" />
@@ -318,10 +372,25 @@ export default function FarmerProducePage() {
               </div>
 
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                <span className="text-slate-400">Total Lot Value:</span>
-                <span className="font-black text-slate-900 dark:text-white text-sm">
-                  {formatINR(item.quantity * item.expectedPrice)}
-                </span>
+                <div>
+                  <span className="text-slate-400 block text-[10px]">Total Lot Value:</span>
+                  <span className="font-black text-slate-900 dark:text-white text-sm">
+                    {formatINR(item.quantity * item.expectedPrice)}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setProduceToDelete(item);
+                    setDeleteError(null);
+                  }}
+                  className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  title={`Delete ${item.crop}`}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
+                </button>
               </div>
             </Card>
           ))}
@@ -499,6 +568,92 @@ export default function FarmerProducePage() {
           </div>
         </form>
       </Modal>
+
+      {/* Delete Produce Confirmation Modal */}
+      {produceToDelete && (
+        <Modal
+          isOpen={Boolean(produceToDelete)}
+          onClose={() => {
+            if (!isDeleting) {
+              setProduceToDelete(null);
+              setDeleteError(null);
+            }
+          }}
+          title="Delete Produce Listing"
+          subtitle="Permanently remove this crop listing from your inventory and the marketplace."
+        >
+          <div className="space-y-4">
+            {deleteError && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
+                <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span className="font-bold block text-rose-200">Deletion Failed</span>
+                  <span className="leading-relaxed">{deleteError}</span>
+                </div>
+              </div>
+            )}
+
+            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">Crop Name</span>
+                <span className="text-sm font-bold text-white">{produceToDelete.crop}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">Available Stock</span>
+                <span className="text-xs font-bold text-emerald-400">
+                  {(produceToDelete.availableQuantity ?? produceToDelete.quantity).toLocaleString()} {produceToDelete.unit}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">Expected Price</span>
+                <span className="text-xs font-semibold text-slate-200">
+                  {formatINR(produceToDelete.expectedPrice)}/{produceToDelete.unit}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-slate-400">Location</span>
+                <span className="text-xs text-slate-300 truncate max-w-[220px]">{produceToDelete.location}</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Are you sure you want to delete this listing? This action cannot be undone, and buyers will no longer be able to discover or purchase this crop.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={() => {
+                  setProduceToDelete(null);
+                  setDeleteError(null);
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isDeleting}
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 disabled:opacity-50 transition flex items-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Confirm Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
     </div>
   );

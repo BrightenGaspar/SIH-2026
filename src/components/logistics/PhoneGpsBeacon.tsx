@@ -23,6 +23,7 @@ import { Card } from '@/components/common/Card';
 import { Button } from '@/components/common/Button';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/context/I18nContext';
+import { supabase } from '@/lib/supabase';
 
 export interface PhoneGpsBeaconProps {
   tripId: string;
@@ -108,10 +109,15 @@ export default function PhoneGpsBeacon({
         timestamp: new Date(pos.timestamp).toISOString(),
       };
 
+      const { data: { session } } = await supabase.auth.getSession();
+
       const res = await fetch('/api/telemetry', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(session?.access_token
+            ? { Authorization: `Bearer ${session.access_token}` }
+            : {}),
         },
         body: JSON.stringify(payload),
       });

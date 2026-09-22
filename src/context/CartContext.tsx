@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { CartItem, ProductItem, BulkPriceTier } from '@/types/consumer';
+import { CartItem, ProductItem, BulkPriceTier, MIN_BULK_ORDER_KG } from '@/types/consumer';
 
 interface CartContextType {
   items: CartItem[];
@@ -67,7 +67,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         };
         return updated;
       } else {
-        const initialQty = Math.max(quantityKg, product.minOrderQuantityKg || 1);
+        const initialQty = Math.min(
+          product.availableQuantityKg,
+          Math.max(quantityKg, product.minOrderQuantityKg || MIN_BULK_ORDER_KG, MIN_BULK_ORDER_KG)
+        );
         return [
           ...prev,
           {
@@ -85,13 +88,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const updateQuantity = (productId: string, quantityKg: number) => {
-    if (quantityKg <= 0) {
+    if (quantityKg < MIN_BULK_ORDER_KG) {
       removeFromCart(productId);
       return;
     }
     setItems(prev => prev.map(item => {
       if (item.product.id === productId) {
-        const capped = Math.min(quantityKg, item.product.availableQuantityKg);
+        const capped = Math.min(
+          item.product.availableQuantityKg,
+          Math.max(quantityKg, MIN_BULK_ORDER_KG)
+        );
         return {
           ...item,
           quantityKg: capped,
@@ -120,7 +126,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(prev => prev.map(item => {
       if (item.product.id === productId) {
         const newQty = item.quantityKg - amountKg;
-        if (newQty <= 0) return null;
+        if (newQty < MIN_BULK_ORDER_KG) return null;
         return {
           ...item,
           quantityKg: newQty,

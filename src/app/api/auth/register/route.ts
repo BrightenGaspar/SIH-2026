@@ -55,6 +55,11 @@ export async function POST(request: NextRequest) {
           full_name: resolvedFullName,
           role: dbRole,
           phone: phone || '',
+          place: place || '',
+          area: area || '',
+          state: state || '',
+          district: district || '',
+          fpo_name: fpo_name || fpoName || '',
         },
       },
     });
@@ -97,6 +102,18 @@ export async function POST(request: NextRequest) {
           error: 'User creation failed: No user returned by auth provider',
         },
         { status: 500 }
+      );
+    }
+
+    if (!authData.session) {
+      return NextResponse.json(
+        {
+          success: true,
+          requiresEmailConfirmation: true,
+          message: 'Account created. Please verify your email before signing in.',
+          user: { id: user.id, email: user.email },
+        },
+        { status: 202 }
       );
     }
 

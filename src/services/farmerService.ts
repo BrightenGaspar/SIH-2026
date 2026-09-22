@@ -400,21 +400,26 @@ export const farmerService = {
   /**
    * Delete a produce item directly from public.produce
    */
-  async deleteProduce(id: string): Promise<boolean> {
-    const { error: prodErr } = await supabase
-      .from('produce')
-      .delete()
-      .eq('id', id);
-
+  async deleteProduce(id: string): Promise<{ success: boolean; error?: string }> {
     try {
-      await supabase.from('produce_listings').delete().eq('id', id);
-    } catch {}
+      const { error: prodErr } = await supabase
+        .from('produce')
+        .delete()
+        .eq('id', id);
 
-    if (prodErr) {
-      console.error('Supabase produce delete error:', prodErr.message);
-      return false;
+      try {
+        await supabase.from('produce_listings').delete().eq('id', id);
+      } catch {}
+
+      if (prodErr) {
+        console.error('Supabase produce delete error:', prodErr.message);
+        return { success: false, error: prodErr.message };
+      }
+      return { success: true };
+    } catch (err: any) {
+      console.error('deleteProduce error:', err);
+      return { success: false, error: err?.message || 'Failed to delete produce' };
     }
-    return true;
   },
 
   /**

@@ -31,6 +31,8 @@ export type ConsumerOrderStatus =
 export type RiskLevel = 'Low' | 'Medium' | 'High';
 export type RoadVehicleType = 'Tata Ace' | 'Tata 407 Reefer' | 'Mahindra Bolero Maxi Truck';
 
+export const MIN_BULK_ORDER_KG = 50;
+
 export type SupportedLanguage = 'en' | 'te' | 'ta' | 'ml' | 'hi' | 'bn' | 'mr';
 
 export interface ConsumerUser {

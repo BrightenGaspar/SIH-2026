@@ -9,6 +9,7 @@ import {
   BuyerType,
 } from '@/types/consumer';
 import { supabase } from '@/lib/supabase';
+import { MIN_BULK_ORDER_KG } from '@/types/consumer';
 import { normalizeCategory, inferProduceCategory, ProduceCategory } from '@/lib/categoryHelpers';
 
 export interface MarketplaceProduceItem {
@@ -467,6 +468,10 @@ export const consumerService = {
       throw new Error('Invalid order: Missing produce listing identifier.');
     }
 
+    if (quantity < MIN_BULK_ORDER_KG) {
+      throw new Error(`Bulk orders require a minimum quantity of ${MIN_BULK_ORDER_KG} kg.`);
+    }
+
     // Ensure listing is mirrored in produce_listings if it originated from produce table
     try {
       const { data: listingCheck } = await supabase
@@ -526,6 +531,11 @@ export const consumerService = {
         rpcOrderId = data.order_id;
         rpcTotalAmount = Number(data.total_amount);
       } else if (error && !error.message?.includes('Authentication required') && error.code !== '42501') {
+        if (/produce listing not found/i.test(error.message)) {
+          throw new Error(
+            'This produce listing is no longer available. It may have been deleted or purchased by another buyer. Please remove it from your cart and choose another listing.'
+          );
+        }
         const match = error.message.match(/Available:\s*([0-9.]+)/i);
         if (match) {
           throw new Error(`Only ${match[1]} kg is currently available. Please reduce your quantity.`);

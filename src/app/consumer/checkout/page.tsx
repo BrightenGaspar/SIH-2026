@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { MIN_BULK_ORDER_KG } from '@/types/consumer';
 import { useAuth } from '@/context/AuthContext';
 import { useI18n } from '@/context/I18nContext';
 import { consumerService } from '@/services/consumerService';
@@ -62,6 +63,11 @@ export default function ConsumerCheckoutPage() {
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    const belowMinimumItem = items.find(item => item.quantityKg < MIN_BULK_ORDER_KG);
+    if (belowMinimumItem) {
+      setCheckoutError(`${belowMinimumItem.product.name} requires a minimum bulk quantity of ${MIN_BULK_ORDER_KG} kg.`);
+      return;
+    }
     setIsProcessing(true);
     setCheckoutError(null);
 

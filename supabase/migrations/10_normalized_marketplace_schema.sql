@@ -467,17 +467,3 @@ BEGIN
   END IF;
 END $$;
 
--- ------------------------------------------------------------------------------
--- 11. IDEMPOTENT DEMO SEED DATA (ON CONFLICT DO NOTHING)
--- ------------------------------------------------------------------------------
-INSERT INTO public.produce_listings (
-  id, produce_name, variety, category, total_quantity, available_quantity,
-  price_per_unit, unit, harvest_date, quality_grade, brix_level, shelf_life_days,
-  location_address, status
-)
-VALUES
-  ('a1111111-1111-4111-8111-111111111111', 'Onion (Nashik Red)', 'Garwa Selection', 'vegetables', 1000, 1000, 28, 'kg', CURRENT_DATE, 'A', 5.2, 14, 'Nashik APMC Hub, Maharashtra', 'active'),
-  ('b2222222-2222-4222-8222-222222222222', 'Tomato (Hybrid Desi)', 'US-440 Desi Selection', 'vegetables', 2500, 2500, 35, 'kg', CURRENT_DATE, 'A', 4.8, 10, 'Shadnagar Farm Hub, Telangana', 'active'),
-  ('c3333333-3333-4333-8333-333333333333', 'Green Chilli (G4 Teja)', 'Guntur Special G4', 'spices', 800, 800, 65, 'kg', CURRENT_DATE, 'A', 6.0, 12, 'Guntur Mirchi Yard, Andhra Pradesh', 'active'),
-  ('d4444444-4444-4444-8444-444444444444', 'Potato (Kufri Jyoti)', 'Table Premium', 'vegetables', 3000, 3000, 22, 'kg', CURRENT_DATE, 'A', 4.5, 30, 'Hassan Cold Hub, Karnataka', 'active')
-ON CONFLICT (id) DO NOTHING;

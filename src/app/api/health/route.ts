@@ -18,7 +18,7 @@ export async function GET() {
         auth: { persistSession: false },
       });
       const queryStart = Date.now();
-      const { error } = await client.from('public_produce_catalog').select('id').limit(1);
+      const { error } = await client.from('produce_listings').select('id').limit(1);
       latencyMs = Date.now() - queryStart;
       if (!error) {
         databaseConnected = true;

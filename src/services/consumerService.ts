@@ -545,6 +545,11 @@ export const consumerService = {
 
     if (error) {
       console.error('atomic_checkout_order RPC error:', error.message);
+      if (/produce listing not found/i.test(error.message)) {
+        throw new Error(
+          'This produce listing is no longer available. It may have been deleted or purchased by another buyer. Please remove it from your cart and choose another listing.'
+        );
+      }
       // Clean, user-friendly message for stock exhaustion matching prompt requirements
       const match = error.message.match(/Available:\s*([0-9.]+)/i);
       if (match) {

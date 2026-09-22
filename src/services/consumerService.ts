@@ -9,6 +9,7 @@ import {
   BuyerType,
 } from '@/types/consumer';
 import { supabase } from '@/lib/supabase';
+import { MIN_BULK_ORDER_KG } from '@/types/consumer';
 import { normalizeCategory, inferProduceCategory, ProduceCategory } from '@/lib/categoryHelpers';
 
 export interface MarketplaceProduceItem {
@@ -492,6 +493,10 @@ export const consumerService = {
 
     if (!listingId) {
       throw new Error('Invalid order: Missing produce listing identifier.');
+    }
+
+    if (quantity < MIN_BULK_ORDER_KG) {
+      throw new Error(`Bulk orders require a minimum quantity of ${MIN_BULK_ORDER_KG} kg.`);
     }
 
     // Ensure listing is mirrored in produce_listings if it originated from produce table
